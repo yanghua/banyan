@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * generic context. contains both general object
  * and those object that it owns resource that must be destroyed
  */
-class GenericContext {
+public class GenericContext {
 
     @NotNull
     private ZooKeeper             zooKeeper;

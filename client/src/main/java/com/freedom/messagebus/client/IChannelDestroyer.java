@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * the interface of channel destroyer used to destroy the channel
  */
-interface IChannelDestroyer {
+public interface IChannelDestroyer {
 
     /**
      * destroy the channel

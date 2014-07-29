@@ -26,7 +26,7 @@ public class LongLiveZookeeper {
 
     private static ZooKeeper createZKClient() {
         try {
-            return new ZooKeeper(host + port, 30000, new SessionWatcher());
+            return new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }

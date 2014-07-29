@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * the message context, mostly used in handler chain
  */
-class MessageContext {
+public class MessageContext {
 
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 

@@ -38,10 +38,10 @@ public class TestProduceAndConsumer extends TestCase {
     }
 
     public void testSimpleProduceAndConsume() throws Exception {
-        Messagebus client = Messagebus.getInstance();
-        client.setZkHost("localhost");
-        client.setZkPort(2181);
-        client.open();
+//        Messagebus client = Messagebus.getInstance();
+//        client.setZkHost("localhost");
+//        client.setZkPort(2181);
+//        client.open();
 
         //start consume
         appkey = java.util.UUID.randomUUID().toString();
