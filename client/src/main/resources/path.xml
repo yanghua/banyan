@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<path p="/" xmlns="http://com.freedom.messagebus">
+    <path p="/proxy">
+        <path p="/proxy/log">
+            <path p="/proxy/log/console"/>
+            <path p="/proxy/log/file"/>
+        </path>
+        <path p="/proxy/message">
+            <path p="/proxy/message/sys">
+                <path p="/proxy/message/sys/notification"/>
+            </path>
+            <path p="/proxy/message/business"></path>
+        </path>
+    </path>
+</path>

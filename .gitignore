@@ -1,0 +1,8 @@
+.idea/*
+.DS_Store
+*/target/*
+*.iml
+META-INF/*
+*.rdb
+common/*
+manager/*
