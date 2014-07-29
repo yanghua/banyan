@@ -226,6 +226,34 @@ client.getConsumer()
 closer.closeConsumer();
 ```
 
+(2)IProducer
+
+关于生产消息的接口，目前开放了四个接口方法：
+
+* 单个消息的简单发送
+* 单个消息的事务型发送
+* 批量消息的简单发送
+* 批量消息的事务型发送
+
+这里包含两个关键参考点：（1）是否是批量发送；（2）是否为事务型发送
+
+是否批量发送：这里开放单个消息的发送接口，主要是为了客户端调用方便，这样如果只发送一条消息就没有必要构建一个消息数组（虽然在处理的过程中还是会被封装为数组，这也是为了处理逻辑上的一致简洁性），但如果发送前已经明确有超过一条消息即将发送，还是推荐使用批量发送接口，这会省去获取Channel的开销，因为即便采用pool的机制，也还是有个获取的过程
+
+是否为事务型发送：这里为了某些必须确认消息是否送达的安全性较高的场景而提供，事实上如果消息的安全性没有那么重要（事实上消息中间件server端的持久化机制已经给安全性提供了基本的保障），**不推荐** 使用事务型发送接口，因为它将对每条发送的消息给予应答确认。
+
+(3)IConsumer
+
+消费消息的接口比较简单，只有一个。值得一提的是，在调用该接口的时候，需要传递入一个消息处理的回调。该接口即为 `IMessageReceiverListener` ，它包含有一个onMessage方法，在获取到消息之后，将触发该方法的调用，它提供给业务处理方两个参数：
+
+* Message: 消息对象的顶层语义接口
+* MessageFormat: 消息的格式
+
+通过这两个对象，就足以还原并获取真实的消息。（根据消息格式，对 `Message` 的实例进行强制向下转型到特定的消息格式对象），具体请参看示例调用代码。
+
+
+
+
+
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/message-inherits.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/carry-inherits.png
 [3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/message-formatter-inherits.png
