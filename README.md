@@ -9,11 +9,12 @@
 
 继承关系如下图：
 
+![img 1][1]
 
 
 ##调用示例
 
-```
+```java
 public void testSimpleProduceAndConsume() throws Exception {
         Messagebus client = Messagebus.getInstance();
         client.setZkHost("localhost");
@@ -68,3 +69,6 @@ public void testSimpleProduceAndConsume() throws Exception {
     }    
     
 ```
+
+
+[1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/message-inherits.png
