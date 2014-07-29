@@ -1,3 +1,6 @@
+#议题
+[名词解释](#名词解释)
+
 ##名词解释
 - message carry: 消息的produce / consume 被抽象为carry(表示消息的 **搬运** )
 - message format: object/text等，注意此处没有称之为message type，请注意区分
@@ -163,9 +166,51 @@ public void testSimpleProduceAndConsume() throws Exception {
 
         client.close();
     }  
-    
 ```
 
+
+###关于调用示例的说明
+（1）Messagebus
+
+代表客户端的关键对象，其被实现为单例模式。因此获得其实例，需要调用其静态方法：
+
+
+```
+Messagebus client = Messagebus.getInstance();
+```
+
+在前面提及过，客户端通过zookeeper来同步远程配置。所以，在获得Messagebus的实例之后，关键的一步就是设置zookeeper的host以及port:
+
+```
+client.setZkHost("localhost");
+client.setZkPort(2181);
+```
+注意，如果不显式设置，则Messagebus则分别对这两个字段采用 **localhost** 及 **2181** 进行初始化。
+
+设置完必要的属性之后，需要调用Messagebus的实例来初始化关键对象：
+
+```
+client.open();
+```
+
+这些关键对象对于消息的carry至关重要，但从另一方面来说他们也都是“昂贵资源”。所以，在确认不再carry消息后，需要尽快释放这些资源：
+
+```
+client.close();
+```
+
+通过Messagebus的实例，可以获得producer以及consumer：
+
+```
+client.getProducer()
+client.getConsumer()
+```
+
+在生产消息的时候需要构建各种格式的消息对象，在消费消息的时候，有一个值得注意的地方。由于消息的生产和消费对于程序的实现模型有着本质的不同（通常，生产是瞬时性的，而消费是long event loop的），在消费的时候因为内部在一个独立的线程上构建有一个event loop，如果不想继续消费，需要关掉它。这里是通过一个 ***IConsumerCloser*** 实现的。在消费的时候，会将构建有event loop的线程的控制权（说白了就是它的引用）下放给该接口的实现者（该接口定义了一个closeConsumer方法），通过该接口的实例上调用closeConsumer来关闭consumer:
+
+```
+closer.closeConsumer();
+```
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/message-inherits.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/carry-inherits.png
