@@ -47,7 +47,8 @@ public class TestProduceAndConsumer extends TestCase {
         appkey = java.util.UUID.randomUUID().toString();
         msgType = "business";
         String queueName = "oa.sms";
-        IConsumerCloser closer = client.getConsumer().consume(appkey, msgType, queueName, new IMessageReceiveListener() {
+        IConsumerCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
+                                                              new IMessageReceiveListener() {
             @Override
             public void onMessage(Message msg, MessageFormat format) {
                 switch (format) {
@@ -60,8 +61,7 @@ public class TestProduceAndConsumer extends TestCase {
                     case Object: {
                         ObjectMessage objMsg = (ObjectMessage) msg;
                         SimpleObjectMessagePOJO realObj = (SimpleObjectMessagePOJO) objMsg.getObject();
-
-                        logger.error("received message : " + realObj.getTxt());
+                        logger.debug("received message : " + realObj.getTxt());
                     }
                     break;
 
