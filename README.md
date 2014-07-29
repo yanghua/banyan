@@ -1,5 +1,19 @@
-#议题
+#提纲
 [名词解释](#名词解释)
+
+[消息传输](#消息传输)
+
+[消息格式](#消息格式)
+
+[消息的链式处理](#消息的链式处理)
+
+[消息处理的上下文对象](#消息处理的上下文对象)
+
+[Channel的对象池](#Channel的对象池)
+
+[远程配置与管控](#远程配置与管控)
+
+[调用示例](###调用示例)
 
 ##名词解释
 - message carry: 消息的produce / consume 被抽象为carry(表示消息的 **搬运** )
@@ -179,7 +193,7 @@ public void testSimpleProduceAndConsume() throws Exception {
 Messagebus client = Messagebus.getInstance();
 ```
 
-在前面提及过，客户端通过zookeeper来同步远程配置。所以，在获得Messagebus的实例之后，关键的一步就是设置zookeeper的host以及port:
+在前面提及过，客户端通过zookeeper来同步远程配置。所以，在获得 `Messagebus` 的实例之后，关键的一步就是设置zookeeper的host以及port:
 
 ```
 client.setZkHost("localhost");
@@ -187,7 +201,7 @@ client.setZkPort(2181);
 ```
 注意，如果不显式设置，则Messagebus则分别对这两个字段采用 **localhost** 及 **2181** 进行初始化。
 
-设置完必要的属性之后，需要调用Messagebus的实例来初始化关键对象：
+设置完必要的属性之后，需要调用 `Messagebus` 的实例来初始化关键对象：
 
 ```
 client.open();
@@ -199,7 +213,7 @@ client.open();
 client.close();
 ```
 
-通过Messagebus的实例，可以获得producer以及consumer：
+通过 `Messagebus` 的实例，可以获得producer以及consumer，他们也是carry消息的真实对象：
 
 ```
 client.getProducer()
