@@ -1,5 +1,6 @@
 package com.freedom.messagebus.client.core.config;
 
+import com.freedom.messagebus.client.core.classLoader.RemoteClassLoader;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
@@ -97,17 +98,22 @@ public class ConfigManager {
             configProperty = new Properties();
             poolProperties = new Properties();
 
-            //TODO:test
-            File file = new File((this.getClass().getClassLoader().getResource("pool.properties")).toURI());
-            byte[] fileBytes = CommonUtil.getBytesFromFile(file);
-            zooKeeper.setData("/proxy", fileBytes, 19);
+            if (!this.zooKeeper.getState().isAlive())
+                throw new RuntimeException("zookeeper is not alive");
 
-            byte[] poolData = zooKeeper.getData("/proxy", false, null);
-            ByteArrayInputStream bais = new ByteArrayInputStream(poolData);
-            poolProperties.load(bais);
+            this.initWithRemoteConfig();
+
+            //TODO:test
+//            File file = new File((this.getClass().getClassLoader().getResource("pool.properties")).toURI());
+//            byte[] fileBytes = CommonUtil.getBytesFromFile(file);
+//            zooKeeper.setData("/proxy", fileBytes, 19);
+//
+//            byte[] poolData = zooKeeper.getData("/proxy", false, null);
+//            ByteArrayInputStream bais = new ByteArrayInputStream(poolData);
+//            poolProperties.load(bais);
 
             configProperty.load(this.getClass().getClassLoader().getResourceAsStream("config.properties"));
-//            poolProperties.load(this.getClass().getClassLoader().getResourceAsStream("pool.properties"));
+            poolProperties.load(this.getClass().getClassLoader().getResourceAsStream("pool.properties"));
 
             //parse
             List<HandlerModel> pHandlerModels = parseHandlers("produce");
@@ -118,12 +124,8 @@ public class ConfigManager {
             consumerHandlerModels = Collections.unmodifiableList(cHandlerModels);
 
             //box
-            List<AbstractHandler> pHandlerChain = initHandlers(MessageCarryType.PRODUCE);
-            List<AbstractHandler> cHandlerChain = initHandlers(MessageCarryType.CONSUME);
-
-            //changed to unmodifiable
-            produceHandlerChain = Collections.unmodifiableList(pHandlerChain);
-            consumerHandlerChain = Collections.unmodifiableList(cHandlerChain);
+            produceHandlerChain = initHandlers(MessageCarryType.PRODUCE);
+            consumerHandlerChain = initHandlers(MessageCarryType.CONSUME);
 
             if (logger.isInfoEnabled()) {
                 printHandlerChain(MessageCarryType.PRODUCE);
@@ -145,16 +147,25 @@ public class ConfigManager {
         } catch (IOException e) {
             logger.error("[init] occurs a IOException : " + e.getMessage());
             return false;
-        } catch (KeeperException e) {
-            logger.error("[init] occurs a KeeperException : " + e.getMessage());
-            return false;
-        } catch (InterruptedException e) {
-            logger.error("[init] occurs a InterruptedException : " + e.getMessage());
-            return false;
-        } catch (URISyntaxException e) {
-            logger.error("[init] occurs a URISyntaxException : " + e.getMessage());
-            return false;
         }
+//        catch (KeeperException e) {
+//            logger.error("[init] occurs a KeeperException : " + e.getMessage());
+//            return false;
+//        } catch (InterruptedException e) {
+//            logger.error("[init] occurs a InterruptedException : " + e.getMessage());
+//            return false;
+//        } catch (URISyntaxException e) {
+//            logger.error("[init] occurs a URISyntaxException : " + e.getMessage());
+//            return false;
+//        }
+    }
+
+    private void initWithLocalConfig() {
+
+    }
+
+    private void initWithRemoteConfig() {
+
     }
 
     @NotNull
@@ -185,6 +196,27 @@ public class ConfigManager {
     @NotNull
     public Map<String, RuleModel> getQueueNameRules() {
         return queueNameRules;
+    }
+
+    public void updateHandlerChain(String path, byte[] data) {
+        //TODO:test
+        String binaryname = "com.freedom.messagebus.client.handler.produce.MessageSizeValidator";
+        RemoteClassLoader rcl = new RemoteClassLoader(data);
+        AbstractHandler remoteHandler = null;
+        try {
+            Class clazz = rcl.loadClass(binaryname);
+            remoteHandler = (AbstractHandler)clazz.newInstance();
+
+            //add new handler
+            this.produceHandlerChain.add(2, remoteHandler);
+        } catch (ClassNotFoundException e) {
+            logger.error("[updateHandlerChain] occurs a ClassNotFoundException : " + e.getMessage());
+        } catch (InstantiationException e) {
+            logger.error("[updateHandlerChain] occurs a InstantiationException : " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            logger.error("[updateHandlerChain] occurs a IllegalAccessException : " + e.getMessage());
+        }
+
     }
 
     @NotNull

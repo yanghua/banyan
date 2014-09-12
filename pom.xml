@@ -12,6 +12,7 @@
         <module>client</module>
         <module>manager</module>
         <module>common</module>
+        <module>managesystem</module>
     </modules>
     <name>a message bus</name>
 
@@ -20,7 +21,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
 
@@ -86,12 +87,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- apache zookeeper -->
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.3.4</version>
-        </dependency>
+
 
     </dependencies>
 

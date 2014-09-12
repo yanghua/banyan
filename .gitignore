@@ -4,5 +4,3 @@
 *.iml
 META-INF/*
 *.rdb
-common/*
-manager/*

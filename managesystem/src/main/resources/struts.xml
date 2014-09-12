@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <constant name="struts.devMode" value="true" />
+
+    <!--<constant name="struts.action.extension" value="xhtml,xml,json,action" />-->
+    <!--<constant name="struts.mapper.prefixMapping" value="/rest:rest,:struts" />-->
+
+    <!-- for restful api -->
+    <!--<constant name="struts.mapper.class" value="rest" />-->
+    <!--<constant name="struts.convention.action.suffix" value="Controller" />-->
+    <!--<constant name="struts.convention.action.mapAllMatches" value="true" />-->
+    <!--<constant name="struts.convention.default.parent.package" value="rest-default" />-->
+    <!--<constant name="struts.convention.package.locators" value="monitor" />-->
+
+    <include file="struts-default.xml" />
+
+    <package name="managesystem" extends="struts-default">
+
+        <interceptors>
+            <interceptor-stack name="appDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appDefaultStack" />
+
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception"
+                               result="error" />
+        </global-exception-mappings>
+
+        <action name="" class="com.freedom.managesystem.action.global.IndexAction" method="execute">
+            <result type="freemarker">/WEB-INF/page/index.ftl</result>
+        </action>
+
+        <action name="index" class="com.freedom.managesystem.action.global.IndexAction" method="execute">
+            <result type="freemarker">/WEB-INF/page/index.ftl</result>
+        </action>
+
+
+        <!--<action name="*_*" class="com.freedom.managesystem.action.maintain.{0}Action" method="{1}">-->
+            <!--<result name="success">/success.jsp</result>-->
+            <!--<result name="error">/error.jsp</result>-->
+        <!--</action>-->
+
+        <action name="*_*" class="com.freedom.managesystem.action.monitor.{1}Action" method="{2}">
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
+
+        <!--<action name="*_*" class="com.freedom.managesystem.action.alarm.{0}Action" method="{1}">-->
+            <!--<result name="success">/success.jsp</result>-->
+            <!--<result name="error">/error.jsp</result>-->
+        <!--</action>-->
+    </package>
+</struts>

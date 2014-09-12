@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freedom.managesystem.dao.ConfigMapper">
+    <insert id="save" parameterType="Config" >
+        INSERT INTO CONFIG("KEY", "VALUE") values (#{key}, #{value})
+    </insert>
+    <select id="find" parameterType="long" resultType="Config">
+        SELECT * FROM CONFIG WHERE GENERATED_ID = #{generatedId}
+    </select>
+    <update id="update" parameterType="Config">
+        UPDATE CONFIG SET "VALUE"=#{value} WHERE "KEY"=#{key}
+    </update>
+    <delete id="delete" parameterType="long">
+        DELETE FROM CONFIG WHERE GENERATED_ID = #{generatedId}
+    </delete>
+</mapper>

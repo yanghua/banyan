@@ -74,19 +74,30 @@ public class Messagebus {
     public void open() throws MessagebusConnectedFailedException {
         //load class
         this.zookeeper = LongLiveZookeeper.getZKInstance(this.getZkHost(), this.getZkPort());
+
+        if (!this.zookeeper.getState().isAlive())
+            throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
+
         this.configManager = ConfigManager.getInstance(this.zookeeper);
         int pathNum = this.configManager.getPaths().size();
         LongLiveZookeeper.watchPaths(configManager.getPaths().toArray(new String[pathNum]),
                                      new IConfigChangedListener() {
                                          @Override
-                                         public void onChanged(String path, byte[] newData, Watcher.Event.EventType eventType) {
+                                         public void onChanged(String path,
+                                                               byte[] newData,
+                                                               Watcher.Event.EventType eventType,
+                                                               ConfigManager cfManager) {
                                              logger.debug("path : " + path + " has changed!");
+
+                                             if (path.equals("/testRemoteHandler"))
+                                                cfManager.updateHandlerChain(path, newData);
                                          }
                                      });
 
         this.initConnection();
 
-        this.useChannelPool = Boolean.valueOf(configManager.getConfigProperty().getProperty("messagebus.client.useChannelPool"));
+        this.useChannelPool =
+            Boolean.valueOf(configManager.getConfigProperty().getProperty("messagebus.client.useChannelPool"));
         //if use channel pool
         if (this.useChannelPool) {
             this.initChannelPool();

@@ -131,7 +131,8 @@ public class LongLiveZookeeper {
                         logger.debug("NodeDataChanged : " + path);
                         byte[] data = this.zooKeeper.getData(path, false, null);
                         logger.info("data is : " + new String(data));
-                        this.listener.onChanged(path, data, watchedEvent.getType());
+                        this.listener.onChanged(path, data, watchedEvent.getType(),
+                                                ConfigManager.getInstance(this.zooKeeper));
                         break;
 
                     case NodeCreated:

@@ -1,14 +1,22 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.message.Message;
 import com.freedom.messagebus.client.core.message.ObjectMessage;
 import com.freedom.messagebus.client.core.message.TextMessage;
 import com.freedom.messagebus.client.model.MessageFormat;
 import com.freedom.messagebus.client.model.message.ObjectMessagePOJO;
 import com.freedom.messagebus.client.model.message.TextMessagePOJO;
+import com.freedom.messagebus.common.CommonUtil;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.zookeeper.ZooKeeper;
+import sun.applet.AppletListener;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: yanghua
@@ -20,17 +28,21 @@ public class TestProduceAndConsumer extends TestCase {
 
     private static final Log logger = LogFactory.getLog(TestProduceAndConsumer.class);
 
-
+    private ZooKeeper zooKeeper;
     private Messagebus client;
 
     private String appkey;
     private String msgType;
 
+    private String host = "115.29.96.85";
+    private int port = 2181;
+
     public void setUp() throws Exception {
         client = Messagebus.getInstance();
-        client.setZkHost("localhost");
-        client.setZkPort(2181);
+        client.setZkHost(host);
+        client.setZkPort(port);
         client.open();
+        zooKeeper = LongLiveZookeeper.getZKInstance(host, port);
     }
 
     public void tearDown() throws Exception {
@@ -38,14 +50,10 @@ public class TestProduceAndConsumer extends TestCase {
     }
 
     public void testSimpleProduceAndConsume() throws Exception {
-//        Messagebus client = Messagebus.getInstance();
-//        client.setZkHost("localhost");
-//        client.setZkPort(2181);
-//        client.open();
-
         //start consume
-        appkey = java.util.UUID.randomUUID().toString();
+//        appkey = java.util.UUID.randomUUID().toString();
         msgType = "business";
+        appkey = "kobe";
         String queueName = "oa.sms";
         IConsumerCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
                                                               new IMessageReceiveListener() {
@@ -85,6 +93,20 @@ public class TestProduceAndConsumer extends TestCase {
 
         //sleep for checking the result
         Thread.sleep(10000);
+
+        //add remote handler
+        File classFile = new File(client.getClass().getClassLoader().getResource("MessageSizeValidator.class").toURI());
+        zooKeeper.setData("/testRemoteHandler", CommonUtil.getBytesFromFile(classFile), 6);
+
+        TimeUnit.SECONDS.sleep(20);
+
+
+        //produce again
+        client.getProducer().produce(msg, MessageFormat.Text, appkey, queueName, msgType);
+
+        //sleep for checking the result
+        Thread.sleep(30000);
+
         closer.closeConsumer();
 
         client.close();
