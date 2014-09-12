@@ -11,7 +11,5 @@
         <!--<typeAlias type="" alias="" />-->
     <!--</typeAliases>-->
 
-    <!--<mappers>-->
-        <!--<mapper resource="com/freedom.managesystem/dao/ConfigMapper.xml" />-->
-    <!--</mappers>-->
+
 </configuration>
