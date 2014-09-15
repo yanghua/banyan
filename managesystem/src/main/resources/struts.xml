@@ -5,16 +5,8 @@
         "http://struts.apache.org/dtds/struts-2.3.dtd">
 <struts>
     <constant name="struts.devMode" value="true" />
-
-    <!--<constant name="struts.action.extension" value="xhtml,xml,json,action" />-->
-    <!--<constant name="struts.mapper.prefixMapping" value="/rest:rest,:struts" />-->
-
-    <!-- for restful api -->
-    <!--<constant name="struts.mapper.class" value="rest" />-->
-    <!--<constant name="struts.convention.action.suffix" value="Controller" />-->
-    <!--<constant name="struts.convention.action.mapAllMatches" value="true" />-->
-    <!--<constant name="struts.convention.default.parent.package" value="rest-default" />-->
-    <!--<constant name="struts.convention.package.locators" value="monitor" />-->
+    <constant name="struts.i18n.encoding" value="utf-8" />
+    <constant name="struts.enable.SlashesInActionNames" value="true" />
 
     <include file="struts-default.xml" />
 
@@ -40,28 +32,21 @@
                                result="error" />
         </global-exception-mappings>
 
-        <action name="" class="com.freedom.managesystem.action.global.IndexAction" method="execute">
-            <result type="freemarker">/WEB-INF/page/index.ftl</result>
+        <action name="" class="com.freedom.managesystem.action.global.IndexAction" method="index">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
 
-        <action name="index" class="com.freedom.managesystem.action.global.IndexAction" method="execute">
-            <result type="freemarker">/WEB-INF/page/index.ftl</result>
+        <action name="index" class="com.freedom.managesystem.action.global.IndexAction" method="index">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
 
-
-        <!--<action name="*_*" class="com.freedom.managesystem.action.maintain.{0}Action" method="{1}">-->
-            <!--<result name="success">/success.jsp</result>-->
-            <!--<result name="error">/error.jsp</result>-->
-        <!--</action>-->
-
-        <action name="*_*" class="com.freedom.managesystem.action.monitor.{1}Action" method="{2}">
+        <action name="/*/*/*" class="com.freedom.managesystem.action.{1}.{2}Action" method="{3}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
 
-        <!--<action name="*_*" class="com.freedom.managesystem.action.alarm.{0}Action" method="{1}">-->
-            <!--<result name="success">/success.jsp</result>-->
-            <!--<result name="error">/error.jsp</result>-->
-        <!--</action>-->
     </package>
+
+
 </struts>

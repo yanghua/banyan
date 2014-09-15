@@ -1,0 +1,68 @@
+html {
+background:#eee;
+}
+
+body {
+/*text-align:center;*/
+font-size:small;
+font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+padding:0;
+}
+
+article,aside,figure,figure img,figcaption,hgroup,footer,header,nav,section,video,object,output {
+display:block;
+}
+
+#container {
+text-align:left;
+background:#fff;
+border:1px solid #ccc;
+-webkit-box-shadow:rgba(0,0,0,0.2) 0 0 5px;
+-moz-box-shadow:rgba(0,0,0,0.2) 0 0 5px;
+-o-box-shadow:rgba(0,0,0,0.2) 0 0 5px;
+box-shadow:rgba(0,0,0,0.2) 0 0 5px;
+width:640px;
+margin:0 auto 0px;
+}
+
+form.wufoo {
+position:relative;
+margin:10px 14px 0;
+padding:0 0 10px;
+}
+
+#logo {
+min-height:0;
+background-color:#dedede;
+text-indent:-9000px;
+text-decoration:none;
+margin:0;
+padding:0;
+}
+
+#logo a {
+min-height:40px;
+height:40px;
+display:block;
+/*background:url(../images/wflogo.png) no-repeat left top;*/
+overflow:hidden;
+}
+
+* html #logo a {
+_background-image:none;
+/*_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../images/wflogo.png",sizingMethod="crop");*/
+}
+
+img,a img {
+border:none;
+-ms-interpolation-mode:bicubic;
+}
+
+.hide,.cloak div,.cloak span,.likert.cloak tbody,.likert.cloak thead {
+display:none!important;
+}
+
+.likert.cloak table {
+border:none;
+}
+

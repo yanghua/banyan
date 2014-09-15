@@ -1,3 +1,4 @@
+<script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-6-10/esl.js"></script>
 <script type="text/javascript">
     // 路径配置
     require.config({

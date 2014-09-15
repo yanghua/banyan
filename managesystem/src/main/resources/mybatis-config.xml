@@ -3,13 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <settings>
-        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="false"/>
         <setting name="aggressiveLazyLoading" value="false" />
     </settings>
-
-    <!--<typeAliases>-->
-        <!--<typeAlias type="" alias="" />-->
-    <!--</typeAliases>-->
-
-
 </configuration>

@@ -2,8 +2,8 @@
     <div class="lm01"><img class="peptx" src="../../resources/image/tximg.jpg"/>
         <div class="pepdet">
             <p class="pepname">李小雅</p>
-            <p>李小雅</p>
-            <p>江苏话务一部三组</p>
+            <p>开放平台事业部</p>
+            <p>消息总线组</p>
         </div>
         <div class="clear"></div>
     </div>
