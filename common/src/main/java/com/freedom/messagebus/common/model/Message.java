@@ -2,6 +2,7 @@ package com.freedom.messagebus.common.model;
 
 import java.util.Map;
 
+@Deprecated
 /**
  * Desc: the entity of message. encapsulated message-protocol
  * User: yanghua

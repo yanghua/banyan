@@ -10,9 +10,10 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>client</module>
-        <module>manager</module>
+        <module>server</module>
         <module>common</module>
         <module>managesystem</module>
+        <module>interactor-component</module>
     </modules>
     <name>a message bus</name>
 
@@ -93,6 +94,17 @@
 
     <build>
         <finalName>messagebus</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 

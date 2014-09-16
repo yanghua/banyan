@@ -2,15 +2,20 @@ package com.freedom.messagebus.common.message.messageBody;
 
 import com.freedom.messagebus.common.message.IMessageBody;
 
-public class AppMessageBody implements IMessageBody {
+import java.io.Serializable;
 
-    private String messageBody;
+public class AppMessageBody implements IMessageBody,Serializable {
 
-    public String getMessageBody() {
+    private byte[] messageBody;
+
+    public AppMessageBody() {
+    }
+
+    public byte[] getMessageBody() {
         return messageBody;
     }
 
-    public void setMessageBody(String messageBody) {
+    public void setMessageBody(byte[] messageBody) {
         this.messageBody = messageBody;
     }
 }

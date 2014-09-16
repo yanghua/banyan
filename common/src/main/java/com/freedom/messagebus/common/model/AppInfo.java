@@ -1,9 +1,11 @@
 package com.freedom.messagebus.common.model;
 
+import java.io.Serializable;
+
 /**
  * app info
  */
-public class AppInfo extends BaseModel {
+public class AppInfo implements Serializable {
 
     private String appId;
 

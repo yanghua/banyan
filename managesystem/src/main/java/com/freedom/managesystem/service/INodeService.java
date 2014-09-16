@@ -1,6 +1,6 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.Node;
+import com.freedom.messagebus.common.model.Node;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

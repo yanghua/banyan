@@ -2,7 +2,7 @@ package com.freedom.managesystem.action.maintain;
 
 import com.freedom.managesystem.action.BaseAction;
 import com.freedom.managesystem.action.ValidatedFaileInActionException;
-import com.freedom.managesystem.pojo.Node;
+import com.freedom.messagebus.common.model.Node;
 import com.freedom.managesystem.service.INodeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

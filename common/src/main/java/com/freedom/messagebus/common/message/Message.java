@@ -5,6 +5,9 @@ public class Message {
     private IMessageHeader messageHeader;
     private IMessageBody messageBody;
 
+    public Message() {
+    }
+
     public IMessageHeader getMessageHeader() {
         return messageHeader;
     }

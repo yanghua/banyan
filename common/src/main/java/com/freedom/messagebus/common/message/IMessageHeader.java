@@ -2,25 +2,26 @@ package com.freedom.messagebus.common.message;
 
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 
 public interface IMessageHeader {
 
-    public long getMessageId();
+    public String getMessageId();
 
-//    public void setMessageId(long messageId);
+    public void setMessageId(String messageId);
 
     public String getType();
 
 //    public void setType(String type);
 
-    public Timestamp getTimestamp();
+    public Date getTimestamp();
 
-//    public void setTimestamp(Timestamp timestamp);
+    public void setTimestamp(Date timestamp);
 
     public short getPriority();
 
-//    public void setPriority(short priority);
+    public void setPriority(short priority);
 
     public String getExpiration();
 
@@ -32,19 +33,19 @@ public interface IMessageHeader {
 
     public Map<String, Object> getHeaders();
 
-//    public void setHeaders(Map<String, Object> headers);
+    public void setHeaders(Map<String, Object> headers);
 
     public String getContentEncoding();
 
-//    public void setContentEncoding(String contentEncoding);
+    public void setContentEncoding(String contentEncoding);
 
     public String getContentType();
 
-//    public void setContentType(String contentType);
+    public void setContentType(String contentType);
 
     public String getReplyTo();
 
-//    public void setReplyTo(String replyTo);
+    public void setReplyTo(String replyTo);
 
     public String getAppId();
 
@@ -52,11 +53,11 @@ public interface IMessageHeader {
 
     public String getUserId();
 
-    public void setUserId(String userId);
+//    public void setUserId(String userId);
 
     public String getClusterId();
 
-    public void setClusterId(String clusterId);
+//    public void setClusterId(String clusterId);
 
     public String getCorrelationId();
 
