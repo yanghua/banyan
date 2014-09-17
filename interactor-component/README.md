@@ -29,9 +29,11 @@
 proxy package提供了message produce / comsume的代理。当然它们的实现都相对 **primitive** ，更多的功能、特性可以由第三方包装实现，当然后续它们的接口可能还要重做修改。
 
 produce:
+
 ![img 3][3]
 
 consume:
+
 ![img 4][4]
 
 关于consume，提供了两个同名的方法 `consume`，说明如下：
