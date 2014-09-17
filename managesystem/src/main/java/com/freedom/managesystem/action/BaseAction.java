@@ -3,12 +3,10 @@ package com.freedom.managesystem.action;
 import com.freedom.managesystem.pojo.Module;
 import com.freedom.managesystem.service.IModuleService;
 import com.google.gson.Gson;
-import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;

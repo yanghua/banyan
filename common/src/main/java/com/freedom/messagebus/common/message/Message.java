@@ -3,7 +3,7 @@ package com.freedom.messagebus.common.message;
 public class Message {
 
     private IMessageHeader messageHeader;
-    private IMessageBody messageBody;
+    private IMessageBody   messageBody;
 
     public Message() {
     }

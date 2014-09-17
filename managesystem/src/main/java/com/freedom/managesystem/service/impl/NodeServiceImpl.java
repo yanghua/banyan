@@ -1,8 +1,8 @@
 package com.freedom.managesystem.service.impl;
 
 import com.freedom.managesystem.dao.INodeMapper;
-import com.freedom.messagebus.common.model.Node;
 import com.freedom.managesystem.service.INodeService;
+import com.freedom.messagebus.common.model.Node;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 

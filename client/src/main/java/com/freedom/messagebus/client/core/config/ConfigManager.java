@@ -6,19 +6,14 @@ import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.client.model.RuleModel;
 import com.freedom.messagebus.client.model.RuleType;
-import com.freedom.messagebus.common.CommonUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -205,7 +200,7 @@ public class ConfigManager {
         AbstractHandler remoteHandler = null;
         try {
             Class clazz = rcl.loadClass(binaryname);
-            remoteHandler = (AbstractHandler)clazz.newInstance();
+            remoteHandler = (AbstractHandler) clazz.newInstance();
 
             //add new handler
             this.produceHandlerChain.add(2, remoteHandler);

@@ -53,8 +53,8 @@ public class ExchangeManager extends AbstractInitializer {
     public void bind(@NotNull String exchangeName, @NotNull String bindTo, String routingKey) throws IOException {
         super.init();
         if (!this.exchangeExists(exchangeName) || !this.exchangeExists(bindTo)) {
-            logger.error("exchange : " + exchangeName + " or " + bindTo +"is not exists");
-            throw new IOException("exchange : " + exchangeName + " or " + bindTo +"is not exists");
+            logger.error("exchange : " + exchangeName + " or " + bindTo + "is not exists");
+            throw new IOException("exchange : " + exchangeName + " or " + bindTo + "is not exists");
         }
 
         this.channel.exchangeBind(exchangeName, bindTo, routingKey);
@@ -64,8 +64,8 @@ public class ExchangeManager extends AbstractInitializer {
     public void unbind(@NotNull String exchangeName, @NotNull String unbindTo, String routingKey) throws IOException {
         super.init();
         if (!this.exchangeExists(exchangeName) || !this.exchangeExists(unbindTo)) {
-            logger.error("exchange : " + exchangeName + " or " + unbindTo +"is not exists");
-            throw new IOException("exchange : " + exchangeName + " or " + unbindTo +"is not exists");
+            logger.error("exchange : " + exchangeName + " or " + unbindTo + "is not exists");
+            throw new IOException("exchange : " + exchangeName + " or " + unbindTo + "is not exists");
         }
 
         this.channel.exchangeUnbind(exchangeName, unbindTo, routingKey);
@@ -74,7 +74,7 @@ public class ExchangeManager extends AbstractInitializer {
 
     public void delete(@NotNull String exchangeName) throws IOException {
         super.init();
-        if (!this.exchangeExists(exchangeName)){
+        if (!this.exchangeExists(exchangeName)) {
             logger.error("exchange : " + exchangeName + " is not exists");
             throw new IOException("exchange : " + exchangeName + " is not exists");
         }

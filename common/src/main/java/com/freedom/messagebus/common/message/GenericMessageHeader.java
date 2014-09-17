@@ -1,16 +1,13 @@
 package com.freedom.messagebus.common.message;
 
-import com.freedom.messagebus.common.message.IMessageHeader;
-
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
 /**
  * a generic message header
  */
-class GenericMessageHeader implements IMessageHeader,Serializable {
+class GenericMessageHeader implements IMessageHeader, Serializable {
 
     private String              messageId;
     private String              type;

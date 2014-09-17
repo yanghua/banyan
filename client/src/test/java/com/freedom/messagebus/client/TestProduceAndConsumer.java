@@ -12,9 +12,7 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.ZooKeeper;
-import sun.applet.AppletListener;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -28,14 +26,14 @@ public class TestProduceAndConsumer extends TestCase {
 
     private static final Log logger = LogFactory.getLog(TestProduceAndConsumer.class);
 
-    private ZooKeeper zooKeeper;
+    private ZooKeeper  zooKeeper;
     private Messagebus client;
 
     private String appkey;
     private String msgType;
 
     private String host = "115.29.96.85";
-    private int port = 2181;
+    private int    port = 2181;
 
     public void setUp() throws Exception {
         client = Messagebus.getInstance();
@@ -57,27 +55,27 @@ public class TestProduceAndConsumer extends TestCase {
         String queueName = "oa.sms";
         IConsumerCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
                                                               new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message msg, MessageFormat format) {
-                switch (format) {
-                    case Text: {
-                        TextMessage txtMsg = (TextMessage) msg;
-                        logger.debug("received message : " + txtMsg.getMessageBody());
-                    }
-                    break;
+                                                                  @Override
+                                                                  public void onMessage(Message msg, MessageFormat format) {
+                                                                      switch (format) {
+                                                                          case Text: {
+                                                                              TextMessage txtMsg = (TextMessage) msg;
+                                                                              logger.debug("received message : " + txtMsg.getMessageBody());
+                                                                          }
+                                                                          break;
 
-                    case Object: {
-                        ObjectMessage objMsg = (ObjectMessage) msg;
-                        SimpleObjectMessagePOJO realObj = (SimpleObjectMessagePOJO) objMsg.getObject();
-                        logger.debug("received message : " + realObj.getTxt());
-                    }
-                    break;
+                                                                          case Object: {
+                                                                              ObjectMessage objMsg = (ObjectMessage) msg;
+                                                                              SimpleObjectMessagePOJO realObj = (SimpleObjectMessagePOJO) objMsg.getObject();
+                                                                              logger.debug("received message : " + realObj.getTxt());
+                                                                          }
+                                                                          break;
 
-                    //case other format
-                    //...
-                }
-            }
-        });
+                                                                          //case other format
+                                                                          //...
+                                                                      }
+                                                                  }
+                                                              });
 
         //produce text msg
         TextMessagePOJO msg = new TextMessagePOJO();

@@ -24,7 +24,9 @@ public class HttpHelper {
 
     private static final Log logger = LogFactory.getLog(HttpHelper.class);
 
-    public static @NotNull String syncHTTPGet(@NotNull Map<String, Object> requestParamDic, @NotNull AuthInfo authInfo) {
+    public static
+    @NotNull
+    String syncHTTPGet(@NotNull Map<String, Object> requestParamDic, @NotNull AuthInfo authInfo) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         CloseableHttpResponse response = null;
@@ -39,7 +41,7 @@ public class HttpHelper {
             HttpGet httpGet = new HttpGet(uri);
             response = httpClient.execute(httpGet);
             HttpEntity entity = response.getEntity();
-            if (entity != null){
+            if (entity != null) {
                 long len = entity.getContentLength();
                 if (len == -1)
                     return "";

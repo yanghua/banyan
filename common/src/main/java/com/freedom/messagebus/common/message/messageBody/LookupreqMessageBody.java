@@ -4,7 +4,7 @@ import com.freedom.messagebus.common.message.IMessageBody;
 
 import java.io.Serializable;
 
-public class LookupreqMessageBody implements IMessageBody,Serializable {
+public class LookupreqMessageBody implements IMessageBody, Serializable {
 
     private String type;
     private String destination;

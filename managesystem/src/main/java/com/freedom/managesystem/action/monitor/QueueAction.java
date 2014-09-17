@@ -11,6 +11,4 @@ public class QueueAction extends ActionSupport {
     private IQueueService queueService;
 
 
-
-
 }

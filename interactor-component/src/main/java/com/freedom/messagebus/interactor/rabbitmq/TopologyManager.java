@@ -21,7 +21,7 @@ public class TopologyManager extends AbstractInitializer {
         if (instance == null) {
             synchronized (TopologyManager.class) {
                 if (instance == null) {
-                    instance=new TopologyManager(host);
+                    instance = new TopologyManager(host);
                 }
             }
         }

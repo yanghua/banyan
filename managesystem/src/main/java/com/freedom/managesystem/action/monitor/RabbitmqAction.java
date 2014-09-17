@@ -14,7 +14,7 @@ public class RabbitmqAction extends ActionSupport {
     @Autowired
     private IRabbitmqService rabbitmqService;
 
-    public String overview() throws IOException{
+    public String overview() throws IOException {
         String jsonStr = rabbitmqService.overview();
         HttpServletResponse response = ServletActionContext.getResponse();
 

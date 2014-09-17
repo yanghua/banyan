@@ -9,20 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum MessageType {
 
 
-    AppMessage("appMessage",0),
+    AppMessage("appMessage", 0),
 
-    AuthreqMessage("authreqMessage",1),
+    AuthreqMessage("authreqMessage", 1),
 
-    AuthrespMessage("authrespMessage",2),
+    AuthrespMessage("authrespMessage", 2),
 
-    LookupreqMessage("lookupreqMessage",3),
+    LookupreqMessage("lookupreqMessage", 3),
 
-    LookuprespMessage("lookuprespMessage",4),
+    LookuprespMessage("lookuprespMessage", 4),
 
     CacheExpiredMessage("cacheExpiredMessage", 5);
 
-    private static final Log logger = LogFactory.getLog(MessageType.class);
-    private static Map<String, MessageType> lookupList = new ConcurrentHashMap<>(6);
+    private static final Log                      logger     = LogFactory.getLog(MessageType.class);
+    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(6);
 
     static {
         lookupList.put("appMessage", AppMessage);
@@ -45,7 +45,7 @@ public enum MessageType {
     }
 
     private String type;
-    private int index;
+    private int    index;
 
     private MessageType(String type, int index) {
         this.type = type;

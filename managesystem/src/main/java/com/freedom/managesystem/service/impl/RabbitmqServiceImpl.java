@@ -13,7 +13,6 @@ import java.util.Map;
 public class RabbitmqServiceImpl implements IRabbitmqService {
 
 
-
     //region http service
     @NotNull
     @Override

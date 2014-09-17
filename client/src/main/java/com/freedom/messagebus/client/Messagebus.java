@@ -90,7 +90,7 @@ public class Messagebus {
                                              logger.debug("path : " + path + " has changed!");
 
                                              if (path.equals("/testRemoteHandler"))
-                                                cfManager.updateHandlerChain(path, newData);
+                                                 cfManager.updateHandlerChain(path, newData);
                                          }
                                      });
 

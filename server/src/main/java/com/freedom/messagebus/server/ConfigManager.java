@@ -61,7 +61,7 @@ public class ConfigManager {
         try {
             Stat stat = this.zooKeeper.exists(path, false);
             if (stat == null)
-                throw new IllegalStateException("the path : " + path +" is not exists!");
+                throw new IllegalStateException("the path : " + path + " is not exists!");
 
             int version = stat.getVersion();
             this.zooKeeper.setData(path, newData, version);
@@ -75,7 +75,7 @@ public class ConfigManager {
     public void setConfig(@NotNull String path, @NotNull byte[] newData, boolean ifNotThenCreate) {
         try {
             Stat stat = this.zooKeeper.exists(path, false);
-            if (stat == null ){
+            if (stat == null) {
                 if (ifNotThenCreate)
                     this.zooKeeper.create(path, newData, null, CreateMode.PERSISTENT);
                 else

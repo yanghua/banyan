@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -110,7 +109,7 @@ public class ModuleAction extends BaseAction {
         responseJTableData(resp, generateUpdateSuccessJSONStr());
     }
 
-    public void parentModuleInfo() throws IOException  {
+    public void parentModuleInfo() throws IOException {
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
         List<Module> moduleList = moduleService.getParentModule();

@@ -4,11 +4,11 @@
         "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
         "http://struts.apache.org/dtds/struts-2.3.dtd">
 <struts>
-    <constant name="struts.devMode" value="true" />
-    <constant name="struts.i18n.encoding" value="utf-8" />
-    <constant name="struts.enable.SlashesInActionNames" value="true" />
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.i18n.encoding" value="utf-8"/>
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
 
-    <include file="struts-default.xml" />
+    <include file="struts-default.xml"/>
 
     <package name="managesystem" extends="struts-default">
 
@@ -21,7 +21,7 @@
             </interceptor-stack>
         </interceptors>
 
-        <default-interceptor-ref name="appDefaultStack" />
+        <default-interceptor-ref name="appDefaultStack"/>
 
         <global-results>
             <result name="error">/error.jsp</result>
@@ -29,7 +29,7 @@
 
         <global-exception-mappings>
             <exception-mapping exception="java.lang.Exception"
-                               result="error" />
+                               result="error"/>
         </global-exception-mappings>
 
         <action name="" class="com.freedom.managesystem.action.global.IndexAction" method="index">

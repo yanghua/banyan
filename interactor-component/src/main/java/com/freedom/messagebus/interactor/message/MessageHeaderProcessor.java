@@ -11,20 +11,20 @@ public class MessageHeaderProcessor {
     public static AMQP.BasicProperties box(IMessageHeader header) {
         AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
         return builder.messageId(String.valueOf(header.getMessageId()))
-               .appId(header.getAppId())
-               .clusterId(header.getClusterId())
-               .contentEncoding(header.getContentEncoding())
-               .contentType(header.getContentType())
-               .correlationId(header.getCorrelationId())
-               .deliveryMode((int) header.getDeliveryMode())
-               .expiration(header.getExpiration())
-               .headers(header.getHeaders())
-               .priority((int) header.getPriority())
-               .replyTo(header.getReplyTo())
-               .timestamp(header.getTimestamp())
-               .type(header.getType())
-               .userId(header.getUserId())
-               .build();
+                      .appId(header.getAppId())
+                      .clusterId(header.getClusterId())
+                      .contentEncoding(header.getContentEncoding())
+                      .contentType(header.getContentType())
+                      .correlationId(header.getCorrelationId())
+                      .deliveryMode((int) header.getDeliveryMode())
+                      .expiration(header.getExpiration())
+                      .headers(header.getHeaders())
+                      .priority((int) header.getPriority())
+                      .replyTo(header.getReplyTo())
+                      .timestamp(header.getTimestamp())
+                      .type(header.getType())
+                      .userId(header.getUserId())
+                      .build();
     }
 
     public static IMessageHeader unbox(@NotNull AMQP.BasicProperties properties, MessageType msgType) {

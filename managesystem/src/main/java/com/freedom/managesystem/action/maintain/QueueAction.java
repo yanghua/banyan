@@ -8,7 +8,7 @@ public class QueueAction extends ActionSupport {
 
     }
 
-    public void unload(){
+    public void unload() {
 
     }
 

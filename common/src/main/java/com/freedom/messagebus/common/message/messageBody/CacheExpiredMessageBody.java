@@ -4,7 +4,7 @@ import com.freedom.messagebus.common.message.IMessageBody;
 
 import java.io.Serializable;
 
-public class CacheExpiredMessageBody implements IMessageBody,Serializable {
+public class CacheExpiredMessageBody implements IMessageBody, Serializable {
 
     private String cache;
 

@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = "classpath:applicationContextForTest.xml")
@@ -31,8 +30,8 @@ public class NodeServiceTest extends AbstractTransactionalJUnit4SpringContextTes
         node.setName("proxy");
         node.setValue("fanout");
         node.setParentId(-1);
-        node.setLevel((short)0);
-        node.setType((short)0);
+        node.setLevel((short) 0);
+        node.setType((short) 0);
         nodeService.create(node);
     }
 }

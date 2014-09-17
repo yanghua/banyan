@@ -54,12 +54,12 @@ public class QueueManager extends AbstractInitializer {
 
     public void unbind(@NotNull String queueName, @NotNull String unbindTo, String routingKey) throws IOException {
         super.init();
-        if (queueName.isEmpty()){
+        if (queueName.isEmpty()) {
             logger.error("[unbind] queueName is empty");
             throw new IOException("[unbind] queueName is empty");
         }
 
-        if (unbindTo.isEmpty()){
+        if (unbindTo.isEmpty()) {
             logger.error("[ubind] unbindTo param is empty");
             throw new IOException("[ubind] unbindTo param is empty");
         }
@@ -68,7 +68,7 @@ public class QueueManager extends AbstractInitializer {
             logger.error("[unbind] queue : " + queueName + " is not exists");
         }
 
-        if (!this.exists(unbindTo)){
+        if (!this.exists(unbindTo)) {
             logger.error("[unbind] unbind queue : " + unbindTo + " is not exists");
         }
 
@@ -83,7 +83,7 @@ public class QueueManager extends AbstractInitializer {
             throw new IOException("[delete] queueName is empty");
         }
 
-        if (!this.exists(queueName)){
+        if (!this.exists(queueName)) {
             logger.error("[delete] queue : " + queueName + " is not exists");
         }
 

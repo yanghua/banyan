@@ -40,16 +40,16 @@ public class ProxyProducer {
                              @NotNull String routingKey,
                              @NotNull List<byte[]> dataList,
                              @NotNull AMQP.BasicProperties properties
-                             ) throws IOException {
+                            ) throws IOException {
         for (byte[] bytes : dataList)
             this.produce(exchangeName, channel, routingKey, bytes, properties);
     }
 
     public void batchProduceWithTX(@NotNull String exchangeName,
-                                    @NotNull Channel channel,
-                                    @NotNull String routingKey,
-                                    @NotNull List<byte[]> dataList,
-                                    @NotNull AMQP.BasicProperties properties
+                                   @NotNull Channel channel,
+                                   @NotNull String routingKey,
+                                   @NotNull List<byte[]> dataList,
+                                   @NotNull AMQP.BasicProperties properties
                                   ) throws IOException {
         for (byte[] bytes : dataList)
             this.produceWithTX(exchangeName, channel, routingKey, bytes, properties);

@@ -4,7 +4,7 @@ import com.freedom.messagebus.common.message.IMessageBody;
 
 import java.io.Serializable;
 
-public class LookuprespMessageBody implements IMessageBody,Serializable {
+public class LookuprespMessageBody implements IMessageBody, Serializable {
 
     private String exchangeName;
     private String routingKey;

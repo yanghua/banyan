@@ -4,7 +4,7 @@ import com.freedom.messagebus.common.message.IMessageBody;
 
 import java.io.Serializable;
 
-public class AppMessageBody implements IMessageBody,Serializable {
+public class AppMessageBody implements IMessageBody, Serializable {
 
     private byte[] messageBody;
 

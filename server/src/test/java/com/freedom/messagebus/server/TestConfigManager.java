@@ -17,7 +17,7 @@ public class TestConfigManager extends TestCase {
 
     public void testInitConfigManager() throws Exception {
         ZooKeeper zooKeeper =
-        this.configManager = ConfigManager.getInstance();
+            this.configManager = ConfigManager.getInstance();
 
     }
 }

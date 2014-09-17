@@ -4,6 +4,6 @@
 <configuration>
     <settings>
         <setting name="lazyLoadingEnabled" value="false"/>
-        <setting name="aggressiveLazyLoading" value="false" />
+        <setting name="aggressiveLazyLoading" value="false"/>
     </settings>
 </configuration>

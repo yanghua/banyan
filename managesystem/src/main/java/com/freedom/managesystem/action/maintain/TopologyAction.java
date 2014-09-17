@@ -2,8 +2,8 @@ package com.freedom.managesystem.action.maintain;
 
 import com.freedom.managesystem.action.BaseAction;
 import com.freedom.managesystem.action.ValidatedFaileInActionException;
-import com.freedom.messagebus.common.model.Node;
 import com.freedom.managesystem.service.INodeService;
+import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
@@ -54,7 +54,7 @@ public class TopologyAction extends BaseAction {
     }
 
     public List<Node> getNodeList() {
-        if (this.nodeList == null){
+        if (this.nodeList == null) {
             this.nodeList = nodeService.getAll();
         }
 
@@ -81,7 +81,7 @@ public class TopologyAction extends BaseAction {
         this.node = node;
     }
 
-    private String generateTreeData () {
+    private String generateTreeData() {
         Map<Integer, Node> nodeMap = this.buildHashmap();
         StringBuilder sb = new StringBuilder();
         sb.append("[");
