@@ -4,9 +4,9 @@
 下图展示了server端程序的模块图：
 ![img 1][1]
 
-- app 为server的入口，提供了server的启动逻辑；
-- bootstrap 为server最先启动的核心服务，通常包括了比如：rabbitmq-server的启动/zookeeper的启动；它们是同步启动；并且不允许失败的
-- daemon package内部定义了系统其他的后台服务
+- app : 为server的入口，提供了server的启动逻辑；
+- bootstrap : 为server最先启动的核心服务，通常包括了比如：rabbitmq-server的启动/zookeeper的启动；它们是同步启动；并且不允许失败的
+- daemon : package内部定义了系统其他的后台服务
 
 ##关于bootstrap
 它定义了系统核心组件的启动逻辑，是消息总线可靠运行以及其他一切的前提。它们必须顺序、同步启动；如果没有这个前提，后续所有的东西都不会发生。
@@ -49,10 +49,10 @@
 * 上行系统消息
 * 下行系统消息  
 
-其中后两个 **系统消息** 。对于这几种系统级信息的处理可以采用不同的方式：
+对于这几种系统级信息的处理可以采用不同的方式：
 
 * 下行配置 ： 走zookeeper主动推送；
-* 上行系统消息（上行事件）：由客户端发往名为（queue.proxy.message.sys.#）的队列，交由 `UpstreamSysMsgService`处理
+* 上行系统消息 ：由客户端发往名为（queue.proxy.message.sys.#）的队列，交由 `UpstreamSysMsgService`处理
 * 下行系统消息 ： 走zookeeper做event推送
 
 zookeeper的布局形如：
