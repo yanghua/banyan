@@ -1,4 +1,4 @@
-package com.freedom.messagebus.server.service;
+package com.freedom.messagebus.server.daemon;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -8,9 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-/**
- * Created by yanghua on 9/19/14.
- */
 public class ServiceLoader {
 
     private static final Log logger = LogFactory.getLog(ServiceLoader.class);
@@ -36,12 +33,15 @@ public class ServiceLoader {
         //scan annotation for load service
     }
 
-    private void load() {
+    public void launch() {
         if (longtimeliveServiceMap.size() != 0) {
             return;
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(longtimeliveServiceMap.size());
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(longtimeliveServiceMap.size());
+//        scheduledExecutorService.scheduleAtFixedRate()
 
     }
 }

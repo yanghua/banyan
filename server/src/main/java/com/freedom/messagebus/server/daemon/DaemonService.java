@@ -1,4 +1,4 @@
-package com.freedom.messagebus.server.service;
+package com.freedom.messagebus.server.daemon;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface DaemonService {
     String value() default "";
+    RunPolicy policy() default RunPolicy.ONCE;
 }
