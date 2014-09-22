@@ -35,7 +35,7 @@
 实现：它可以是一个http的代理服务
 
 ###UpstreamSysMsgService
-上行系统消息服务，它是 `ONCE` 服务，它也是全什么周期的。实现：在内部以while(true)的方式侦听名为 ***queue.proxy.message.sys.XXX*** 的队列。
+上行系统消息服务，它是 `ONCE` 服务，它也是全生命周期的。实现：在内部以while(true)的方式侦听名为 ***queue.proxy.message.sys.XXX*** 的队列。
 
 ###SystemMonitorService
 系统资源监控服务，它以 `CYCLE_SCHEDULED` 方式运行，它以某个设定的周期定时执行。
