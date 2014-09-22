@@ -17,7 +17,7 @@ public abstract class AbstractInitializer {
     protected ConnectionFactory connectionFactory;
     protected Connection        connection;
     protected Channel           channel;
-    private   String            host;
+    protected    String            host;
 
     protected AbstractInitializer(String host) {
         this.host = host;

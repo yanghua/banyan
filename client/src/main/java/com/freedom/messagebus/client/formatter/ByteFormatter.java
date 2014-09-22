@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.core.message.Message;
 /**
  * the formatter for bytes
  */
+@Deprecated
 public class ByteFormatter implements IFormatter {
 
     /**

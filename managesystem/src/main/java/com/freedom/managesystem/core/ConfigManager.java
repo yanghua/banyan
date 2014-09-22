@@ -1,6 +1,6 @@
 package com.freedom.managesystem.core;
 
-import com.freedom.managesystem.pojo.AuthInfo;
+import com.freedom.messagebus.common.model.AuthInfo;
 
 public class ConfigManager {
 

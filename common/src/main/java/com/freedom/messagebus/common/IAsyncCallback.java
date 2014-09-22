@@ -1,4 +1,4 @@
-package com.freedom.managesystem.util;
+package com.freedom.messagebus.common;
 
 public interface IAsyncCallback {
 

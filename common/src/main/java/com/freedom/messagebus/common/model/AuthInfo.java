@@ -1,4 +1,4 @@
-package com.freedom.managesystem.pojo;
+package com.freedom.messagebus.common.model;
 
 import java.io.Serializable;
 

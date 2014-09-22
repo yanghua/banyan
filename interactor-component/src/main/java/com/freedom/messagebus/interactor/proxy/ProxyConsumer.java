@@ -97,6 +97,7 @@ public class ProxyConsumer implements Runnable {
 
     private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
         msg.setMessageHeader(MessageHeaderProcessor.unbox(properties, msgType));
+        msg.setMessageType(msgType);
 
         IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
         msg.setMessageBody(msgBodyProcessor.unbox(bodyData));

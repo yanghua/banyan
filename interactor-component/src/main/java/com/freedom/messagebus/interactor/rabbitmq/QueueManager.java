@@ -18,7 +18,7 @@ public class QueueManager extends AbstractInitializer {
         super(host);
     }
 
-    public QueueManager defaultQueueManager(String host) {
+    public static QueueManager defaultQueueManager(String host) {
         if (instance == null) {
             synchronized (QueueManager.class) {
                 if (instance == null)
@@ -49,6 +49,22 @@ public class QueueManager extends AbstractInitializer {
         this.create(queueName);
         if (bindTo != null && !bindTo.isEmpty() && exists(bindTo))
             this.channel.queueBind(queueName, bindTo, routingKey);
+        super.close();
+    }
+
+    public void bind(@NotNull String queueName, @NotNull String bindTo, String routingKey) throws IOException {
+        super.init();
+        if (!exists(queueName)) {
+            logger.error("[bind] queue : " + queueName + " is not exists!");
+            throw new IOException("queue : " + queueName + " is not exists!");
+        }
+
+        if (!exists(bindTo)) {
+            logger.error("[bind] bindTo : " + bindTo + " is not exists!");
+            throw new IOException("[bind] bindTo : " + bindTo + " is not exists!");
+        }
+        this.channel.queueBind(queueName, bindTo, routingKey);
+
         super.close();
     }
 

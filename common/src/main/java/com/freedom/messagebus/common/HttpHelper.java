@@ -1,6 +1,6 @@
-package com.freedom.managesystem.util;
+package com.freedom.messagebus.common;
 
-import com.freedom.managesystem.pojo.AuthInfo;
+import com.freedom.messagebus.common.model.AuthInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;

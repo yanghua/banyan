@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * message format
  */
+@Deprecated
 public enum MessageFormat {
 
     Byte,

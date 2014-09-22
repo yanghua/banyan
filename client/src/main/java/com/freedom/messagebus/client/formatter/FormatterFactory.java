@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.model.MessageFormat;
 /**
  * formatter factory
  */
+@Deprecated
 public class FormatterFactory {
 
     /**

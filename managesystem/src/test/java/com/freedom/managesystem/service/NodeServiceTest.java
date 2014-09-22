@@ -1,6 +1,6 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.Node;
+import com.freedom.messagebus.common.model.Node;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

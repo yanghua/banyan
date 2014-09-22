@@ -175,13 +175,6 @@
             <version>1.2.2</version>
         </dependency>
 
-        <!-- apache http client -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.core.message.Message;
 /**
  * the formatter for map message
  */
+@Deprecated
 public class MapMessageFormatter implements IFormatter {
 
     /**

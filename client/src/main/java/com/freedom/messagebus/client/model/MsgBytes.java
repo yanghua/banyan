@@ -10,6 +10,7 @@ package com.freedom.messagebus.client.model;
  * byte[] and Byte[] automatically. What's more the type-cast is expensive.
  * So, we warped byte[] to a object and let the list store MsgBytes.
  */
+@Deprecated
 public class MsgBytes extends BaseModel {
 
     private byte[] msgBytes;

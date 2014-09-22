@@ -44,6 +44,27 @@
                     </select>
                 </div>
             </li>
+            <li id="foli105" class="notranslate ">
+                <label class="desc" id="title110" for="Field113">
+                    路由类型
+                </label>
+                <div>
+                    <select id="foli115" name="node.routerType" class="field select large" tabindex="6">
+                        <option value="0" selected="selected">
+                            direct
+                        </option>
+                        <option value="1">
+                            fanout
+                        </option>
+                        <option value="2">
+                            topic
+                        </option>
+                        <option value="3">
+                            header
+                        </option>
+                    </select>
+                </div>
+            </li>
             <li id="foli104" class="notranslate ">
                 <label class="desc" id="title110" for="Field110">
                     父节点

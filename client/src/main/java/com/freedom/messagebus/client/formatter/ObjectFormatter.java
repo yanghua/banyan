@@ -11,6 +11,7 @@ import java.io.*;
 /**
  * the object formatter
  */
+@Deprecated
 public class ObjectFormatter implements IFormatter {
 
     private static final Log logger = LogFactory.getLog(ObjectFormatter.class);

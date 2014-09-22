@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface INodeMapper {
 
-    @Insert("INSERT INTO NODE(name, value, parentId, type, level) VALUES (#{name}, " +
-                "#{value}, #{parentId}, #{type}, #{level})")
+    @Insert("INSERT INTO NODE(name, value, parentId, type, level, routerType, routingKey) VALUES (#{name}, " +
+                "#{value}, #{parentId}, #{type}, #{level}, #{routerType}, #{routingKey})")
     public void save(Node node);
 
     @Select("SELECT * FROM NODE ORDER BY level")

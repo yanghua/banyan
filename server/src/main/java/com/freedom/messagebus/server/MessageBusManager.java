@@ -17,6 +17,7 @@ import java.util.List;
  * Time: 2:34 PM
  * Copyright (c) 2013 yanghua. All rights reserved.
  */
+@Deprecated
 public final class MessageBusManager extends AbstractInitializer {
 
     private static final Log logger = LogFactory.getLog(MessageBusManager.class);

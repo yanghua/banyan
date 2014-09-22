@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.core.message.Message;
 /**
  * the interface of formatter
  */
+@Deprecated
 public interface IFormatter {
 
     /**

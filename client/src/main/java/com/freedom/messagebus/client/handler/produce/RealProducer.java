@@ -4,6 +4,12 @@ import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.MsgBytes;
+import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
+import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
+import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
+import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
@@ -19,9 +25,6 @@ public class RealProducer extends AbstractHandler {
 
     private static final Log logger = LogFactory.getLog(RealProducer.class);
 
-    private static final AMQP.BasicProperties.Builder BASIC_PROPERTIES_BUILDER = new AMQP.BasicProperties.Builder();
-
-
     /**
      * the main process method all sub class must implement
      *
@@ -31,13 +34,30 @@ public class RealProducer extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        AMQP.BasicProperties properties = buildMsgFormatProperty(context);
-
         try {
             if (context.isEnableTransaction()) {
-                this.transactionProduce(properties, context, chain);
+                for (Message msg : context.getMessages()) {
+                    IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msg.getMessageType());
+                    byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
+                    AMQP.BasicProperties properties = MessageHeaderProcessor.box(msg.getMessageHeader());
+                    ProxyProducer.produceWithTX(CONSTS.PROXY_EXCHANGE_NAME,
+                                                context.getChannel(),
+                                                context.getRuleValue(),
+                                                msgBody,
+                                                properties);
+                }
             } else {
-                this.normalProduce(properties, context, chain);
+                for (Message msg : context.getMessages()) {
+                    IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msg.getMessageType());
+                    byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
+                    AMQP.BasicProperties properties = MessageHeaderProcessor.box(msg.getMessageHeader());
+
+                    ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
+                                               context.getChannel(),
+                                               context.getRuleValue(),
+                                               msgBody,
+                                               properties);
+                }
             }
 
             chain.handle(context);
@@ -45,41 +65,6 @@ public class RealProducer extends AbstractHandler {
             logger.error("[handle] occurs a IOException : " + e.getMessage());
         } finally {
             context.getDestroyer().destroy(context.getChannel());
-        }
-    }
-
-    @NotNull
-    private AMQP.BasicProperties buildMsgFormatProperty(@NotNull MessageContext context) {
-        AMQP.BasicProperties properties = BASIC_PROPERTIES_BUILDER
-            .deliveryMode(2)
-            .contentType(context.getMsgFormat().stringValue())
-            .build();
-
-        return properties;
-    }
-
-    private void normalProduce(@NotNull AMQP.BasicProperties properties, @NotNull MessageContext context,
-                               @NotNull IHandlerChain chain) throws IOException {
-        Channel channel = context.getChannel();
-
-        for (MsgBytes msgBytes : context.getMsgBytes()) {
-            channel.basicPublish("exchange.proxy", context.getRuleValue(), properties, msgBytes.getMsgBytes());
-        }
-    }
-
-    private void transactionProduce(@NotNull AMQP.BasicProperties properties, @NotNull MessageContext context,
-                                    @NotNull IHandlerChain chain) throws IOException {
-        Channel channel = context.getChannel();
-
-        //transaction begin
-        channel.txSelect();
-
-        for (MsgBytes msgBytes : context.getMsgBytes()) {
-            channel.basicPublish("exchange.proxy", context.getRuleValue(), properties, msgBytes.getMsgBytes());
-
-            //commit every message with wrapped a transaction
-            //NOTE: it is almost for security! Not for normal, because of bad performance!!!
-            channel.txCommit();
         }
     }
 

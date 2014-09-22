@@ -12,6 +12,8 @@ public class Node implements Serializable {
     private String value;
     private int    parentId;
     private short  type;         //0: exchange 1: queue
+    private String routerType;
+    private String routingKey;
     private short  level;
 
     public Node() {
@@ -57,6 +59,22 @@ public class Node implements Serializable {
         this.type = type;
     }
 
+    public String getRouterType() {
+        return routerType;
+    }
+
+    public void setRouterType(String routerType) {
+        this.routerType = routerType;
+    }
+
+    public String getRoutingKey() {
+        return routingKey;
+    }
+
+    public void setRoutingKey(String routingKey) {
+        this.routingKey = routingKey;
+    }
+
     public short getLevel() {
         return level;
     }
@@ -73,6 +91,8 @@ public class Node implements Serializable {
             ", value='" + value + '\'' +
             ", parentId=" + parentId +
             ", type=" + type +
+            ", routerType='" + routerType + '\'' +
+            ", routingKey='" + routingKey + '\'' +
             ", level=" + level +
             '}';
     }

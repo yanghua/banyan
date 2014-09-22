@@ -18,7 +18,7 @@ public class ExchangeManager extends AbstractInitializer {
         super(host);
     }
 
-    public static ExchangeManager getInstance(@NotNull String host) {
+    public static ExchangeManager defaultManager(@NotNull String host) {
         if (instance == null) {
             synchronized (TopologyManager.class) {
                 if (instance == null) {

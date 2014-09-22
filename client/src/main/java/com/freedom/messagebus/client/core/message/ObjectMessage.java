@@ -5,6 +5,7 @@ import java.io.Serializable;
 /**
  * the object message interface
  */
+@Deprecated
 public interface ObjectMessage extends Message {
 
     /**

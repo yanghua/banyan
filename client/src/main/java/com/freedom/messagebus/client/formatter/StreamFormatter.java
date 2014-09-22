@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.core.message.Message;
 /**
  * the stream formatter
  */
+@Deprecated
 public class StreamFormatter implements IFormatter {
 
     @Override

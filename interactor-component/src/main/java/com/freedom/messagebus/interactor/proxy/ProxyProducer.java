@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProxyProducer {
 
-    public void produce(@NotNull String exchangeName,
+    public static void produce(@NotNull String exchangeName,
                         @NotNull Channel channel,
                         @NotNull String routingKey,
                         @NotNull byte[] data,
@@ -18,7 +18,7 @@ public class ProxyProducer {
         channel.basicPublish(exchangeName, routingKey, properties, data);
     }
 
-    public void produceWithTX(@NotNull String exchangeName,
+    public static void produceWithTX(@NotNull String exchangeName,
                               @NotNull Channel channel,
                               @NotNull String routingKey,
                               @NotNull byte[] data,
@@ -35,24 +35,24 @@ public class ProxyProducer {
         channel.txCommit();
     }
 
-    public void batchProduce(@NotNull String exchangeName,
+    public static void batchProduce(@NotNull String exchangeName,
                              @NotNull Channel channel,
                              @NotNull String routingKey,
                              @NotNull List<byte[]> dataList,
                              @NotNull AMQP.BasicProperties properties
                             ) throws IOException {
         for (byte[] bytes : dataList)
-            this.produce(exchangeName, channel, routingKey, bytes, properties);
+            produce(exchangeName, channel, routingKey, bytes, properties);
     }
 
-    public void batchProduceWithTX(@NotNull String exchangeName,
+    public static void batchProduceWithTX(@NotNull String exchangeName,
                                    @NotNull Channel channel,
                                    @NotNull String routingKey,
                                    @NotNull List<byte[]> dataList,
                                    @NotNull AMQP.BasicProperties properties
                                   ) throws IOException {
         for (byte[] bytes : dataList)
-            this.produceWithTX(exchangeName, channel, routingKey, bytes, properties);
+            produceWithTX(exchangeName, channel, routingKey, bytes, properties);
     }
 
 }

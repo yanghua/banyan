@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 /**
  * the default text formatter
  */
+@Deprecated
 public class DefaultTextFormatter implements IFormatter {
 
     //TODO: choose json or bson by config

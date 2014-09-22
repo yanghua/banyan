@@ -3,6 +3,7 @@ package com.freedom.managesystem.action.maintain;
 import com.freedom.managesystem.action.BaseAction;
 import com.freedom.managesystem.action.ValidatedFaileInActionException;
 import com.freedom.managesystem.service.INodeService;
+import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +38,10 @@ public class TopologyAction extends BaseAction {
 
         if (node.getValue() == null || node.getValue().isEmpty())
             throw new ValidatedFaileInActionException("node.value");
+
+        node.setValue(this.generateValue());
+
+        node.setRoutingKey(this.generateRoutingKey());
 
         nodeService.create(node);
         ServletActionContext.getResponse().sendRedirect("/maintain/Topology/index");
@@ -113,5 +118,51 @@ public class TopologyAction extends BaseAction {
         }
 
         return hashedNodeMap;
+    }
+
+    private String generateValue() {
+        //exchange
+        if (node.getType() == 0) {
+            Node parentNode = nodeService.get(node.getParentId());
+            if (parentNode.getType() == 0 && parentNode.getValue() != null) {
+                return parentNode.getValue() + "." + node.getValue();
+            } else {
+                logger.error("[generateValue] illegal parent node, " +
+                                 " can not be null or non-exchange");
+                throw new IllegalStateException("illegal parent node");
+            }
+        } else {        //queue
+            Node parentNode = nodeService.get(node.getParentId());
+            if (parentNode.getValue()!= null){
+                String parentValue = parentNode.getValue();
+                int dotFirstIdx = parentValue.indexOf(".");
+                return "queue" + parentValue.substring(dotFirstIdx) + "." + node.getValue();
+            } else {
+                logger.error("[generateValue] illegal parent node, " +
+                                 " can not be null and value must be non-empty");
+                throw new IllegalStateException("illegal parent node");
+            }
+        }
+    }
+
+    private String generateRoutingKey() {
+        if (node.getValue()== null || node.getValue().isEmpty()
+            || !node.getValue().contains(".")){
+            logger.error("[generateRoutingKey] illegal node value");
+            throw new IllegalStateException("[generateRoutingKey] illegal node value");
+        }
+
+        if (node.getType() == 0 && !node.getRouterType().equals("topic")) {
+            return "";
+        }
+
+        String value = node.getValue();
+        int firstDotIdx = value.indexOf(".");
+        if (node.getType() == 0) {
+            return "routingkey" + value.substring(firstDotIdx) + ".#";
+        }
+
+        return "routingkey" + value.substring(firstDotIdx);
+
     }
 }

@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.message.Message;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consumer.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
@@ -13,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
+import com.freedom.messagebus.common.message.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +38,7 @@ public class MessageContext {
      * for produce
      */
     @NotNull
-    private Message[]  messages;
-    @NotNull
-    private MsgBytes[] msgBytes;
+    private com.freedom.messagebus.common.message.Message[] messages;
 
     /**
      * for consume
@@ -52,10 +50,6 @@ public class MessageContext {
 
     @NotNull
     private MessageCarryType carryType;     //produce or consume
-    @NotNull
-    private String           msgType;       //system or business
-    @NotNull
-    private MessageFormat    msgFormat;     //byte or stream or obj
 
     /**
      * if carry type is produce then it means : routingKey
@@ -136,15 +130,6 @@ public class MessageContext {
     }
 
     @NotNull
-    public MsgBytes[] getMsgBytes() {
-        return msgBytes;
-    }
-
-    public void setMsgBytes(@NotNull MsgBytes[] msgBytes) {
-        this.msgBytes = msgBytes;
-    }
-
-    @NotNull
     public Channel getChannel() {
         return channel;
     }
@@ -169,15 +154,6 @@ public class MessageContext {
 
     public void setCarryType(@NotNull MessageCarryType carryType) {
         this.carryType = carryType;
-    }
-
-    @NotNull
-    public String getMsgType() {
-        return msgType;
-    }
-
-    public void setMsgType(@NotNull String msgType) {
-        this.msgType = msgType;
     }
 
     @NotNull
@@ -237,15 +213,6 @@ public class MessageContext {
 
     public void setListener(@NotNull IMessageReceiveListener listener) {
         this.listener = listener;
-    }
-
-    @NotNull
-    public MessageFormat getMsgFormat() {
-        return msgFormat;
-    }
-
-    public void setMsgFormat(@NotNull MessageFormat msgFormat) {
-        this.msgFormat = msgFormat;
     }
 
     @NotNull

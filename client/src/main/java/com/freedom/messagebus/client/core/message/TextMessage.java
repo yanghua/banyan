@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * the text message interface
  */
+@Deprecated
 public interface TextMessage extends Message {
 
     /**

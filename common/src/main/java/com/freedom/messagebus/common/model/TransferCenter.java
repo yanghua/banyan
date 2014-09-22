@@ -9,6 +9,7 @@ import com.freedom.messagebus.common.RouterType;
  * Time: 2:57 PM
  * Copyright (c) 2013 yanghua. All rights reserved.
  */
+@Deprecated
 public class TransferCenter extends BaseModel {
 
     private String     appKey;
