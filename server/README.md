@@ -23,7 +23,7 @@
 首先，所有的这些后台服务，都实现了IService接口（同时也都实现了Runnable接口，即预示着他们都是以独立线程的方式来运行）。其次，这里通过Java annotation（DaemonService）的方式来实现在运行时对服务进行动态加载以及“自查找”。
 这里为服务区分了不同的运行策略（以RunPolicy枚举来实现）：
 
-* ONCE : 只允许一次的
+* ONCE : 只运行一次
 * CYCLE_SCHEDULED :周期性循环执行的
 
 服务实例的创建、加载运行是通过图中 `ServiceLoader` 类来实现的。它会先扫描所有带有 `DaemonService` 的类，并按照 `RunPolicy` 进行分组实例化。这里分组的原因是因为不同运行策略的服务，需要采用不同的线程池来执行；
