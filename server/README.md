@@ -59,13 +59,12 @@ zookeeper的布局形如：
 
 ![img 3][3]
 
-这么做的几种目的：
+这么做的几个原因：
 
-- 大大减轻rabbitmq本身的负载，无论是channel与queue都大大减少；这样只需要server的`UpstreamSysMsgService` listen queue.proxy.message.sys下的queue即可，每个客户端无需通过listen queue接受系统信息
-- 理论上来说，只要是想获得即时消息，就必须开一个socket长连接，这种模式，将rabbitmq的server负载转移到zookeeper的宿主server上去
-- 考虑消息总线的系统消息场景，不管是上行、还是下行几乎都是单向，很多系统消息都不是request-response这种模型。级别是这种模型，上下行消息也只不过是走了异步模式的request-response，并且这些消息如果是走queue传输的话也是异步处理的模式
+- 大大减轻rabbitmq本身的负载，无论是channel与queue都大为减少；这样只需要server的`UpstreamSysMsgService` listen queue.proxy.message.sys下的queue即可，每个客户端无需通过listen queue接受系统信息
+- 理论上来说，只要是想获得即时消息，就必须开一个socket长连接，这种模式，将rabbitmq的server负载转移到zookeeper的宿主server上去，而zookeeper的客户端模型本身就是基于event的push模型
+- 考虑消息总线的系统消息场景，不管是上行、还是下行几乎都是单向的，对客户端而言很多系统消息都不是request-response这种模型。即便是这种模型，上下行消息也只不过是走了异步模式的request-response，并且这些消息如果是走queue传输的话也是异步处理的模式
 - queue只关注业务系统的消息传递
-
 
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/server-module.png
