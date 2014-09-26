@@ -8,8 +8,6 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -30,8 +28,8 @@ public class LongLiveZookeeper {
     private static          CountDownLatch    latch             = new CountDownLatch(1);
 
     private ZooKeeper zooKeeper;
-    private String host;
-    private int port;
+    private String    host;
+    private int       port;
 
     private LongLiveZookeeper(String host, int port) {
         this.host = host;
@@ -149,7 +147,7 @@ public class LongLiveZookeeper {
                         break;
 
                 }
-            } catch (KeeperException| IOException | InterruptedException e) {
+            } catch (KeeperException | IOException | InterruptedException e) {
                 logger.error("[process] occurs a Exception : " + e.getMessage());
             } finally {
                 try {
@@ -170,7 +168,7 @@ public class LongLiveZookeeper {
             }
         }
 
-        private void refreshLocalCachedRouterFile (String path, byte[] newData) throws IOException {
+        private void refreshLocalCachedRouterFile(String path, byte[] newData) throws IOException {
             Path routerFilePath = FileSystems.getDefault().getPath(CONSTS.EXPORTED_NODE_FILE_PATH);
             FileOutputStream fos = null;
             try {

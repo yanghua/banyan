@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
-import com.freedom.messagebus.common.CommonUtil;
 import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
@@ -10,10 +9,6 @@ import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.ZooKeeper;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 /**
  * User: yanghua
@@ -25,8 +20,8 @@ public class TestProduceAndConsumer extends TestCase {
 
     private static final Log logger = LogFactory.getLog(TestProduceAndConsumer.class);
 
-    private LongLiveZookeeper  zooKeeper;
-    private Messagebus client;
+    private LongLiveZookeeper zooKeeper;
+    private Messagebus        client;
 
     private String appkey;
     private String msgType;
@@ -55,7 +50,7 @@ public class TestProduceAndConsumer extends TestCase {
 
                                                                   @Override
                                                                   public void onMessage(Message message) {
-                                                                        logger.info("[message-id] : " + message.getMessageHeader().getMessageId());
+                                                                      logger.info("[message-id] : " + message.getMessageHeader().getMessageId());
                                                                   }
                                                               });
 

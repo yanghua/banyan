@@ -10,7 +10,10 @@ import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
 import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConsumerCancelledException;
+import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -26,11 +29,11 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
     private static final Log logger = LogFactory.getLog(OriginalReceiver.class);
 
     @NotNull
-    private Thread          currentThread;
+    private Thread           currentThread;
     @NotNull
     private QueueingConsumer currentConsumer;
     @NotNull
-    private Channel         currentChannel;
+    private Channel          currentChannel;
 
     @NotNull
     private IChannelDestroyer channelDestroyer;

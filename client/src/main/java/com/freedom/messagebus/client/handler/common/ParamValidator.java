@@ -31,7 +31,7 @@ public class ParamValidator extends AbstractHandler {
         if (context.getQueueNode() == null) {
             logger.error("[handle] the context field : queueNode is illegal. it can not be null");
             throw new ParamValidateFailedException("the context field : queueNode is illegal. " +
-                                                   "it can not be null ");
+                                                       "it can not be null ");
         }
 
         if (context.getQueueNode().getType() == 0) {

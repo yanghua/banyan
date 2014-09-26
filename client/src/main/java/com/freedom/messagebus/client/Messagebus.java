@@ -2,13 +2,11 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.authorize.Authorizer;
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.config.IConfigChangedListener;
 import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
-import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
@@ -17,8 +15,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -34,14 +30,14 @@ public class Messagebus {
     private static volatile Messagebus instance = null;
 
     @NotNull
-    private String appKey;
+    private String    appKey;
     @NotNull
     private IProducer producer;
     @NotNull
     private IConsumer consumer;
 
     @NotNull
-    private LongLiveZookeeper             zookeeper;
+    private LongLiveZookeeper     zookeeper;
     @NotNull
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;

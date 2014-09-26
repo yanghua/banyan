@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consumer.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
@@ -12,7 +11,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -52,7 +50,7 @@ public class MessageContext {
     @NotNull
     private MessageCarryType carryType;     //produce or consume
     @NotNull
-    private Node queueNode;                 //store current carry node
+    private Node             queueNode;                 //store current carry node
 
     @NotNull
     private Channel                 channel;

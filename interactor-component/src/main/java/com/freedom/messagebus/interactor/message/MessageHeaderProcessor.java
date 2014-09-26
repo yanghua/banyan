@@ -43,7 +43,7 @@ public class MessageHeaderProcessor {
         if (msgIdStr != null && !msgIdStr.isEmpty())
             msgHeader.setMessageId(Long.valueOf(msgIdStr));
         else
-            logger.error("[unbox] illegal message id (can not be null) " );
+            logger.error("[unbox] illegal message id (can not be null) ");
 
         switch (msgType) {
             case AppMessage:

@@ -9,7 +9,9 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,16 +59,16 @@ public class ZookeeperInitializer {
         }
     }
 
-    private void dumpDbConfig() throws IOException, InterruptedException{
+    private void dumpDbConfig() throws IOException, InterruptedException {
         String cmdStr = CONSTS.EXPORTED_NODE_CMD_STR + CONSTS.EXPORTED_NODE_FILE_PATH;
         ShellHelper.exec(cmdStr);
 
         Path path = FileSystems.getDefault().getPath(CONSTS.EXPORTED_NODE_FILE_PATH);
-        if (!Files.exists(path)){
+        if (!Files.exists(path)) {
             logger.error("the file for initialize zookeeper node at path : " +
                              CONSTS.EXPORTED_NODE_FILE_PATH + " is not exists!");
             throw new RuntimeException("the file for initialize zookeeper node at path : " +
-            CONSTS.EXPORTED_NODE_FILE_PATH + " is not exists!");
+                                           CONSTS.EXPORTED_NODE_FILE_PATH + " is not exists!");
         }
     }
 

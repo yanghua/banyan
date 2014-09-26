@@ -23,8 +23,8 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     /**
      * simple producer just produces a message
      *
-     * @param msg       a general message
-     * @param to        the message's destination
+     * @param msg a general message
+     * @param to  the message's destination
      */
     @Override
     public void produce(@NotNull Message msg,
@@ -38,8 +38,8 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
      * simple producer just produces a message but surrounds with a transaction
      * Note: make sure that your scenario very care about security, otherwise do NOT use it!
      *
-     * @param msg       a general message
-     * @param to        the message's destination
+     * @param msg a general message
+     * @param to  the message's destination
      */
     @Override
     public void produceWithTX(@NotNull Message msg,
@@ -53,8 +53,8 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     /**
      * a producer produces a set of messages
      *
-     * @param msgs      a general message's array
-     * @param to        the message's destination
+     * @param msgs a general message's array
+     * @param to   the message's destination
      */
     @Override
     public void batchProduce(@NotNull Message[] msgs,
@@ -68,8 +68,8 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
      * a producer produces a set of messages but surrounds with a transaction
      * Note: make sure that your scenario very care about security, otherwise do NOT use it!
      *
-     * @param msgs      a general message's array
-     * @param to        the message's destination
+     * @param msgs a general message's array
+     * @param to   the message's destination
      */
     @Override
     public void batchProduceWithTX(@NotNull Message[] msgs,

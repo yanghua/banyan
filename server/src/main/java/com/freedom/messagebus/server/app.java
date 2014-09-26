@@ -1,6 +1,5 @@
 package com.freedom.messagebus.server;
 
-import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
 import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;

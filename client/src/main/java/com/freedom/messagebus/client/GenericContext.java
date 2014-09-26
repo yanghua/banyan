@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class GenericContext {
 
     @NotNull
-    private LongLiveZookeeper             zooKeeper;
+    private LongLiveZookeeper     zooKeeper;
     @NotNull
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;

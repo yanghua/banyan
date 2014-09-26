@@ -5,7 +5,6 @@ import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.message.messageBody.AuthrespMessageBody;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.google.gson.Gson;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.concurrent.CountDownLatch;
 
 public class Authorizer {
 

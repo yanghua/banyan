@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * a generic consumer which implements IConsumer

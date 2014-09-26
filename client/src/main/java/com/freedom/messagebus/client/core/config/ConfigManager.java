@@ -4,13 +4,14 @@ import com.freedom.messagebus.client.core.classLoader.RemoteClassLoader;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.client.model.RuleModel;
-import com.freedom.messagebus.client.model.RuleType;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.XPath;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
@@ -288,7 +289,7 @@ public class ConfigManager {
     }
 
     @NotNull
-    public synchronized void parseRouterInfo () throws MalformedURLException {
+    public synchronized void parseRouterInfo() throws MalformedURLException {
         SAXReader reader = new SAXReader();
         File routerFile = new File(CONSTS.EXPORTED_NODE_FILE_PATH);
         URL url = routerFile.toURI().toURL();

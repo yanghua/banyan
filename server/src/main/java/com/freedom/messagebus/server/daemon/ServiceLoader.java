@@ -8,7 +8,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -29,7 +28,7 @@ public class ServiceLoader {
 
     private Map<String, IService> runOnceServiceMap;
     private Map<String, IService> scheduleCycleServiceMap;
-    private Map<String, Object> context;
+    private Map<String, Object>   context;
 
     private ServiceLoader(Map<String, Object> context) {
         this.context = context;
@@ -53,7 +52,7 @@ public class ServiceLoader {
             ExecutorService executorService =
                 Executors.newFixedThreadPool(runOnceServiceMap.size());
             for (Map.Entry<String, IService> entry : this.runOnceServiceMap.entrySet()) {
-                executorService.submit((Runnable)entry.getValue());
+                executorService.submit((Runnable) entry.getValue());
             }
         }
 
@@ -61,7 +60,7 @@ public class ServiceLoader {
             ScheduledExecutorService scheduledExecutorService =
                 Executors.newScheduledThreadPool(scheduleCycleServiceMap.size());
             for (Map.Entry<String, IService> entry : this.scheduleCycleServiceMap.entrySet()) {
-                scheduledExecutorService.scheduleAtFixedRate((Runnable)entry.getValue(), 0, 10, TimeUnit.SECONDS);
+                scheduledExecutorService.scheduleAtFixedRate((Runnable) entry.getValue(), 0, 10, TimeUnit.SECONDS);
             }
         }
     }
@@ -132,10 +131,10 @@ public class ServiceLoader {
                     //get physical path
                     String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
                     findAndAddClassesInPackageByFile(packageStr, filePath, recursive, classes);
-                } else if("jar".equals(protocol)) {
+                } else if ("jar".equals(protocol)) {
                     JarFile jar;
                     String packageName = packageStr;
-                    jar = ((JarURLConnection)url.openConnection()).getJarFile();
+                    jar = ((JarURLConnection) url.openConnection()).getJarFile();
                     Enumeration<JarEntry> entries = jar.entries();
                     while (entries.hasMoreElements()) {
                         JarEntry entry = entries.nextElement();
@@ -157,7 +156,7 @@ public class ServiceLoader {
                                     String className = name.substring(packageName.length() + 1, name.length() - 6);
 
                                     try {
-                                        classes.add((Class<IService>)Class.forName(packageName + "." + className));
+                                        classes.add((Class<IService>) Class.forName(packageName + "." + className));
                                     } catch (ClassNotFoundException e) {
                                         logger.error("[traverse] occurs a ClassNotFoundException : " + e.getMessage());
                                     }

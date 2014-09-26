@@ -5,7 +5,6 @@ import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
-import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.freedom.messagebus.server.daemon.DaemonService;
 import com.freedom.messagebus.server.daemon.IService;
 import com.freedom.messagebus.server.daemon.RunPolicy;

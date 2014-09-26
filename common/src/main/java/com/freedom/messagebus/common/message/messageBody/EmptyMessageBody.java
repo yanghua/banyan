@@ -8,6 +8,6 @@ public class EmptyMessageBody implements IMessageBody {
     }
 
     public String toString() {
-        return  "a empty string";
+        return "a empty string";
     }
 }

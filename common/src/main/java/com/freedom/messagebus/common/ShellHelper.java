@@ -13,7 +13,7 @@ public class ShellHelper {
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
     public static void exec(@NotNull String cmdStr) throws IOException, InterruptedException {
-        String[] splitedParts = new String[] {
+        String[] splitedParts = new String[]{
             "/bin/sh", "-c", cmdStr
         };
         Process process = Runtime.getRuntime().exec(splitedParts);
