@@ -54,7 +54,7 @@ public class TopologyManager extends AbstractInitializer {
 
         //declare queue
         QueueManager queueManager = QueueManager.defaultQueueManager(this.host);
-        for (Node node : queueSet){
+        for (Node node : queueSet) {
             queueManager.create(node.getName());
         }
 

@@ -4,6 +4,7 @@ import com.freedom.messagebus.common.message.IMessageBody;
 
 import java.io.Serializable;
 
+@Deprecated
 public class LookuprespMessageBody implements IMessageBody, Serializable {
 
     private String exchangeName;

@@ -6,7 +6,9 @@ public class MessageFactory {
 
     public static Message createMessage(MessageType messageType) {
         Message aMsg = new Message();
+        aMsg.setMessageType(messageType);
         aMsg.setMessageHeader(createMessageHeader(messageType));
+
         switch (messageType) {
             case AppMessage:
                 aMsg.setMessageBody(new AppMessageBody());
@@ -41,7 +43,7 @@ public class MessageFactory {
         genericMsgHeader.setType(messageType.getType());
         switch (messageType) {
             case AppMessage:
-
+                genericMsgHeader.setType("appMessage");
                 break;
 
             case AuthreqMessage:

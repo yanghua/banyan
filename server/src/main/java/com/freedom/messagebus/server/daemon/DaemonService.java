@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface DaemonService {
     String value() default "";
+
     RunPolicy policy() default RunPolicy.ONCE;
 }

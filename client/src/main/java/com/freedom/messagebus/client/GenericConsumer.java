@@ -1,11 +1,15 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
+import com.freedom.messagebus.common.IMessageReceiveListener;
+import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * a generic consumer which implements IConsumer
@@ -21,8 +25,6 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
     /**
      * consume message
      *
-     * @param appKey          the app key which the consumer representation
-     * @param msgType         message type (business / system)
      * @param queueName       the name of queue that the consumer want to connect
      *                        generally, is the app-name
      * @param receiveListener the message receiver
@@ -32,19 +34,17 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
      */
     @NotNull
     @Override
-    public IConsumerCloser consume(@NotNull String appKey, @NotNull String msgType, @NotNull String queueName,
+    public IConsumerCloser consume(@NotNull String queueName,
                                    @NotNull IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext context = new MessageContext();
         context.setCarryType(MessageCarryType.CONSUME);
-        context.setAppKey(appKey);
-        context.setMsgType(msgType);
-        context.setRuleValue(queueName);
-        context.setListener(receiveListener);
+        context.setAppKey(super.context.getAppKey());
+        Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
+        context.setQueueNode(node);
 
-        context.setZooKeeper(this.context.getZooKeeper());
         context.setPool(this.context.getPool());
-        context.setConfigManager(this.context.getConfigManager());
         context.setConnection(this.context.getConnection());
+        context.setListener(receiveListener);
 
         //launch
         carry(context);

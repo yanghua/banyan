@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * the POJO that implements the TextMessage interface
  */
+@Deprecated
 public class TextMessagePOJO implements TextMessage {
 
     /**

@@ -1,18 +1,19 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consumer.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.client.model.MessageFormat;
-import com.freedom.messagebus.client.model.MsgBytes;
+import com.freedom.messagebus.common.IMessageReceiveListener;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.model.Node;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
-import com.freedom.messagebus.common.message.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,31 +39,21 @@ public class MessageContext {
      * for produce
      */
     @NotNull
-    private com.freedom.messagebus.common.message.Message[] messages;
+    private Message[] messages;
 
     /**
      * for consume
      */
     @NotNull
     private Message consumedMsg;
-    @NotNull
-    private byte[]  consumedMsgBytes;
+//    @NotNull
+//    private byte[]  consumedMsgBytes;
 
     @NotNull
     private MessageCarryType carryType;     //produce or consume
-
-    /**
-     * if carry type is produce then it means : routingKey
-     * else if carry type is consume then it means queueName.
-     * <p/>
-     * if this field's value is a empty string that means
-     * it will be matched with a generic rule like : #
-     * Note:
-     * when carry type is consume, this field can not be null or empty.
-     * It will be validated by a handle named : ParamValidator
-     */
     @NotNull
-    private String                  ruleValue;
+    private Node queueNode;                 //store current carry node
+
     @NotNull
     private Channel                 channel;
     @NotNull
@@ -74,13 +65,6 @@ public class MessageContext {
     @NotNull
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
-    /**
-     * for resource recycle
-     */
-    @NotNull
-    private ZooKeeper             zooKeeper;
-    @NotNull
-    private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
 
     public MessageContext() {
@@ -89,7 +73,7 @@ public class MessageContext {
     @NotNull
     public String getHost() {
         if (this.host == null) {
-            this.host = this.configManager.getConfigProperty().getProperty("messagebus.client.host");
+            this.host = ConfigManager.getInstance().getConfigProperty().getProperty("messagebus.client.host");
             return this.host;
         }
         return this.host;
@@ -157,17 +141,17 @@ public class MessageContext {
     }
 
     @NotNull
-    public Map<String, Object> getOtherParams() {
-        return otherParams;
+    public Node getQueueNode() {
+        return queueNode;
+    }
+
+    public void setQueueNode(@NotNull Node queueNode) {
+        this.queueNode = queueNode;
     }
 
     @NotNull
-    public String getRuleValue() {
-        return ruleValue;
-    }
-
-    public void setRuleValue(@NotNull String ruleValue) {
-        this.ruleValue = ruleValue;
+    public Map<String, Object> getOtherParams() {
+        return otherParams;
     }
 
     @NotNull
@@ -197,14 +181,14 @@ public class MessageContext {
         this.consumedMsg = consumedMsg;
     }
 
-    @NotNull
-    public byte[] getConsumedMsgBytes() {
-        return consumedMsgBytes;
-    }
-
-    public void setConsumedMsgBytes(@NotNull byte[] consumedMsgBytes) {
-        this.consumedMsgBytes = consumedMsgBytes;
-    }
+//    @NotNull
+//    public byte[] getConsumedMsgBytes() {
+//        return consumedMsgBytes;
+//    }
+//
+//    public void setConsumedMsgBytes(@NotNull byte[] consumedMsgBytes) {
+//        this.consumedMsgBytes = consumedMsgBytes;
+//    }
 
     @NotNull
     public IMessageReceiveListener getListener() {
@@ -213,24 +197,6 @@ public class MessageContext {
 
     public void setListener(@NotNull IMessageReceiveListener listener) {
         this.listener = listener;
-    }
-
-    @NotNull
-    public ZooKeeper getZooKeeper() {
-        return zooKeeper;
-    }
-
-    public void setZooKeeper(@NotNull ZooKeeper zooKeeper) {
-        this.zooKeeper = zooKeeper;
-    }
-
-    @NotNull
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public void setConfigManager(@NotNull ConfigManager configManager) {
-        this.configManager = configManager;
     }
 
     public AbstractPool<Channel> getPool() {

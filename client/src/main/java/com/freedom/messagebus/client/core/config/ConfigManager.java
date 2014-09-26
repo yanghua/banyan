@@ -6,16 +6,20 @@ import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.client.model.RuleModel;
 import com.freedom.messagebus.client.model.RuleType;
+import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.ZooKeeper;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * the config manager
@@ -24,8 +28,8 @@ public class ConfigManager {
 
     private static final Log logger = LogFactory.getLog(ConfigManager.class);
 
-    @NotNull
-    private ZooKeeper zooKeeper;
+    private boolean inited = false;
+    public static volatile ConfigManager instance;
 
     @NotNull
     private Properties configProperty;
@@ -42,27 +46,20 @@ public class ConfigManager {
     private List<AbstractHandler> consumerHandlerChain;
 
     @NotNull
-    private Map<String, RuleModel> routingKeyRules;
+    private Map<String, Node> exchangeNodeMap;
     @NotNull
-    private Map<String, RuleModel> queueNameRules;
+    private Map<String, Node> queueNodeMap;
 
-    private List<String> paths;
-
-    private boolean inited = false;
-
-    public static volatile ConfigManager instance;
-
-    private ConfigManager(@NotNull ZooKeeper zooKeeper) {
-        this.zooKeeper = zooKeeper;
+    private ConfigManager() {
         this.inited = this.init();
     }
 
     @NotNull
-    public static ConfigManager getInstance(@NotNull ZooKeeper zooKeeper) {
+    public static ConfigManager getInstance() {
         if (instance == null) {
             synchronized (ConfigManager.class) {
                 if (instance == null) {
-                    instance = new ConfigManager(zooKeeper);
+                    instance = new ConfigManager();
                 }
             }
         }
@@ -72,20 +69,16 @@ public class ConfigManager {
 
     public Properties getConfigProperty() {
         if (!this.inited)
-            throw new IllegalStateException("ConfigManager inited failed");
+            throw new IllegalStateException("ZookeeperManager inited failed");
 
         return configProperty;
     }
 
     public Properties getPoolProperties() {
         if (!this.inited)
-            throw new IllegalStateException("ConfigManager inited failed");
+            throw new IllegalStateException("ZookeeperManager inited failed");
 
         return poolProperties;
-    }
-
-    public List<String> getPaths() {
-        return paths;
     }
 
     private boolean init() {
@@ -93,30 +86,12 @@ public class ConfigManager {
             configProperty = new Properties();
             poolProperties = new Properties();
 
-            if (!this.zooKeeper.getState().isAlive())
-                throw new RuntimeException("zookeeper is not alive");
-
-            this.initWithRemoteConfig();
-
-            //TODO:test
-//            File file = new File((this.getClass().getClassLoader().getResource("pool.properties")).toURI());
-//            byte[] fileBytes = CommonUtil.getBytesFromFile(file);
-//            zooKeeper.setData("/proxy", fileBytes, 19);
-//
-//            byte[] poolData = zooKeeper.getData("/proxy", false, null);
-//            ByteArrayInputStream bais = new ByteArrayInputStream(poolData);
-//            poolProperties.load(bais);
-
             configProperty.load(this.getClass().getClassLoader().getResourceAsStream("config.properties"));
             poolProperties.load(this.getClass().getClassLoader().getResourceAsStream("pool.properties"));
 
             //parse
-            List<HandlerModel> pHandlerModels = parseHandlers("produce");
-            List<HandlerModel> cHandlerModels = parseHandlers("consumer");
-
-            //changed to unmodifiable
-            produceHandlerModels = Collections.unmodifiableList(pHandlerModels);
-            consumerHandlerModels = Collections.unmodifiableList(cHandlerModels);
+            produceHandlerModels = parseHandlers("produce");
+            consumerHandlerModels = parseHandlers("consumer");
 
             //box
             produceHandlerChain = initHandlers(MessageCarryType.PRODUCE);
@@ -127,40 +102,13 @@ public class ConfigManager {
                 printHandlerChain(MessageCarryType.CONSUME);
             }
 
-            //parse rule
-            Map<String, RuleModel> rRules = parseRule(RuleType.ROUTINGKEY);
-            Map<String, RuleModel> qRules = parseRule(RuleType.QUEUENAME);
-
-            //changed to unmodifiable
-            routingKeyRules = Collections.unmodifiableMap(rRules);
-            queueNameRules = Collections.unmodifiableMap(qRules);
-
-            //parse path
-            paths = parsePath();
+            this.parseRouterInfo();
 
             return true;
         } catch (IOException e) {
             logger.error("[init] occurs a IOException : " + e.getMessage());
             return false;
         }
-//        catch (KeeperException e) {
-//            logger.error("[init] occurs a KeeperException : " + e.getMessage());
-//            return false;
-//        } catch (InterruptedException e) {
-//            logger.error("[init] occurs a InterruptedException : " + e.getMessage());
-//            return false;
-//        } catch (URISyntaxException e) {
-//            logger.error("[init] occurs a URISyntaxException : " + e.getMessage());
-//            return false;
-//        }
-    }
-
-    private void initWithLocalConfig() {
-
-    }
-
-    private void initWithRemoteConfig() {
-
     }
 
     @NotNull
@@ -184,13 +132,13 @@ public class ConfigManager {
     }
 
     @NotNull
-    public Map<String, RuleModel> getRoutingKeyRules() {
-        return routingKeyRules;
+    public Map<String, Node> getExchangeNodeMap() {
+        return exchangeNodeMap;
     }
 
     @NotNull
-    public Map<String, RuleModel> getQueueNameRules() {
-        return queueNameRules;
+    public Map<String, Node> getQueueNodeMap() {
+        return queueNodeMap;
     }
 
     public void updateHandlerChain(String path, byte[] data) {
@@ -238,13 +186,13 @@ public class ConfigManager {
             xPath = element.createXPath("ns:handler-name");
             xPath.setNamespaceURIs(map);
 
-            Node handlerNameNode = xPath.selectSingleNode(element);
+            org.dom4j.Node handlerNameNode = xPath.selectSingleNode(element);
             String handlerName = handlerNameNode.getStringValue();
 
             xPath = element.createXPath("ns:handler-path");
             xPath.setNamespaceURIs(map);
 
-            Node handlerPathNode = xPath.selectSingleNode(element);
+            org.dom4j.Node handlerPathNode = xPath.selectSingleNode(element);
             String handlerPath = handlerPathNode.getStringValue();
 
             HandlerModel model = new HandlerModel();
@@ -340,66 +288,10 @@ public class ConfigManager {
     }
 
     @NotNull
-    private Map<String, RuleModel> parseRule(RuleType ruleType) {
-        Map<String, RuleModel> result = new HashMap<String, RuleModel>();
-
+    public synchronized void parseRouterInfo () throws MalformedURLException {
         SAXReader reader = new SAXReader();
-        URL url = ConfigManager.class.getClassLoader().getResource("rule.xml");
-        Document doc = null;
-        String nsPartialStr = "";
-
-        switch (ruleType) {
-            case ROUTINGKEY:
-                nsPartialStr = "routingKeys";
-                break;
-
-            case QUEUENAME:
-                nsPartialStr = "queueNames";
-                break;
-        }
-
-        try {
-            doc = reader.read(url);
-        } catch (DocumentException e) {
-            logger.error("[parseRule] occurs a DocumentException exception : " + e.getMessage());
-        }
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("ns", "http://com.freedom.messagebus");
-        XPath xPath = doc.createXPath("//ns:rules/ns:" + nsPartialStr + "/ns:rule");
-        xPath.setNamespaceURIs(map);
-
-        List<Element> ruleElements = xPath.selectNodes(doc);
-
-        for (Element ruleElement : ruleElements) {
-            xPath = ruleElement.createXPath("ns:rule-name");
-            xPath.setNamespaceURIs(map);
-
-            Node ruleNameNode = xPath.selectSingleNode(ruleElement);
-            String ruleName = ruleNameNode.getStringValue();
-
-            xPath = ruleElement.createXPath("ns:rule-pattern");
-            xPath.setNamespaceURIs(map);
-
-            Node rulePatternNode = xPath.selectSingleNode(ruleElement);
-            String rulePattern = rulePatternNode.getStringValue();
-
-            RuleModel ruleModel = new RuleModel();
-            ruleModel.setRuleName(ruleName);
-            ruleModel.setRulePattern(rulePattern);
-
-            result.put(ruleModel.getRuleName(), ruleModel);
-        }
-
-        return result;
-    }
-
-    @NotNull
-    private List<String> parsePath() {
-        List<String> result = new ArrayList<String>();
-
-        SAXReader reader = new SAXReader();
-        URL url = ConfigManager.class.getClassLoader().getResource("path.xml");
+        File routerFile = new File(CONSTS.EXPORTED_NODE_FILE_PATH);
+        URL url = routerFile.toURI().toURL();
         Document doc = null;
 
         try {
@@ -408,19 +300,38 @@ public class ConfigManager {
             logger.error("[parseRule] occurs a DocumentException exception : " + e.getMessage());
         }
 
-        Map<String, String> nsmap = new HashMap<String, String>();
-        nsmap.put("ns", "http://com.freedom.messagebus");
-        String rootXPathStr = "//ns:path";
-        XPath xPath = doc.createXPath(rootXPathStr);
-        xPath.setNamespaceURIs(nsmap);
+        Element rootElement = doc.getRootElement();
+        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
 
-        List<Element> paths = xPath.selectNodes(doc);
+        List<Element> rowElements = databaseNode.selectNodes("//row");
+        List<Node> nodes = new ArrayList<>(rowElements.size());
+        for (Element row : rowElements) {
+            Node anode = new Node();
 
-        for (Element e : paths) {
-            result.add(e.attributeValue("p"));
+            anode.setGeneratedId(Integer.valueOf(row.selectSingleNode("field[@name='generatedId']").getStringValue()));
+            anode.setName(row.selectSingleNode("field[@name='name']").getStringValue());
+            anode.setValue(row.selectSingleNode("field[@name='value']").getStringValue());
+            anode.setParentId(Integer.valueOf(row.selectSingleNode("field[@name='parentId']").getStringValue()));
+            anode.setType(Short.valueOf(row.selectSingleNode("field[@name='type']").getStringValue()));
+            anode.setLevel(Short.valueOf(row.selectSingleNode("field[@name='level']").getStringValue()));
+            anode.setRouterType(row.selectSingleNode("field[@name='routerType']").getStringValue());
+            anode.setRoutingKey(row.selectSingleNode("field[@name='routingKey']").getStringValue());
+
+            nodes.add(anode);
         }
 
-        return result;
+        this.extractDifferentNodes(nodes);
     }
 
+    private void extractDifferentNodes(List<Node> nodes) {
+        this.exchangeNodeMap = new ConcurrentHashMap<>();
+        this.queueNodeMap = new ConcurrentHashMap<>();
+
+        for (Node node : nodes) {
+            if (node.getType() == 0)
+                this.exchangeNodeMap.put(node.getName(), node);
+            else
+                this.queueNodeMap.put(node.getName(), node);
+        }
+    }
 }

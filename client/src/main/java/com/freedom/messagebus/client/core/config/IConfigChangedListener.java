@@ -12,11 +12,9 @@ public interface IConfigChangedListener {
      *
      * @param path          the changed znode's name
      * @param newData       new data
-     * @param ConfigManager the config manager
      */
     public void onChanged(String path,
                           byte[] newData,
-                          Watcher.Event.EventType eventType,
-                          ConfigManager ConfigManager);
+                          Watcher.Event.EventType eventType);
 
 }

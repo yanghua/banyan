@@ -48,7 +48,7 @@ public class TopologyManager {
     private String sysNotificationRoutingKey = "routingkey.message.system.notification";
     private String sysReportStateRoutingKey  = "routingkey.message.system.reportstate";
 
-    //based on business for every registered app
+    //based on business for every registered App
     private String oaRoutingKey  = "routingkey.message.business.oa.#";
     private String erpRoutingKey = "routingkey.message.business.erp";
     private String crmRoutingKey = "routingkey.message.business.crm";

@@ -4,12 +4,17 @@ import com.freedom.messagebus.common.message.IMessageHeader;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
 import com.rabbitmq.client.AMQP;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageHeaderProcessor {
 
+    private static final Log logger = LogFactory.getLog(MessageHeaderProcessor.class);
+
     public static AMQP.BasicProperties box(IMessageHeader header) {
         AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
+
         return builder.messageId(String.valueOf(header.getMessageId()))
                       .appId(header.getAppId())
                       .clusterId(header.getClusterId())
@@ -34,7 +39,11 @@ public class MessageHeaderProcessor {
         msgHeader.setCorrelationId(properties.getCorrelationId());
         msgHeader.setHeaders(properties.getHeaders());
         msgHeader.setTimestamp(properties.getTimestamp());
-        msgHeader.setMessageId(properties.getMessageId());
+        String msgIdStr = properties.getMessageId();
+        if (msgIdStr != null && !msgIdStr.isEmpty())
+            msgHeader.setMessageId(Long.valueOf(msgIdStr));
+        else
+            logger.error("[unbox] illegal message id (can not be null) " );
 
         switch (msgType) {
             case AppMessage:
@@ -68,7 +77,7 @@ public class MessageHeaderProcessor {
                 break;
         }
 
-        return null;
+        return msgHeader;
     }
 
 }

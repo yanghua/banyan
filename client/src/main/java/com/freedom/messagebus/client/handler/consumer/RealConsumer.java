@@ -3,6 +3,7 @@ package com.freedom.messagebus.client.handler.consumer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
@@ -27,11 +28,10 @@ public class RealConsumer extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        Channel channel = context.getChannel();
 
-        QueueingConsumer consumer = new QueueingConsumer(channel);
+        QueueingConsumer consumer = null;
         try {
-            channel.basicConsume(context.getRuleValue(), false, consumer);
+            consumer = ProxyConsumer.consume(context.getChannel(), context.getQueueNode().getValue());
         } catch (IOException e) {
             logger.error("[handler] occurs a IOException : " + e.getMessage());
         }

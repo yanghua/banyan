@@ -1,5 +1,6 @@
 package com.freedom.messagebus.client.core.config;
 
+import com.freedom.messagebus.common.CONSTS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.KeeperException;
@@ -7,7 +8,13 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -19,28 +26,34 @@ public class LongLiveZookeeper {
 
     private static final Log logger = LogFactory.getLog(LongLiveZookeeper.class);
 
-    private static volatile ZooKeeper      zooKeeper = null;
-    private static          CountDownLatch latch     = new CountDownLatch(1);
-    private static String host;
-    private static int    port;
+    private static volatile LongLiveZookeeper longLiveZookeeper = null;
+    private static          CountDownLatch    latch             = new CountDownLatch(1);
 
-    private static ZooKeeper createZKClient() {
+    private ZooKeeper zooKeeper;
+    private String host;
+    private int port;
+
+    private LongLiveZookeeper(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.init();
+    }
+
+    private void init() {
         try {
-            return new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
+            zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }
     }
 
-    public static ZooKeeper getZKInstance(String h, int p) {
-        if (zooKeeper == null) {
+    public static LongLiveZookeeper getZKInstance(String h, int p) {
+        if (longLiveZookeeper == null) {
             synchronized (LongLiveZookeeper.class) {
-                if (zooKeeper == null) {
-                    host = h;
-                    port = p;
+                if (longLiveZookeeper == null) {
 
                     latch = new CountDownLatch(1);
-                    zooKeeper = createZKClient();
+                    longLiveZookeeper = new LongLiveZookeeper(h, p);
 
                     try {
                         latch.await(30, TimeUnit.SECONDS);
@@ -54,10 +67,10 @@ public class LongLiveZookeeper {
             }
         }
 
-        return zooKeeper;
+        return longLiveZookeeper;
     }
 
-    public static void close() {
+    public void close() {
         if (zooKeeper != null) {
             synchronized (LongLiveZookeeper.class) {
                 if (zooKeeper != null) {
@@ -72,7 +85,7 @@ public class LongLiveZookeeper {
         }
     }
 
-    public static void watchPaths(String[] paths, IConfigChangedListener listener) {
+    public void watchPaths(String[] paths, IConfigChangedListener listener) {
         try {
             PathWatcher watcher = new PathWatcher(zooKeeper, listener);
             for (String path : paths) {
@@ -85,22 +98,24 @@ public class LongLiveZookeeper {
         }
     }
 
+    public boolean isAlive() {
+        return this.zooKeeper.getState().isAlive();
+    }
+
     /**
      * session watcher for watching zookeeper's session timeout
      */
-    private static class SessionWatcher implements Watcher {
+    private class SessionWatcher implements Watcher {
 
         @Override
         public void process(WatchedEvent watchedEvent) {
-            logger.debug("loop");
             if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
                 if (latch != null) {
                     latch.countDown();
                 }
             } else if (watchedEvent.getState() == Event.KeeperState.Expired) {
                 close();
-                getZKInstance(host, port);
-
+                init();
             }
         }
     }
@@ -108,7 +123,7 @@ public class LongLiveZookeeper {
     /**
      * path watcher for watching znode's change
      */
-    private static class PathWatcher implements Watcher {
+    private class PathWatcher implements Watcher {
 
         private ZooKeeper              zooKeeper;
         private IConfigChangedListener listener;
@@ -120,34 +135,22 @@ public class LongLiveZookeeper {
 
         @Override
         public void process(WatchedEvent watchedEvent) {
-            logger.debug("------->watching");
-
             String path = watchedEvent.getPath();
+            logger.debug("[process] path : " + path + "changed");
 
             try {
                 switch (watchedEvent.getType()) {
-
                     case NodeDataChanged:
-                        logger.debug("NodeDataChanged : " + path);
-                        byte[] data = this.zooKeeper.getData(path, false, null);
-                        logger.info("data is : " + new String(data));
-                        this.listener.onChanged(path, data, watchedEvent.getType(),
-                                                ConfigManager.getInstance(this.zooKeeper));
-                        break;
-
                     case NodeCreated:
-                        //TODO:
-                        break;
-
                     case NodeDeleted:
-                        //TODO:
+                        byte[] data = this.zooKeeper.getData(path, false, null);
+                        this.processPathChange(path, data);
+                        this.listener.onChanged(path, data, watchedEvent.getType());
                         break;
 
                 }
-            } catch (KeeperException e) {
-                logger.error("[process] occurs a KeeperException : " + e.getMessage());
-            } catch (InterruptedException e) {
-                logger.error("[process] occurs a InterruptedException : " + e.getMessage());
+            } catch (KeeperException| IOException | InterruptedException e) {
+                logger.error("[process] occurs a Exception : " + e.getMessage());
             } finally {
                 try {
                     this.zooKeeper.exists(path, this);
@@ -157,6 +160,38 @@ public class LongLiveZookeeper {
                     logger.error("[process] finally occurs a InterruptedException : " + e.getMessage());
                 }
             }
+        }
+
+        private void processPathChange(String path, byte[] newData) throws IOException {
+            if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
+                this.refreshLocalCachedRouterFile(path, newData);
+            } else {
+                //TODO
+            }
+        }
+
+        private void refreshLocalCachedRouterFile (String path, byte[] newData) throws IOException {
+            Path routerFilePath = FileSystems.getDefault().getPath(CONSTS.EXPORTED_NODE_FILE_PATH);
+            FileOutputStream fos = null;
+            try {
+                if (!Files.exists(routerFilePath)) { //override
+                    Files.createFile(routerFilePath);
+                }
+
+                fos = new FileOutputStream(CONSTS.EXPORTED_NODE_FILE_PATH);
+                fos.write(newData);
+            } catch (IOException e) {
+                logger.error("[refreshLocalCachedRouterFile] occurs a IOException : " + e.getMessage());
+                throw new IOException(e);
+            } finally {
+                try {
+                    fos.flush();
+                    fos.close();
+                } catch (IOException e) {
+                    logger.error("[refreshLocalCachedRouterFile] finally block occurs a IOException : " + e.getMessage());
+                }
+            }
+
         }
 
     }

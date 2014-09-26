@@ -56,7 +56,7 @@ public class ProxyConsumer implements Runnable {
                 Message msg = new Message();
                 initMessage(msg, msgType, properties, msgBody);
 
-                listener.onMessage(msg, msgType);
+                listener.onMessage(msg);
 
                 this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             }

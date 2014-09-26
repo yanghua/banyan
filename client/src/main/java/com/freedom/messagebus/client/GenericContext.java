@@ -1,6 +1,7 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -14,22 +15,24 @@ import org.jetbrains.annotations.NotNull;
 public class GenericContext {
 
     @NotNull
-    private ZooKeeper             zooKeeper;
+    private LongLiveZookeeper             zooKeeper;
     @NotNull
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
     @NotNull
     private Connection            connection;
+    @NotNull
+    private String                appKey;
 
     public GenericContext() {
     }
 
     @NotNull
-    public ZooKeeper getZooKeeper() {
+    public LongLiveZookeeper getZooKeeper() {
         return zooKeeper;
     }
 
-    public void setZooKeeper(@NotNull ZooKeeper zooKeeper) {
+    public void setZooKeeper(@NotNull LongLiveZookeeper zooKeeper) {
         this.zooKeeper = zooKeeper;
     }
 
@@ -57,6 +60,15 @@ public class GenericContext {
 
     public void setConnection(@NotNull Connection connection) {
         this.connection = connection;
+    }
+
+    @NotNull
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(@NotNull String appKey) {
+        this.appKey = appKey;
     }
 
     @Override

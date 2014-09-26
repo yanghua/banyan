@@ -3,7 +3,6 @@ package com.freedom.messagebus.client.handler.produce;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.client.model.MsgBytes;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
@@ -11,7 +10,6 @@ import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
 import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +40,7 @@ public class RealProducer extends AbstractHandler {
                     AMQP.BasicProperties properties = MessageHeaderProcessor.box(msg.getMessageHeader());
                     ProxyProducer.produceWithTX(CONSTS.PROXY_EXCHANGE_NAME,
                                                 context.getChannel(),
-                                                context.getRuleValue(),
+                                                context.getQueueNode().getRoutingKey(),
                                                 msgBody,
                                                 properties);
                 }
@@ -53,10 +51,10 @@ public class RealProducer extends AbstractHandler {
                     AMQP.BasicProperties properties = MessageHeaderProcessor.box(msg.getMessageHeader());
 
                     ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
-                                               context.getChannel(),
-                                               context.getRuleValue(),
-                                               msgBody,
-                                               properties);
+                                          context.getChannel(),
+                                          context.getQueueNode().getRoutingKey(),
+                                          msgBody,
+                                          properties);
                 }
             }
 

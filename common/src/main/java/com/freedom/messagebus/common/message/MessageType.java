@@ -15,10 +15,13 @@ public enum MessageType {
 
     AuthrespMessage("authrespMessage", 2),
 
+    @Deprecated
     LookupreqMessage("lookupreqMessage", 3),
 
+    @Deprecated
     LookuprespMessage("lookuprespMessage", 4),
 
+    @Deprecated
     CacheExpiredMessage("cacheExpiredMessage", 5);
 
     private static final Log                      logger     = LogFactory.getLog(MessageType.class);

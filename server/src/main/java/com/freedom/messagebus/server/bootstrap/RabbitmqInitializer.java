@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class RabbitmqInitializer {
 
-    private static Log logger = LogFactory.getLog(RabbitmqInitializer.class);
+    private static          Log                 logger   = LogFactory.getLog(RabbitmqInitializer.class);
     private static volatile RabbitmqInitializer instance = null;
 
     public static RabbitmqInitializer getInstance() {
@@ -21,7 +21,7 @@ public class RabbitmqInitializer {
         return instance;
     }
 
-    public void launch () {
+    public void launch() {
 
     }
 

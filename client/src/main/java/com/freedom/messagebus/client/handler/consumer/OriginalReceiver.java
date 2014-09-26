@@ -5,11 +5,12 @@ import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
-import com.freedom.messagebus.client.model.MessageFormat;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConsumerCancelledException;
-import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.QueueingConsumer;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageType;
+import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
+import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
+import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
+import com.rabbitmq.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
     @NotNull
     private Thread          currentThread;
     @NotNull
-    private DefaultConsumer currentConsumer;
+    private QueueingConsumer currentConsumer;
     @NotNull
     private Channel         currentChannel;
 
@@ -68,22 +69,27 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
     }
 
     public void run() {
-        QueueingConsumer consumer = null;
-        if (this.currentConsumer instanceof QueueingConsumer) {
-            consumer = (QueueingConsumer) this.currentConsumer;
-        } else {
-            throw new RuntimeException("unsupported type of consumer");
-        }
-
         try {
             while (true) {
-                QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                this.context.setMsgFormat(MessageFormat.lookup(delivery.getProperties().getContentType()));
-                this.context.setConsumedMsgBytes(delivery.getBody());
+                QueueingConsumer.Delivery delivery = this.currentConsumer.nextDelivery();
 
-                this.chain.handle(this.context);
+                AMQP.BasicProperties properties = delivery.getProperties();
+                byte[] msgBody = delivery.getBody();
 
                 this.currentChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+
+                String msgTypeStr = properties.getType();
+                if (msgTypeStr == null || msgTypeStr.isEmpty()) {
+                    logger.error("[run] message type is null or empty");
+                    continue;
+                }
+
+                MessageType msgType = MessageType.lookup(msgTypeStr);
+                Message msg = new Message();
+                initMessage(msg, msgType, properties, msgBody);
+
+                this.context.setConsumedMsg(msg);
+                this.chain.handle(this.context);
             }
         } catch (InterruptedException e) {
             logger.info("[run] close the consumer's message handler!");
@@ -108,5 +114,13 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
 
     protected long getThreadID() {
         return this.currentThread.getId();
+    }
+
+    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
+        msg.setMessageHeader(MessageHeaderProcessor.unbox(properties, msgType));
+        msg.setMessageType(msgType);
+
+        IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
+        msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
     }
 }

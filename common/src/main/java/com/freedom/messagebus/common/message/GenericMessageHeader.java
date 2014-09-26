@@ -9,12 +9,12 @@ import java.util.Map;
  */
 class GenericMessageHeader implements IMessageHeader, Serializable {
 
-    private String              messageId;
+    private long                messageId;
     private String              type;
     private Date                timestamp;
     private short               priority;
     private String              expiration;
-    private short               deliveryMode;
+    private short               deliveryMode = 2;
     private Map<String, Object> headers;
     private String              contentEncoding;
     private String              contentType;
@@ -27,11 +27,11 @@ class GenericMessageHeader implements IMessageHeader, Serializable {
     protected GenericMessageHeader() {
     }
 
-    public String getMessageId() {
+    public long getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    public void setMessageId(long messageId) {
         this.messageId = messageId;
     }
 
@@ -39,7 +39,7 @@ class GenericMessageHeader implements IMessageHeader, Serializable {
         return type;
     }
 
-    protected void setType(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -68,7 +68,7 @@ class GenericMessageHeader implements IMessageHeader, Serializable {
     }
 
     public short getDeliveryMode() {
-        return deliveryMode;
+        return 2;
     }
 
     private void setDeliveryMode(short deliveryMode) {

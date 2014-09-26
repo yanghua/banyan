@@ -1,5 +1,6 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.client.core.authorize.Authorizer;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.config.IConfigChangedListener;
 import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
@@ -7,6 +8,10 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
+import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageFactory;
+import com.freedom.messagebus.common.message.MessageType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -29,12 +34,14 @@ public class Messagebus {
     private static volatile Messagebus instance = null;
 
     @NotNull
+    private String appKey;
+    @NotNull
     private IProducer producer;
     @NotNull
     private IConsumer consumer;
 
     @NotNull
-    private ZooKeeper             zookeeper;
+    private LongLiveZookeeper             zookeeper;
     @NotNull
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
@@ -48,15 +55,15 @@ public class Messagebus {
     private String zkHost;
     private int    zkPort;
 
-    private Messagebus() {
-
+    private Messagebus(String appKey) {
+        this.appKey = appKey;
     }
 
-    public static Messagebus getInstance() {
+    public static Messagebus getInstance(String appKey) {
         if (instance == null) {
             synchronized (Messagebus.class) {
                 if (instance == null) {
-                    instance = new Messagebus();
+                    instance = new Messagebus(appKey);
                 }
             }
         }
@@ -75,26 +82,27 @@ public class Messagebus {
         //load class
         this.zookeeper = LongLiveZookeeper.getZKInstance(this.getZkHost(), this.getZkPort());
 
-        if (!this.zookeeper.getState().isAlive())
+        if (!this.zookeeper.isAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
 
-        this.configManager = ConfigManager.getInstance(this.zookeeper);
-        int pathNum = this.configManager.getPaths().size();
-        LongLiveZookeeper.watchPaths(configManager.getPaths().toArray(new String[pathNum]),
-                                     new IConfigChangedListener() {
-                                         @Override
-                                         public void onChanged(String path,
-                                                               byte[] newData,
-                                                               Watcher.Event.EventType eventType,
-                                                               ConfigManager cfManager) {
-                                             logger.debug("path : " + path + " has changed!");
-
-                                             if (path.equals("/testRemoteHandler"))
-                                                 cfManager.updateHandlerChain(path, newData);
-                                         }
-                                     });
+        this.configManager = ConfigManager.getInstance();
+//        int pathNum = this.configManager.getPaths().size();
+//        this.zookeeper.watchPaths(configManager.getPaths().toArray(new String[pathNum]),
+//                                     new IConfigChangedListener() {
+//                                         @Override
+//                                         public void onChanged(String path,
+//                                                               byte[] newData,
+//                                                               Watcher.Event.EventType eventType) {
+//                                             logger.debug("path : " + path + " has changed!");
+//
+//                                             if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER))
+//                                                 cfManager.updateHandlerChain(path, newData);
+//                                         }
+//                                     });
 
         this.initConnection();
+
+        this.doAuth();
 
         this.useChannelPool =
             Boolean.valueOf(configManager.getConfigProperty().getProperty("messagebus.client.useChannelPool"));
@@ -104,6 +112,7 @@ public class Messagebus {
         }
 
         GenericContext context = new GenericContext();
+        context.setAppKey(appKey);
         context.setPool(this.pool);
         context.setConfigManager(this.configManager);
         context.setZooKeeper(this.zookeeper);
@@ -131,7 +140,7 @@ public class Messagebus {
             if (this.connection.isOpen())
                 this.connection.close();
 
-            LongLiveZookeeper.close();
+            this.zookeeper.close();
 
             this.isOpen = false;
         } catch (IOException e) {
@@ -210,4 +219,13 @@ public class Messagebus {
         pool = new ChannelPool(config, new ChannelFactory(this.connection));
     }
 
+    private boolean doAuth() {
+        //auth request
+        Message authReqMsg = MessageFactory.createMessage(MessageType.AuthreqMessage);
+        Authorizer authorizer = Authorizer.getInstance();
+//        authorizer.syncRequestAuthorize();
+
+        //TODO
+        return false;
+    }
 }

@@ -7,6 +7,7 @@ import java.io.Serializable;
 /**
  * the pojo that implement the ObjectMessage's interface
  */
+@Deprecated
 public class ObjectMessagePOJO implements ObjectMessage {
 
     /**

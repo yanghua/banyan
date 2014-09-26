@@ -1,9 +1,9 @@
 package com.freedom.messagebus.client.handler.consumer;
 
-import com.freedom.messagebus.client.IMessageReceiveListener;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.common.IMessageReceiveListener;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +21,7 @@ public class MessageProcessor extends AbstractHandler {
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
         IMessageReceiveListener receiveListener = context.getListener();
-        receiveListener.onMessage(context.getConsumedMsg(), context.getMsgFormat());
+        receiveListener.onMessage(context.getConsumedMsg());
 
         chain.handle(context);
     }

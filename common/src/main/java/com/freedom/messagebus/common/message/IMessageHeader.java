@@ -6,9 +6,9 @@ import java.util.Map;
 
 public interface IMessageHeader {
 
-    public String getMessageId();
+    public long getMessageId();
 
-    public void setMessageId(String messageId);
+    public void setMessageId(long messageId);
 
     public String getType();
 
