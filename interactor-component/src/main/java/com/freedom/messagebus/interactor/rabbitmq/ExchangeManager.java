@@ -2,6 +2,7 @@ package com.freedom.messagebus.interactor.rabbitmq;
 
 import com.freedom.messagebus.common.AbstractInitializer;
 import com.freedom.messagebus.common.RouterType;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ public class ExchangeManager extends AbstractInitializer {
         this.channel.exchangeDeclare(exchangeName, routerType.toString(), true);
 
         //bind
-        if (bindTo != null && !bindTo.isEmpty() && this.exchangeExists(bindTo))
+        if (bindTo != null && !bindTo.isEmpty() && this.innerExists(bindTo, channel))
             this.channel.exchangeBind(exchangeName, bindTo, routingKey);
 
         super.close();
@@ -52,7 +53,7 @@ public class ExchangeManager extends AbstractInitializer {
 
     public void bind(@NotNull String exchangeName, @NotNull String bindTo, String routingKey) throws IOException {
         super.init();
-        if (!this.exchangeExists(exchangeName) || !this.exchangeExists(bindTo)) {
+        if (!this.innerExists(exchangeName, channel) || !this.innerExists(bindTo, channel)) {
             logger.error("exchange : " + exchangeName + " or " + bindTo + "is not exists");
             throw new IOException("exchange : " + exchangeName + " or " + bindTo + "is not exists");
         }
@@ -63,7 +64,7 @@ public class ExchangeManager extends AbstractInitializer {
 
     public void unbind(@NotNull String exchangeName, @NotNull String unbindTo, String routingKey) throws IOException {
         super.init();
-        if (!this.exchangeExists(exchangeName) || !this.exchangeExists(unbindTo)) {
+        if (!this.innerExists(exchangeName, channel) || !this.innerExists(unbindTo, channel)) {
             logger.error("exchange : " + exchangeName + " or " + unbindTo + "is not exists");
             throw new IOException("exchange : " + exchangeName + " or " + unbindTo + "is not exists");
         }
@@ -74,7 +75,7 @@ public class ExchangeManager extends AbstractInitializer {
 
     public void delete(@NotNull String exchangeName) throws IOException {
         super.init();
-        if (!this.exchangeExists(exchangeName)) {
+        if (!this.innerExists(exchangeName, channel)) {
             logger.error("exchange : " + exchangeName + " is not exists");
             throw new IOException("exchange : " + exchangeName + " is not exists");
         }
@@ -96,5 +97,15 @@ public class ExchangeManager extends AbstractInitializer {
         return result;
     }
 
+    private boolean innerExists(@NotNull String exchangeName, @NotNull Channel outerChannel) {
+        boolean result = true;
+        try {
+            outerChannel.exchangeDeclarePassive(exchangeName);
+        } catch (IOException e) {
+            result = false;
+        }
+
+        return result;
+    }
 
 }

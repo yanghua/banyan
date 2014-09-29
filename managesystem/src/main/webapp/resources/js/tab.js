@@ -1,5 +1,5 @@
 // JavaScript Document
-function tab(o, s, cb, ev){//tabÇÐ»»Àà
+function tab(o, s, cb, ev){//tabï¿½Ð»ï¿½ï¿½ï¿½
 	var $ = function(o){return document.getElementById(o)};
 	var css = o.split((s||'_'));
 	if(css.length!=4)return;

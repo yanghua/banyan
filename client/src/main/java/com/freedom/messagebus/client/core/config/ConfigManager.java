@@ -42,9 +42,17 @@ public class ConfigManager {
     @NotNull
     private List<HandlerModel>    consumerHandlerModels;
     @NotNull
+    private List<HandlerModel>    requestHandlerModels;
+    @NotNull
+    private List<HandlerModel>    responseHandlerModels;
+    @NotNull
     private List<AbstractHandler> produceHandlerChain;
     @NotNull
     private List<AbstractHandler> consumerHandlerChain;
+    @NotNull
+    private List<AbstractHandler> requestHandlerChain;
+    @NotNull
+    private List<AbstractHandler> responseHandlerChain;
 
     @NotNull
     private Map<String, Node> exchangeNodeMap;
@@ -93,10 +101,14 @@ public class ConfigManager {
             //parse
             produceHandlerModels = parseHandlers("produce");
             consumerHandlerModels = parseHandlers("consumer");
+            requestHandlerModels = parseHandlers("request");
+            responseHandlerModels = parseHandlers("response");
 
             //box
             produceHandlerChain = initHandlers(MessageCarryType.PRODUCE);
             consumerHandlerChain = initHandlers(MessageCarryType.CONSUME);
+            requestHandlerChain = initHandlers(MessageCarryType.REQUEST);
+            responseHandlerChain = initHandlers(MessageCarryType.RESPONSE);
 
             if (logger.isInfoEnabled()) {
                 printHandlerChain(MessageCarryType.PRODUCE);
@@ -123,6 +135,16 @@ public class ConfigManager {
     }
 
     @NotNull
+    public List<HandlerModel> getRequestHandlerModels() {
+        return requestHandlerModels;
+    }
+
+    @NotNull
+    public List<HandlerModel> getResponseHandlerModels() {
+        return responseHandlerModels;
+    }
+
+    @NotNull
     public List<AbstractHandler> getProduceHandlerChain() {
         return produceHandlerChain;
     }
@@ -130,6 +152,16 @@ public class ConfigManager {
     @NotNull
     public List<AbstractHandler> getConsumerHandlerChain() {
         return consumerHandlerChain;
+    }
+
+    @NotNull
+    public List<AbstractHandler> getRequestHandlerChain() {
+        return requestHandlerChain;
+    }
+
+    @NotNull
+    public List<AbstractHandler> getResponseHandlerChain() {
+        return responseHandlerChain;
     }
 
     @NotNull
@@ -219,6 +251,14 @@ public class ConfigManager {
                 models = consumerHandlerModels;
                 break;
 
+            case REQUEST:
+                models = requestHandlerModels;
+                break;
+
+            case RESPONSE:
+                models = responseHandlerModels;
+                break;
+
             default: {
                 logger.error("[initHandlers] : unknow message handle type");
                 models = new ArrayList<HandlerModel>(0);
@@ -256,6 +296,12 @@ public class ConfigManager {
             case CONSUME: {
                 handlerModels = consumerHandlerModels;
                 title = "consume";
+            }
+            break;
+
+            case REQUEST: {
+                handlerModels = requestHandlerModels;
+                title = "request";
             }
             break;
 

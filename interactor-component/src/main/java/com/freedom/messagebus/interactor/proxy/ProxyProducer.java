@@ -20,7 +20,7 @@ public class ProxyProducer {
 
     public static void produceWithTX(@NotNull String exchangeName,
                                      @NotNull Channel channel,
-                                     @NotNull String routingKey,
+                                     String routingKey,
                                      @NotNull byte[] data,
                                      @NotNull AMQP.BasicProperties properties
                                     ) throws IOException {

@@ -33,7 +33,7 @@ THE SOFTWARE.
 (function ($) {
 
     var unloadingPage;
-    
+
     $(window).on('beforeunload', function () {
         unloadingPage = true;
     });
@@ -146,7 +146,7 @@ THE SOFTWARE.
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -1199,7 +1199,7 @@ THE SOFTWARE.
                     jqXHR.abort();
                     return;
                 }
-                
+
                 if (options.error) {
                     options.error(arguments);
                 }
@@ -1584,7 +1584,7 @@ THE SOFTWARE.
             if(value != undefined) {
                 $input.val(value);
             }
-            
+
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             $input.datepicker({ dateFormat: displayFormat });
             return $('<div />')
@@ -1599,7 +1599,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $textArea.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -1612,7 +1612,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -1625,7 +1625,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -1715,7 +1715,7 @@ THE SOFTWARE.
 
             return $containerDiv;
         },
-        
+
         /* Fills a dropdown list with given options.
         *************************************************************************/
         _fillDropDownListWithOptions: function ($select, options, value) {
@@ -1852,7 +1852,7 @@ THE SOFTWARE.
                     }
 
                     var field = self.options.fields[fieldName];
-                    
+
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;
@@ -2357,11 +2357,11 @@ THE SOFTWARE.
         *************************************************************************/
         _create: function () {
             base._create.apply(this, arguments);
-            
+
             if (!this.options.actions.updateAction) {
                 return;
             }
-            
+
             this._createEditDialogDiv();
         },
 
@@ -2410,7 +2410,7 @@ THE SOFTWARE.
         *************************************************************************/
         _onSaveClickedOnEditForm: function () {
             var self = this;
-            
+
             //row maybe removed by another source, if so, do nothing
             if (self._$editingRow.hasClass('jtable-row-removed')) {
                 self._$editDiv.dialog('close');
@@ -2619,7 +2619,7 @@ THE SOFTWARE.
                         form: $editForm
                     }));
             }
-            
+
             self._makeCascadeDropDowns($editForm, record, 'edit');
 
             $editForm.submit(function () {
@@ -2637,7 +2637,7 @@ THE SOFTWARE.
         *************************************************************************/
         _saveEditForm: function ($editForm, $saveButton) {
             var self = this;
-            
+
             var completeEdit = function (data) {
                 if (data.Result != 'OK') {
                     self._showError(data.Message);
@@ -3130,7 +3130,7 @@ THE SOFTWARE.
 
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
-            
+
             //deleteAction may be a function, check if it is
             if (!url && $.isFunction(self.options.actions.deleteAction)) {
 
@@ -3910,7 +3910,7 @@ THE SOFTWARE.
         *************************************************************************/
         _createJtParamsForLoading: function () {
             var jtParams = base._createJtParamsForLoading.apply(this, arguments);
-            
+
             if (this.options.paging) {
                 jtParams.jtStartIndex = (this._currentPageNo - 1) * this.options.pageSize;
                 jtParams.jtPageSize = this.options.pageSize;
@@ -4088,7 +4088,7 @@ THE SOFTWARE.
                 .appendTo(this._$pagingListArea);
 
             this._jqueryuiThemeAddClass($pageNumber, 'ui-button ui-state-default', 'ui-state-hover');
-            
+
             if (this._currentPageNo == pageNumber) {
                 $pageNumber.addClass('jtable-page-number-active jtable-page-number-disabled');
                 this._jqueryuiThemeAddClass($pageNumber, 'ui-state-active');
@@ -4289,7 +4289,7 @@ THE SOFTWARE.
         *************************************************************************/
         _makeColumnSortable: function ($columnHeader, fieldName) {
             var self = this;
-            
+
             $columnHeader
                 .addClass('jtable-column-header-sortable')
                 .click(function (e) {
@@ -4298,7 +4298,7 @@ THE SOFTWARE.
                     if (!self.options.multiSorting || !e.ctrlKey) {
                         self._lastSorting = []; //clear previous sorting
                     }
-                    
+
                     self._sortTableByColumn($columnHeader);
                 });
 
@@ -4552,12 +4552,12 @@ THE SOFTWARE.
             this._$columnSelectionDiv = $('<div />')
                 .addClass('jtable-column-selection-container')
                 .appendTo(self._$mainContainer);
-            
+
             this._$table.children('thead').bind('contextmenu', function (e) {
                 if (!self.options.columnSelectable) {
                     return;
                 }
-                
+
                 e.preventDefault();
 
                 //Make an overlay div to disable page clicks
@@ -4571,13 +4571,13 @@ THE SOFTWARE.
                     .appendTo(document.body);
 
                 self._fillColumnSelection();
-                
+
                 //Calculate position of column selection list and show it
 
                 var containerOffset = self._$mainContainer.offset();
                 var selectionDivTop = e.pageY - containerOffset.top;
                 var selectionDivLeft = e.pageX - containerOffset.left;
-                
+
                 var selectionDivMinWidth = 100; //in pixels
                 var containerWidth = self._$mainContainer.width();
 
@@ -4593,7 +4593,7 @@ THE SOFTWARE.
                 }).show();
             });
         },
-        
+
         /* Prepares content of settings dialog.
         *************************************************************************/
         _fillColumnSelection: function () {
@@ -4921,7 +4921,7 @@ THE SOFTWARE.
         *************************************************************************/
         closeChildTable: function ($row, closed) {
             var self = this;
-            
+
             var $childRowColumn = this.getChildRow($row).children('td');
             var $childTable = $childRowColumn.data('childTable');
             if (!$childTable) {

@@ -50,7 +50,7 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
                 Message msg = new Message();
                 initMessage(msg, msgType, properties, msgBody);
 
-                logger.info("[message-id] : " + msg.getMessageHeader().getMessageId());
+                logger.info("[" + msg.getMessageHeader().getMessageId() + "]-" + "[" + msg.getMessageHeader().getType() + "]");
 
                 this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             }

@@ -2,6 +2,7 @@ package com.freedom.messagebus.interactor.rabbitmq;
 
 import com.freedom.messagebus.common.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -46,20 +47,20 @@ public class QueueManager extends AbstractInitializer {
             throw new IOException("[create] queueName param is empty");
         }
 
-        this.create(queueName);
-        if (bindTo != null && !bindTo.isEmpty() && exists(bindTo))
+        this.channel.queueDeclare(queueName, true, false, false, null);
+        if (bindTo != null && !bindTo.isEmpty() && this.innerExists(bindTo, this.channel))
             this.channel.queueBind(queueName, bindTo, routingKey);
         super.close();
     }
 
     public void bind(@NotNull String queueName, @NotNull String bindTo, String routingKey) throws IOException {
         super.init();
-        if (!exists(queueName)) {
+        if (!this.innerExists(queueName, this.channel)) {
             logger.error("[bind] queue : " + queueName + " is not exists!");
             throw new IOException("queue : " + queueName + " is not exists!");
         }
 
-        if (!exists(bindTo)) {
+        if (!this.innerExists(bindTo, this.channel)) {
             logger.error("[bind] bindTo : " + bindTo + " is not exists!");
             throw new IOException("[bind] bindTo : " + bindTo + " is not exists!");
         }
@@ -80,11 +81,11 @@ public class QueueManager extends AbstractInitializer {
             throw new IOException("[ubind] unbindTo param is empty");
         }
 
-        if (!this.exists(queueName)) {
+        if (!this.innerExists(queueName, this.channel)) {
             logger.error("[unbind] queue : " + queueName + " is not exists");
         }
 
-        if (!this.exists(unbindTo)) {
+        if (!this.innerExists(unbindTo, this.channel)) {
             logger.error("[unbind] unbind queue : " + unbindTo + " is not exists");
         }
 
@@ -99,7 +100,7 @@ public class QueueManager extends AbstractInitializer {
             throw new IOException("[delete] queueName is empty");
         }
 
-        if (!this.exists(queueName)) {
+        if (!this.innerExists(queueName, this.channel)) {
             logger.error("[delete] queue : " + queueName + " is not exists");
         }
 
@@ -116,6 +117,23 @@ public class QueueManager extends AbstractInitializer {
             result = false;
         }
         super.close();
+
+        return result;
+    }
+
+    /**
+     * for other function, it borrow a outer channel
+     * @param queueName
+     * @param outerChannel
+     * @return
+     */
+    private boolean innerExists(String queueName, Channel outerChannel) {
+        boolean result = true;
+        try {
+            AMQP.Queue.DeclareOk declareOk = outerChannel.queueDeclarePassive(queueName);
+        } catch (IOException e) {
+            result = false;
+        }
 
         return result;
     }

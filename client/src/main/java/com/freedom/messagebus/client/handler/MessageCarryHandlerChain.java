@@ -26,6 +26,14 @@ public class MessageCarryHandlerChain implements IHandlerChain {
             case CONSUME:
                 handlerChain = context.getConfigManager().getConsumerHandlerChain();
                 break;
+
+            case REQUEST:
+                handlerChain = context.getConfigManager().getRequestHandlerChain();
+                break;
+
+            case RESPONSE:
+                handlerChain = context.getConfigManager().getResponseHandlerChain();
+                break;
         }
     }
 

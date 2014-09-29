@@ -18,7 +18,7 @@ function disableSubmitButton() {
 // global array highlight_array so we dont have to loop through the dom every time.
 function initializeFocus(){
 	var fields = getElementsByClassName(document, "*", "field");
-	
+
 	for(i = 0; i < fields.length; i++) {
 		if(fields[i].type == 'radio' || fields[i].type == 'checkbox') {
 			fields[i].onclick = function() {highlight(this, 4);};
@@ -37,10 +37,10 @@ function highlight(el, depth){
 	if(depth == 2){var fieldContainer = el.parentNode.parentNode;}
 	if(depth == 3){var fieldContainer = el.parentNode.parentNode.parentNode;}
 	if(depth == 4){var fieldContainer = el.parentNode.parentNode.parentNode.parentNode;}
-	
+
 	addClassName(fieldContainer, 'focused', true);
 	var focusedFields = getElementsByClassName(document, "*", "focused");
-	
+
 	for(i = 0; i < focusedFields.length; i++) {
 		if(focusedFields[i] != fieldContainer){
 			removeClassName(focusedFields[i], 'focused');
@@ -78,7 +78,7 @@ function validateRange(ColumnId, RangeType) {
 			case 'character':
 				msg.innerHTML = field.value.length;
 				break;
-				
+
 			case 'word':
 				var val = field.value;
 				val = val.replace(/\n/g, " ");
@@ -89,7 +89,7 @@ function validateRange(ColumnId, RangeType) {
 				}
 				msg.innerHTML = used;
 				break;
-				
+
 			case 'digit':
 				msg.innerHTML = field.value.length;
 				break;
@@ -107,10 +107,10 @@ function getElementsByClassName(oElm, strTagName, strClassName){
 	var oRegExp = new RegExp("(^|\\s)" + strClassName + "(\\s|$)");
 	var oElement;
 	for(var i=0; i<arrElements.length; i++){
-		oElement = arrElements[i];		
+		oElement = arrElements[i];
 		if(oRegExp.test(oElement.className)){
 			arrReturnElements.push(oElement);
-		}	
+		}
 	}
 	return (arrReturnElements)
 }
@@ -131,7 +131,7 @@ function addClassName(objElement, strClass, blnMayAlreadyExist){
       arrList[arrList.length] = strClass;
       objElement.className = arrList.join(' ');
    }
-   else{  
+   else{
       objElement.className = strClass;
       }
 }
@@ -157,8 +157,8 @@ function addEvent( obj, type, fn ) {
     obj["e"+type+fn] = fn;
     obj[type+fn] = function() { obj["e"+type+fn]( window.event ) };
     obj.attachEvent( "on"+type, obj[type+fn] );
-  } 
+  }
   else{
-    obj.addEventListener( type, fn, false );	
+    obj.addEventListener( type, fn, false );
   }
 }

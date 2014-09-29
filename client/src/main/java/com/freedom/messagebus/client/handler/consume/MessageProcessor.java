@@ -1,4 +1,4 @@
-package com.freedom.messagebus.client.handler.consumer;
+package com.freedom.messagebus.client.handler.consume;
 
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;

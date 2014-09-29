@@ -2,6 +2,7 @@ package com.freedom.messagebus.client.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.ws.Response;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -12,7 +13,9 @@ import java.util.concurrent.ConcurrentMap;
 public enum MessageCarryType {
 
     PRODUCE,
-    CONSUME;
+    CONSUME,
+    REQUEST,
+    RESPONSE;
 
     private static final ConcurrentMap<String, MessageCarryType> lookups =
         new ConcurrentHashMap<String, MessageCarryType>(2);
@@ -20,6 +23,8 @@ public enum MessageCarryType {
     static {
         lookups.put("produce", PRODUCE);
         lookups.put("consume", CONSUME);
+        lookups.put("request", REQUEST);
+        lookups.put("response", RESPONSE);
     }
 
     @NotNull

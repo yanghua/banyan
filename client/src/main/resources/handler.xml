@@ -3,7 +3,7 @@
     <produce>
         <handler>
             <handler-name>MessageId-Generator</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.produce.MessageIdGenerator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
@@ -29,15 +29,59 @@
         </handler>
         <handler>
             <handler-name>Real-Consumer</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.consumer.RealConsumer</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.consume.RealConsumer</handler-path>
         </handler>
         <handler>
             <handler-name>Original-Receiver</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.consumer.OriginalReceiver</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.consume.OriginalReceiver</handler-path>
         </handler>
         <handler>
             <handler-name>Message-Process</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.consumer.MessageProcessor</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.consume.MessageProcessor</handler-path>
         </handler>
     </consumer>
+    <request>
+        <handler>
+            <handler-name>MessageId-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Validate-Handler</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Pooled-Channel-Handler</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.PooledChannelAccessor</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Temp-Queue-Initializer</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.request.TempQueueInitializer</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Real-Requester</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.request.RealRequester</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Blocked-And-Timeout-Response</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.request.BlockedAndTimeoutResponser</handler-path>
+        </handler>
+    </request>
+    <response>
+        <handler>
+            <handler-name>MessageId-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Validate-Handler</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Pooled-Channel-Handler</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.PooledChannelAccessor</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Response-Sender</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.response.ResponseSender</handler-path>
+        </handler>
+    </response>
 </handler-plugins>

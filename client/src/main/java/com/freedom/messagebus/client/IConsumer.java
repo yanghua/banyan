@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * the interface of consumer
  */
-interface IConsumer {
+public interface IConsumer {
 
     /**
      * consume message

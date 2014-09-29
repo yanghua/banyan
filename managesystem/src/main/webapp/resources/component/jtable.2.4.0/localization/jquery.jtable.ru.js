@@ -17,7 +17,7 @@
         saving: 'Сохранение...',
         cancel: 'Отмена',
         deleteText: 'Удалить',
-        deleting: 'Удаление...',                                                                                               
+        deleting: 'Удаление...',
         error: 'Ошибка',
         close: 'Закрыть',
         cannotLoadOptionsFor: 'Невозможно загрузить варианты для поля {0}',

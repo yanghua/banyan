@@ -62,7 +62,7 @@ public class TestProduceAndConsumer extends TestCase {
         client.getProducer().produce(msg, queueName);
 
         //sleep for checking the result
-        Thread.sleep(10000);
+        Thread.sleep(600000);
 
         closer.closeConsumer();
 

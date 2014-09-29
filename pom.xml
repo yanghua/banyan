@@ -14,6 +14,7 @@
         <module>common</module>
         <module>managesystem</module>
         <module>interactor-component</module>
+        <module>scenario</module>
     </modules>
     <name>a message bus</name>
 
@@ -91,7 +92,7 @@
     </dependencies>
 
     <build>
-        <finalName>messagebus</finalName>
+        <finalName>messagebus-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

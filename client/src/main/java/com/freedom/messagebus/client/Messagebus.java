@@ -2,11 +2,13 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.authorize.Authorizer;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.config.IConfigChangedListener;
 import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
+import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
@@ -15,9 +17,11 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.zookeeper.Watcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Properties;
 
 /**
@@ -35,6 +39,10 @@ public class Messagebus {
     private IProducer producer;
     @NotNull
     private IConsumer consumer;
+    @NotNull
+    private IRequester requester;
+    @NotNull
+    private IResponser responser;
 
     @NotNull
     private LongLiveZookeeper     zookeeper;
@@ -82,19 +90,23 @@ public class Messagebus {
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
 
         this.configManager = ConfigManager.getInstance();
-//        int pathNum = this.configManager.getPaths().size();
-//        this.zookeeper.watchPaths(configManager.getPaths().toArray(new String[pathNum]),
-//                                     new IConfigChangedListener() {
-//                                         @Override
-//                                         public void onChanged(String path,
-//                                                               byte[] newData,
-//                                                               Watcher.Event.EventType eventType) {
-//                                             logger.debug("path : " + path + " has changed!");
-//
-//                                             if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER))
-//                                                 cfManager.updateHandlerChain(path, newData);
-//                                         }
-//                                     });
+        this.zookeeper.watchPaths(new String[] {CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER},
+             new IConfigChangedListener() {
+                 @Override
+                 public void onChanged(String path,
+                                       byte[] newData,
+                                       Watcher.Event.EventType eventType) {
+                     logger.info("path : " + path + " has changed!");
+
+                     try {
+                         if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER))
+                            ConfigManager.getInstance().parseRouterInfo();
+                     } catch (Exception e) {
+                        logger.error("[onChanged] occurs a Exception : " + e.getMessage());
+                     }
+                 }
+             }
+         );
 
         this.initConnection();
 
@@ -116,6 +128,8 @@ public class Messagebus {
 
         producer = new GenericProducer(context);
         consumer = new GenericConsumer(context);
+        requester = new GenericRequester(context);
+        responser = new GenericResponser(context);
 
         isOpen = true;
     }
@@ -160,6 +174,22 @@ public class Messagebus {
                 ("Illegal State: please call Messagebus#open() first!");
 
         return consumer;
+    }
+
+    @NotNull
+    public IRequester getRequester() throws MessagebusUnOpenException{
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
+
+        return requester;
+    }
+
+    @NotNull
+    public IResponser getResponser() throws MessagebusUnOpenException {
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
+
+        return responser;
     }
 
     public boolean isOpen() {

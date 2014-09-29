@@ -119,8 +119,6 @@ public class ServiceLoader {
         boolean recursive = true;
         String packageDirName = packageStr.replace('.', '/');
 
-        logger.info("package dir name is : " + packageDirName);
-
         Enumeration<URL> dirs;
         try {
             dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);

@@ -2,7 +2,7 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
-import com.freedom.messagebus.client.handler.consumer.OriginalReceiver;
+import com.freedom.messagebus.client.handler.consume.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
@@ -44,11 +44,9 @@ public class MessageContext {
      */
     @NotNull
     private Message consumedMsg;
-//    @NotNull
-//    private byte[]  consumedMsgBytes;
 
     @NotNull
-    private MessageCarryType carryType;     //produce or consume
+    private MessageCarryType carryType;                 //produce or consume
     @NotNull
     private Node             queueNode;                 //store current carry node
 
@@ -64,6 +62,11 @@ public class MessageContext {
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
     private AbstractPool<Channel> pool;
+    private long                  requestTimeout;
+    private boolean               hasRequestTimeout;
+
+    @NotNull
+    private String tempQueueName;                       //for response
 
     public MessageContext() {
     }
@@ -179,15 +182,6 @@ public class MessageContext {
         this.consumedMsg = consumedMsg;
     }
 
-//    @NotNull
-//    public byte[] getConsumedMsgBytes() {
-//        return consumedMsgBytes;
-//    }
-//
-//    public void setConsumedMsgBytes(@NotNull byte[] consumedMsgBytes) {
-//        this.consumedMsgBytes = consumedMsgBytes;
-//    }
-
     @NotNull
     public IMessageReceiveListener getListener() {
         return listener;
@@ -203,6 +197,31 @@ public class MessageContext {
 
     public void setPool(AbstractPool<Channel> pool) {
         this.pool = pool;
+    }
+
+    public long getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public void setRequestTimeout(long requestTimeout) {
+        this.requestTimeout = requestTimeout;
+    }
+
+    public boolean isRequestTimeout() {
+        return hasRequestTimeout;
+    }
+
+    public void setIsRequestTimeout(boolean hasRequestTimeout) {
+        this.hasRequestTimeout = hasRequestTimeout;
+    }
+
+    @NotNull
+    public String getTempQueueName() {
+        return tempQueueName;
+    }
+
+    public void setTempQueueName(@NotNull String tempQueueName) {
+        this.tempQueueName = tempQueueName;
     }
 
     @Override
