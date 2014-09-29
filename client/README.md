@@ -18,44 +18,21 @@
 [调用示例](#调用示例)
 
 ##名词解释
-- message carry: 消息的produce / consume 被抽象为carry(表示消息的 **搬运** )
-- message format: object/text等，注意此处没有称之为message type，请注意区分
-- message type: business/system 按照业务逻辑来划分
+- message carry: 消息的传输（`produce` `consume` `request` `response` ）被抽象为carry(表示消息的 **搬运** )
 
 ##消息传输
-消息传输分为produce / consume 被抽象为两个接口：
+消息传输被抽象为四个接口：
 
 * IProducer: 定义了生产消息的接口
 * IConsumer: 定义了消费消息的接口
+* IRequest: 定义了发送请求消息的接口
+* IResponse: 定义了发送响应/应答消息的接口
 * AbstractMessageCarryer: 抽象了消息传输的共性部分（主要包含handler-chain的实例化）
 
 继承关系图如下：
+
 ![img 2][2]
 
-
-
-##消息格式
-参照jms规范，目前messagebus支持如下五种消息：
-
-* Stream - 流
-* Bytes - 字节数组
-* Map - map(键值对)
-* Object - 对象类型
-* Text - 文本类型
-
-继承关系如下图：
-
-![img 1][1]
-
-消息中间件默认只接受byte[]，因此需要对以上支持的消息进行格式化，这部分对应的继承关系图：
-![img 3][3]
-
-其中：
-
-* IFormatter: 为消息格式化器接口，提供了消息格式化的两个契约方法：
-    - format(Message): 为消息格式化方法，用于produce
-    - deFormat(byte[]): 为消息反格式化方法，用于consume
-* FormatterFactory: 提供了formatter的创建工厂
 
 ##消息的链式处理
 消息的链式处理，有利于切割处理模块，方便拆分功能等。我认为这种方式应该是以数据为处理核心的业务模型的首选。
@@ -68,14 +45,33 @@ AbstractHandler处于继承类的顶端，为一个抽象的处理器，它定�
 * handle: 每个继承它的handler所必须实现的 **抽象** 方法，是实现handler-chain的关键
 * destroy: 释放资源的触发方法，将在“关闭”messagebus client的时候被逐一调用
 
-从上面的图示可以看到，所有的handler被分为三大类（分别位于三个package中）:
+从上面的图示可以看到，所有的handler被分为三大类（分别位于五个package中）:
 
 * common: 公共handler包，用于封装p & c都需要处理的逻辑，比如参数校验等
 * produce: 在生产消息过程中，需要的handler
 * consumer: 在发送消息过程中，需要的handler
+* request: 在发送请求消息的过程中，需要的handler
+* response: 在发送响应消息的过程中，使用到的handler
 
-目前已经支持的handler的文件目录结构图
-![img 5][5]
+###produce 的处理链
+如下图:
+
+![img 10][10]
+
+###consume 的处理链
+如下图:
+
+![img 11][11]
+
+###request 的处理链
+如下图:
+
+![img 12][12]
+
+###response 的处理链
+如下图:
+
+![img 13][13]
 
 当然，他们的先后顺序并不是定死的，而是依赖于配置：
 ![img 6][6]
@@ -275,8 +271,11 @@ closer.closeConsumer();
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/carry-inherits.png
 [3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/message-formatter-inherits.png
 [4]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/handle-chain.png
-[5]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/handler-chain-structure.png
 [6]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/handler-chain-config.png
 [7]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/message-context.png
 [8]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/channel-pool.png
 [9]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/zookeeper-node.png
+[10]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/produce-chain.png
+[11]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/consume-chain.png
+[12]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/request-chain.png
+[13]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/response-chain.png
