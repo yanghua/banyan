@@ -3,9 +3,11 @@
 
 [消息传输](#消息传输)
 
-[消息格式](#消息格式)
-
 [消息的链式处理](#消息的链式处理)
+
+[req/resp](#req/resp)
+
+[分布式消息Id](#分布式消息Id)
 
 [消息处理的上下文对象](#消息处理的上下文对象)
 
@@ -94,7 +96,7 @@ req/resp是用于模拟请求/应答的消息交互模型，这也是大部分�
 
 ![img 15][15]
 
-通常会认为这种模式，通过p/c listen的队列，中转一下即可，也就是总路线1 与路线 2-*。但最终发现，无论找路由拓扑中的某个节点，都会破坏队列的 **职责单一性** ，如果一个队列接收多种不同的消息，而且是混杂式的并且是不同的消费场景，将会使消费端变得混乱、不可控。所以最终的做法是，在produce发往queue-1的时候，以其发送的消息ID，创建一个挂载在rabbitmq上的一个默认的exchange上得临时队列。客户端收到以后，往该临时队列中发送响应信息，producer接收到响应信息后，将临时队列删除。
+通常会认为这种模式，通过p/c listen的队列，中转一下即可，也就是路线1 与 路线2-*。但最终发现，无论找路由拓扑中的某个节点，都会破坏队列的 **职责单一性** ，如果一个队列接收多种不同的消息，而且是混杂式的并且是不同的消费场景，将会使消费端变得混乱、不可控。所以最终的做法是，在produce发往queue-1的时候，以其发送的消息ID，创建一个挂载在rabbitmq上的一个默认的exchange上得临时队列。客户端收到以后，往该临时队列中发送响应信息，producer接收到响应信息后，将临时队列删除。所以正确的路线应为：路线1 与 路线3
 
 
 ##分布式消息Id
@@ -180,135 +182,6 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 * 必须依赖一个客户端已存在的接口实现，不然无法利用多态机制进行强制向上转型
 
 但毫无疑问，这是动态打补丁或临时救急的一种有效方式！
-
-
-
-##调用示例
-
-```java
-public void testSimpleProduceAndConsume() throws Exception {
-        Messagebus client = Messagebus.getInstance();
-        client.setZkHost("localhost");
-        client.setZkPort(2181);
-        client.open();
-
-        //start consume
-        appkey = java.util.UUID.randomUUID().toString();
-        msgType = "business";
-        String queueName = "oa.sms";
-        IConsumerCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
-                                                              new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message msg, MessageFormat format) {
-                switch (format) {
-                    case Text: {
-                        TextMessage txtMsg = (TextMessage) msg;
-                        logger.debug("received message : " + txtMsg.getMessageBody());
-                    }
-                    break;
-
-                    case Object: {
-                        ObjectMessage objMsg = (ObjectMessage) msg;
-                        SimpleObjectMessagePOJO realObj = (SimpleObjectMessagePOJO) objMsg.getObject();
-                        logger.debug("received message : " + realObj.getTxt());
-                    }
-                    break;
-
-                    //case other format
-                    //...
-                }
-            }
-        });
-
-        //produce text msg
-        TextMessagePOJO msg = new TextMessagePOJO();
-        msg.setMessageBody("just a test");
-        client.getProducer().produce(msg, MessageFormat.Text, appkey, queueName, msgType);
-
-        //produce object msg
-        ObjectMessagePOJO objMsg = new ObjectMessagePOJO();
-        SimpleObjectMessagePOJO soPojo = new SimpleObjectMessagePOJO();
-        soPojo.setTxt("test object-message");
-        objMsg.setObject(soPojo);
-        client.getProducer().produce(objMsg, MessageFormat.Object, appkey, queueName, msgType);
-
-        //sleep for checking the result
-        Thread.sleep(10000);
-        closer.closeConsumer();
-
-        client.close();
-    }  
-```
-
-
-###关于调用示例的说明
-（1）Messagebus
-
-代表客户端的关键对象，其被实现为单例模式。因此获得其实例，需要调用其静态方法：
-
-
-```
-Messagebus client = Messagebus.getInstance();
-```
-
-在前面提及过，客户端通过zookeeper来同步远程配置。所以，在获得 `Messagebus` 的实例之后，关键的一步就是设置zookeeper的host以及port:
-
-```
-client.setZkHost("localhost");
-client.setZkPort(2181);
-```
-注意，如果不显式设置，则Messagebus则分别对这两个字段采用 **localhost** 及 **2181** 进行初始化。
-
-设置完必要的属性之后，需要调用 `Messagebus` 的实例来初始化关键对象：
-
-```
-client.open();
-```
-
-这些关键对象对于消息的carry至关重要，但从另一方面来说他们也都是“昂贵资源”。所以，在确认不再carry消息后，需要尽快释放这些资源：
-
-```
-client.close();
-```
-
-通过 `Messagebus` 的实例，可以获得producer以及consumer，他们也是carry消息的真实对象：
-
-```
-client.getProducer()
-client.getConsumer()
-```
-
-在生产消息的时候需要构建各种格式的消息对象，在消费消息的时候，有一个值得注意的地方。由于消息的生产和消费对于程序的实现模型有着本质的不同（通常，生产是瞬时性的，而消费是long event loop的），在消费的时候因为内部在一个独立的线程上构建有一个event loop，如果不想继续消费，需要关掉它。这里是通过一个 ***IConsumerCloser*** 实现的。在消费的时候，会将构建有event loop的线程的控制权（说白了就是它的引用）下放给该接口的实现者（该接口定义了一个closeConsumer方法），通过该接口的实例上调用closeConsumer来关闭consumer:
-
-```
-closer.closeConsumer();
-```
-
-(2)IProducer
-
-关于生产消息的接口，目前开放了四个接口方法：
-
-* 单个消息的简单发送
-* 单个消息的事务型发送
-* 批量消息的简单发送
-* 批量消息的事务型发送
-
-这里包含两个关键参考点：（1）是否是批量发送；（2）是否为事务型发送
-
-是否批量发送：这里开放单个消息的发送接口，主要是为了客户端调用方便，这样如果只发送一条消息就没有必要构建一个消息数组（虽然在处理的过程中还是会被封装为数组，这也是为了处理逻辑上的一致简洁性），但如果发送前已经明确有超过一条消息即将发送，还是推荐使用批量发送接口，这会省去获取Channel的开销，因为即便采用pool的机制，也还是有个获取的过程
-
-是否为事务型发送：这里为了某些必须确认消息是否送达的安全性较高的场景而提供，事实上如果消息的安全性没有那么重要（事实上消息中间件server端的持久化机制已经给安全性提供了基本的保障），**不推荐** 使用事务型发送接口，因为它将对每条发送的消息给予应答确认。
-
-(3)IConsumer
-
-消费消息的接口比较简单，只有一个。值得一提的是，在调用该接口的时候，需要传递入一个消息处理的回调。该接口即为 `IMessageReceiverListener` ，它包含有一个onMessage方法，在获取到消息之后，将触发该方法的调用，它提供给业务处理方两个参数：
-
-* Message: 消息对象的顶层语义接口
-* MessageFormat: 消息的格式
-
-通过这两个对象，就足以还原并获取真实的消息。（根据消息格式，对 `Message` 的实例进行强制向下转型到特定的消息格式对象），具体请参看示例调用代码。
-
-
 
 
 

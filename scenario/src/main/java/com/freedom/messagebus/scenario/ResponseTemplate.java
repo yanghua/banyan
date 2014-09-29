@@ -57,10 +57,12 @@ public class ResponseTemplate {
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message) {
+                            //handle message
                             String msgId = String.valueOf(message.getMessageHeader().getMessageId());
                             logger.info("[" + msgId +
                                             "]-[" + message.getMessageHeader().getType() + "]");
 
+                            //send response
                             responser.responseTmpMessage(message, msgId);
                         }
                     });
