@@ -37,6 +37,7 @@ public class ConfigManager {
     @NotNull
     private Properties poolProperties;
 
+    //region handle models
     @NotNull
     private List<HandlerModel>    produceHandlerModels;
     @NotNull
@@ -45,6 +46,9 @@ public class ConfigManager {
     private List<HandlerModel>    requestHandlerModels;
     @NotNull
     private List<HandlerModel>    responseHandlerModels;
+    //endregion
+
+    //region handler instance
     @NotNull
     private List<AbstractHandler> produceHandlerChain;
     @NotNull
@@ -53,6 +57,7 @@ public class ConfigManager {
     private List<AbstractHandler> requestHandlerChain;
     @NotNull
     private List<AbstractHandler> responseHandlerChain;
+    //endregion
 
     @NotNull
     private Map<String, Node> exchangeNodeMap;
