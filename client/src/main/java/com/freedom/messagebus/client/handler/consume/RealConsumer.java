@@ -27,16 +27,17 @@ public class RealConsumer extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
+        if(!context.isSync()) {
+            QueueingConsumer consumer = null;
+            try {
+                consumer = ProxyConsumer.consume(context.getChannel(), context.getQueueNode().getValue());
+            } catch (IOException e) {
+                logger.error("[handler] occurs a IOException : " + e.getMessage());
+            }
 
-        QueueingConsumer consumer = null;
-        try {
-            consumer = ProxyConsumer.consume(context.getChannel(), context.getQueueNode().getValue());
-        } catch (IOException e) {
-            logger.error("[handler] occurs a IOException : " + e.getMessage());
+            //add external params
+            context.getOtherParams().put("consumer", consumer);
         }
-
-        //add external params
-        context.getOtherParams().put("consumer", consumer);
 
         chain.handle(context);
     }

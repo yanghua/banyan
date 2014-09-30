@@ -20,8 +20,10 @@ public class MessageProcessor extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        IMessageReceiveListener receiveListener = context.getListener();
-        receiveListener.onMessage(context.getConsumedMsg());
+        if (!context.isSync()) {
+            IMessageReceiveListener receiveListener = context.getListener();
+            receiveListener.onMessage(context.getConsumedMsg());
+        }
 
         chain.handle(context);
     }

@@ -39,6 +39,10 @@
             <handler-name>Message-Process</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.consume.MessageProcessor</handler-path>
         </handler>
+        <handler>
+            <handler-name>Sync-Consumer</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.consume.SyncConsumer</handler-path>
+        </handler>
     </consumer>
     <request>
         <handler>

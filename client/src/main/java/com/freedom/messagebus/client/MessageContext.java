@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,8 +63,12 @@ public class MessageContext {
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
     private AbstractPool<Channel> pool;
-    private long                  requestTimeout;
-    private boolean               hasRequestTimeout;
+    private long                  timeout;
+    private boolean               hasTimeout;
+
+    private int consumeMsgNum;
+    private List<Message> consumeMsgs;
+    private boolean isSync = false;
 
     @NotNull
     private String tempQueueName;                       //for response
@@ -199,20 +204,20 @@ public class MessageContext {
         this.pool = pool;
     }
 
-    public long getRequestTimeout() {
-        return requestTimeout;
+    public long getTimeout() {
+        return timeout;
     }
 
-    public void setRequestTimeout(long requestTimeout) {
-        this.requestTimeout = requestTimeout;
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
-    public boolean isRequestTimeout() {
-        return hasRequestTimeout;
+    public boolean isTimeout() {
+        return hasTimeout;
     }
 
-    public void setIsRequestTimeout(boolean hasRequestTimeout) {
-        this.hasRequestTimeout = hasRequestTimeout;
+    public void setIsTimeout(boolean hasTimeout) {
+        this.hasTimeout = hasTimeout;
     }
 
     @NotNull
@@ -222,6 +227,30 @@ public class MessageContext {
 
     public void setTempQueueName(@NotNull String tempQueueName) {
         this.tempQueueName = tempQueueName;
+    }
+
+    public int getConsumeMsgNum() {
+        return consumeMsgNum;
+    }
+
+    public void setConsumeMsgNum(int consumeMsgNum) {
+        this.consumeMsgNum = consumeMsgNum;
+    }
+
+    public List<Message> getConsumeMsgs() {
+        return consumeMsgs;
+    }
+
+    public void setConsumeMsgs(List<Message> consumeMsgs) {
+        this.consumeMsgs = consumeMsgs;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean isSync) {
+        this.isSync = isSync;
     }
 
     @Override

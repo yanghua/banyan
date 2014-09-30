@@ -3,12 +3,14 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.IMessageReceiveListener;
+import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * a generic consumer which implements IConsumer
@@ -35,26 +37,53 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
     @Override
     public IConsumerCloser consume(@NotNull String queueName,
                                    @NotNull IMessageReceiveListener receiveListener) throws IOException {
-        final MessageContext context = new MessageContext();
-        context.setCarryType(MessageCarryType.CONSUME);
-        context.setAppKey(super.context.getAppKey());
+        final MessageContext ctx = new MessageContext();
+        ctx.setCarryType(MessageCarryType.CONSUME);
+        ctx.setAppKey(super.context.getAppKey());
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
-        context.setQueueNode(node);
+        ctx.setQueueNode(node);
 
-        context.setPool(this.context.getPool());
-        context.setConnection(this.context.getConnection());
-        context.setListener(receiveListener);
+        ctx.setPool(this.context.getPool());
+        ctx.setConnection(this.context.getConnection());
+        ctx.setListener(receiveListener);
+        ctx.setSync(false);
 
         //launch
-        carry(context);
+        carry(ctx);
 
         return new IConsumerCloser() {
             @Override
             public void closeConsumer() {
-                context.getReceiver().shutdown();
+                ctx.getReceiver().shutdown();
             }
         };
     }
 
+    /**
+     * consume with sync-mode, when received messages' num equal the given num
+     * or timeout the consume will return
+     *
+     * @param queueName the name of queue that the consumer want to connect
+     * @param num       the num which the client expected (the result's num may not be equals to the given num)
+     * @param timeout   the timeout (ms)
+     * @return received message
+     */
+    @NotNull
+    @Override
+    public List<Message> consume(@NotNull String queueName, int num, long timeout) {
+        final MessageContext ctx = new MessageContext();
+        ctx.setCarryType(MessageCarryType.CONSUME);
+        ctx.setAppKey(super.context.getAppKey());
+        Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
+        ctx.setQueueNode(node);
+        ctx.setPool(this.context.getPool());
+        ctx.setConnection(this.context.getConnection());
+        ctx.setTimeout(timeout);
+        ctx.setConsumeMsgNum(num);
+        ctx.setSync(true);
 
+        carry(ctx);
+
+        return ctx.getConsumeMsgs();
+    }
 }

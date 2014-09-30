@@ -39,9 +39,10 @@ public static void produce() {
 ```
 
 ##consume
-consume的使用方式见： `ConsumeTemplate`
+consume的使用方式见： `AsyncConsumeTemplate` 与 `SyncConsumeTemplate`
 
-consume 的使用方式属于那种service模型，因为你不知道消息什么时候会来到，通常都采用：`阻塞侦听`的模式，消息的处理时机未知，因此消费端的Messagebus对象生命周期较长。常用的场景：
+###异步消费
+异步 consume 的使用方式属于那种service模型，因为你不知道消息什么时候会来到，通常都采用：`阻塞侦听`的模式，消息的处理时机未知，因此消费端的Messagebus对象生命周期较长。常用的场景：
 
 * 在`Application_Start`之时以一个独立的线程打开；在`Application_End`之时关闭
 * 独立的宿主服务
@@ -100,6 +101,45 @@ public static class ConsumerService extends Thread {
         }
     }
 ```
+
+###同步消费
+同步consume属于主动&按需消费模型，它是阻塞式的。阻塞返回的条件基于两者：
+
+* 消费的总记录数
+* 本次消费的总时长
+
+> 在内部对每个消息阻塞等待的时间 : 总时长 / 希望消费的总记录数
+
+示例代码：
+
+```java
+public static void main(String[] args) {
+        Messagebus client = Messagebus.getInstance(appkey);
+        client.setZkHost(host);
+        client.setZkPort(port);
+
+        IConsumer consumer = null;
+        try {
+            client.open();
+            consumer = client.getConsumer();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        } catch (MessagebusUnOpenException e) {
+            e.printStackTrace();
+        }
+
+        //consume
+        List<Message> msgs = consumer.consume(appName, 2, 10_000);
+        client.close();
+
+        for (Message msg : msgs) {
+            logger.info("message id : " + msg.getMessageHeader().getMessageId());
+        }
+
+    }
+```
+
+
 
 ##request
 request的使用方式见： `RequestTemplate`

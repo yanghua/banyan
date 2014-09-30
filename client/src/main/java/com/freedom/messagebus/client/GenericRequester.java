@@ -2,7 +2,6 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.model.Node;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +30,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         cxt.setAppKey(super.context.getAppKey());
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
         cxt.setQueueNode(node);
-        cxt.setRequestTimeout(timeout);
+        cxt.setTimeout(timeout);
         cxt.setMessages(new Message[] {msg});
 
         cxt.setPool(this.context.getPool());
@@ -39,7 +38,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
 
         carry(cxt);
 
-        if (cxt.isRequestTimeout() || cxt.getConsumedMsg()== null)
+        if (cxt.isTimeout() || cxt.getConsumedMsg()== null)
             throw new MessageResponseTimeoutException("message request time out.");
 
         return cxt.getConsumedMsg();

@@ -10,14 +10,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * consume 的常用使用场景有如下特点：
+ * asynchronous consume 的常用使用场景有如下特点：
  * (1)长时间被动等待的服务端处理程序/组件
  * (2)属于请求/响应模型的服务器端
  * (3)宿主环境下作为独立线程的后台处理程序
  */
-public class ConsumeTemplate {
+public class AsyncConsumeTemplate {
 
-    private static final Log    logger = LogFactory.getLog(ConsumeTemplate.class);
+    private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
     private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host = "115.29.96.85";

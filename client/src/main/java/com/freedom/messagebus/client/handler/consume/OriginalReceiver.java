@@ -57,18 +57,22 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        context.setReceiver(this);
-        this.chain = chain;
-        this.context = context;
-        this.currentChannel = context.getChannel();
-        this.channelDestroyer = context.getDestroyer();
-        this.currentConsumer = (QueueingConsumer) context.getOtherParams().get("consumer");
+        if (!context.isSync()) {
+            context.setReceiver(this);
+            this.chain = chain;
+            this.context = context;
+            this.currentChannel = context.getChannel();
+            this.channelDestroyer = context.getDestroyer();
+            this.currentConsumer = (QueueingConsumer) context.getOtherParams().get("consumer");
 
-        //enable repeat handler at this handler
-        MessageCarryHandlerChain carryHandlerChain = (MessageCarryHandlerChain) this.chain;
-        carryHandlerChain.setEnableRepeatBeforeNextHandler(true);
+            //enable repeat handler at this handler
+            MessageCarryHandlerChain carryHandlerChain = (MessageCarryHandlerChain) this.chain;
+            carryHandlerChain.setEnableRepeatBeforeNextHandler(true);
 
-        this.currentThread.start();
+            this.currentThread.start();
+        }else {
+            chain.handle(context);
+        }
     }
 
     public void run() {

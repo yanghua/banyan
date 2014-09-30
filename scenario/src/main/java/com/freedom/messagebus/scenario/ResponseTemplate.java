@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ResponseTemplate {
 
-    private static final Log    logger = LogFactory.getLog(ConsumeTemplate.class);
+    private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
     private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host = "115.29.96.85";

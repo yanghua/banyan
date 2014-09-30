@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client.handler.request;
 
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.HandlerModel;
@@ -47,11 +46,11 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
         try {
             //just receive one
             QueueingConsumer consumer = ProxyConsumer.consume(context.getChannel(), String.valueOf(msgId));
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery(context.getRequestTimeout() * 1000);
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(context.getTimeout() * 1000);
 
             //timeout
             if (delivery == null) {
-                context.setIsRequestTimeout(true);
+                context.setIsTimeout(true);
                 return;
             }
 
@@ -74,6 +73,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
         } catch (IOException | InterruptedException e) {
             logger.error("[handle] occurs a exception : " + e.getMessage());
         } finally {
+            //delete temp queue
             QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());
             String msgIdStr = String.valueOf(msgId);
             try {
@@ -82,6 +82,9 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
                 }
             } catch (IOException e) {
                 logger.error("[handle] finally block occurs a IOException : " + e.getMessage());
+            } finally {
+                //destroy channel
+                context.getDestroyer().destroy(context.getChannel());
             }
         }
     }
