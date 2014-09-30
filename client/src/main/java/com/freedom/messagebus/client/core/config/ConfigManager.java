@@ -334,7 +334,6 @@ public class ConfigManager {
 
     }
 
-    @NotNull
     public synchronized void parseRouterInfo() throws MalformedURLException {
         SAXReader reader = new SAXReader();
         File routerFile = new File(CONSTS.EXPORTED_NODE_FILE_PATH);
