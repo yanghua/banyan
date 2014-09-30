@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * the main operator of messagebus client
@@ -34,11 +35,11 @@ public class Messagebus {
     private static volatile Messagebus instance = null;
 
     @NotNull
-    private String    appKey;
+    private String     appKey;
     @NotNull
-    private IProducer producer;
+    private IProducer  producer;
     @NotNull
-    private IConsumer consumer;
+    private IConsumer  consumer;
     @NotNull
     private IRequester requester;
     @NotNull
@@ -52,8 +53,9 @@ public class Messagebus {
     @NotNull
     private Connection            connection;
 
-    private boolean isOpen         = false;
-    private boolean useChannelPool = false;
+    private AtomicBoolean isOpen         = new AtomicBoolean(false);
+    private boolean       useChannelPool = false;
+
 
     @NotNull
     private String zkHost;
@@ -82,7 +84,7 @@ public class Messagebus {
      *
      * @throws MessagebusConnectedFailedException
      */
-    public void open() throws MessagebusConnectedFailedException {
+    public synchronized void open() throws MessagebusConnectedFailedException {
         //load class
         this.zookeeper = LongLiveZookeeper.getZKInstance(this.getZkHost(), this.getZkPort());
 
@@ -90,12 +92,12 @@ public class Messagebus {
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
 
         this.configManager = ConfigManager.getInstance();
-        this.zookeeper.watchPaths(new String[] {CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER},
-             new IConfigChangedListener() {
-                 @Override
-                 public void onChanged(String path,
-                                       byte[] newData,
-                                       Watcher.Event.EventType eventType) {
+        this.zookeeper.watchPaths(new String[]{CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER},
+                                  new IConfigChangedListener() {
+                                      @Override
+                                      public void onChanged(String path,
+                                                            byte[] newData,
+                                                            Watcher.Event.EventType eventType) {
                      logger.info("path : " + path + " has changed!");
 
                      try {
@@ -131,7 +133,10 @@ public class Messagebus {
         requester = new GenericRequester(context);
         responser = new GenericResponser(context);
 
-        isOpen = true;
+        boolean success = this.isOpen.compareAndSet(false, true);
+        if (!success){
+            logger.error("occurs a non-consistency : the field isOpen should be false but it's actually true");
+        }
     }
 
     /**
@@ -139,7 +144,7 @@ public class Messagebus {
      * pls invoke this method after making sure you will not use the client in
      * current context.
      */
-    public void close() {
+    public synchronized void close() {
         //release all resource
         try {
             this.configManager.destroy();
@@ -152,7 +157,10 @@ public class Messagebus {
 
             this.zookeeper.close();
 
-            this.isOpen = false;
+            boolean success = this.isOpen.compareAndSet(true, false);
+            if (!success) {
+                logger.error("occurs a non-consistency : the field isOpen should be true but it's actually false");
+            }
         } catch (IOException e) {
             logger.error("[close] occurs a IOException : " + e.getMessage());
         }
@@ -193,7 +201,7 @@ public class Messagebus {
     }
 
     public boolean isOpen() {
-        return this.isOpen;
+        return this.isOpen.get();
     }
 
     @NotNull

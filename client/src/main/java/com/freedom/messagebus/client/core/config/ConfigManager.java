@@ -319,7 +319,7 @@ public class ConfigManager {
         }
     }
 
-    public void destroy() {
+    public synchronized void destroy() {
         if (produceHandlerChain != null) {
             for (AbstractHandler handler : produceHandlerChain) {
                 handler.destroy();
