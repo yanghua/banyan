@@ -15,6 +15,7 @@
         <module>managesystem</module>
         <module>interactor-component</module>
         <module>scenario</module>
+        <module>httpbridge</module>
     </modules>
     <name>a message bus</name>
 
