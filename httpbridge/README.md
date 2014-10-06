@@ -22,6 +22,29 @@ request params :
 	
 response :
 
+```
+```
+
+###consume:
+
+```
+/messagebus/queues/{qname}/messages?appkey={appkey}&type={consume}&mode={sync}&num={num}&timeout={timeout}
+```
+
+http method : `GET`
+
+request params : 
+
+* path : qname - 队列名称
+* querystring : 
+	* appkey - 授权key （必填）
+	* type - 鉴别API，值为 `consume` （必填）
+	* mode - 取值 `sync` 或 `async` （必填）
+	* num - 希望获取的消息数目，范围 0 < num <=100 （mode 为 sync时有效）
+	* timeout - 超时时间，单位为毫秒 （mode 为 sync时有效）
+	
+response : 
+
 ```js
 {
 	statusCode: 10200,
@@ -47,29 +70,6 @@ response :
 		}
 	]
 }
-```
-
-###consume:
-
-```
-/messagebus/queues/{qname}/messages?appkey={appkey}&type={consume}&mode={sync}&num={num}&timeout={timeout}
-```
-
-http method : `GET`
-
-request params : 
-
-* path : qname - 队列名称
-* querystring : 
-	* appkey - 授权key （必填）
-	* type - 鉴别API，值为 `consume` （必填）
-	* mode - 取值 `sync` 或 `async` （必填）
-	* num - 希望获取的消息数目，范围 0 < num <=100 （mode 为 sync时有效）
-	* timeout - 超时时间，单位为毫秒 （mode 为 sync时有效）
-	
-response : 
-
-```
 
 ```
 
