@@ -22,7 +22,7 @@ request params :
 	
 response :
 
-```json
+```js
 {
 	statusCode: 10200,
 	error: "",
