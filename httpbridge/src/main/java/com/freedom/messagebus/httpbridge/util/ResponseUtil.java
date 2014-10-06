@@ -17,7 +17,7 @@ public class ResponseUtil {
         writer.write("{ \"statusCode\" : " + statusCode + "," +
                          " \"error\" : \"" + err + "\"," +
                          " \"msg\" : \"" + msg + "\", " +
-                         " \"data\" : \"" + data + "\"" +
+                         " \"data\" : " + data +
                          "}");
         writer.flush();
         writer.close();

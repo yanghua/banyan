@@ -22,8 +22,31 @@ request params :
 	
 response :
 
-```
-
+```json
+{
+	statusCode: 10200,
+	error: "",
+	msg: "",
+	data: [
+		{
+			messageHeader: {
+				messageId: 518977236485992450,
+				type: "appMessage",
+				priority: 0,
+				deliveryMode: 2
+			},
+			messageBody: {
+				messageBody: [
+					116,
+					101,
+					115,
+					116
+				]
+			},
+			messageType: "AppMessage"
+		}
+	]
+}
 ```
 
 ###consume:

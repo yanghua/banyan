@@ -31,6 +31,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-
+    <listener>
+        <listener-class>com.freedom.messagebus.httpbridge.listener.AppContextListener</listener-class>
+    </listener>
 
 </web-app>
