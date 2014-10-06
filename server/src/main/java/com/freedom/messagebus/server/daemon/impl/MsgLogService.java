@@ -22,6 +22,7 @@ import java.io.IOException;
 public class MsgLogService extends AbstractInitializer implements Runnable, IService {
 
     private static final Log logger = LogFactory.getLog(MsgLogService.class);
+    private static final String consumerTag = "tag.consumer.msgLog";
 
     public MsgLogService(String host) {
         super(host);
@@ -31,7 +32,9 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
     public void run() {
         try {
             super.init();
-            QueueingConsumer consumer = ProxyConsumer.consume(this.channel, CONSTS.DEFAULT_CONSOLE_QUEUE_NAME);
+            QueueingConsumer consumer = ProxyConsumer.consume(this.channel,
+                                                              CONSTS.DEFAULT_CONSOLE_QUEUE_NAME,
+                                                              consumerTag);
             if (consumer == null)
                 throw new IOException(" consumer is null ");
 
@@ -60,6 +63,7 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
             logger.info(" consumer closed! ");
         } finally {
             try {
+                this.channel.basicCancel(consumerTag);
                 super.close();
             } catch (IOException e) {
                 logger.error("[run] occurs a IOException : " + e.getMessage());

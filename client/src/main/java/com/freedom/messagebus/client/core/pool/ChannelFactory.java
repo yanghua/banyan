@@ -27,7 +27,7 @@ public class ChannelFactory implements PooledObjectFactory<Channel> {
     public void destroyObject(PooledObject<Channel> channelPooledObject) throws Exception {
         Channel channel = channelPooledObject.getObject();
 
-        if (!channel.isOpen()) {
+        if (channel.isOpen()) {
             try {
                 channel.close();
             } finally {

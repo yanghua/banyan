@@ -30,7 +30,9 @@ public class RealConsumer extends AbstractHandler {
         if(!context.isSync()) {
             QueueingConsumer consumer = null;
             try {
-                consumer = ProxyConsumer.consume(context.getChannel(), context.getQueueNode().getValue());
+                consumer = ProxyConsumer.consume(context.getChannel(),
+                                                 context.getQueueNode().getValue(),
+                                                 context.getConsumerTag());
             } catch (IOException e) {
                 logger.error("[handler] occurs a IOException : " + e.getMessage());
             }

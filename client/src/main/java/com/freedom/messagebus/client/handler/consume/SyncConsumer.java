@@ -10,6 +10,7 @@ import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
 import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.GetResponse;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,22 +35,19 @@ public class SyncConsumer extends AbstractHandler {
         if (context.isSync()) {
             List<Message> consumeMsgs = new ArrayList<>(context.getConsumeMsgNum());
             context.setConsumeMsgs(consumeMsgs);
-            long everyTimeout = context.getTimeout() / context.getConsumeMsgNum();
-            QueueingConsumer consumer;
             try {
-                consumer = ProxyConsumer.consume(context.getChannel(),
-                                                 context.getQueueNode().getValue());
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
-                    QueueingConsumer.Delivery delivery= consumer.nextDelivery(everyTimeout);
-                    if (delivery == null){
+                    GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
+                                                                   context.getQueueNode().getValue());
+
+                    if (response == null)
                         continue;
-                    }
 
-                    AMQP.BasicProperties properties = delivery.getProperties();
-                    byte[] msgBody = delivery.getBody();
+                    AMQP.BasicProperties properties = response.getProps();
+                    byte[] msgBody = response.getBody();
 
-                    context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
 
                     String msgTypeStr = properties.getType();
                     if (msgTypeStr == null || msgTypeStr.isEmpty()) {
@@ -64,8 +62,6 @@ public class SyncConsumer extends AbstractHandler {
                 }
             } catch (IOException e) {
                 logger.error("[handle] occurs a IOException " + e.getMessage());
-            } catch (InterruptedException e) {
-                logger.info("[handle] occurs a InterruptedException " + e.getMessage());
             } finally {
                 //destroy channel
                 context.getDestroyer().destroy(context.getChannel());

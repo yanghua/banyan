@@ -6,10 +6,7 @@ import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
 import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConsumerCancelledException;
-import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -108,14 +105,22 @@ public class ProxyConsumer implements Runnable {
      *
      * @param channel
      * @param queueName
+     * @param consumerTag
      * @return
      * @throws IOException
      */
     public static QueueingConsumer consume(@NotNull Channel channel,
-                                           @NotNull String queueName) throws IOException {
+                                           @NotNull String queueName,
+                                           String consumerTag) throws IOException {
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName, false, consumer);
+        channel.basicConsume(queueName, false, consumerTag, consumer);
         return consumer;
+    }
+
+    public static GetResponse consumeSingleMessage(@NotNull Channel channel,
+                                            @NotNull String queueName) throws IOException {
+        boolean notAutoAck = false;
+        return channel.basicGet(queueName, notAutoAck);
     }
 
 }

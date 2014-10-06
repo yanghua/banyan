@@ -45,7 +45,9 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
 
         try {
             //just receive one
-            QueueingConsumer consumer = ProxyConsumer.consume(context.getChannel(), String.valueOf(msgId));
+            QueueingConsumer consumer = ProxyConsumer.consume(context.getChannel(),
+                                                              String.valueOf(msgId),
+                                                              context.getConsumerTag());
             QueueingConsumer.Delivery delivery = consumer.nextDelivery(context.getTimeout() * 1000);
 
             //timeout

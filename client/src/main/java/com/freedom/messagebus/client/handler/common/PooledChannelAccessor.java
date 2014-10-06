@@ -5,14 +5,21 @@ import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 /**
  * pooled channel accessor used to access a channel from a pool
  * the pool based on apache common pool (v2.0)
  */
 public class PooledChannelAccessor extends AbstractHandler {
+
+    private static final Log logger = LogFactory.getLog(PooledChannelAccessor.class);
 
     /**
      * the main process method all sub class must implement
@@ -21,7 +28,7 @@ public class PooledChannelAccessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
+    public void handle(@NotNull final MessageContext context,
                        @NotNull IHandlerChain chain) {
 
         final AbstractPool<Channel> pool = context.getPool();
@@ -32,6 +39,18 @@ public class PooledChannelAccessor extends AbstractHandler {
         context.setDestroyer(new IChannelDestroyer() {
             @Override
             public void destroy(@NotNull Channel channel) {
+                //if carry is consume or request then release current consumer
+                if (context.getCarryType().equals(MessageCarryType.CONSUME) ||
+                    context.getCarryType().equals(MessageCarryType.REQUEST)) {
+                    if(context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()){
+                        try {
+                            channel.basicCancel(context.getConsumerTag());
+                        } catch (IOException e) {
+                            logger.error("[destroy] occurs a IOException : " + e.getMessage());
+                        }
+                    }
+                }
+
                 pool.returnResource(channel);
             }
         });

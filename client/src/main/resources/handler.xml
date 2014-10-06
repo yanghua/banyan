@@ -20,6 +20,10 @@
     </produce>
     <consumer>
         <handler>
+            <handler-name>Consumer-Tag-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumerTagGenerator</handler-path>
+        </handler>
+        <handler>
             <handler-name>Validate-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
         </handler>
@@ -64,6 +68,10 @@
         <handler>
             <handler-name>Real-Requester</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.request.RealRequester</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Consumer-Tag-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumerTagGenerator</handler-path>
         </handler>
         <handler>
             <handler-name>Blocked-And-Timeout-Response</handler-name>

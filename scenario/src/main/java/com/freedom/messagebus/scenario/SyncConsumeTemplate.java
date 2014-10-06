@@ -38,7 +38,7 @@ public class SyncConsumeTemplate {
         }
 
         //consume
-        List<Message> msgs = consumer.consume(appName, 2, 10_000);
+        List<Message> msgs = consumer.consume(appName, 2);
         client.close();
 
         for (Message msg : msgs) {

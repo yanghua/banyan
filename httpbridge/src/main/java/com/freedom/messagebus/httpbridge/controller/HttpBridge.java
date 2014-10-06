@@ -130,9 +130,7 @@ public class HttpBridge extends HttpServlet {
         throws ServletException, IOException {
         String queueName = request.getRequestURI().split("/")[3];
         String numStr = request.getParameter("num");
-        String timeoutStr = request.getParameter("timeout");
         int num = 0;
-        long timeout = -1l;
 
         List<Message> messages = null;
 
@@ -150,21 +148,8 @@ public class HttpBridge extends HttpServlet {
                 throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than "+
                                                         Consts.MAX_CONSUME_NUM + " and greater than " + Consts.MIN_CONSUME_NUM);
 
-            if (timeoutStr == null)
-                throw new NullPointerException("[syncConsume] param : timeout can not be null or empty");
-
-            try {
-                timeout = Long.valueOf(timeoutStr);
-            } catch (NumberFormatException e) {
-                throw new InvalidParameterException("[syncConsume] invalidate param : timeout, it must be a Long!");
-            }
-
-            if (timeout < Consts.MIN_CONSUME_TIMEOUT || timeout > Consts.MAX_CONSUME_TIMEOUT)
-                throw new InvalidParameterException("[syncConsume] invalidate param : timeout, it should be less than " +
-                                                        Consts.MAX_CONSUME_TIMEOUT + " and greater than " + Consts.MIN_CONSUME_TIMEOUT);
-
             IConsumer consumer = messagebus.getConsumer();
-            messages = consumer.consume(queueName, num, timeout);
+            messages = consumer.consume(queueName, num);
             String msgsStr = gson.toJson(messages);
             ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", msgsStr);
         } catch (Exception e) {

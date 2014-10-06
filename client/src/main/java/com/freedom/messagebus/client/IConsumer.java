@@ -31,10 +31,10 @@ public interface IConsumer {
      * or timeout the consume will return
      * @param queueName the name of queue that the consumer want to connect
      * @param num the num which the client expected (the result's num may not be equals to the given num)
-     * @param timeout the timeout (ms)
+
      * @return received message
      */
     @NotNull
-    public List<Message> consume(@NotNull String queueName, int num, long timeout);
+    public List<Message> consume(@NotNull String queueName, int num);
 
 }

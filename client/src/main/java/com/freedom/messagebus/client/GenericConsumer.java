@@ -70,7 +70,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
      */
     @NotNull
     @Override
-    public List<Message> consume(@NotNull String queueName, int num, long timeout) {
+    public List<Message> consume(@NotNull String queueName, int num) {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppKey(super.context.getAppKey());
@@ -78,7 +78,6 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         ctx.setQueueNode(node);
         ctx.setPool(this.context.getPool());
         ctx.setConnection(this.context.getConnection());
-        ctx.setTimeout(timeout);
         ctx.setConsumeMsgNum(num);
         ctx.setSync(true);
 

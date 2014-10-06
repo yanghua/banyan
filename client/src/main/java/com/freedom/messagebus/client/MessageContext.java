@@ -45,6 +45,8 @@ public class MessageContext {
      */
     @NotNull
     private Message consumedMsg;
+    private String consumerTag;
+
 
     @NotNull
     private MessageCarryType carryType;                 //produce or consume
@@ -251,6 +253,14 @@ public class MessageContext {
 
     public void setSync(boolean isSync) {
         this.isSync = isSync;
+    }
+
+    public String getConsumerTag() {
+        return consumerTag;
+    }
+
+    public void setConsumerTag(String consumerTag) {
+        this.consumerTag = consumerTag;
     }
 
     @Override
