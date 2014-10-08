@@ -37,7 +37,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.freedom.messagebus.scenario.RequestTemplate</mainClass>
+                            <mainClass>com.freedom.messagebus.scenario.client.RequestTemplate</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -64,7 +64,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.freedom.messagebus.scenario.RequestTemplate</mainClass>
+                            <mainClass>com.freedom.messagebus.scenario.client.RequestTemplate</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

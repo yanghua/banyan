@@ -118,7 +118,7 @@ public class ProxyConsumer implements Runnable {
     }
 
     public static GetResponse consumeSingleMessage(@NotNull Channel channel,
-                                            @NotNull String queueName) throws IOException {
+                                                   @NotNull String queueName) throws IOException {
         boolean notAutoAck = false;
         return channel.basicGet(queueName, notAutoAck);
     }

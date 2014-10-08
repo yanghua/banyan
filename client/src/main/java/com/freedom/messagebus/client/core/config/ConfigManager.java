@@ -39,13 +39,13 @@ public class ConfigManager {
 
     //region handle models
     @NotNull
-    private List<HandlerModel>    produceHandlerModels;
+    private List<HandlerModel> produceHandlerModels;
     @NotNull
-    private List<HandlerModel>    consumerHandlerModels;
+    private List<HandlerModel> consumerHandlerModels;
     @NotNull
-    private List<HandlerModel>    requestHandlerModels;
+    private List<HandlerModel> requestHandlerModels;
     @NotNull
-    private List<HandlerModel>    responseHandlerModels;
+    private List<HandlerModel> responseHandlerModels;
     //endregion
 
     //region handler instance

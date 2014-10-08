@@ -27,7 +27,7 @@ public class RealConsumer extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        if(!context.isSync()) {
+        if (!context.isSync()) {
             QueueingConsumer consumer = null;
             try {
                 consumer = ProxyConsumer.consume(context.getChannel(),

@@ -15,30 +15,30 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
     /**
      * send a request and got a response
      *
-     * @param msg      request message
-     * @param to       send to destination
-     * @param timeout  response wait timeout
-     * @throws com.freedom.messagebus.client.MessageResponseTimeoutException
+     * @param msg     request message
+     * @param to      send to destination
+     * @param timeout response wait timeout
      * @return Message the response
+     * @throws com.freedom.messagebus.client.MessageResponseTimeoutException
      */
     @Override
-    public Message request( @NotNull Message msg,
-                            @NotNull String to,
-                            long timeout) throws MessageResponseTimeoutException {
+    public Message request(@NotNull Message msg,
+                           @NotNull String to,
+                           long timeout) throws MessageResponseTimeoutException {
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.REQUEST);
         cxt.setAppKey(super.context.getAppKey());
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
         cxt.setQueueNode(node);
         cxt.setTimeout(timeout);
-        cxt.setMessages(new Message[] {msg});
+        cxt.setMessages(new Message[]{msg});
 
         cxt.setPool(this.context.getPool());
         cxt.setConnection(this.context.getConnection());
 
         carry(cxt);
 
-        if (cxt.isTimeout() || cxt.getConsumedMsg()== null)
+        if (cxt.isTimeout() || cxt.getConsumedMsg() == null)
             throw new MessageResponseTimeoutException("message request time out.");
 
         return cxt.getConsumedMsg();

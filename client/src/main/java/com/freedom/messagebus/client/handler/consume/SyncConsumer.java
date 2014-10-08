@@ -11,7 +11,6 @@ import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
-import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public class SyncConsumer extends AbstractHandler {
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
-                                                                   context.getQueueNode().getValue());
+                                                                              context.getQueueNode().getValue());
 
                     if (response == null)
                         continue;

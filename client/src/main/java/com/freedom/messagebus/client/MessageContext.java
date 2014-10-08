@@ -45,7 +45,7 @@ public class MessageContext {
      */
     @NotNull
     private Message consumedMsg;
-    private String consumerTag;
+    private String  consumerTag;
 
 
     @NotNull
@@ -68,7 +68,7 @@ public class MessageContext {
     private long                  timeout;
     private boolean               hasTimeout;
 
-    private int consumeMsgNum;
+    private int           consumeMsgNum;
     private List<Message> consumeMsgs;
     private boolean isSync = false;
 

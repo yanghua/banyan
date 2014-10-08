@@ -21,7 +21,7 @@ import java.io.IOException;
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
 public class MsgLogService extends AbstractInitializer implements Runnable, IService {
 
-    private static final Log logger = LogFactory.getLog(MsgLogService.class);
+    private static final Log    logger      = LogFactory.getLog(MsgLogService.class);
     private static final String consumerTag = "tag.consumer.msgLog";
 
     public MsgLogService(String host) {

@@ -70,7 +70,7 @@ public class OriginalReceiver extends AbstractHandler implements Runnable {
             carryHandlerChain.setEnableRepeatBeforeNextHandler(true);
 
             this.currentThread.start();
-        }else {
+        } else {
             chain.handle(context);
         }
     }

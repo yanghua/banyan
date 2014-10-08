@@ -29,9 +29,9 @@ public interface IConsumer {
     /**
      * consume with sync-mode, when received messages' num equal the given num
      * or timeout the consume will return
+     *
      * @param queueName the name of queue that the consumer want to connect
-     * @param num the num which the client expected (the result's num may not be equals to the given num)
-
+     * @param num       the num which the client expected (the result's num may not be equals to the given num)
      * @return received message
      */
     @NotNull

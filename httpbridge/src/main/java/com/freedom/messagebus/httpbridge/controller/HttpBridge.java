@@ -6,6 +6,8 @@ import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageJSONSerializer;
+import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.httpbridge.util.Consts;
 import com.freedom.messagebus.httpbridge.util.ResponseUtil;
 import com.google.gson.Gson;
@@ -73,15 +75,21 @@ public class HttpBridge extends HttpServlet {
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY));
             String queueName = request.getRequestURI().split("/")[3];
             String msgArrStr = request.getParameter("messages");
-            Message[] msgArr = gson.fromJson(msgArrStr, Message[].class);
 
-            try {
-                IProducer producer = messagebus.getProducer();
-                producer.batchProduce(msgArr, queueName);
-            } catch (MessagebusUnOpenException e) {
-                logger.error("[produce] occurs a MessagebusUnOpenException : " + e.getMessage());
+            if (msgArrStr == null || msgArrStr.isEmpty()) {
+                logger.error("[produce] param : messages can not be null or empty");
+                ResponseUtil.response(response, Consts.HTTP_FAILED_CODE,
+                                      "param : messages can not be null or empty", "", "");
+            } else {
+                Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.AppMessage);
+
+                try {
+                    IProducer producer = messagebus.getProducer();
+                    producer.batchProduce(msgArr, queueName);
+                } catch (MessagebusUnOpenException e) {
+                    logger.error("[produce] occurs a MessagebusUnOpenException : " + e.getMessage());
+                }
             }
-
         }
     }
 
@@ -145,13 +153,17 @@ public class HttpBridge extends HttpServlet {
             }
 
             if (num < Consts.MIN_CONSUME_NUM || num > Consts.MAX_CONSUME_NUM)
-                throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than "+
+                throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than " +
                                                         Consts.MAX_CONSUME_NUM + " and greater than " + Consts.MIN_CONSUME_NUM);
 
             IConsumer consumer = messagebus.getConsumer();
             messages = consumer.consume(queueName, num);
-            String msgsStr = gson.toJson(messages);
-            ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", msgsStr);
+            if (messages == null) {
+                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "",  "[]");
+            } else {
+                String msgsStr = MessageJSONSerializer.serializeMessages(messages);
+                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "",  msgsStr);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
             ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, e.getMessage(), "", "");

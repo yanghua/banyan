@@ -5,7 +5,6 @@ import com.freedom.messagebus.httpbridge.util.ResponseUtil;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +40,7 @@ public class URLDispatcher implements Filter {
             String appKeyVal = request.getParameter(THE_KEY_OF_APP_KEY);
             if (appKeyVal == null || appKeyVal.isEmpty()) {
                 logger.error("[doFilter] missed query string : appkey");
-                ResponseUtil.response((HttpServletResponse)servletResponse, Consts.HTTP_FAILED_CODE,
+                ResponseUtil.response((HttpServletResponse) servletResponse, Consts.HTTP_FAILED_CODE,
                                       "missed query string : appkey!", "", gson.toJson(""));
             } else {
                 filterChain.doFilter(request, servletResponse);

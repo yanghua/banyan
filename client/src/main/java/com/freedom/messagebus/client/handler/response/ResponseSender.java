@@ -3,7 +3,6 @@ package com.freedom.messagebus.client.handler.response;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;

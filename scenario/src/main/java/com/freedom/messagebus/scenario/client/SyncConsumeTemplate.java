@@ -1,4 +1,4 @@
-package com.freedom.messagebus.scenario;
+package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.IConsumer;
 import com.freedom.messagebus.client.Messagebus;

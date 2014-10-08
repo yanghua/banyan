@@ -2,7 +2,6 @@ package com.freedom.messagebus.client.model;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.xml.ws.Response;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

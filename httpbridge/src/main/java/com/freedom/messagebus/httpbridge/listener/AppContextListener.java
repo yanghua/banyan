@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.httpbridge.util.Consts;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.ServletContextCleaner;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,8 +29,8 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = (Messagebus)servletContextEvent.getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY);
-        if (messagebus !=null && messagebus.isOpen()) {
+        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY);
+        if (messagebus != null && messagebus.isOpen()) {
             messagebus.close();
         }
     }

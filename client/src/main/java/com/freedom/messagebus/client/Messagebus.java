@@ -21,7 +21,6 @@ import org.apache.zookeeper.Watcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -98,17 +97,17 @@ public class Messagebus {
                                       public void onChanged(String path,
                                                             byte[] newData,
                                                             Watcher.Event.EventType eventType) {
-                     logger.info("path : " + path + " has changed!");
+                                          logger.info("path : " + path + " has changed!");
 
-                     try {
-                         if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER))
-                            ConfigManager.getInstance().parseRouterInfo();
-                     } catch (Exception e) {
-                        logger.error("[onChanged] occurs a Exception : " + e.getMessage());
-                     }
-                 }
-             }
-         );
+                                          try {
+                                              if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER))
+                                                  ConfigManager.getInstance().parseRouterInfo();
+                                          } catch (Exception e) {
+                                              logger.error("[onChanged] occurs a Exception : " + e.getMessage());
+                                          }
+                                      }
+                                  }
+                                 );
 
         this.initConnection();
 
@@ -134,7 +133,7 @@ public class Messagebus {
         responser = new GenericResponser(context);
 
         boolean success = this.isOpen.compareAndSet(false, true);
-        if (!success){
+        if (!success) {
             logger.error("occurs a non-consistency : the field isOpen should be false but it's actually true");
         }
     }
@@ -185,7 +184,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IRequester getRequester() throws MessagebusUnOpenException{
+    public IRequester getRequester() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 

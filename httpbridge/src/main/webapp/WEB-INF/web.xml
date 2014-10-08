@@ -14,7 +14,7 @@
         <servlet-class>com.freedom.messagebus.httpbridge.controller.HttpBridge</servlet-class>
         <!--<load-on-startup>1</load-on-startup>-->
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>httpBridge</servlet-name>
         <url-pattern>/messagebus/*</url-pattern>

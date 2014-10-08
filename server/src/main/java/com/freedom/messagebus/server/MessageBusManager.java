@@ -3,7 +3,6 @@ package com.freedom.messagebus.manager;
 import com.freedom.messagebus.common.AbstractInitializer;
 import com.freedom.messagebus.common.CommonUtil;
 import com.freedom.messagebus.common.RouterType;
-import com.freedom.messagebus.common.model.TransferCenter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;

@@ -123,6 +123,7 @@ public class QueueManager extends AbstractInitializer {
 
     /**
      * for other function, it borrow a outer channel
+     *
      * @param queueName
      * @param outerChannel
      * @return
