@@ -32,7 +32,7 @@ public class RequestTemplate {
             messagebus.open();
             IRequester requester = messagebus.getRequester();
 
-            respMsg = requester.request(msg, queueName, 10);
+            respMsg = requester.request(msg, queueName, 30000);
             //use response message...
             logger.info("response message : [" + respMsg.getMessageHeader().getMessageId() + "]");
         } catch (MessagebusConnectedFailedException | MessagebusUnOpenException |

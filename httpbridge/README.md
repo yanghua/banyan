@@ -72,13 +72,13 @@ response :
 
 ```
 
-> consume 模式为`sync`时，请求属于普通的http请求，而模式为`async`是则为长连接请求，请求参数：num 与 timeout 只在mode为 `sync`时有效，并且num跟最终返回response中返回的数目 **不一定相等**
+> consume 模式为`sync`时，对应于 `pull` 模式，请求属于普通的http请求，而模式为`async`是则为长连接请求，对应于`push`模式，请求参数：num 与 timeout 只在mode为 `sync`时有效，并且num跟最终返回response中返回的数目 **不一定相等**
 
 
 ###request:
 
 ```
-/messagebus/queues/{qname}/messages?appkey={appkey}&timeout={timeout}
+/messagebus/queues/{qname}/messages?appkey={appkey}&type={type}&timeout={timeout}
 ```
 
 http method : `POST`

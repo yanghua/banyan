@@ -1,9 +1,6 @@
 package com.freedom.messagebus.httpbridge.controller;
 
-import com.freedom.messagebus.client.IConsumer;
-import com.freedom.messagebus.client.IProducer;
-import com.freedom.messagebus.client.Messagebus;
-import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageJSONSerializer;
@@ -79,15 +76,21 @@ public class HttpBridge extends HttpServlet {
             if (msgArrStr == null || msgArrStr.isEmpty()) {
                 logger.error("[produce] param : messages can not be null or empty");
                 ResponseUtil.response(response, Consts.HTTP_FAILED_CODE,
-                                      "param : messages can not be null or empty", "", "");
+                                      "param : messages can not be null or empty", "", "''");
             } else {
                 Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.AppMessage);
 
                 try {
                     IProducer producer = messagebus.getProducer();
                     producer.batchProduce(msgArr, queueName);
+                    ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", "''");
                 } catch (MessagebusUnOpenException e) {
                     logger.error("[produce] occurs a MessagebusUnOpenException : " + e.getMessage());
+                    ResponseUtil.response(response,
+                                          Consts.HTTP_FAILED_CODE,
+                                          "[produce] occurs a MessagebusUnOpenException : " + e.getMessage(),
+                                          "",
+                                          "''");
                 }
             }
         }
@@ -98,7 +101,7 @@ public class HttpBridge extends HttpServlet {
         if (!request.getMethod().toLowerCase().equals("get")) {
             logger.error("[consume] error http request method");
             ResponseUtil.response(response, Consts.HTTP_FAILED_CODE,
-                                  "error http request method", "", "");
+                                  "error http request method", "", "''");
         } else {
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY));
             String mode = request.getParameter("mode");
@@ -106,7 +109,7 @@ public class HttpBridge extends HttpServlet {
             if (mode == null || mode.isEmpty()) {
                 logger.error("[consume] the param : mode can not be null or empty");
                 ResponseUtil.response(response, Consts.HTTP_FAILED_CODE,
-                                      "the param : mode can not be null or empty", "", "");
+                                      "the param : mode can not be null or empty", "", "''");
             } else {
                 switch (mode.toLowerCase()) {
                     case "sync":
@@ -126,12 +129,66 @@ public class HttpBridge extends HttpServlet {
 
     private void request(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+        try {
+            if (!request.getMethod().toLowerCase().equals("post"))
+                throw new InvalidParameterException("error http method : " + request.getMethod());
 
+            String timeoutStr = request.getParameter("timeout");
+            if (timeoutStr == null || timeoutStr.isEmpty())
+                throw new NullPointerException("param : timeout can not be null or empty");
+
+            long timeout;
+            timeout = Long.valueOf(timeoutStr);
+
+            if (timeout < Consts.MIN_CONSUME_TIMEOUT || timeout > Consts.MAX_CONSUME_TIMEOUT)
+                throw new InvalidParameterException("invalid param : timeout it should be greater than :" + Consts.MIN_CONSUME_TIMEOUT +
+                                                        "and less than : " + Consts.MAX_CONSUME_TIMEOUT);
+
+            String queueName = request.getRequestURI().split("/")[3];
+            String msgStr = request.getParameter("message");
+
+            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.AppMessage);
+
+            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY));
+
+            IRequester requester = messagebus.getRequester();
+            Message responseMsg = requester.request(msg, queueName, timeout);
+
+            String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
+            ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", respMsgStr);
+        } catch (MessagebusUnOpenException e) {
+            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "''");
+        } catch (MessageResponseTimeoutException e) {
+            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "''");
+        } catch (Exception e) {
+            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, "occrus a exception : " + e.getMessage(), "", "''");
+        }
     }
 
     private void response(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+        if (!request.getMethod().toLowerCase().equals("post")) {
+            logger.error("error http method : " + request.getMethod());
+            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, "error http method : " + request.getMethod(),
+                                  "", "''");
+        } else {
+            String queueName = request.getRequestURI().split("/")[3];
+            String msgStr = request.getParameter("message");
 
+            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.AppMessage);
+
+            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY));
+
+            IResponser responser = null;
+            try {
+                responser = messagebus.getResponser();
+                responser.responseTmpMessage(msg, queueName);
+                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", "''");
+            } catch (MessagebusUnOpenException e) {
+                ResponseUtil.response(response, Consts.HTTP_FAILED_CODE,
+                                      "occurs a MessagebusUnOpenException exception : " + e.getMessage(), "", "''");
+            }
+        }
     }
 
     private void syncConsume(HttpServletRequest request, HttpServletResponse response, Messagebus messagebus)
@@ -159,14 +216,14 @@ public class HttpBridge extends HttpServlet {
             IConsumer consumer = messagebus.getConsumer();
             messages = consumer.consume(queueName, num);
             if (messages == null) {
-                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "",  "[]");
+                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
             } else {
                 String msgsStr = MessageJSONSerializer.serializeMessages(messages);
-                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "",  msgsStr);
+                ResponseUtil.response(response, Consts.HTTP_SUCCESS_CODE, "", "", msgsStr);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, e.getMessage(), "", "");
+            ResponseUtil.response(response, Consts.HTTP_FAILED_CODE, e.getMessage(), "", "''");
         }
     }
 

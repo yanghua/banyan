@@ -5,7 +5,6 @@ import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageJSONSerializer;
 import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -22,20 +21,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProduceTemplate {
+public class RequestTemplate {
 
-    private static final Log logger = LogFactory.getLog(ProduceTemplate.class);
+    private static final Log logger = LogFactory.getLog(RequestTemplate.class);
 
-    private static final Gson gson = new Gson();
-
-    private static String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?appkey=%s&type=produce";
+    private static String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?appkey=%s&type=request&timeout=%s";
     private static String testHost      = "localhost";
     private static int    testPort      = 8081;
     private static String testQueue     = "crm";
     private static String appkey        = "jahksjdfhakjdflkasdjflk";
+    private static long   timeout       = 5000;
 
     public static void main(String[] args) {
-        String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey);
+        String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey, timeout);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -45,20 +43,17 @@ public class ProduceTemplate {
         AppMessageBody appMessageBody = (AppMessageBody) testMsg.getMessageBody();
         appMessageBody.setMessageBody("test".getBytes());
 
-        List<Message> msgs = new ArrayList<>(1);
-        msgs.add(testMsg);
-        String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
+        String msg2json = MessageJSONSerializer.serialize(testMsg);
 
         try {
             HttpPost postRequest = new HttpPost(url);
             List<NameValuePair> nvps = new ArrayList<>();
-            nvps.add(new BasicNameValuePair("messages", msgs2json));
+            nvps.add(new BasicNameValuePair("message", msg2json));
             postRequest.setEntity(new UrlEncodedFormEntity(nvps));
 
             response = httpClient.execute(postRequest);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                logger.info("response is : " + EntityUtils.toString(entity));
                 long len = entity.getContentLength();
                 if (len == -1)
                     logger.error("there is no response data.");

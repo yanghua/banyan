@@ -40,8 +40,7 @@ public class PooledChannelAccessor extends AbstractHandler {
             @Override
             public void destroy(@NotNull Channel channel) {
                 //if carry is consume or request then release current consumer
-                if (context.getCarryType().equals(MessageCarryType.CONSUME) ||
-                    context.getCarryType().equals(MessageCarryType.REQUEST)) {
+                if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
                     if (context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()) {
                         try {
                             channel.basicCancel(context.getConsumerTag());

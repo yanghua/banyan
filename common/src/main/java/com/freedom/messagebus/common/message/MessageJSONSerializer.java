@@ -41,6 +41,23 @@ public class MessageJSONSerializer {
         return msg;
     }
 
+    public static Message deSerialize(@NotNull JsonElement msgElement, @NotNull MessageType type) {
+        checkMessageType(type);
+
+        JsonObject obj = msgElement.getAsJsonObject();
+        JsonElement headerElement = obj.get("messageHeader");
+        AppMessageBody body = gson.fromJson(obj.get("messageBody"), AppMessageBody.class);
+        MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
+        IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
+
+        Message msg = new Message();
+        msg.setMessageHeader(header);
+        msg.setMessageBody(body);
+        msg.setMessageType(msgType);
+
+        return msg;
+    }
+
     @NotNull
     public static String serializeMessages(@NotNull Collection<Message> msgs) {
         for (Message msg : msgs) {
