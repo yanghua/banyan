@@ -1,6 +1,8 @@
 #overview
 httpbridge 如其名，它是消息总线接口基于http的实现。用于衔接各种异构系统。
 
+> 说明：请尽可能使用messagebus4java-client
+
 ##Restful
 
 ###produce：
@@ -22,7 +24,13 @@ request params :
 	
 response :
 
-```
+```js
+{
+	statusCode: 10200,
+	error: "",
+	msg: "",
+	data: ''
+}
 ```
 
 ###consume:
@@ -95,8 +103,29 @@ request params :
 	
 response :
 
-```
-
+```js
+{
+	statusCode: 10200,
+	error: "",
+	msg: "",
+	data: {
+			messageHeader: {
+				messageId: 518977236485992450,
+				type: "appMessage",
+				priority: 0,
+				deliveryMode: 2
+			},
+			messageBody: {
+				messageBody: [
+					116,
+					101,
+					115,
+					116
+				]
+			},
+			messageType: "AppMessage"
+	}
+}
 ```
 
 > request 用于模拟req / resp模型，它收到的response是另一个client通过下面的response接口发送的。它用于立即等待处理结果的模型，而是否发送响应，这取决于目标队列的处理器，因此它提供一个timeout来避免无限等待。
@@ -117,8 +146,25 @@ request params :
 * request body :
 	* message - 消息对象	
 	
+response :
+
+```js
+{
+	statusCode: 10200,
+	error: "",
+	msg: "",
+	data: ''
+}
+```
+	
 > response 跟上面的request是同一个模型的另一端，需要注意的是，这里的response指的是 **发送响应** 而不是接收响应！
 
 
 ##技术实现
+### messagebus-client 的代理
+messagebus-httpbridge 用于为messagebus提供http访问的支持。本质上，httpbridge的server相当于一个 **代理服务器**，在server内部也是通过调用 `messagebus-client` 来实现与messagebus的交互。
+
+### jetty （暂未实现）
+作为一种轻量级java web container。jetty拥有一些不错的特性，比如高度的模块化、扩展性强等。但选择jetty的主要原因还是来自于它的 `continuation` 技术能更好得应对 `server push` 模型(长连接，comet)。这里它用于 `consume`的 `async`模型。
+
 
