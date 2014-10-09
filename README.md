@@ -1,5 +1,22 @@
 #overview
-消息总线项目各Module（子项目）交互关系图：
+消息总线用于对各种异构系统之间消息的通信提供支持。其常见的应用场景有：
+
+* 系统集成
+* 面向组件/模块的软件开发
+* 为ESB/SOA的实现提供底层支持
+
+##树状路由拓扑结构
+消息总线内部实现基于rabbitmq，借助于rabbitmq多样的消息 exchange 类型，可以构建出各种功能十分强大的路由模式。下面是消息总线实现的路由拓扑结构：
+
+![img 3][3]
+
+树状路由结构拥有如下优势：
+
+* 对客户端隐藏路由结构（只需知道首节点:proxy即可）
+* 多样的消息发送模式：单播 、 多播 、 组播
+* 在不干涉消息传输链路的情况下，实现消息日志
+
+##Module关系
 
 ![img 1][1]
 
@@ -36,3 +53,4 @@
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/overview/architecture.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/overview/module-dependency.png
+[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/overview/router-topology.png
