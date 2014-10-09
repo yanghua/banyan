@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
@@ -49,7 +48,7 @@ public class TestProduceAndConsumer extends TestCase {
                                                               new IMessageReceiveListener() {
 
                                                                   @Override
-                                                                  public void onMessage(Message message) {
+                                                                  public void onMessage(Message message, IConsumerCloser consumerCloser) {
                                                                       logger.info("[message-id] : " + message.getMessageHeader().getMessageId());
                                                                   }
                                                               });

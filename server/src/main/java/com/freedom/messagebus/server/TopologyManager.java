@@ -1,4 +1,4 @@
-package com.freedom.messagebus.manager;
+package com.freedom.messagebus.server;
 
 import com.freedom.messagebus.common.RouterType;
 import com.rabbitmq.client.Channel;

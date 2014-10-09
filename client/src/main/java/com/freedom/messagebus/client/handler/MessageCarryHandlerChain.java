@@ -14,8 +14,6 @@ public class MessageCarryHandlerChain implements IHandlerChain {
 
     private List<AbstractHandler> handlerChain;
     private int     pos          = 0;
-    private boolean enableRepeat = false;
-    private int     repeatPos    = -1;
 
     public MessageCarryHandlerChain(MessageCarryType type, GenericContext context) {
         switch (type) {
@@ -47,16 +45,6 @@ public class MessageCarryHandlerChain implements IHandlerChain {
         if (this.pos < handlerChain.size()) {
             AbstractHandler currentHandler = handlerChain.get(pos++);
             currentHandler.handle(context, this);
-        } else if (this.enableRepeat) {         //end
-            this.pos = this.repeatPos;          //reset the position
         }
-    }
-
-    public void setEnableRepeatBeforeNextHandler(boolean enableRepeat) {
-        this.enableRepeat = enableRepeat;
-        if (this.enableRepeat) {
-            this.repeatPos = this.pos;
-        } else
-            this.repeatPos = -1;
     }
 }

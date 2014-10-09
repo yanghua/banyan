@@ -4,7 +4,6 @@ import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consume.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.model.Node;
 import com.rabbitmq.client.Channel;
@@ -54,13 +53,13 @@ public class MessageContext {
     private Node             queueNode;                 //store current carry node
 
     @NotNull
-    private Channel                 channel;
+    private Channel                           channel;
     @NotNull
-    private OriginalReceiver        receiver;
+    private OriginalReceiver.ReceiveEventLoop receiveEventLoop;
     @NotNull
-    private IChannelDestroyer       destroyer;
+    private IChannelDestroyer                 destroyer;
     @NotNull
-    private IMessageReceiveListener listener;
+    private IMessageReceiveListener           listener;
     @NotNull
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
@@ -131,12 +130,12 @@ public class MessageContext {
     }
 
     @NotNull
-    public OriginalReceiver getReceiver() {
-        return receiver;
+    public OriginalReceiver.ReceiveEventLoop getReceiveEventLoop() {
+        return receiveEventLoop;
     }
 
-    public void setReceiver(@NotNull OriginalReceiver receiver) {
-        this.receiver = receiver;
+    public void setReceiveEventLoop(@NotNull OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
+        this.receiveEventLoop = receiveEventLoop;
     }
 
     @NotNull

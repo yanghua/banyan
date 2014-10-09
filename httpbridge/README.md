@@ -80,7 +80,11 @@ response :
 
 ```
 
-> consume 模式为`sync`时，对应于 `pull` 模式，请求属于普通的http请求，而模式为`async`是则为长连接请求，对应于`push`模式，请求参数：num 与 timeout 只在mode为 `sync`时有效，并且num跟最终返回response中返回的数目 **不一定相等**
+> consume 模式为`sync`时，对应于 `pull` 模式，请求属于普通的http请求，而模式为`async`是则为长连接请求，对应于`push`模式，请求参数：num 只在mode为 `sync`时有效，并且num跟最终返回response中返回的数目 **不一定相等** 
+> 在 `async` 模式下，一次长连接最长有效时间为 **60s**（该值目前为服务端指定，客户端不可自定义）；客户端在两种情况下会再次发起长连接请求：
+> 
+> * 客户端收到服务端回复的超时响应
+> * 客户端收到消息响应
 
 
 ###request:

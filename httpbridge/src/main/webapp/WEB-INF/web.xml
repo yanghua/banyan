@@ -12,6 +12,7 @@
     <servlet>
         <servlet-name>httpBridge</servlet-name>
         <servlet-class>com.freedom.messagebus.httpbridge.controller.HttpBridge</servlet-class>
+        <async-supported>true</async-supported>
         <!--<load-on-startup>1</load-on-startup>-->
     </servlet>
 
@@ -24,6 +25,7 @@
     <filter>
         <filter-name>urlDispatcher</filter-name>
         <filter-class>com.freedom.messagebus.httpbridge.filter.URLDispatcher</filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>

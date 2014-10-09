@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client.core.authorize;
 
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
@@ -58,13 +57,13 @@ public class Authorizer {
 
         //consume proxy/message/sys/auth queue
         ProxyConsumer proxyConsumer = new ProxyConsumer();
-        proxyConsumer.consume(channel, CONSTS.DEFAULT_AUTH_QUEUE_NAME, new IMessageReceiveListener() {
-            @Override
-            public void onMessage(final Message message) {
-                instance.boxAuthrespMsg(authRespMsg, message);
-                instance.notify();
-            }
-        });
+//        proxyConsumer.consume(channel, CONSTS.DEFAULT_AUTH_QUEUE_NAME, new IMessageReceiveListener() {
+//            @Override
+//            public void onMessage(final Message message, IConsumerCloser consumerCloser) {
+//                instance.boxAuthrespMsg(authRespMsg, message);
+//                instance.notify();
+//            }
+//        });
 
         //send auth request message
         ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,

@@ -2,7 +2,6 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
@@ -54,7 +53,11 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         return new IConsumerCloser() {
             @Override
             public void closeConsumer() {
-                ctx.getReceiver().shutdown();
+                synchronized (this) {
+                    if (ctx.getReceiveEventLoop().isAlive()) {
+                        ctx.getReceiveEventLoop().shutdown();
+                    }
+                }
             }
         };
     }
@@ -65,7 +68,6 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
      *
      * @param queueName the name of queue that the consumer want to connect
      * @param num       the num which the client expected (the result's num may not be equals to the given num)
-     * @param timeout   the timeout (ms)
      * @return received message
      */
     @NotNull

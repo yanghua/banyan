@@ -178,7 +178,7 @@
     </dependencies>
 
     <build>
-        <finalName>messagebus-server</finalName>
+        <finalName>managesystem</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

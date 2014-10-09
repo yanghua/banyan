@@ -1,6 +1,5 @@
 package com.freedom.messagebus.client;
 
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import org.jetbrains.annotations.NotNull;
 

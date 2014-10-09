@@ -2,7 +2,6 @@ package com.freedom.messagebus.scenario.client;
 
 
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +55,7 @@ public class ResponseTemplate {
                     final IResponser responser = client.getResponser();
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message) {
+                        public void onMessage(Message message, IConsumerCloser consumerCloser) {
                             //handle message
                             String msgId = String.valueOf(message.getMessageHeader().getMessageId());
                             logger.info("[" + msgId +

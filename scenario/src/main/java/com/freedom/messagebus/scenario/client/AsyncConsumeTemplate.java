@@ -1,7 +1,6 @@
 package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.IMessageReceiveListener;
 import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +59,7 @@ public class AsyncConsumeTemplate {
                     IConsumer consumer = client.getConsumer();
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message) {
+                        public void onMessage(Message message, IConsumerCloser consumerCloser) {
                             logger.info("[" + message.getMessageHeader().getMessageId() +
                                             "]-[" + message.getMessageHeader().getType() + "]");
                         }

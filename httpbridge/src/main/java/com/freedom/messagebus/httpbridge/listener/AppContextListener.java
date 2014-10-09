@@ -2,7 +2,7 @@ package com.freedom.messagebus.httpbridge.listener;
 
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
-import com.freedom.messagebus.httpbridge.util.Consts;
+import com.freedom.messagebus.httpbridge.util.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,13 +15,13 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = Messagebus.getInstance(Consts.HTTP_BRIDGE_APP_KEY);
+        Messagebus messagebus = Messagebus.getInstance(Constants.HTTP_BRIDGE_APP_KEY);
         //TODO:
         messagebus.setZkHost("115.29.96.85");
         messagebus.setZkPort(2181);
         try {
             messagebus.open();
-            servletContextEvent.getServletContext().setAttribute(Consts.MESSAGE_BUS_KEY, messagebus);
+            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGE_BUS_KEY, messagebus);
         } catch (MessagebusConnectedFailedException e) {
             logger.error("[contextInitialized] occurs a MessagebusConnectedFailedException : " + e.getMessage());
         }
@@ -29,7 +29,7 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Consts.MESSAGE_BUS_KEY);
+        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY);
         if (messagebus != null && messagebus.isOpen()) {
             messagebus.close();
         }
