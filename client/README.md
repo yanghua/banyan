@@ -17,7 +17,7 @@
 
 [动态添加处理器](#动态添加处理器)
 
-[调用示例](#调用示例)
+[Best Practice](#Best Practice)
 
 ##名词解释
 - message carry: 消息的传输（`produce` `consume` `request` `response` ）被抽象为carry(表示消息的 **搬运** )
@@ -185,6 +185,7 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 * 客户端的主对象 `Messagebus` 被实现为单例模式，客户端应该尽可能缩短其生命周期，做到 **最晚打开，最早关闭**
 * 消息carry的主对象，在 `Messagebus` 被实例化时创建，因此其也是默认被实现为单例的。可将其视为 ***helper*** 对象
 * 每个消息在carry的过程中，都拥有自己的上下文对象(`MessageContext`)
+* 消息以异步消费的模式下，因为是派生出一个独立的线程来做event loop，因此，在客户端不想继续消费时，有两种方式对其进行关闭：（1）consume方法返回一个 `IConsumerCloser` 的实例用于关闭；（2）消息产生事件，携带的一个参数即为 `IConsumerCloser` 的实例可以随时关闭event loop.
 
 
 

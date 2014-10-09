@@ -25,7 +25,6 @@ import java.util.List;
 public class HttpBridge extends HttpServlet {
 
     private static final Log  logger = LogFactory.getLog(HttpBridge.class);
-    private static final Gson gson   = new Gson();
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
@@ -144,7 +143,8 @@ public class HttpBridge extends HttpServlet {
             timeout = Long.valueOf(timeoutStr);
 
             if (timeout < Constants.MIN_REQUEST_TIMEOUT || timeout > Constants.MAX_REQUEST_TIMEOUT)
-                throw new InvalidParameterException("invalid param : timeout it should be greater than :" + Constants.MIN_REQUEST_TIMEOUT +
+                throw new InvalidParameterException("invalid param : timeout it should be greater than :" +
+                                                        Constants.MIN_REQUEST_TIMEOUT +
                                                         "and less than : " + Constants.MAX_REQUEST_TIMEOUT);
 
             String queueName = request.getRequestURI().split("/")[3];
@@ -160,11 +160,11 @@ public class HttpBridge extends HttpServlet {
             String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
             ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
         } catch (MessagebusUnOpenException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "''");
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "\"\"");
         } catch (MessageResponseTimeoutException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "''");
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "\"\"");
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occrus a exception : " + e.getMessage(), "", "''");
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a exception : " + e.getMessage(), "", "\"\"");
         }
     }
 
