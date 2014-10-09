@@ -32,7 +32,7 @@
 * common : 通用底层组件，定义了一些基本的数据结构，如果消息、消息头、消息体等
 * interactor-component : 交互组件，用于解耦其他各Module跟rabbitmq的依赖
 
-另外的三个为项目：
+另外的四个为项目：
 
 - client : 消息总线的客户端，提供给其他应用访问消息总线的接口
 - server : 服务端，包含了rabbitmq管理，系统监控，日志记录等，一个daemon server
@@ -45,10 +45,11 @@
 由于除common不需要跟rabbitmq交互之外，以上其他的module都有跟rabbitmq交互的需求。因此从降低依赖的角度出发，我们有必要通过 ***组件化*** 的手段，来达到封装变化的目的。在消息总线中，所有跟rabbitmq交互的操作都被封装在 `interactor-component` 中。这样后面任何关于rabbitmq-java-client的变化，都只需修改该组件。
 
 
-
-
-
-
+##实践说明
+* 队列职责单一化，一个队列处理器**尽量**只处理**一种**类型的**业务**消息
+* 拓扑图最后一层节点始终是队列节点，而非exchange节点
+* 构建队列之前，权衡好粒度
+* 以面向服务或面向组件的开发方式来分拆服务提高复用性与可靠性
 
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/overview/architecture.png
