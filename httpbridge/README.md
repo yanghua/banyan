@@ -60,10 +60,20 @@ response :
 	data: [
 		{
 			messageHeader: {
-				messageId: 518977236485992450,
+				messageId: 520133271997313000,
 				type: "appMessage",
+				timestamp: null,
 				priority: 0,
-				deliveryMode: 2
+				expiration: null,
+				deliveryMode: 2,
+				headers: null,
+				contentEncoding: null,
+				contentType: null,
+				replyTo: null,
+				appId: null,
+				userId: null,
+				clusterId: null,
+				correlationId: null
 			},
 			messageBody: {
 				messageBody: [
@@ -114,10 +124,20 @@ response :
 	msg: "",
 	data: {
 			messageHeader: {
-				messageId: 518977236485992450,
+				messageId: 520133271997313000,
 				type: "appMessage",
+				timestamp: null,
 				priority: 0,
-				deliveryMode: 2
+				expiration: null,
+				deliveryMode: 2,
+				headers: null,
+				contentEncoding: null,
+				contentType: null,
+				replyTo: null,
+				appId: null,
+				userId: null,
+				clusterId: null,
+				correlationId: null
 			},
 			messageBody: {
 				messageBody: [
@@ -168,7 +188,8 @@ response :
 ### messagebus-client 的代理
 messagebus-httpbridge 用于为messagebus提供http访问的支持。本质上，httpbridge的server相当于一个 **代理服务器**，在server内部也是通过调用 `messagebus-client` 来实现与messagebus的交互。
 
-### jetty （暂未实现）
+### jetty continuation
 作为一种轻量级java web container。jetty拥有一些不错的特性，比如高度的模块化、扩展性强等。但选择jetty的主要原因还是来自于它的 `continuation` 技术能更好得应对 `server push` 模型(长连接，comet)。这里它用于 `consume`的 `async`模型。
 
+jetty 的 continuation mod 支持异步的servlet，它支持对同一个请求dispatch多次，这样就不必建立thread-request map可以在waiting的时候快速将线程返回到线程池。
 
