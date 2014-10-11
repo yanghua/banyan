@@ -36,7 +36,7 @@ public class HttpBridge extends HttpServlet {
             logger.error("the query string : type can not be null or empty");
             ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
                                   "the query string : type can not be null or empty",
-                                  "", "''");
+                                  "", "\"\"");
         } else {
             MessageCarryType msgCarryType = MessageCarryType.lookup(apiType);
 

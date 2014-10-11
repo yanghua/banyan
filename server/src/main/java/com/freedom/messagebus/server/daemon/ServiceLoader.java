@@ -1,5 +1,6 @@
 package com.freedom.messagebus.server.daemon;
 
+import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,7 +88,8 @@ public class ServiceLoader {
                                 case ONCE: {
                                     if (hasParamedCstor) {
                                         Constructor<IService> constructor = clazz.getConstructor(String.class);
-                                        service = constructor.newInstance((String) this.context.get("host"));
+                                        service = constructor.newInstance(
+                                            (String) this.context.get(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
                                     } else
                                         service = clazz.newInstance();
 
@@ -98,12 +100,17 @@ public class ServiceLoader {
                                 case CYCLE_SCHEDULED: {
                                     if (hasParamedCstor) {
                                         Constructor<IService> constructor = clazz.getConstructor(String.class);
-                                        service = constructor.newInstance((String) this.context.get("host"));
+                                        service = constructor.newInstance(
+                                            (String) this.context.get(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
                                     } else
                                         service = clazz.newInstance();
                                     scheduleCycleServiceMap.put(daemonService.value(), clazz.newInstance());
                                 }
                                 break;
+
+                                default:
+                                    throw new UnsupportedOperationException("unsupported daemon service policy : "
+                                                                                + daemonService.policy());
                             }
                         }
                     }

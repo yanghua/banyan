@@ -12,6 +12,7 @@ import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
+import com.freedom.messagebus.common.model.Config;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -21,6 +22,7 @@ import org.apache.zookeeper.Watcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -114,7 +116,7 @@ public class Messagebus {
         this.doAuth();
 
         this.useChannelPool =
-            Boolean.valueOf(configManager.getConfigProperty().getProperty("messagebus.client.useChannelPool"));
+            Boolean.valueOf(configManager.getClientConfigMap().get("messagebus.client.useChannelPool").getValue());
         //if use channel pool
         if (this.useChannelPool) {
             this.initChannelPool();
@@ -228,7 +230,7 @@ public class Messagebus {
 
     private void initConnection() throws MessagebusConnectedFailedException {
         try {
-            String host = this.configManager.getConfigProperty().getProperty("messagebus.client.host");
+            String host = this.configManager.getClientConfigMap().get("messagebus.client.host").getValue();
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(host);
@@ -240,14 +242,14 @@ public class Messagebus {
     }
 
     private void initChannelPool() {
-        Properties poolConfig = this.configManager.getPoolProperties();
+        Map<String, Config> clientConfigs = this.configManager.getClientConfigMap();
 
         ChannelPoolConfig config = new ChannelPoolConfig();
-        config.setMaxTotal(Integer.valueOf(poolConfig.getProperty("channel.pool.maxTotal")));
-        config.setMaxIdle(Integer.valueOf(poolConfig.getProperty("channel.pool.maxIdle")));
-        config.setMaxWaitMillis(Long.valueOf(poolConfig.getProperty("channel.pool.maxWait")));
-        config.setTestOnBorrow(Boolean.valueOf(poolConfig.getProperty("channel.pool.testOnBorrow")));
-        config.setTestOnReturn(Boolean.valueOf(poolConfig.getProperty("channel.pool.testOnReturn")));
+        config.setMaxTotal(Integer.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxTotal").getValue()));
+        config.setMaxIdle(Integer.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxIdle").getValue()));
+        config.setMaxWaitMillis(Long.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxWait").getValue()));
+        config.setTestOnBorrow(Boolean.valueOf(clientConfigs.get("messagebus.client.channel.pool.testOnBorrow").getValue()));
+        config.setTestOnReturn(Boolean.valueOf(clientConfigs.get("messagebus.client.channel.pool.testOnReturn").getValue()));
 
         pool = new ChannelPool(config, new ChannelFactory(this.connection));
     }

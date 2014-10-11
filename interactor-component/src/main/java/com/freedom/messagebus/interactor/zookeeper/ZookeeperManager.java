@@ -47,12 +47,6 @@ public class ZookeeperManager {
             logger.error("[getConfig] occurs a KeeperException : " + e.getMessage());
         } catch (InterruptedException e) {
             logger.error("[getConfig] occurs a InterruptedException : " + e.getMessage());
-        } finally {
-            try {
-                this.zooKeeper.close();
-            } catch (InterruptedException e) {
-
-            }
         }
 
         return new byte[0];
@@ -70,12 +64,6 @@ public class ZookeeperManager {
             logger.error("[setConfig] occurs a KeeperException : " + e.getMessage());
         } catch (InterruptedException e) {
             logger.error("[setConfig] occurs a InterruptedException : " + e.getMessage());
-        } finally {
-            try {
-                this.zooKeeper.close();
-            } catch (InterruptedException e) {
-
-            }
         }
     }
 
@@ -96,13 +84,13 @@ public class ZookeeperManager {
             logger.error("[setConfig] occurs a KeeperException : " + e.getMessage());
         } catch (InterruptedException e) {
             logger.error("[setConfig] occurs a InterruptedException : " + e.getMessage());
-        } finally {
-            try {
-                this.zooKeeper.close();
-            } catch (InterruptedException e) {
-
-            }
         }
+    }
+
+    public void createNode(@NotNull String path) throws Exception {
+        Stat stat = this.zooKeeper.exists(path, false);
+        if (stat == null)
+            this.zooKeeper.create(path, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     }
 
 }

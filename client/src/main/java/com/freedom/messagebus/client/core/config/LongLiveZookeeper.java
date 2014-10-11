@@ -7,6 +7,8 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +42,7 @@ public class LongLiveZookeeper {
     private void init() {
         try {
             zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
+            this.fetchNewZookeeperData();
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }
@@ -161,37 +164,67 @@ public class LongLiveZookeeper {
         }
 
         private void processPathChange(String path, byte[] newData) throws IOException {
-            if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
-                this.refreshLocalCachedRouterFile(path, newData);
-            } else {
-                //TODO
-            }
+            refreshLocalCachedFile(path, newData);
         }
 
-        private void refreshLocalCachedRouterFile(String path, byte[] newData) throws IOException {
-            Path routerFilePath = FileSystems.getDefault().getPath(CONSTS.EXPORTED_NODE_FILE_PATH);
-            FileOutputStream fos = null;
+    }
+
+    @NotNull
+    public byte[] getConfig(@NotNull String path) {
+        try {
+            Stat stat = this.zooKeeper.exists(path, false);
+            if (stat == null)
+                throw new IllegalStateException("the path : " + path + " is not exists!");
+
+            return this.zooKeeper.getData(path, null, null);
+        } catch (KeeperException e) {
+            logger.error("[getConfig] occurs a KeeperException : " + e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("[getConfig] occurs a InterruptedException : " + e.getMessage());
+        }
+
+        return new byte[0];
+    }
+
+    private void fetchNewZookeeperData() throws IOException {
+        //get new config info
+        byte[] routerData = this.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
+        byte[] configData = this.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+        //refresh local
+        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER, routerData);
+        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG, configData);
+    }
+
+    private void refreshLocalCachedFile(String path, byte[] newData) throws IOException {
+        String filePath;
+        if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
+            filePath = CONSTS.EXPORTED_NODE_FILE_PATH;
+        } else if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG)) {
+            filePath = CONSTS.EXPORTED_CONFIG_FILE_PATH;
+        } else {
+            return;
+        }
+
+        Path routerFilePath = FileSystems.getDefault().getPath(filePath);
+        FileOutputStream fos = null;
+        try {
+            if (!Files.exists(routerFilePath)) { //override
+                Files.createFile(routerFilePath);
+            }
+
+            fos = new FileOutputStream(filePath);
+            fos.write(newData);
+        } catch (IOException e) {
+            logger.error("[refreshLocalCachedRouterFile] occurs a IOException : " + e.getMessage());
+            throw new IOException(e);
+        } finally {
             try {
-                if (!Files.exists(routerFilePath)) { //override
-                    Files.createFile(routerFilePath);
-                }
-
-                fos = new FileOutputStream(CONSTS.EXPORTED_NODE_FILE_PATH);
-                fos.write(newData);
+                fos.flush();
+                fos.close();
             } catch (IOException e) {
-                logger.error("[refreshLocalCachedRouterFile] occurs a IOException : " + e.getMessage());
-                throw new IOException(e);
-            } finally {
-                try {
-                    fos.flush();
-                    fos.close();
-                } catch (IOException e) {
-                    logger.error("[refreshLocalCachedRouterFile] finally block occurs a IOException : " + e.getMessage());
-                }
+                logger.error("[refreshLocalCachedRouterFile] finally block occurs a IOException : " + e.getMessage());
             }
-
         }
-
     }
 
 }

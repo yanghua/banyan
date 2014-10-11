@@ -14,6 +14,7 @@ import java.io.InputStream;
  * Time: 3:09 PM
  * Copyright (c) 2013 yanghua. All rights reserved.
  */
+@Deprecated
 public class CommonUtil {
 
     /**

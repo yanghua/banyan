@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.model.Config;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,11 +33,6 @@ public class ConfigManager {
     private boolean inited = false;
     public static volatile ConfigManager instance;
 
-    @NotNull
-    private Properties configProperty;
-    @NotNull
-    private Properties poolProperties;
-
     //region handle models
     @NotNull
     private List<HandlerModel> produceHandlerModels;
@@ -63,6 +59,8 @@ public class ConfigManager {
     private Map<String, Node> exchangeNodeMap;
     @NotNull
     private Map<String, Node> queueNodeMap;
+    @NotNull
+    private Map<String, Config> clientConfigMap;
 
     private ConfigManager() {
         this.inited = this.init();
@@ -81,28 +79,8 @@ public class ConfigManager {
         return instance;
     }
 
-    public Properties getConfigProperty() {
-        if (!this.inited)
-            throw new IllegalStateException("ZookeeperManager inited failed");
-
-        return configProperty;
-    }
-
-    public Properties getPoolProperties() {
-        if (!this.inited)
-            throw new IllegalStateException("ZookeeperManager inited failed");
-
-        return poolProperties;
-    }
-
     private boolean init() {
         try {
-            configProperty = new Properties();
-            poolProperties = new Properties();
-
-            configProperty.load(this.getClass().getClassLoader().getResourceAsStream("config.properties"));
-            poolProperties.load(this.getClass().getClassLoader().getResourceAsStream("pool.properties"));
-
             //parse
             produceHandlerModels = parseHandlers("produce");
             consumerHandlerModels = parseHandlers("consumer");
@@ -121,6 +99,7 @@ public class ConfigManager {
             }
 
             this.parseRouterInfo();
+            this.parseConfigInfo();
 
             return true;
         } catch (IOException e) {
@@ -177,6 +156,11 @@ public class ConfigManager {
     @NotNull
     public Map<String, Node> getQueueNodeMap() {
         return queueNodeMap;
+    }
+
+    @NotNull
+    public Map<String, Config> getClientConfigMap() {
+        return clientConfigMap;
     }
 
     public void updateHandlerChain(String path, byte[] data) {
@@ -348,7 +332,7 @@ public class ConfigManager {
         try {
             doc = reader.read(url);
         } catch (DocumentException e) {
-            logger.error("[parseRule] occurs a DocumentException exception : " + e.getMessage());
+            logger.error("[parseRouterInfo] occurs a DocumentException exception : " + e.getMessage());
         }
 
         Element rootElement = doc.getRootElement();
@@ -374,6 +358,35 @@ public class ConfigManager {
         this.extractDifferentNodes(nodes);
     }
 
+    public synchronized void parseConfigInfo() throws MalformedURLException {
+        SAXReader reader = new SAXReader();
+        File routerFile = new File(CONSTS.EXPORTED_CONFIG_FILE_PATH);
+        URL url = routerFile.toURI().toURL();
+        Document doc = null;
+
+        try {
+            doc = reader.read(url);
+        } catch (DocumentException e) {
+            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
+        }
+
+        Element rootElement = doc.getRootElement();
+        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
+
+        List<Element> rowElements = databaseNode.selectNodes("//row");
+        List<Config> configItems = new ArrayList<>(rowElements.size());
+        for (Element row : rowElements) {
+            Config config = new Config();
+
+            config.setKey(row.selectSingleNode("field[@name='key']").getStringValue());
+            config.setValue(row.selectSingleNode("field[@name='value']").getStringValue());
+
+            configItems.add(config);
+        }
+
+        this.extractClientConfigs(configItems);
+    }
+
     private void extractDifferentNodes(List<Node> nodes) {
         this.exchangeNodeMap = new ConcurrentHashMap<>();
         this.queueNodeMap = new ConcurrentHashMap<>();
@@ -383,6 +396,15 @@ public class ConfigManager {
                 this.exchangeNodeMap.put(node.getName(), node);
             else
                 this.queueNodeMap.put(node.getName(), node);
+        }
+    }
+
+    private void extractClientConfigs(List<Config> configs) {
+        this.clientConfigMap = new ConcurrentHashMap<>();
+
+        for (Config config : configs) {
+            if (config.getKey().contains("client"))
+                this.clientConfigMap.put(config.getKey(), config);
         }
     }
 }

@@ -80,7 +80,7 @@ public class MessageContext {
     @NotNull
     public String getHost() {
         if (this.host == null) {
-            this.host = ConfigManager.getInstance().getConfigProperty().getProperty("messagebus.client.host");
+            this.host = ConfigManager.getInstance().getClientConfigMap().get("messagebus.client.host").getValue();
             return this.host;
         }
         return this.host;
