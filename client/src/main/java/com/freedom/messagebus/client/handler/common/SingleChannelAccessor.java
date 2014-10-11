@@ -62,6 +62,12 @@ public class SingleChannelAccessor extends AbstractHandler {
             }
         });
 
+        try {
+            context.getChannel().basicRecover();
+        } catch (IOException e) {
+            logger.error("[handle] occurs a IOException : " + e.getMessage());
+        }
+
         chain.handle(context);
     }
 }

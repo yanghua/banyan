@@ -30,7 +30,6 @@ public class PooledChannelAccessor extends AbstractHandler {
     @Override
     public void handle(@NotNull final MessageContext context,
                        @NotNull IHandlerChain chain) {
-
         final AbstractPool<Channel> pool = context.getPool();
 
         context.setChannel(pool.getResource());
@@ -53,6 +52,12 @@ public class PooledChannelAccessor extends AbstractHandler {
                 pool.returnResource(channel);
             }
         });
+
+        try {
+            context.getChannel().basicRecover();
+        } catch (IOException e) {
+            logger.error("[handle] occurs a IOException : " + e.getMessage());
+        }
 
         chain.handle(context);
     }
