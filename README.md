@@ -43,7 +43,7 @@
 > managesystem 与 server共享数据库。主要是因为server的部分功能跟managesystem互为补充，它们通过数据库交互。比如通过managesystem的管理界面设置预警阈值，但真正的处理、判断逻辑还是由server来完成。但server是消息总线的必备组成部分，而managesystem是可选的。
 
 ##核心交互组件
-由于除common不需要跟rabbitmq交互之外，以上其他的module都有跟rabbitmq交互的需求。因此从降低依赖的角度出发，我们有必要通过 ***组件化*** 的手段，来达到封装变化的目的。在消息总线中，所有跟rabbitmq交互的操作都被封装在 `interactor-component` 中。这样后面任何关于rabbitmq-java-client的变化，都只需修改该组件。
+由于除common不需要跟rabbitmq交互之外，以上其他的module都有跟rabbitmq交互的需求。因此从降低依赖的角度出发，可以通过 ***组件化*** 的手段，来达到封装变化的目的。在消息总线中，所有跟rabbitmq交互的操作都被封装在 `interactor-component` 中。这样后面任何关于rabbitmq-java-client的变化，都只需修改该组件。
 
 
 ##实践说明
@@ -51,6 +51,17 @@
 * 拓扑图最后一层节点始终是队列节点，而非exchange节点
 * 构建队列之前，权衡好粒度
 * 以面向服务或面向组件的开发方式来分拆服务提高复用性与可靠性
+
+##Todo-List
+* server实现路由拓扑结构的一键初始化
+* server中通过命令控制rabbitmq启动
+* 将server自身的启动做成unix-daemon-server的启动方式
+* 对client进行优化，考虑线程安全问题（同步）
+* 考虑将zookeeper的部分操作封装到 `interactor-component`
+* 在各Module中加入异常收集功能，抛出的异常，自动回发到 `queue.proxy.message.sys.exception-collector` 中
+* client加入更多的filter，配合动态配置，实现对client更细化的控制
+* client/httpbridge性能测试的量化数据
+
 
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/overview/architecture.png
