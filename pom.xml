@@ -16,6 +16,7 @@
         <module>interactor-component</module>
         <module>scenario</module>
         <module>httpbridge</module>
+        <module>benchmark</module>
     </modules>
     <name>a message bus</name>
 
