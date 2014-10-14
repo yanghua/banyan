@@ -46,7 +46,7 @@ public class Produce {
                 client.open();
                 client.getProducer().produce(msg, queueName);
             } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
-                logger
+//                logger
             } finally {
                 client.close();
             }

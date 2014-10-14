@@ -35,8 +35,6 @@ public class CONSTS {
 
     public static final byte[] EMPTY_PRIMITIVE_BYTE_ARRAY = new byte[0];
 
-//    public static final String META_EXCHANGE_NAME = "exchange.meta";
-
     public static int DEFAULT_AUTH_REQUEST_TIMEOUT_SECONDS = 30;
 
 

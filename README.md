@@ -53,7 +53,7 @@
 * 以面向服务或面向组件的开发方式来分拆服务提高复用性与可靠性
 
 ##Todo-List
-* server实现路由拓扑结构的一键初始化
+* ~~server实现路由拓扑结构的一键初始化~~
 * server中通过命令控制rabbitmq启动
 * 将server自身的启动做成unix-daemon-server的启动方式，编写安装、部署说明文档
 * 对client进行优化，考虑线程安全问题（同步）

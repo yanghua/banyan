@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+@Deprecated
 public class TopologyManager extends AbstractInitializer {
 
     private static final Log logger = LogFactory.getLog(TopologyManager.class);
@@ -55,7 +56,7 @@ public class TopologyManager extends AbstractInitializer {
         //declare queue
         QueueManager queueManager = QueueManager.defaultQueueManager(this.host);
         for (Node node : queueSet) {
-            queueManager.create(node.getName());
+            queueManager.create(node.getValue());
         }
 
         //bind queue

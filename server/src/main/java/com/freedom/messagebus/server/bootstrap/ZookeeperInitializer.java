@@ -91,7 +91,7 @@ public class ZookeeperInitializer {
                                             config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_USER),
                                             config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD));
         String cmdStr = partOfcmdStr + filePath;
-        ShellHelper.exec(cmdStr);
+        ShellHelper.exec("/bin/sh -c " + cmdStr);
 
         Path path = FileSystems.getDefault().getPath(filePath);
         if (!Files.exists(path)) {

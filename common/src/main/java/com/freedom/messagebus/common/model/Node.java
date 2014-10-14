@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * representation a node of the topology
  */
-public class Node implements Serializable {
+public class Node implements Serializable,Comparable<Node> {
 
     private int    generatedId;
     private String name;
@@ -81,6 +81,16 @@ public class Node implements Serializable {
 
     public void setLevel(short level) {
         this.level = level;
+    }
+
+    @Override
+    public int compareTo(Node o) {
+        if (this.generatedId == o.getGeneratedId())
+            return 0;
+        else if (this.generatedId < o.getGeneratedId())
+            return -1;
+        else
+            return 1;
     }
 
     @Override

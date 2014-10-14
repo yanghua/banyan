@@ -7,12 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class ShellHelper {
 
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
-    public static void exec(@NotNull String cmdStr) throws IOException, InterruptedException {
+    public static ExecResult exec(@NotNull String cmdStr) throws IOException, InterruptedException {
         String[] splitedParts = new String[]{
             "/bin/sh", "-c", cmdStr
         };
@@ -20,8 +21,16 @@ public class ShellHelper {
         process.waitFor();
 
         String errStr = translateFromStream(process.getErrorStream());
-        logger.error("[exec] occurs a error, " + " and error msg is :" + errStr + " command is : " + cmdStr);
-        logger.info("[exec] output info is " + translateFromStream(process.getInputStream()));
+        String infoStr = translateFromStream(process.getInputStream());
+
+        ExecResult execResult = new ExecResult();
+        execResult.setError(errStr);
+        execResult.setInfo(infoStr);
+
+        logger.debug("[exec] occurs a error, " + " and error msg is :" + errStr + " command is : " + cmdStr);
+        logger.debug("[exec] output info is " + infoStr);
+
+        return execResult;
     }
 
     private static String translateFromStream(InputStream stream) throws IOException {
@@ -37,4 +46,35 @@ public class ShellHelper {
         return sb.toString();
     }
 
+    public static class ExecResult {
+
+        private String info;
+        private String error;
+
+        public ExecResult() {}
+
+        public String getInfo() {
+            return info;
+        }
+
+        public void setInfo(String info) {
+            this.info = info;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+
+        @Override
+        public String toString() {
+            return "ExecResult{" +
+                "info='" + info + '\'' +
+                ", error='" + error + '\'' +
+                '}';
+        }
+    }
 }

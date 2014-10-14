@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.nio.file.*;
 
+@Deprecated
 public class Authorizer {
 
     private static Log  logger = LogFactory.getLog(Authorizer.class);
