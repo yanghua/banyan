@@ -138,6 +138,6 @@ service messagebus-server restart
 
 
 
-[1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/release/release-service-check.png
-[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/release/release-service-status.png
-[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/release/release-ps.png
+[1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/releaseimages/release-service-check.png
+[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/releaseimages/release-service-status.png
+[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/server/releaseimages/release-ps.png
