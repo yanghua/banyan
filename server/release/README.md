@@ -1,5 +1,5 @@
 #overview
-本文档用于说明 `messagebus-server`在 FreeBSD 环境下的安装、部署、启动步骤，此处展示如何将其以类 `unix-service` 的方式运行
+本文档用于说明 `messagebus-server`在 **FreeBSD** 环境下的安装、部署、启动步骤并展示如何将其构建成 `unix-like-service` 的方式运行
 
 ##依赖组件
 * rabbitmq(3.3.4+)
@@ -8,7 +8,7 @@
 * Zookeeper
 * mysql
 
-> 在启动message bus server之前请确认它们已被正确安装并且运行良好。
+> 在启动message bus server之前请确认这些组件已被正确安装并且运行良好。
 
 
 ##准备工作
@@ -98,7 +98,7 @@ ps u 12019
 
 ![img 3][3]
 
-> 其实 命令 `check` 与 `status` 执行的任务相同
+> 命令 `check` 与 `status` 执行的任务相同
 
 ##stop
 * 关闭message bus server（与此同时 mq server也一同被关闭，而其他组件状态保持不变）
@@ -132,7 +132,11 @@ service messagebus-server restart
 
 日志路径默认存放于： `/usr/local/messagebus-server/log/server/server.log`
 
+修改日志配置项：
 
+```
+vi /usr/local/messagebus-server/conf/log4j.properties
+```
 
 
 
