@@ -51,7 +51,7 @@ public class CONSTS {
 
     public static String ZOOKEEPER_ROOT_PATH_FOR_EVENT = "/event";
 
-    public static String DEFAULT_CONSOLE_QUEUE_NAME = "queue.proxy.log.console";
+    public static String DEFAULT_FILE_QUEUE_NAME = "queue.proxy.log.file";
 
     public static long DEFAULT_DATACENTER_ID_FOR_UUID = 00001L;
     //endregion

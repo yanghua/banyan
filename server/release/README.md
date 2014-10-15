@@ -119,18 +119,26 @@ service messagebus-server restart
 ##日志记录配置
 日志配置文件存放于：`/usr/local/messagebus-server/conf/log4j.properties` 
 
-默认按天记录messagebus-server的所有日志，如无需要可不必更改。日志框架基于 `log4j` 提供两种日志记录类型：
+按照业务划分的，日志类型分为：
 
-* 按文件大小拆分 
-* 按日期划分 (默认)
+* server日志 ，位于路径`/usr/local/messagebus-server/log/server/server.log`
+* message日志，位于路径`/usr/local/messagebus-server/log/message/msg.log`
 
-记录的日志内容包含：
+日志框架基于 `log4j` 提供两种日志记录策略分别应对与两种日志类型：
+
+* 按文件大小拆分 -> message日志
+* 按日期划分 (默认) -> server日志
+
+server日志记录的日志内容包含：
 
 - 启动日志
 - 运行时日志
 - 关闭日志
 
-日志路径默认存放于： `/usr/local/messagebus-server/log/server/server.log`
+message日志记录的内容暂时包括：
+
+- 消息编号
+- 消息类型
 
 修改日志配置项：
 

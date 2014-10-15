@@ -14,10 +14,8 @@ public class ShellHelper {
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
     public static ExecResult exec(@NotNull String cmdStr) throws IOException, InterruptedException {
-        String[] splitedParts = new String[]{
-            "/bin/sh", "-c", cmdStr
-        };
-        Process process = Runtime.getRuntime().exec(splitedParts);
+        String[] cmd = {"/bin/sh", "-c", cmdStr};
+        Process process = Runtime.getRuntime().exec(cmd);
         process.waitFor();
 
         String errStr = translateFromStream(process.getErrorStream());

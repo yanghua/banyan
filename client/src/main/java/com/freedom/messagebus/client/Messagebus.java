@@ -148,9 +148,10 @@ public class Messagebus {
     public synchronized void close() {
         //release all resource
         try {
-            this.configManager.destroy();
+            if (this.configManager != null)
+                this.configManager.destroy();
 
-            if (this.useChannelPool)
+            if (this.useChannelPool && pool!= null)
                 pool.destroy();
 
             if (this.connection.isOpen())

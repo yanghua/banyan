@@ -21,7 +21,7 @@ import java.io.IOException;
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
 public class MsgLogService extends AbstractInitializer implements Runnable, IService {
 
-    private static final Log    logger      = LogFactory.getLog(MsgLogService.class);
+    private static final Log    logger      = LogFactory.getLog("msgLog");
     private static final String consumerTag = "tag.consumer.msgLog";
 
     public MsgLogService(String host) {
@@ -33,7 +33,7 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
         try {
             super.init();
             QueueingConsumer consumer = ProxyConsumer.consume(this.channel,
-                                                              CONSTS.DEFAULT_CONSOLE_QUEUE_NAME,
+                                                              CONSTS.DEFAULT_FILE_QUEUE_NAME,
                                                               consumerTag);
             if (consumer == null)
                 throw new IOException(" consumer is null ");
