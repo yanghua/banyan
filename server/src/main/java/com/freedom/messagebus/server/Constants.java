@@ -14,4 +14,10 @@ public class Constants {
 
     public static final String KEY_MESSAGEBUS_SERVER_DB_PASSWORD = "messagebus.server.db.password";
 
+    public static final String KEY_ARG_CONFIG_FILE_PATH = "configFilePath";
+
+    public static final String KEY_ARG_SERVER_LOG4J_PROPERTY_PATH = "serverLog4jPropertyPath";
+
+    public static final String KEY_ARG_COMMAND = "cmd";
+
 }

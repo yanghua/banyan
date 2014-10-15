@@ -54,11 +54,11 @@
 
 ##Todo-List
 * ~~server实现路由拓扑结构的一键初始化~~
-* server中通过命令控制rabbitmq启动
-* 将server自身的启动做成unix-daemon-server的启动方式，编写安装、部署说明文档
+* ~~server中通过命令控制rabbitmq启动~~
+* ~~将server自身的启动做成unix-daemon-server的启动方式，编写安装、部署说明文档~~
 * 对client进行优化，考虑线程安全问题（同步）
 * 考虑将zookeeper的部分操作封装到 `interactor-component`
-* 在各Module中加入异常收集功能，抛出的异常，自动回发到 `queue.proxy.message.sys.exception-collector` 中
+* 在各Module中加入异常收集功能，抛出的异常，自动回发到 `queue.proxy.message.sys.exception-collector` 中（进行中）
 * client加入更多的filter，配合动态配置，实现对client更细化的控制
 * 实现授权/认证检查
 * 考虑加入Pub/Sub的实现

@@ -7,8 +7,12 @@ import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,13 +20,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class App {
 
     private static final Log logger = LogFactory.getLog(App.class);
+    private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
 
     public static void main(String[] args) {
-        String configFilePathStr = null;
-        if (args != null && args.length > 0)
-            configFilePathStr = args[0];
+        //debug args
+        if (logger.isDebugEnabled()) {
+            debugArgs(args);
+        }
 
-        startup(configFilePathStr);
+        Map<String, String> argMap = extractRunArgs(args);
+
+        if (argMap.containsKey(Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH))
+            PropertyConfigurator.configure(argMap.get(Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH));
+        else if (Files.exists(Paths.get(DEFAULT_SERVER_LOG4J_PROPERTY_PATH)))
+            PropertyConfigurator.configure(DEFAULT_SERVER_LOG4J_PROPERTY_PATH);
+
+        String cmd = argMap.get(Constants.KEY_ARG_COMMAND);
+        invokeCommand(cmd, argMap);
     }
 
     public static void startup(String configFilePathStr) {
@@ -91,4 +105,70 @@ public class App {
         }
     }
 
+    public static void stop(String configFilePathStr) {
+        //configuration
+        ConfigurationLoader configurationLoader = ConfigurationLoader.defaultLoader();
+        configurationLoader.setConfigFilePathStr(configFilePathStr);
+
+        try {
+            configurationLoader.launch();
+        } catch (IOException e) {
+            logger.error("[main] ConfigurationLoader#launch occurs a IOException : " + e.getMessage());
+            logger.error("please check the config file's exists at path : /etc/message.server.config.properties");
+            return;
+        }
+
+        Properties config = configurationLoader.getConfigProperties();
+        RabbitmqServerManager serverManager = RabbitmqServerManager.defaultManager(config);
+        if (serverManager.isAlive())
+            serverManager.stop();
+    }
+
+    private static void debugArgs(String[] args) {
+        logger.debug("there are " + args.length + " args. list below : ");
+        for (String arg : args)
+            logger.debug("arg : " + arg);
+    }
+
+    private static Map<String, String> extractRunArgs(String[] args) {
+        Map<String, String> argMap = new HashMap<>(args.length);
+
+        for(String arg : args) {
+            String[] splitKV = arg.split("=");
+            if (splitKV.length != 2) {
+                logger.error("[extractRunArgs] error argument format! ");
+                throw new IllegalArgumentException("[extractRunArgs] error argument format! ");
+            }
+
+            argMap.put(splitKV[0], splitKV[1]);
+        }
+
+        return argMap;
+    }
+
+    private static void invokeCommand(String cmd, Map<String, String> argMap) {
+        if (cmd == null) {
+            startup(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+            return;
+        }
+
+        switch (cmd) {
+            case "start":
+                startup(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+                break;
+
+            case "stop":
+                stop(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+                break;
+
+            case "restart":
+                //outer invoke(start-stop-daemon)
+                break;
+
+            default: {
+                logger.error("illegal argument command : " + cmd);
+                throw new IllegalArgumentException("illegal argument command : " + cmd);
+            }
+        }
+    }
 }
