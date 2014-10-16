@@ -29,7 +29,7 @@ public class PooledChannelAccessor extends AbstractHandler {
      */
     @Override
     public void handle(@NotNull final MessageContext context,
-                       @NotNull IHandlerChain chain) {
+                       @NotNull final IHandlerChain chain) {
         final AbstractPool<Channel> pool = context.getPool();
 
         context.setChannel(pool.getResource());
