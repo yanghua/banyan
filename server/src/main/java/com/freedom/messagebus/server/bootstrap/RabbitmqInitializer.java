@@ -7,7 +7,6 @@ import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.dataaccess.DBAccessor;
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -145,8 +144,6 @@ public class RabbitmqInitializer extends AbstractInitializer {
 
         return result;
     }
-
-
 
 
 }

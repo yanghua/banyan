@@ -25,7 +25,7 @@ public class ZookeeperInitializer {
     private static volatile ZookeeperInitializer instance = null;
 
     private ZookeeperManager zookeeperManager;
-    private ZooKeeper zookeeper;
+    private ZooKeeper        zookeeper;
     private boolean isInited = false;
     private static Properties config;
 

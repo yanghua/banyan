@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class App {
 
-    private static final Log logger = LogFactory.getLog(App.class);
+    private static final Log    logger                             = LogFactory.getLog(App.class);
     private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
 
     public static void main(String[] args) {
@@ -133,7 +133,7 @@ public class App {
     private static Map<String, String> extractRunArgs(String[] args) {
         Map<String, String> argMap = new HashMap<>(args.length);
 
-        for(String arg : args) {
+        for (String arg : args) {
             String[] splitKV = arg.split("=");
             if (splitKV.length != 2) {
                 logger.error("[extractRunArgs] error argument format! ");

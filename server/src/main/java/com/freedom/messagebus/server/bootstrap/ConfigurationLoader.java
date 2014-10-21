@@ -16,7 +16,7 @@ public class ConfigurationLoader {
 
     private static final String DEFAULT_CONFIG_FILE_PATH = "/etc/message.server.config.properties";
 
-    private String configFilePathStr;
+    private String     configFilePathStr;
     private Properties configProperties;
 
     public static ConfigurationLoader defaultLoader() {
@@ -30,7 +30,7 @@ public class ConfigurationLoader {
         return instance;
     }
 
-    public void launch() throws FileNotFoundException,IOException {
+    public void launch() throws FileNotFoundException, IOException {
         String filePathStr;
         if (this.configFilePathStr != null)
             filePathStr = this.configFilePathStr;
