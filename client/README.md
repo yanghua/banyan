@@ -33,39 +33,16 @@ AbstractHandler处于继承类的顶端，为一个抽象的处理器，它定�
 * handle: 每个继承它的handler所必须实现的 **抽象** 方法，是实现handler-chain的关键
 * destroy: 释放资源的触发方法，将在“关闭”messagebus client的时候被逐一调用
 
-从上面的图示可以看到，所有的handler被分为三大类（分别位于五个package中）:
+上面的各个package封装了每种carry需要用到的handler，它们的使用顺序将会体现在配置文件中。
 
-* common: 公共handler包，用于封装p & c都需要处理的逻辑，比如参数校验等
-* produce: 在生产消息过程中，需要的handler
-* consumer: 在发送消息过程中，需要的handler
-* request: 在发送请求消息的过程中，需要的handler
-* response: 在发送响应消息的过程中，使用到的handler
-
-###produce 的处理链
-如下图:
-
-![img 10][10]
-
-###consume 的处理链
-如下图:
-
-![img 11][11]
-
-###request 的处理链
-如下图:
-
-![img 12][12]
-
-###response 的处理链
-如下图:
-
-![img 13][13]
-
-将处理逻辑以handler进行切分，不仅有利于业务隔离，同时也有利于通过组合进行很方便的重用。这里重用得比较多得几个handler有：
+将处理逻辑以handler进行切分，不仅有利于业务隔离，同时也有利于通过组合进行重用。这里重用得比较多得几个handler有：
 
 * MessageId-Generator
 * Pooled-Channel-Handler
-* Validate-Handler
+
+其中对于validator，它有共性验证的部分，因此可以抽象出一个基类来实现：
+
+![img 10][10]
 
 当然，他们的先后顺序并不是定死的，而是依赖于配置，配置文件即为该[handler.xml](https://github.com/yanghua/messagebus/blob/master/client/src/main/resources/handler.xml) 文件
 ![img 6][6]
@@ -218,10 +195,7 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 [7]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/message-context.png
 [8]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/channel-pool.png
 [9]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/zookeeper-node.png
-[10]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/produce-chain.png
-[11]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/consume-chain.png
-[12]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/request-chain.png
-[13]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/response-chain.png
+[10]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/param-validator.png
 [14]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/node-db-info.png
 [15]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/req-resp.png
 [16]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/client/partofroutertopology.png
