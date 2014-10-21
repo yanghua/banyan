@@ -2,15 +2,17 @@ package com.freedom.messagebus.interactor.message;
 
 
 import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.bodyprocessor.AppMsgBodyProcessor;
+import com.freedom.messagebus.interactor.message.bodyprocessor.BroadcastMsgBodyProcessor;
+import com.freedom.messagebus.interactor.message.bodyprocessor.PubSubMsgBodyProcessor;
+import com.freedom.messagebus.interactor.message.bodyprocessor.QueueMsgBodyProcessor;
 
 public class MessageBodyProcessorFactory {
 
     public static IMessageBodyProcessor createMsgBodyProcessor(MessageType messageType) {
         IMessageBodyProcessor processor = null;
         switch (messageType) {
-            case AppMessage:
-                processor = new AppMsgBodyProcessor();
+            case QueueMessage:
+                processor = new QueueMsgBodyProcessor();
                 break;
 
             case AuthreqMessage:
@@ -21,17 +23,14 @@ public class MessageBodyProcessorFactory {
 
                 break;
 
-            case LookupreqMessage:
-
+            case PubSubMessage:
+                processor = new PubSubMsgBodyProcessor();
                 break;
 
-            case LookuprespMessage:
-
+            case BroadcastMessage:
+                processor = new BroadcastMsgBodyProcessor();
                 break;
 
-            case CacheExpiredMessage:
-
-                break;
         }
 
         return processor;

@@ -9,34 +9,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum MessageType {
 
 
-    AppMessage("appMessage", 0),
+    QueueMessage("queue", 0),
+    AuthreqMessage("authreq", 1),
+    AuthrespMessage("authresp", 2),
+    PubSubMessage("pubsub", 3),
+    BroadcastMessage("broadcast", 4);
 
-    AuthreqMessage("authreqMessage", 1),
-
-    AuthrespMessage("authrespMessage", 2),
-
-    @Deprecated
-    LookupreqMessage("lookupreqMessage", 3),
-
-    @Deprecated
-    LookuprespMessage("lookuprespMessage", 4),
-
-    @Deprecated
-    CacheExpiredMessage("cacheExpiredMessage", 5);
-
-    private static final Log                      logger     = LogFactory.getLog(MessageType.class);
-    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(6);
+    private static final Log logger = LogFactory.getLog(MessageType.class);
+    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(5);
 
     static {
-        lookupList.put("appMessage", AppMessage);
-        lookupList.put("authreqMessage", AuthreqMessage);
-        lookupList.put("authrespMessage", AuthrespMessage);
-        lookupList.put("lookupreqMessage", LookupreqMessage);
-        lookupList.put("lookuprespMessage", LookuprespMessage);
-        lookupList.put("cacheExpiredMessage", CacheExpiredMessage);
+        lookupList.put("queue", QueueMessage);
+        lookupList.put("authreq", AuthreqMessage);
+        lookupList.put("authresp", AuthrespMessage);
+        lookupList.put("pubsub", PubSubMessage);
+        lookupList.put("broadcast", BroadcastMessage);
     }
 
-    public static MessageType lookup(String msgTypeStr) {
+    public static MessageType lookup(String msgTypeStr) throws UnknownError {
         MessageType msgType = lookupList.get(msgTypeStr);
 
         if (msgType == null) {

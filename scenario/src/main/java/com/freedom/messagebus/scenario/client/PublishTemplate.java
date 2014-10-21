@@ -5,29 +5,20 @@ import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
 import com.freedom.messagebus.common.message.*;
 
-public class ProduceTemplate {
+public class PublishTemplate {
 
     private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
     private static final String host   = "115.29.96.85";
     private static final int    port   = 2181;
 
-    /**
-     * produce的常见场景有如下几个特点：
-     * (1)按需使用
-     * (2)生命周期短
-     * (3)如果发生的消息量大，可使用多线程发送
-     */
-    public static void produce() {
-        String queueName = "crm";
-
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.getMessageHeader().setReplyTo(queueName);
+    public static void publish() {
+        Message msg = MessageFactory.createMessage(MessageType.PubSubMessage);
+        msg.getMessageHeader().setReplyTo("crm");
         msg.getMessageHeader().setContentType("text/plain");
         msg.getMessageHeader().setContentEncoding("utf-8");
 
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
         body.setContent("test".getBytes());
-
         msg.setMessageBody(body);
 
         Messagebus client = Messagebus.getInstance(appkey);
@@ -36,7 +27,7 @@ public class ProduceTemplate {
 
         try {
             client.open();
-            client.getProducer().produce(msg, queueName);
+            client.getPublisher().publish(new Message[] {msg});
         } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
             e.printStackTrace();
         } finally {
@@ -45,7 +36,7 @@ public class ProduceTemplate {
     }
 
     public static void main(String[] args) {
-        produce();
+        publish();
     }
 
 }

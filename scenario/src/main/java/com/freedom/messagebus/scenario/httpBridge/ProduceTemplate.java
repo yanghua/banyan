@@ -1,10 +1,6 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageJSONSerializer;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
+import com.freedom.messagebus.common.message.*;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,12 +37,15 @@ public class ProduceTemplate {
 
         CloseableHttpResponse response = null;
 
-        Message testMsg = MessageFactory.createMessage(MessageType.AppMessage);
-        AppMessageBody appMessageBody = (AppMessageBody) testMsg.getMessageBody();
-        appMessageBody.setMessageBody("test".getBytes());
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.getMessageHeader().setReplyTo(testQueue);
+
+        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
 
         List<Message> msgs = new ArrayList<>(1);
-        msgs.add(testMsg);
+        msgs.add(msg);
         String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
 
         try {

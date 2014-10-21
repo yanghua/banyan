@@ -17,7 +17,6 @@ public class CONSTS {
     @Deprecated
     public static final String TRANSFER_CENTER_NAME_PATTERN = "%s_TRANSFER_CENTER_%s";
 
-    public static final String PROXY_EXCHANGE_NAME = "exchange.proxy";
 
     public static final String DEFAULT_AUTH_QUEUE_NAME = "queue.proxy.message.sys.auth";
 
@@ -37,8 +36,6 @@ public class CONSTS {
 
     public static int DEFAULT_AUTH_REQUEST_TIMEOUT_SECONDS = 30;
 
-
-    //region server const
     public static String EXPORTED_NODE_FILE_PATH  = "/var/tmp/messagebus_router_for_zookeeper.xml";
     public static String EXPORTED_NODE_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X messagebus_sys_db NODE> ";
 
@@ -51,8 +48,11 @@ public class CONSTS {
 
     public static String ZOOKEEPER_ROOT_PATH_FOR_EVENT = "/event";
 
-    public static String DEFAULT_FILE_QUEUE_NAME = "queue.proxy.log.file";
+    public static final String PROXY_EXCHANGE_NAME      = "exchange.proxy";
+    public static       String DEFAULT_FILE_QUEUE_NAME  = "queue.proxy.log.file";
+    public static       String PUBSUB_ROUTING_KEY       = "routingkey.proxy.message.pubsub.#";
+    public static       String PUBSUB_QUEUE_NAME_SUFFIX = "-pubsub";
 
     public static long DEFAULT_DATACENTER_ID_FOR_UUID = 00001L;
-    //endregion
+
 }

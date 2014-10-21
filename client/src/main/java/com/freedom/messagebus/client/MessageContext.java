@@ -24,14 +24,13 @@ public class MessageContext {
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
     @NotNull
-    public Connection connection;
-
+    public  Connection connection;
     @NotNull
-    private String  host;
-    private boolean isAuthorized;
-    private boolean enableTransaction;
+    private String     host;
+    private boolean    isAuthorized;
+    private boolean    enableTransaction;
     @NotNull
-    private String  appKey;
+    private String     appKey;
 
     /**
      * for produce
@@ -42,7 +41,6 @@ public class MessageContext {
     /**
      * for consume
      */
-    @NotNull
     private Message consumedMsg;
     private String  consumerTag;
 
@@ -73,6 +71,8 @@ public class MessageContext {
 
     @NotNull
     private String tempQueueName;                       //for response
+
+    private List<String> subQueueNames;
 
     public MessageContext() {
     }
@@ -179,12 +179,11 @@ public class MessageContext {
         this.destroyer = destroyer;
     }
 
-    @NotNull
     public Message getConsumedMsg() {
         return consumedMsg;
     }
 
-    public void setConsumedMsg(@NotNull Message consumedMsg) {
+    public void setConsumedMsg(Message consumedMsg) {
         this.consumedMsg = consumedMsg;
     }
 
@@ -260,6 +259,14 @@ public class MessageContext {
 
     public void setConsumerTag(String consumerTag) {
         this.consumerTag = consumerTag;
+    }
+
+    public List<String> getSubQueueNames() {
+        return subQueueNames;
+    }
+
+    public void setSubQueueNames(List<String> subQueueNames) {
+        this.subQueueNames = subQueueNames;
     }
 
     @Override

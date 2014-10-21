@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
@@ -69,7 +70,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
             }
 
             MessageType msgType = MessageType.lookup(msgTypeStr);
-            Message msg = new Message();
+            Message msg = MessageFactory.createMessage(msgType);
             initMessage(msg, msgType, properties, msgBody);
             context.setConsumedMsg(msg);
         } catch (IOException | InterruptedException e) {
@@ -100,8 +101,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
     }
 
     private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        msg.setMessageHeader(MessageHeaderProcessor.unbox(properties, msgType));
-        msg.setMessageType(msgType);
+        MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
 
         IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
         msg.setMessageBody(msgBodyProcessor.unbox(bodyData));

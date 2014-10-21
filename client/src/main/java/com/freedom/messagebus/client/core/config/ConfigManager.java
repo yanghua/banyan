@@ -42,6 +42,12 @@ public class ConfigManager {
     private List<HandlerModel> requestHandlerModels;
     @NotNull
     private List<HandlerModel> responseHandlerModels;
+    @NotNull
+    private List<HandlerModel> publishHandlerModels;
+    @NotNull
+    private List<HandlerModel> subscribeHandlerModels;
+    @NotNull
+    private List<HandlerModel> broadcastHandlerModels;
     //endregion
 
     //region handler instance
@@ -53,12 +59,20 @@ public class ConfigManager {
     private List<AbstractHandler> requestHandlerChain;
     @NotNull
     private List<AbstractHandler> responseHandlerChain;
+    @NotNull
+    private List<AbstractHandler> publishHandlerChain;
+    @NotNull
+    private List<AbstractHandler> subscribeHandlerChain;
+    @NotNull
+    private List<AbstractHandler> broadcastHandlerChain;
     //endregion
 
     @NotNull
     private Map<String, Node> exchangeNodeMap;
     @NotNull
     private Map<String, Node> queueNodeMap;
+    @NotNull
+    private Map<String, Node> pubsubNodeMap;
     @NotNull
     private Map<String, Config> clientConfigMap;
 
@@ -86,16 +100,27 @@ public class ConfigManager {
             consumerHandlerModels = parseHandlers("consumer");
             requestHandlerModels = parseHandlers("request");
             responseHandlerModels = parseHandlers("response");
+            publishHandlerModels = parseHandlers("publish");
+            subscribeHandlerModels = parseHandlers("subscribe");
+            broadcastHandlerModels = parseHandlers("broadcast");
 
             //box
             produceHandlerChain = initHandlers(MessageCarryType.PRODUCE);
             consumerHandlerChain = initHandlers(MessageCarryType.CONSUME);
             requestHandlerChain = initHandlers(MessageCarryType.REQUEST);
             responseHandlerChain = initHandlers(MessageCarryType.RESPONSE);
+            publishHandlerChain = initHandlers(MessageCarryType.PUBLISH);
+            subscribeHandlerChain = initHandlers(MessageCarryType.SUBSCRIBE);
+            broadcastHandlerChain = initHandlers(MessageCarryType.BROADCAST);
 
-            if (logger.isInfoEnabled()) {
+            if (logger.isDebugEnabled()) {
                 printHandlerChain(MessageCarryType.PRODUCE);
                 printHandlerChain(MessageCarryType.CONSUME);
+                printHandlerChain(MessageCarryType.REQUEST);
+                printHandlerChain(MessageCarryType.RESPONSE);
+                printHandlerChain(MessageCarryType.PUBLISH);
+                printHandlerChain(MessageCarryType.SUBSCRIBE);
+                printHandlerChain(MessageCarryType.BROADCAST);
             }
 
             this.parseRouterInfo();
@@ -129,6 +154,21 @@ public class ConfigManager {
     }
 
     @NotNull
+    public List<HandlerModel> getPublishHandlerModels() {
+        return publishHandlerModels;
+    }
+
+    @NotNull
+    public List<HandlerModel> getSubscribeHandlerModels() {
+        return subscribeHandlerModels;
+    }
+
+    @NotNull
+    public List<HandlerModel> getBroadcastHandlerModels() {
+        return broadcastHandlerModels;
+    }
+
+    @NotNull
     public List<AbstractHandler> getProduceHandlerChain() {
         return produceHandlerChain;
     }
@@ -149,6 +189,21 @@ public class ConfigManager {
     }
 
     @NotNull
+    public List<AbstractHandler> getPublishHandlerChain() {
+        return publishHandlerChain;
+    }
+
+    @NotNull
+    public List<AbstractHandler> getSubscribeHandlerChain() {
+        return subscribeHandlerChain;
+    }
+
+    @NotNull
+    public List<AbstractHandler> getBroadcastHandlerChain() {
+        return broadcastHandlerChain;
+    }
+
+    @NotNull
     public Map<String, Node> getExchangeNodeMap() {
         return exchangeNodeMap;
     }
@@ -156,6 +211,11 @@ public class ConfigManager {
     @NotNull
     public Map<String, Node> getQueueNodeMap() {
         return queueNodeMap;
+    }
+
+    @NotNull
+    public Map<String, Node> getPubsubNodeMap() {
+        return pubsubNodeMap;
     }
 
     @NotNull
@@ -248,6 +308,18 @@ public class ConfigManager {
                 models = responseHandlerModels;
                 break;
 
+            case PUBLISH:
+                models = publishHandlerModels;
+                break;
+
+            case SUBSCRIBE:
+                models = subscribeHandlerModels;
+                break;
+
+            case BROADCAST:
+                models = broadcastHandlerModels;
+                break;
+
             default: {
                 logger.error("[initHandlers] : unknow message handle type");
                 models = new ArrayList<HandlerModel>(0);
@@ -294,17 +366,41 @@ public class ConfigManager {
             }
             break;
 
+            case RESPONSE: {
+                handlerModels = responseHandlerModels;
+                title = "response";
+            }
+            break;
+
+            case PUBLISH: {
+                handlerModels = publishHandlerModels;
+                title = "publish";
+            }
+            break;
+
+            case SUBSCRIBE: {
+                handlerModels = subscribeHandlerModels;
+                title = "subscribe";
+            }
+            break;
+
+            case BROADCAST: {
+                handlerModels = broadcastHandlerModels;
+                title = "broadcast";
+            }
+            break;
+
             default: {
                 logger.error("unknown message handle type");
                 handlerModels = new ArrayList<HandlerModel>(0);
             }
         }
 
-        logger.info("==============" + title + "=============");
+        logger.debug("==============" + title + "=============");
         for (HandlerModel model : handlerModels) {
-            logger.info("              " + model.getHandlerName() + "              ");
-            logger.info("                     ||                     ");
-            logger.info("                     \\/                     ");
+            logger.debug("              " + model.getHandlerName() + "              ");
+            logger.debug("                     ||                     ");
+            logger.debug("                     \\/                     ");
         }
     }
 
@@ -390,12 +486,15 @@ public class ConfigManager {
     private void extractDifferentNodes(List<Node> nodes) {
         this.exchangeNodeMap = new ConcurrentHashMap<>();
         this.queueNodeMap = new ConcurrentHashMap<>();
+        this.pubsubNodeMap = new ConcurrentHashMap<>();
 
         for (Node node : nodes) {
             if (node.getType() == 0)
                 this.exchangeNodeMap.put(node.getName(), node);
-            else
+            else if (node.getType() == 1 && !node.getValue().contains("pubsub") && node.getRoutingKey().length() != 0)
                 this.queueNodeMap.put(node.getName(), node);
+            else if (node.getType() == 1 && node.getValue().contains("pubsub"))
+                this.pubsubNodeMap.put(node.getName(), node);
         }
     }
 

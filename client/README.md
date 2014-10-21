@@ -1,23 +1,4 @@
-#提纲
-[名词解释](#名词解释)
 
-[消息传输](#消息传输)
-
-[消息的链式处理](#消息的链式处理)
-
-[req/resp](#req/resp)
-
-[分布式消息Id](#分布式消息Id)
-
-[消息处理的上下文对象](#消息处理的上下文对象)
-
-[Channel的对象池](#Channel的对象池)
-
-[远程配置与管控](#远程配置与管控)
-
-[动态添加处理器](#动态添加处理器)
-
-[Best Practice](#Best Practice)
 
 ##名词解释
 - message carry: 消息的传输（`produce` `consume` `request` `response` `publish` `subscribe` `broadcast` ）被抽象为carry(表示消息的 **搬运** )
@@ -31,7 +12,7 @@
 * IResponser: 定义了发送响应/应答消息的接口
 * IPublisher: 定义了发布消息的接口
 * ISubscriber: 定义了订阅消息的接口
-* IBroadcast: 定义了广播消息的接口
+* IBroadcaster: 定义了广播消息的接口
 * AbstractMessageCarryer: 抽象了消息传输的共性部分（主要包含handler-chain的实例化）
 
 继承关系图如下：
@@ -153,7 +134,7 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 ```
 
 ###router 信息
-消息总线的路由方式依赖于rabbitmq的topic模式 + 一个树形的拓扑结构。而树的节点只有两种类型：exchange 、 queue。
+消息总线的路由方式主要依赖于rabbitmq的topic模式 + 一个树形的拓扑结构。而树的节点只有两种类型：exchange 、 queue。
 这里它们都被抽象为数据结构： `Node`.
 
 其结构如下：
@@ -167,7 +148,7 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 - name：节点的对外公开名称
 - value：标识了它的完全限定名
 
-它对应的数据库表结构形如：
+它对应的数据库表结构形如：（注意这里主要是展示用，所有的应用程序、组件都无法获取这份配置信息，因此它们也无法知道路由信息或者进行恶意的模拟攻击）
 ![img 14][14]
 
 这些配置一旦有变更，就会被理解推送到连接了zookeeper的client，client会将其先保存在 `/tmp/`下，然后理解对其进行解析、装载。消息在进行下一次carry时即会基于新的策略。而这些信息对client以外（app）则是完全透明的。客户端只需要了解需要发送的queue的`name`即可。
@@ -201,7 +182,7 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 可以说 `pub/sub` 是 `broadcast`的特例，因此它们在实现方式上也是一种模式的变种
 
 ###broadcast
-`broadcast` 很简单，它利用rabbitmq fanout 类型的exchange会自动达到 `broadcast`的效果。通过调用客户端 `broadcast` API，其在内部将消息路由到 `pubsub` 节点，后面的事情就交给rabbitmq，它会将该消息发布到所有挂载在其上的队列里去（同business类似，其下的所有队列都是预先初始化的，客户端没有动态初始化的权限）。为了表明它是一次 `broadcast`，需要在消息的message header中如下的key进行明确的设置：
+`broadcast` 很简单，它利用rabbitmq fanout 类型的exchange会自动达到 `broadcast`的效果。通过调用客户端 `broadcast` API，其在内部将消息路由到 `pubsub` 节点，后面的事情就交给rabbitmq，它会将该消息发布到所有挂载在其上的队列里去（同business类似，其下的所有队列都是预先初始化的，客户端没有动态初始化的权限）。为了表明它是一次 `broadcast`，需要对消息的message header中如下的key进行明确的设置：
 
 * type: broadcast
 * replyTo: 发送方的queue name
@@ -214,9 +195,9 @@ zookeeper本身就是用来做配置变更管理，因此此处部分应用了�
 * type: pubsub
 * replyTo: 发送方的queue name
 * appId: 发送方的app id
-* expiration: （option）如果发送的是事件消息，可能具有时效性，需要设置一个过期实现，按需设置
+* expiration: （option）如果发送的是事件消息，可能具有时效性，需要设置一个过期时间，按需设置
 
-由于`pub/sub`类型为fanout，因此进入该exchange的消息，会被其下所有的队列照单全收。因此客户端需要有个filter，记录其所subscribe的所有队列的名称，然后在接到所有消息时，按上面的列出的四个key-value pairs组合过滤出真正应该接受的信息，丢给应用。
+由于`pub/sub`类型为fanout，因此进入该exchange的消息，会被其下所有的队列照单全收，而sub的队列可能只是其中的某一个或某几个。因此客户端需要有个filter，记录其所subscribe的所有队列的名称，然后在接到所有消息时，按上面的列出的四个key-value pairs组合过滤出真正应该接受的信息，丢给应用。
 
 > 虽然pub/sub是实现分布式事件以及协同的有效手段，但这里的用法主要还是集中在业务上。系统级别的事件不会走这种模式，仍然走Zookeeper推送，这带来的好处之一是单点失效。如果，rabbitmq或server组件出现问题，它们建立在其上的一切都将失效，所以系统级别的事件还是独立出去。
 

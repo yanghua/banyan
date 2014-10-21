@@ -38,8 +38,8 @@ public class ResponseTemplate {
 
         Messagebus client = Messagebus.getInstance(appkey);
 
-        String          appName        = "crm";
-        IConsumerCloser consumerCloser = null;
+        String         appName        = "crm";
+        IReceiveCloser consumerCloser = null;
         private final Object lockObj = new Object();
 
         @Override
@@ -55,7 +55,7 @@ public class ResponseTemplate {
                     final IResponser responser = client.getResponser();
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message, IConsumerCloser consumerCloser) {
+                        public void onMessage(Message message, IReceiveCloser consumerCloser) {
                             //handle message
                             String msgId = String.valueOf(message.getMessageHeader().getMessageId());
                             logger.info("[" + msgId +
@@ -77,7 +77,7 @@ public class ResponseTemplate {
                 e.printStackTrace();
             } finally {
                 logger.info("close client");
-                consumerCloser.closeConsumer();
+                consumerCloser.close();
                 client.close();
             }
         }

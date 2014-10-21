@@ -29,9 +29,9 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     @Override
     public void produce(@NotNull Message msg,
                         @NotNull String to) {
-        MessageContext context = this.innerProduce(super.context.getAppKey(), to);
-        context.setMessages(new Message[]{msg});
-        carry(context);
+        MessageContext ctx = this.innerProduce(super.context.getAppKey(), to);
+        ctx.setMessages(new Message[]{msg});
+        carry(ctx);
     }
 
     /**

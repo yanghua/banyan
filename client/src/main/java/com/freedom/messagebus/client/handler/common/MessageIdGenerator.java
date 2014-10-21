@@ -27,7 +27,9 @@ public class MessageIdGenerator extends AbstractHandler {
     public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
         Message[] msgs = context.getMessages();
         //if non-response
-        if (!context.getCarryType().equals(MessageCarryType.RESPONSE)) {
+        if (!(context.getCarryType().equals(MessageCarryType.RESPONSE)
+            || context.getCarryType().equals(MessageCarryType.PUBLISH)
+            || context.getCarryType().equals(MessageCarryType.BROADCAST))) {
             for (Message msg : msgs) {
                 UUIDGenerator generator = new UUIDGenerator(context.getQueueNode().getGeneratedId(), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
                 logger.info("message id is : " + generator.nextId());

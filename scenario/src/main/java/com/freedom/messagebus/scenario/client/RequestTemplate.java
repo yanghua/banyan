@@ -1,10 +1,7 @@
 package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
+import com.freedom.messagebus.common.message.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,11 +17,16 @@ public class RequestTemplate {
         messagebus.setZkHost(host);
         messagebus.setZkPort(port);
 
-        Message msg = MessageFactory.createMessage(MessageType.AppMessage);
         String queueName = "crm";
 
-        AppMessageBody appMessageBody = (AppMessageBody) msg.getMessageBody();
-        appMessageBody.setMessageBody("test".getBytes());
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.getMessageHeader().setReplyTo(queueName);
+        msg.getMessageHeader().setContentType("text/plain");
+        msg.getMessageHeader().setContentEncoding("utf-8");
+
+        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
 
         Message respMsg = null;
 

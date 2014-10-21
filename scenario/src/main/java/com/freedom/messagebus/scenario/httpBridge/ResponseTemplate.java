@@ -1,10 +1,6 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageJSONSerializer;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
+import com.freedom.messagebus.common.message.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -74,9 +70,10 @@ public class ResponseTemplate {
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
 
-                Message testMsg = MessageFactory.createMessage(MessageType.AppMessage);
-                AppMessageBody appMessageBody = (AppMessageBody) testMsg.getMessageBody();
-                appMessageBody.setMessageBody("test".getBytes());
+                Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                body.setContent("test".getBytes());
+                testMsg.setMessageBody(body);
 
                 String msg2json = MessageJSONSerializer.serialize(testMsg);
 
@@ -136,9 +133,10 @@ public class ResponseTemplate {
                         CloseableHttpClient responseHttpClient = HttpClients.createDefault();
 
 
-                        Message testMsg = MessageFactory.createMessage(MessageType.AppMessage);
-                        AppMessageBody appMessageBody = (AppMessageBody) testMsg.getMessageBody();
-                        appMessageBody.setMessageBody("test".getBytes());
+                        Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                        body.setContent("test".getBytes());
+                        testMsg.setMessageBody(body);
 
                         String msg2json = MessageJSONSerializer.serialize(testMsg);
 
@@ -184,7 +182,7 @@ public class ResponseTemplate {
 
         JsonElement msgElement = dataElement.getAsJsonArray().get(0);
 
-        return MessageJSONSerializer.deSerialize(msgElement, MessageType.AppMessage);
+        return MessageJSONSerializer.deSerialize(msgElement, MessageType.QueueMessage);
     }
 
 

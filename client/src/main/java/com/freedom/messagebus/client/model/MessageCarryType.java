@@ -14,16 +14,22 @@ public enum MessageCarryType {
     PRODUCE,
     CONSUME,
     REQUEST,
-    RESPONSE;
+    RESPONSE,
+    PUBLISH,
+    SUBSCRIBE,
+    BROADCAST;
 
     private static final ConcurrentMap<String, MessageCarryType> lookups =
-        new ConcurrentHashMap<String, MessageCarryType>(2);
+        new ConcurrentHashMap<String, MessageCarryType>(6);
 
     static {
         lookups.put("produce", PRODUCE);
         lookups.put("consume", CONSUME);
         lookups.put("request", REQUEST);
         lookups.put("response", RESPONSE);
+        lookups.put("publish", PUBLISH);
+        lookups.put("subscribe", SUBSCRIBE);
+        lookups.put("broadcast", BROADCAST);
     }
 
     @NotNull

@@ -2,7 +2,9 @@ package com.freedom.messagebus.server.daemon.impl;
 
 import com.freedom.messagebus.common.AbstractInitializer;
 import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.message.IMessageHeader;
 import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
@@ -44,18 +46,24 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
                 AMQP.BasicProperties properties = delivery.getProperties();
                 byte[] msgBody = delivery.getBody();
 
+                this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+
                 String msgTypeStr = properties.getType();
                 if (msgTypeStr == null || msgTypeStr.isEmpty()) {
                     logger.error("[run] message type is null or empty");
                 }
 
-                MessageType msgType = MessageType.lookup(msgTypeStr);
-                Message msg = new Message();
+                MessageType msgType = null;
+                try {
+                    msgType = MessageType.lookup(msgTypeStr);
+                } catch (UnknownError unknownError) {
+                    throw new RuntimeException("unknown message type : " + msgTypeStr);
+                }
+                Message msg = MessageFactory.createMessage(msgType);
                 initMessage(msg, msgType, properties, msgBody);
 
-                logger.info("[" + msg.getMessageHeader().getMessageId() + "]-" + "[" + msg.getMessageHeader().getType() + "]");
-
-                this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                //log message
+                logger.info(formatLog(msg.getMessageHeader()));
             }
         } catch (IOException e) {
             logger.error("[run] occurs a IOException : " + e.getMessage());
@@ -72,10 +80,23 @@ public class MsgLogService extends AbstractInitializer implements Runnable, ISer
     }
 
     private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        msg.setMessageHeader(MessageHeaderProcessor.unbox(properties, msgType));
-        msg.setMessageType(msgType);
+        MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
 
         IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
         msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
+    }
+
+    private String formatLog(IMessageHeader msgHeader) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" [id] ");
+        sb.append(msgHeader.getMessageId());
+        sb.append(" [type] ");
+        sb.append(msgHeader.getType());
+        sb.append(" [appId] ");
+        sb.append(msgHeader.getAppId());
+        sb.append(" [replyTo] ");
+        sb.append(msgHeader.getReplyTo());
+
+        return sb.toString();
     }
 }

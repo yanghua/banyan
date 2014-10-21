@@ -7,7 +7,6 @@ import com.freedom.messagebus.common.message.MessageJSONSerializer;
 import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.httpbridge.util.Constants;
 import com.freedom.messagebus.httpbridge.util.ResponseUtil;
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.continuation.Continuation;
@@ -80,7 +79,7 @@ public class HttpBridge extends HttpServlet {
                 ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
                                       "param : messages can not be null or empty", "", "''");
             } else {
-                Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.AppMessage);
+                Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
 
                 try {
                     IProducer producer = messagebus.getProducer();
@@ -150,7 +149,7 @@ public class HttpBridge extends HttpServlet {
             String queueName = request.getRequestURI().split("/")[3];
             String msgStr = request.getParameter("message");
 
-            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.AppMessage);
+            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
 
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
 
@@ -178,7 +177,7 @@ public class HttpBridge extends HttpServlet {
             String queueName = request.getRequestURI().split("/")[3];
             String msgStr = request.getParameter("message");
 
-            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.AppMessage);
+            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
 
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
 
@@ -255,18 +254,18 @@ public class HttpBridge extends HttpServlet {
             @Override
             public void onTimeout(Continuation continuation) {
                 logger.info("[onTimeout] : continuation timeout.");
-                IConsumerCloser closer = (IConsumerCloser) continuation.getAttribute("consumerCloser");
+                IReceiveCloser closer = (IReceiveCloser) continuation.getAttribute("consumerCloser");
                 if (closer != null) {
-                    closer.closeConsumer();
+                    closer.close();
                 }
             }
         });
 
         try {
             IConsumer consumer = messagebus.getConsumer();
-            IConsumerCloser consumerCloser = consumer.consume(queueName, new IMessageReceiveListener() {
+            IReceiveCloser consumerCloser = consumer.consume(queueName, new IMessageReceiveListener() {
                 @Override
-                public void onMessage(Message message, IConsumerCloser consumerCloser) {
+                public void onMessage(Message message, IReceiveCloser consumerCloser) {
                     String msgStr = MessageJSONSerializer.serialize(message);
                     logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
                     try {
@@ -276,7 +275,7 @@ public class HttpBridge extends HttpServlet {
                     } finally {
                         continuation.complete();
                         //close consumer
-                        consumerCloser.closeConsumer();
+                        consumerCloser.close();
                     }
                 }
             });

@@ -1,35 +1,13 @@
 package com.freedom.messagebus.common.message;
 
-public class Message {
+public interface Message {
 
-    private IMessageHeader messageHeader;
-    private IMessageBody   messageBody;
-    private MessageType    messageType;
+    public IMessageHeader getMessageHeader();
 
-    public Message() {
-    }
+    public IMessageBody getMessageBody();
 
-    public IMessageHeader getMessageHeader() {
-        return messageHeader;
-    }
+    public void setMessageBody(IMessageBody messageBody);
 
-    public void setMessageHeader(IMessageHeader messageHeader) {
-        this.messageHeader = messageHeader;
-    }
+    public MessageType getMessageType();
 
-    public IMessageBody getMessageBody() {
-        return messageBody;
-    }
-
-    public void setMessageBody(IMessageBody messageBody) {
-        this.messageBody = messageBody;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(MessageType messageType) {
-        this.messageType = messageType;
-    }
 }

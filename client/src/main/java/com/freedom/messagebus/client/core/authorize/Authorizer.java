@@ -60,7 +60,7 @@ public class Authorizer {
         ProxyConsumer proxyConsumer = new ProxyConsumer();
 //        proxyConsumer.consume(channel, CONSTS.DEFAULT_AUTH_QUEUE_NAME, new IMessageReceiveListener() {
 //            @Override
-//            public void onMessage(final Message message, IConsumerCloser consumerCloser) {
+//            public void onMessage(final Message message, IReceiveCloser consumerCloser) {
 //                instance.boxAuthrespMsg(authRespMsg, message);
 //                instance.notify();
 //            }

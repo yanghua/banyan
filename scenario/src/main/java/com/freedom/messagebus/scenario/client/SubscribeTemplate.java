@@ -6,26 +6,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-/**
- * asynchronous consume 的常用使用场景有如下特点：
- * (1)长时间被动等待的服务端处理程序/组件
- * (2)属于请求/响应模型的服务器端
- * (3)宿主环境下作为独立线程的后台处理程序
- */
-public class AsyncConsumeTemplate {
+public class SubscribeTemplate {
 
-    private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
+    private static final Log    logger = LogFactory.getLog(SubscribeTemplate.class);
     private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host = "115.29.96.85";
     private static final int    port = 2181;
 
     public static void main(String[] args) {
-        ConsumerService service = new ConsumerService();
+        SubscribeService service = new SubscribeService();
 
-        //launch!!!
         service.start();
 
         //blocking main-thread for seeing effect
@@ -39,12 +34,13 @@ public class AsyncConsumeTemplate {
         service.stopService();
     }
 
-    public static class ConsumerService extends Thread {
+    public static class SubscribeService extends Thread {
 
         Messagebus client = Messagebus.getInstance(appkey);
 
-        String         appName        = "crm";
-        IReceiveCloser consumerCloser = null;
+        String receiveQueueName = "crm";
+        List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[] {"crm"});
+        ISubscribeManager subscribeManager = null;
         private final Object lockObj = new Object();
 
         @Override
@@ -56,8 +52,9 @@ public class AsyncConsumeTemplate {
                     client.setZkPort(port);
 
                     client.open();
-                    IConsumer consumer = client.getConsumer();
-                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
+                    ISubscriber subscriber = client.getSubscriber();
+                    subscribeManager = subscriber.subscribe(subQueueNames, receiveQueueName,
+                                                            new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message, IReceiveCloser consumerCloser) {
                             logger.info("[" + message.getMessageHeader().getMessageId() +
@@ -72,9 +69,11 @@ public class AsyncConsumeTemplate {
             } catch (IOException | MessagebusUnOpenException |
                 MessagebusConnectedFailedException | InterruptedException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 logger.info("close client");
-                consumerCloser.close();
+                subscribeManager.close();
                 client.close();
             }
         }
@@ -88,6 +87,7 @@ public class AsyncConsumeTemplate {
             //style 2 : use interrupt
 //            this.interrupt();
         }
+
     }
 
 }

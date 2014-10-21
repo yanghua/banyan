@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -45,6 +44,12 @@ public class Messagebus {
     private IRequester requester;
     @NotNull
     private IResponser responser;
+    @NotNull
+    private IPublisher publisher;
+    @NotNull
+    private ISubscriber subscriber;
+    @NotNull
+    private IBroadcaster broadcaster;
 
     @NotNull
     private LongLiveZookeeper     zookeeper;
@@ -56,7 +61,6 @@ public class Messagebus {
 
     private AtomicBoolean isOpen         = new AtomicBoolean(false);
     private boolean       useChannelPool = false;
-
 
     @NotNull
     private String zkHost;
@@ -133,6 +137,9 @@ public class Messagebus {
         consumer = new GenericConsumer(context);
         requester = new GenericRequester(context);
         responser = new GenericResponser(context);
+        publisher = new GenericPublisher(context);
+        subscriber = new GenericSubscriber(context);
+        broadcaster = new GenericBroadcaster(context);
 
         boolean success = this.isOpen.compareAndSet(false, true);
         if (!success) {
@@ -200,6 +207,30 @@ public class Messagebus {
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
         return responser;
+    }
+
+    @NotNull
+    public IPublisher getPublisher() throws MessagebusUnOpenException {
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
+
+        return publisher;
+    }
+
+    @NotNull
+    public ISubscriber getSubscriber() throws MessagebusUnOpenException {
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
+
+        return subscriber;
+    }
+
+    @NotNull
+    public IBroadcaster getBroadcaster() throws MessagebusUnOpenException {
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
+
+        return broadcaster;
     }
 
     public boolean isOpen() {

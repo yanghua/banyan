@@ -1,6 +1,6 @@
 package com.freedom.messagebus.client.handler.consume;
 
-import com.freedom.messagebus.client.IConsumerCloser;
+import com.freedom.messagebus.client.IReceiveCloser;
 import com.freedom.messagebus.client.IMessageReceiveListener;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
@@ -14,9 +14,9 @@ public class MessageProcessor extends AbstractHandler {
 
     private MessageContext context;
 
-    private IConsumerCloser consumerCloser = new IConsumerCloser() {
+    private IReceiveCloser consumerCloser = new IReceiveCloser() {
         @Override
-        public void closeConsumer() {
+        public void close() {
             synchronized (this) {
                 if (context.getReceiveEventLoop().isAlive()) {
                     context.getReceiveEventLoop().shutdown();
@@ -34,7 +34,7 @@ public class MessageProcessor extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
-        if (!context.isSync()) {
+        if (!context.isSync() && context.getConsumedMsg() != null) {
             this.context = context;
             IMessageReceiveListener receiveListener = context.getListener();
             receiveListener.onMessage(context.getConsumedMsg(), consumerCloser);

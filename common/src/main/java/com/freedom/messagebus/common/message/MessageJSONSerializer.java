@@ -1,6 +1,5 @@
 package com.freedom.messagebus.common.message;
 
-import com.freedom.messagebus.common.message.messageBody.AppMessageBody;
 import com.google.gson.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,14 +28,13 @@ public class MessageJSONSerializer {
 
         JsonObject obj = element.getAsJsonObject();
         JsonElement headerElement = obj.get("messageHeader");
-        AppMessageBody body = gson.fromJson(obj.get("messageBody"), AppMessageBody.class);
+        QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
         MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
         IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-        Message msg = new Message();
-        msg.setMessageHeader(header);
+        Message msg = MessageFactory.createMessage(msgType);
+        adaptMsgHeader(header, msg.getMessageHeader());
         msg.setMessageBody(body);
-        msg.setMessageType(msgType);
 
         return msg;
     }
@@ -46,14 +44,13 @@ public class MessageJSONSerializer {
 
         JsonObject obj = msgElement.getAsJsonObject();
         JsonElement headerElement = obj.get("messageHeader");
-        AppMessageBody body = gson.fromJson(obj.get("messageBody"), AppMessageBody.class);
+        QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
         MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
         IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-        Message msg = new Message();
-        msg.setMessageHeader(header);
+        Message msg = MessageFactory.createMessage(msgType);
+        adaptMsgHeader(header, msg.getMessageHeader());
         msg.setMessageBody(body);
-        msg.setMessageType(msgType);
 
         return msg;
     }
@@ -87,14 +84,13 @@ public class MessageJSONSerializer {
         for (JsonElement e : element.getAsJsonArray()) {
             JsonObject obj = e.getAsJsonObject();
             JsonElement headerElement = obj.get("messageHeader");
-            AppMessageBody body = gson.fromJson(obj.get("messageBody"), AppMessageBody.class);
+            QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
             MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
             IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-            Message msg = new Message();
-            msg.setMessageHeader(header);
+            Message msg = MessageFactory.createMessage(msgType);
+            adaptMsgHeader(header, msg.getMessageHeader());
             msg.setMessageBody(body);
-            msg.setMessageType(msgType);
             msgs[i++] = msg;
         }
 
@@ -102,12 +98,24 @@ public class MessageJSONSerializer {
     }
 
     private static void checkMessageType(@NotNull MessageType type) {
-        if (!type.equals(MessageType.AppMessage)) {
+        if (!type.equals(MessageType.QueueMessage)) {
             logger.error("[serialize] unsupport message type : " + type.toString() +
-                             ", now just support AppMessage");
+                             ", now just support QueueMessage");
             throw new UnsupportedOperationException("unsupport message type : " + type.toString() +
-                                                        ", now just support AppMessage");
+                                                        ", now just support QueueMessage");
         }
+    }
+
+    private static void adaptMsgHeader(IMessageHeader source, IMessageHeader target) {
+        target.setReplyTo(source.getReplyTo());
+        target.setMessageId(source.getMessageId());
+        target.setHeaders(source.getHeaders());
+        target.setAppId(source.getAppId());
+        target.setContentEncoding(source.getContentEncoding());
+        target.setContentType(source.getContentType());
+        target.setCorrelationId(source.getCorrelationId());
+        target.setPriority(source.getPriority());
+        target.setTimestamp(source.getTimestamp());
     }
 
 }

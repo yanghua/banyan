@@ -32,9 +32,9 @@ public class MessageHeaderProcessor {
                       .build();
     }
 
-    public static IMessageHeader unbox(@NotNull AMQP.BasicProperties properties, MessageType msgType) {
-        IMessageHeader msgHeader = MessageFactory.createMessageHeader(msgType);
-
+    public static IMessageHeader unbox(@NotNull AMQP.BasicProperties properties,
+                                       MessageType msgType,
+                                       IMessageHeader msgHeader) {
         //common properties
         msgHeader.setCorrelationId(properties.getCorrelationId());
         msgHeader.setHeaders(properties.getHeaders());
@@ -45,37 +45,29 @@ public class MessageHeaderProcessor {
         else
             logger.error("[unbox] illegal message id (can not be null) ");
 
-        switch (msgType) {
-            case AppMessage:
-                msgHeader.setContentEncoding(properties.getContentEncoding());
-                msgHeader.setContentType(properties.getContentType());
-                msgHeader.setAppId(properties.getAppId());
-                msgHeader.setReplyTo(properties.getReplyTo());
-                break;
+        msgHeader.setContentEncoding(properties.getContentEncoding());
+        msgHeader.setContentType(properties.getContentType());
+        msgHeader.setAppId(properties.getAppId());
+        msgHeader.setReplyTo(properties.getReplyTo());
 
-            case AuthreqMessage:
-                msgHeader.setAppId(properties.getAppId());
-                msgHeader.setReplyTo(properties.getReplyTo());
-                break;
-
-            case AuthrespMessage:
-                msgHeader.setReplyTo(properties.getReplyTo());
-                break;
-
-            case LookupreqMessage:
-                msgHeader.setAppId(properties.getAppId());
-                msgHeader.setReplyTo(properties.getReplyTo());
-                break;
-
-            case LookuprespMessage:
-                msgHeader.setAppId(properties.getAppId());
-                break;
-
-            case CacheExpiredMessage:
-                msgHeader.setContentEncoding(properties.getContentEncoding());
-                msgHeader.setContentType(properties.getContentType());
-                break;
-        }
+//        switch (msgType) {
+//            case QueueMessage:
+//                msgHeader.setContentEncoding(properties.getContentEncoding());
+//                msgHeader.setContentType(properties.getContentType());
+//                msgHeader.setAppId(properties.getAppId());
+//                msgHeader.setReplyTo(properties.getReplyTo());
+//                break;
+//
+//            case AuthreqMessage:
+//                msgHeader.setAppId(properties.getAppId());
+//                msgHeader.setReplyTo(properties.getReplyTo());
+//                break;
+//
+//            case AuthrespMessage:
+//                msgHeader.setReplyTo(properties.getReplyTo());
+//                break;
+//
+//        }
 
         return msgHeader;
     }
