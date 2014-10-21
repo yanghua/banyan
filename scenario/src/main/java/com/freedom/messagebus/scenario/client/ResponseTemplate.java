@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class ResponseTemplate {
 
     private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appid  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host = "115.29.96.85";
     private static final int    port = 2181;
@@ -36,7 +36,7 @@ public class ResponseTemplate {
 
     public static class ResponseService extends Thread {
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appid);
 
         String         appName        = "crm";
         IReceiveCloser consumerCloser = null;

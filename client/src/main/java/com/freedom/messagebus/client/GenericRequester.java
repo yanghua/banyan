@@ -27,7 +27,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
                            long timeout) throws MessageResponseTimeoutException {
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.REQUEST);
-        cxt.setAppKey(super.context.getAppKey());
+        cxt.setAppId(super.context.getAppId());
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
         cxt.setQueueNode(node);
         cxt.setTimeout(timeout);

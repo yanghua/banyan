@@ -10,9 +10,9 @@ import com.freedom.messagebus.common.message.PubSubMessage;
 
 public class PublishTemplate {
 
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
-    private static final String host   = "115.29.96.85";
-    private static final int    port   = 2181;
+    private static final String appId = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String host  = "115.29.96.85";
+    private static final int    port  = 2181;
 
     public static void publish() {
         Message msg = MessageFactory.createMessage(MessageType.PubSubMessage);
@@ -24,7 +24,7 @@ public class PublishTemplate {
         body.setContent("test".getBytes());
         msg.setMessageBody(body);
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

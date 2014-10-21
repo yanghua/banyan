@@ -20,7 +20,7 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
     public void responseTmpMessage(@NotNull Message msg, @NotNull String queueName) {
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.RESPONSE);
-        cxt.setAppKey(super.context.getAppKey());
+        cxt.setAppId(super.context.getAppId());
         cxt.setMessages(new Message[]{msg});
         cxt.setTempQueueName(queueName);
 

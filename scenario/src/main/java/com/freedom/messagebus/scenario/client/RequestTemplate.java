@@ -11,12 +11,12 @@ import org.apache.commons.logging.LogFactory;
 public class RequestTemplate {
 
     private static final Log    logger = LogFactory.getLog(RequestTemplate.class);
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appId  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
     private static final String host   = "115.29.96.85";
     private static final int    port   = 2181;
 
     public static void main(String[] args) {
-        Messagebus messagebus = Messagebus.getInstance(appkey);
+        Messagebus messagebus = Messagebus.getInstance(appId);
         messagebus.setZkHost(host);
         messagebus.setZkPort(port);
 

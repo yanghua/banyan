@@ -16,14 +16,14 @@ import java.util.List;
 public class SyncConsumeTemplate {
 
     private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appId  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host    = "115.29.96.85";
     private static final int    port    = 2181;
     private static final String appName = "crm";
 
     public static void main(String[] args) {
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

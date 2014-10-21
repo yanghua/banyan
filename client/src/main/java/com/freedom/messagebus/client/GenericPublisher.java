@@ -17,7 +17,7 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
     public void publish(Message[] msgs) {
         MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.PUBLISH);
-        ctx.setAppKey(this.context.getAppKey());
+        ctx.setAppId(this.context.getAppId());
         ctx.setMessages(msgs);
 
         ctx.setPool(this.context.getPool());

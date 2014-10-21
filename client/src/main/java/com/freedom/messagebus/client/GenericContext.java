@@ -21,7 +21,7 @@ public class GenericContext {
     @NotNull
     private Connection            connection;
     @NotNull
-    private String                appKey;
+    private String                appId;
 
     public GenericContext() {
     }
@@ -62,12 +62,12 @@ public class GenericContext {
     }
 
     @NotNull
-    public String getAppKey() {
-        return appKey;
+    public String getAppId() {
+        return appId;
     }
 
-    public void setAppKey(@NotNull String appKey) {
-        this.appKey = appKey;
+    public void setAppId(@NotNull String appId) {
+        this.appId = appId;
     }
 
     @Override

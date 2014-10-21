@@ -35,7 +35,7 @@ public class Messagebus {
     private static volatile Messagebus instance = null;
 
     @NotNull
-    private String       appKey;
+    private String       appId;
     @NotNull
     private IProducer    producer;
     @NotNull
@@ -66,15 +66,15 @@ public class Messagebus {
     private String zkHost;
     private int    zkPort;
 
-    private Messagebus(String appKey) {
-        this.appKey = appKey;
+    private Messagebus(String appId) {
+        this.appId = appId;
     }
 
-    public static Messagebus getInstance(String appKey) {
+    public static Messagebus getInstance(String appId) {
         if (instance == null) {
             synchronized (Messagebus.class) {
                 if (instance == null) {
-                    instance = new Messagebus(appKey);
+                    instance = new Messagebus(appId);
                 }
             }
         }
@@ -127,7 +127,7 @@ public class Messagebus {
         }
 
         GenericContext context = new GenericContext();
-        context.setAppKey(appKey);
+        context.setAppId(appId);
         context.setPool(this.pool);
         context.setConfigManager(this.configManager);
         context.setZooKeeper(this.zookeeper);

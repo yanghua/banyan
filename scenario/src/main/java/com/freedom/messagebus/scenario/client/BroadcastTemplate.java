@@ -10,9 +10,9 @@ import com.freedom.messagebus.common.message.MessageType;
 
 public class BroadcastTemplate {
 
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
-    private static final String host   = "115.29.96.85";
-    private static final int    port   = 2181;
+    private static final String appId = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String host  = "115.29.96.85";
+    private static final int    port  = 2181;
 
     public static void broadcast() {
         String queueName = "crm";
@@ -25,7 +25,7 @@ public class BroadcastTemplate {
         body.setContent("test".getBytes());
         msg.setMessageBody(body);
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

@@ -29,7 +29,7 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     @Override
     public void produce(@NotNull Message msg,
                         @NotNull String to) {
-        MessageContext ctx = this.innerProduce(super.context.getAppKey(), to);
+        MessageContext ctx = this.innerProduce(super.context.getAppId(), to);
         ctx.setMessages(new Message[]{msg});
         carry(ctx);
     }
@@ -44,7 +44,7 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     @Override
     public void produceWithTX(@NotNull Message msg,
                               @NotNull String to) {
-        MessageContext context = this.innerProduce(super.context.getAppKey(), to);
+        MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(new Message[]{msg});
         context.setEnableTransaction(true);
         carry(context);
@@ -59,7 +59,7 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     @Override
     public void batchProduce(@NotNull Message[] msgs,
                              @NotNull String to) {
-        MessageContext context = this.innerProduce(super.context.getAppKey(), to);
+        MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(msgs);
         carry(context);
     }
@@ -74,17 +74,17 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     @Override
     public void batchProduceWithTX(@NotNull Message[] msgs,
                                    @NotNull String to) {
-        MessageContext context = this.innerProduce(super.context.getAppKey(), to);
+        MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(msgs);
         context.setEnableTransaction(true);
         carry(context);
     }
 
-    private MessageContext innerProduce(@NotNull String appKey,
+    private MessageContext innerProduce(@NotNull String appId,
                                         @NotNull String to) {
         MessageContext context = new MessageContext();
         context.setCarryType(MessageCarryType.PRODUCE);
-        context.setAppKey(appKey);
+        context.setAppId(appId);
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
         context.setQueueNode(node);
 

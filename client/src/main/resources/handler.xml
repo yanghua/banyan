@@ -7,7 +7,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.produce.ProduceParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -25,7 +25,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumeParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -55,7 +55,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.request.RequestParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -85,7 +85,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.response.ResponseParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -103,7 +103,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.publish.PublishParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -121,7 +121,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.subscribe.SubscribeParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -151,7 +151,7 @@
         </handler>
         <handler>
             <handler-name>Validate-Handler</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.ParamValidator</handler-path>
+            <handler-path>com.freedom.messagebus.client.handler.broadcast.BroadcastParamValidator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>

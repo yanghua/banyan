@@ -24,7 +24,7 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
                                        @NotNull IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
-        ctx.setAppKey(super.context.getAppKey());
+        ctx.setAppId(super.context.getAppId());
         Node node = null;
         if (!receiveQueueName.contains(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX)) {
             String realReceiveQueueName = receiveQueueName + CONSTS.PUBSUB_QUEUE_NAME_SUFFIX;

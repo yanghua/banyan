@@ -13,7 +13,7 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
     public void broadcast(Message[] msgs) {
         MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.BROADCAST);
-        ctx.setAppKey(this.context.getAppKey());
+        ctx.setAppId(this.context.getAppId());
         ctx.setMessages(msgs);
 
         ctx.setPool(this.context.getPool());

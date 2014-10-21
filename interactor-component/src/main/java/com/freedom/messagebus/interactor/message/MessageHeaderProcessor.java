@@ -49,25 +49,6 @@ public class MessageHeaderProcessor {
         msgHeader.setAppId(properties.getAppId());
         msgHeader.setReplyTo(properties.getReplyTo());
 
-//        switch (msgType) {
-//            case QueueMessage:
-//                msgHeader.setContentEncoding(properties.getContentEncoding());
-//                msgHeader.setContentType(properties.getContentType());
-//                msgHeader.setAppId(properties.getAppId());
-//                msgHeader.setReplyTo(properties.getReplyTo());
-//                break;
-//
-//            case AuthreqMessage:
-//                msgHeader.setAppId(properties.getAppId());
-//                msgHeader.setReplyTo(properties.getReplyTo());
-//                break;
-//
-//            case AuthrespMessage:
-//                msgHeader.setReplyTo(properties.getReplyTo());
-//                break;
-//
-//        }
-
         return msgHeader;
     }
 

@@ -10,7 +10,7 @@ import com.freedom.messagebus.common.message.QueueMessage;
 
 public class ProduceTemplate {
 
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appId = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
     private static final String host   = "115.29.96.85";
     private static final int    port   = 2181;
 
@@ -33,7 +33,7 @@ public class ProduceTemplate {
 
         msg.setMessageBody(body);
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

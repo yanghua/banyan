@@ -30,7 +30,7 @@ public class MessageContext {
     private boolean    isAuthorized;
     private boolean    enableTransaction;
     @NotNull
-    private String     appKey;
+    private String     appId;
 
     /**
      * for produce
@@ -162,12 +162,12 @@ public class MessageContext {
     }
 
     @NotNull
-    public String getAppKey() {
-        return appKey;
+    public String getAppId() {
+        return appId;
     }
 
-    public void setAppKey(@NotNull String appKey) {
-        this.appKey = appKey;
+    public void setAppId(@NotNull String appId) {
+        this.appId = appId;
     }
 
     @NotNull

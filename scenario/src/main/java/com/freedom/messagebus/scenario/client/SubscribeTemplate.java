@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class SubscribeTemplate {
 
     private static final Log    logger = LogFactory.getLog(SubscribeTemplate.class);
-    private static final String appkey = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appId  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
     private static final String host = "115.29.96.85";
     private static final int    port = 2181;
@@ -36,7 +36,7 @@ public class SubscribeTemplate {
 
     public static class SubscribeService extends Thread {
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        Messagebus client = Messagebus.getInstance(appId);
 
         String            receiveQueueName = "crm";
         List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
