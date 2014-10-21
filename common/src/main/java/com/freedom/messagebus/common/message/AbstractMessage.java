@@ -2,7 +2,7 @@ package com.freedom.messagebus.common.message;
 
 abstract class AbstractMessage implements Message {
 
-    protected MessageType type;
+    protected MessageType          type;
     protected GenericMessageHeader genericMessageHeader;
 
     protected AbstractMessage() {

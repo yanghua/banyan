@@ -23,7 +23,7 @@ import java.util.List;
 
 public class HttpBridge extends HttpServlet {
 
-    private static final Log  logger = LogFactory.getLog(HttpBridge.class);
+    private static final Log logger = LogFactory.getLog(HttpBridge.class);
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)

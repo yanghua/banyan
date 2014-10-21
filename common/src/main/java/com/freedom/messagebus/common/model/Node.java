@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * representation a node of the topology
  */
-public class Node implements Serializable,Comparable<Node> {
+public class Node implements Serializable, Comparable<Node> {
 
     private int    generatedId;
     private String name;

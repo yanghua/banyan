@@ -17,7 +17,7 @@ public class BroadcastMessage extends AbstractMessage {
     @Override
     public void setMessageBody(IMessageBody messageBody) {
         if (messageBody instanceof BroadcastMessageBody)
-            this.messageBody = (BroadcastMessageBody)messageBody;
+            this.messageBody = (BroadcastMessageBody) messageBody;
         else
             throw new ClassCastException("param : messageBody can not be cast to type : BroadcastMessageBody");
     }

@@ -3,7 +3,10 @@ package com.freedom.messagebus.scenario.client;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
-import com.freedom.messagebus.common.message.*;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageFactory;
+import com.freedom.messagebus.common.message.MessageType;
+import com.freedom.messagebus.common.message.PubSubMessage;
 
 public class PublishTemplate {
 
@@ -27,7 +30,7 @@ public class PublishTemplate {
 
         try {
             client.open();
-            client.getPublisher().publish(new Message[] {msg});
+            client.getPublisher().publish(new Message[]{msg});
         } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
             e.printStackTrace();
         } finally {

@@ -38,8 +38,8 @@ public class SubscribeTemplate {
 
         Messagebus client = Messagebus.getInstance(appkey);
 
-        String receiveQueueName = "crm";
-        List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[] {"crm"});
+        String            receiveQueueName = "crm";
+        List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
         ISubscribeManager subscribeManager = null;
         private final Object lockObj = new Object();
 
@@ -55,12 +55,12 @@ public class SubscribeTemplate {
                     ISubscriber subscriber = client.getSubscriber();
                     subscribeManager = subscriber.subscribe(subQueueNames, receiveQueueName,
                                                             new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message, IReceiveCloser consumerCloser) {
-                            logger.info("[" + message.getMessageHeader().getMessageId() +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
-                        }
-                    });
+                                                                @Override
+                                                                public void onMessage(Message message, IReceiveCloser consumerCloser) {
+                                                                    logger.info("[" + message.getMessageHeader().getMessageId() +
+                                                                                    "]-[" + message.getMessageHeader().getType() + "]");
+                                                                }
+                                                            });
 
                     logger.info("blocked for receiving message!");
                     lockObj.wait(0);

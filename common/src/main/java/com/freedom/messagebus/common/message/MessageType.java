@@ -15,7 +15,7 @@ public enum MessageType {
     PubSubMessage("pubsub", 3),
     BroadcastMessage("broadcast", 4);
 
-    private static final Log logger = LogFactory.getLog(MessageType.class);
+    private static final Log                      logger     = LogFactory.getLog(MessageType.class);
     private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(5);
 
     static {

@@ -19,7 +19,7 @@ public class PubSubMessage extends AbstractMessage {
     @Override
     public void setMessageBody(IMessageBody messageBody) {
         if (messageBody instanceof PubSubMessageBody)
-            this.messageBody = (PubSubMessageBody)messageBody;
+            this.messageBody = (PubSubMessageBody) messageBody;
         else {
             throw new InvalidParameterException("messageBody should can be cast to : PubSubMessageBody");
         }

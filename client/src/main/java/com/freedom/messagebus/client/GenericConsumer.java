@@ -35,7 +35,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
     @NotNull
     @Override
     public IReceiveCloser consume(@NotNull String queueName,
-                                   @NotNull IMessageReceiveListener receiveListener) throws IOException {
+                                  @NotNull IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppKey(super.context.getAppKey());

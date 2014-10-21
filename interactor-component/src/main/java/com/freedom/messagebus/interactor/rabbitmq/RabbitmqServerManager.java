@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class RabbitmqServerManager {
 
-    private static final Log logger = LogFactory.getLog(RabbitmqServerManager.class);
+    private static final    Log                   logger   = LogFactory.getLog(RabbitmqServerManager.class);
     private static volatile RabbitmqServerManager instance = null;
 
     private Properties properties;
@@ -19,7 +19,7 @@ public class RabbitmqServerManager {
     }
 
     public static RabbitmqServerManager defaultManager(Properties config) {
-        if(instance == null) {
+        if (instance == null) {
             synchronized (RabbitmqServerManager.class) {
                 if (instance == null) {
                     instance = new RabbitmqServerManager(config);

@@ -47,7 +47,7 @@ public class OriginalReceiver extends AbstractHandler {
             context.setReceiveEventLoop(eventLoop);
 
             //repeat current handler
-            ((MessageCarryHandlerChain)chain).setEnableRepeatBeforeNextHandler(true);
+            ((MessageCarryHandlerChain) chain).setEnableRepeatBeforeNextHandler(true);
 
             eventLoop.startEventLoop();
         } else {

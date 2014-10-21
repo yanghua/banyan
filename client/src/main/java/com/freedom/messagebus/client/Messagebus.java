@@ -35,19 +35,19 @@ public class Messagebus {
     private static volatile Messagebus instance = null;
 
     @NotNull
-    private String     appKey;
+    private String       appKey;
     @NotNull
-    private IProducer  producer;
+    private IProducer    producer;
     @NotNull
-    private IConsumer  consumer;
+    private IConsumer    consumer;
     @NotNull
-    private IRequester requester;
+    private IRequester   requester;
     @NotNull
-    private IResponser responser;
+    private IResponser   responser;
     @NotNull
-    private IPublisher publisher;
+    private IPublisher   publisher;
     @NotNull
-    private ISubscriber subscriber;
+    private ISubscriber  subscriber;
     @NotNull
     private IBroadcaster broadcaster;
 
@@ -158,7 +158,7 @@ public class Messagebus {
             if (this.configManager != null)
                 this.configManager.destroy();
 
-            if (this.useChannelPool && pool!= null)
+            if (this.useChannelPool && pool != null)
                 pool.destroy();
 
             if (this.connection.isOpen())

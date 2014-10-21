@@ -9,7 +9,7 @@ public class PubSubMsgBodyProcessor implements IMessageBodyProcessor {
     @Override
     public byte[] box(IMessageBody msgBody) {
         if (msgBody instanceof PubSubMessage.PubSubMessageBody) {
-            PubSubMessage.PubSubMessageBody body = (PubSubMessage.PubSubMessageBody)msgBody;
+            PubSubMessage.PubSubMessageBody body = (PubSubMessage.PubSubMessageBody) msgBody;
             return body.getContent();
         } else {
             throw new ClassCastException("[box] param msgBody can not be cast to type : " +

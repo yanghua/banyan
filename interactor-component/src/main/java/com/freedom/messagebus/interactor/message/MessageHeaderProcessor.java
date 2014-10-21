@@ -1,7 +1,6 @@
 package com.freedom.messagebus.interactor.message;
 
 import com.freedom.messagebus.common.message.IMessageHeader;
-import com.freedom.messagebus.common.message.MessageFactory;
 import com.freedom.messagebus.common.message.MessageType;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;

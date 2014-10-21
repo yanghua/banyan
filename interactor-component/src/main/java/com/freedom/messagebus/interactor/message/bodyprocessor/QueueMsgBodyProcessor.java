@@ -9,7 +9,7 @@ public class QueueMsgBodyProcessor implements IMessageBodyProcessor {
     @Override
     public byte[] box(IMessageBody msgBody) {
         if (msgBody instanceof QueueMessage.QueueMessageBody) {
-            QueueMessage.QueueMessageBody body = (QueueMessage.QueueMessageBody)msgBody;
+            QueueMessage.QueueMessageBody body = (QueueMessage.QueueMessageBody) msgBody;
             return body.getContent();
         } else {
             throw new ClassCastException("[box] param : msgBody can not be cast to type QueueMessage.QueueMessageBody ");

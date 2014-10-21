@@ -9,7 +9,7 @@ public class BroadcastMsgBodyProcessor implements IMessageBodyProcessor {
     @Override
     public byte[] box(IMessageBody msgBody) {
         if (msgBody instanceof BroadcastMessage.BroadcastMessageBody) {
-            BroadcastMessage.BroadcastMessageBody body = (BroadcastMessage.BroadcastMessageBody)msgBody;
+            BroadcastMessage.BroadcastMessageBody body = (BroadcastMessage.BroadcastMessageBody) msgBody;
             return body.getContent();
         } else {
             throw new ClassCastException("[box] param msgBody can not be cast to type : " + "BroadcastMessageBody");

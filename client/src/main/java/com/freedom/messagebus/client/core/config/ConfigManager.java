@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -68,11 +71,11 @@ public class ConfigManager {
     //endregion
 
     @NotNull
-    private Map<String, Node> exchangeNodeMap;
+    private Map<String, Node>   exchangeNodeMap;
     @NotNull
-    private Map<String, Node> queueNodeMap;
+    private Map<String, Node>   queueNodeMap;
     @NotNull
-    private Map<String, Node> pubsubNodeMap;
+    private Map<String, Node>   pubsubNodeMap;
     @NotNull
     private Map<String, Config> clientConfigMap;
 

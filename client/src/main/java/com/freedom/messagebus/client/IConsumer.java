@@ -23,7 +23,7 @@ public interface IConsumer {
      */
     @NotNull
     public IReceiveCloser consume(@NotNull String queueName,
-                                   @NotNull IMessageReceiveListener receiveListener) throws IOException;
+                                  @NotNull IMessageReceiveListener receiveListener) throws IOException;
 
     /**
      * consume with sync-mode, when received messages' num equal the given num

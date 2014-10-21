@@ -1,7 +1,7 @@
 package com.freedom.messagebus.client.handler.consume;
 
-import com.freedom.messagebus.client.IReceiveCloser;
 import com.freedom.messagebus.client.IMessageReceiveListener;
+import com.freedom.messagebus.client.IReceiveCloser;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;

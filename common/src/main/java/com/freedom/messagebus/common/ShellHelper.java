@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 public class ShellHelper {
 
@@ -49,7 +48,8 @@ public class ShellHelper {
         private String info;
         private String error;
 
-        public ExecResult() {}
+        public ExecResult() {
+        }
 
         public String getInfo() {
             return info;
