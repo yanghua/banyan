@@ -1,7 +1,7 @@
 package com.freedom.messagebus.client.handler.consume;
 
 import com.freedom.messagebus.client.IMessageReceiveListener;
-import com.freedom.messagebus.client.IReceiveCloser;
+import com.freedom.messagebus.client.IReceiverCloser;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
@@ -14,7 +14,7 @@ public class MessageProcessor extends AbstractHandler {
 
     private MessageContext context;
 
-    private IReceiveCloser consumerCloser = new IReceiveCloser() {
+    private IReceiverCloser consumerCloser = new IReceiverCloser() {
         @Override
         public void close() {
             synchronized (this) {

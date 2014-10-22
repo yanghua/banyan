@@ -1,6 +1,6 @@
 package com.freedom.messagebus.client;
 
-public interface ISubscribeManager extends IReceiveCloser {
+public interface ISubscribeManager extends IReceiverCloser {
 
     @Override
     void close();

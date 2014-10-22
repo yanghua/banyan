@@ -44,11 +44,11 @@
 //    public void testSimpleProduceAndConsume() throws Exception {
 //        //start consume
 //        String queueName = "crm";
-//        IReceiveCloser closer = client.getConsumer().consume(queueName,
+//        IReceiverCloser closer = client.getConsumer().consume(queueName,
 //                                                              new IMessageReceiveListener() {
 //
 //                                                                  @Override
-//                                                                  public void onMessage(Message message, IReceiveCloser consumerCloser) {
+//                                                                  public void onMessage(Message message, IReceiverCloser consumerCloser) {
 //                                                                      logger.info("[message-id] : " + message.getMessageHeader().getMessageId());
 //                                                                  }
 //                                                              });
@@ -73,7 +73,7 @@
 ////        appkey = java.util.UUID.randomUUID().toString();
 ////        msgType = "business";
 ////        String queueName = "oa.email";
-////        IReceiveCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
+////        IReceiverCloser closer = client.getConsumer().consume(appkey, msgType, queueName,
 ////                                                              new IMessageReceiveListener() {
 ////
 ////                                                                  @Override
@@ -103,7 +103,7 @@
 ////        appkey = java.util.UUID.randomUUID().toString();
 ////        msgType = "business";
 ////        String queueName = "erp";
-////        IReceiveCloser closer = client.getConsumer().consume(appkey, msgType, queueName, new IMessageReceiveListener() {
+////        IReceiverCloser closer = client.getConsumer().consume(appkey, msgType, queueName, new IMessageReceiveListener() {
 ////
 ////            @Override
 ////            public void onMessage(Message message, MessageType messageType) {
@@ -127,7 +127,7 @@
 ////        appkey = java.util.UUID.randomUUID().toString();
 ////        msgType = "business";
 ////        String queueName = "crm";
-////        IReceiveCloser closer = client.getConsumer().consume(appkey, msgType, queueName, new IMessageReceiveListener() {
+////        IReceiverCloser closer = client.getConsumer().consume(appkey, msgType, queueName, new IMessageReceiveListener() {
 ////
 ////            @Override
 ////            public void onMessage(Message message, MessageType messageType) {

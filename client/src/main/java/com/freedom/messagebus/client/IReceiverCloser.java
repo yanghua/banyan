@@ -3,7 +3,7 @@ package com.freedom.messagebus.client;
 /**
  * the interface of consumer's closer
  */
-public interface IReceiveCloser {
+public interface IReceiverCloser {
 
     /**
      * close a consumer after a consumer won't consume continuously

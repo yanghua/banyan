@@ -254,7 +254,7 @@ public class HttpBridge extends HttpServlet {
             @Override
             public void onTimeout(Continuation continuation) {
                 logger.info("[onTimeout] : continuation timeout.");
-                IReceiveCloser closer = (IReceiveCloser) continuation.getAttribute("consumerCloser");
+                IReceiverCloser closer = (IReceiverCloser) continuation.getAttribute("consumerCloser");
                 if (closer != null) {
                     closer.close();
                 }
@@ -263,9 +263,9 @@ public class HttpBridge extends HttpServlet {
 
         try {
             IConsumer consumer = messagebus.getConsumer();
-            IReceiveCloser consumerCloser = consumer.consume(queueName, new IMessageReceiveListener() {
+            IReceiverCloser consumerCloser = consumer.consume(queueName, new IMessageReceiveListener() {
                 @Override
-                public void onMessage(Message message, IReceiveCloser consumerCloser) {
+                public void onMessage(Message message, IReceiverCloser consumerCloser) {
                     String msgStr = MessageJSONSerializer.serialize(message);
                     logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
                     try {

@@ -43,8 +43,8 @@ public class AsyncConsumeTemplate {
 
         Messagebus client = Messagebus.getInstance(appid);
 
-        String         appName        = "crm";
-        IReceiveCloser consumerCloser = null;
+        String          appName        = "crm";
+        IReceiverCloser consumerCloser = null;
         private final Object lockObj = new Object();
 
         @Override
@@ -59,7 +59,7 @@ public class AsyncConsumeTemplate {
                     IConsumer consumer = client.getConsumer();
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message, IReceiveCloser consumerCloser) {
+                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
                             logger.info("[" + message.getMessageHeader().getMessageId() +
                                             "]-[" + message.getMessageHeader().getType() + "]");
                         }

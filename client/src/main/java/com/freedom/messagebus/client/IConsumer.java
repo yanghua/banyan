@@ -22,7 +22,7 @@ public interface IConsumer {
      * @throws IOException
      */
     @NotNull
-    public IReceiveCloser consume(@NotNull String queueName,
+    public IReceiverCloser consume(@NotNull String queueName,
                                   @NotNull IMessageReceiveListener receiveListener) throws IOException;
 
     /**
