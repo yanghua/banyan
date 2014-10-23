@@ -41,7 +41,7 @@ public class SubscribeTemplate {
         String            receiveQueueName = "crm";
         List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
         ISubscribeManager subscribeManager = null;
-        private final Object lockObj = new Object();
+        final Object lockObj = new Object();
 
         @Override
         public void run() {
