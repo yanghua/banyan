@@ -1,6 +1,6 @@
 //package com.freedom.messagebus.client;
 //
-//import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
+//import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 //import com.freedom.messagebus.common.message.Message;
 //import com.freedom.messagebus.common.message.MessageFactory;
 //import com.freedom.messagebus.common.message.MessageType;

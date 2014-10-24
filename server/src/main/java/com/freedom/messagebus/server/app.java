@@ -1,6 +1,11 @@
 package com.freedom.messagebus.server;
 
+import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
+import com.freedom.messagebus.interactor.zookeeper.IConfigChangedListener;
+import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
+import com.freedom.messagebus.interactor.zookeeper.ZKEventType;
 import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
 import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
@@ -16,6 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class App {
 
@@ -89,6 +98,7 @@ public class App {
 
         if (mqIsAlive) {
             App app = new App();
+            broadcastEvent(config, CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
 
             synchronized (app) {
                 try {
@@ -120,8 +130,11 @@ public class App {
 
         Properties config = configurationLoader.getConfigProperties();
         RabbitmqServerManager serverManager = RabbitmqServerManager.defaultManager(config);
-        if (serverManager.isAlive())
+        if (serverManager.isAlive()) {
+            App app = new App();
+            broadcastEvent(config, CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
             serverManager.stop();
+        }
     }
 
     private static void debugArgs(String[] args) {
@@ -169,6 +182,25 @@ public class App {
                 logger.error("illegal argument command : " + cmd);
                 throw new IllegalArgumentException("illegal argument command : " + cmd);
             }
+        }
+    }
+
+    private static void broadcastEvent(Properties properties, final String eventTypeStr, final App lockObj) {
+        LongLiveZookeeper zookeeper = LongLiveZookeeper.getZKInstance(
+            properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST),
+            Integer.valueOf(properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT))
+                                                                     );
+
+        try {
+            synchronized (lockObj) {
+                logger.debug("broadcast event : " + eventTypeStr);
+                zookeeper.setConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr.getBytes(), true);
+
+            }
+        } catch (Exception e) {
+            ExceptionHelper.logException(logger, e, "[broadcastEvent]");
+        } finally {
+            zookeeper.close();
         }
     }
 }

@@ -2,13 +2,10 @@ package com.freedom.messagebus.server.bootstrap;
 
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.ShellHelper;
-import com.freedom.messagebus.interactor.zookeeper.ZookeeperManager;
+import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -24,8 +21,7 @@ public class ZookeeperInitializer {
     private static          Log                  logger   = LogFactory.getLog(ZookeeperInitializer.class);
     private static volatile ZookeeperInitializer instance = null;
 
-    private ZookeeperManager zookeeperManager;
-    private ZooKeeper        zookeeper;
+    private LongLiveZookeeper zookeeper;
     private boolean isInited = false;
     private static Properties config;
 
@@ -59,8 +55,7 @@ public class ZookeeperInitializer {
 
     private void init(String host, int port) {
         try {
-            this.zookeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
-            this.zookeeperManager = ZookeeperManager.getInstance(zookeeper);
+            this.zookeeper = LongLiveZookeeper.getZKInstance(host, port);
             this.initNodes();
             this.isInited = true;
         } catch (Exception e) {
@@ -70,9 +65,9 @@ public class ZookeeperInitializer {
     }
 
     private void initNodes() throws Exception {
-        this.zookeeperManager.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
-        this.zookeeperManager.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
-        this.zookeeperManager.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT);
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT);
     }
 
     private void dumpDbForZookeeper() throws IOException, InterruptedException {
@@ -114,21 +109,9 @@ public class ZookeeperInitializer {
         }
 
         String totalStr = sb.toString();
-        this.zookeeperManager.setConfig(zkNode,
-                                        totalStr.getBytes(),
-                                        true);
-    }
-
-    private static class SessionWatcher implements Watcher {
-
-        @Override
-        public void process(WatchedEvent watchedEvent) {
-            if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
-                logger.debug("session connected");
-            } else if (watchedEvent.getState() == Event.KeeperState.Expired) {
-                logger.debug("session expired");
-            }
-        }
+        this.zookeeper.setConfig(zkNode,
+                                 totalStr.getBytes(),
+                                 true);
     }
 
 }

@@ -107,10 +107,13 @@ public class OriginalReceiver extends AbstractHandler {
                 logger.info("[run] close the consumer's message handler!");
             } catch (IOException e) {
                 logger.error("[run] occurs a IOException : " + e.getMessage());
+                this.shutdown();
             } catch (ConsumerCancelledException e) {
                 logger.info("[run] the consumer has been canceled ");
+                this.shutdown();
             } catch (Exception e) {
                 logger.error("[run] occurs a Exception : " + e.getMessage());
+                this.shutdown();
             }
 
             logger.info("******** thread id " + this.getThreadID() + " quit from message receiver ********");

@@ -42,7 +42,8 @@ public class PooledChannelAccessor extends AbstractHandler {
                 if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
                     if (context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()) {
                         try {
-                            channel.basicCancel(context.getConsumerTag());
+                            if (channel.isOpen())
+                                channel.basicCancel(context.getConsumerTag());
                         } catch (IOException e) {
                             logger.error("[destroy] occurs a IOException : " + e.getMessage());
                         }

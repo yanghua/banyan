@@ -1,6 +1,4 @@
-package com.freedom.messagebus.client.core.config;
-
-import org.apache.zookeeper.Watcher;
+package com.freedom.messagebus.interactor.zookeeper;
 
 /**
  * the interface of config changed listener
@@ -15,6 +13,6 @@ public interface IConfigChangedListener {
      */
     public void onChanged(String path,
                           byte[] newData,
-                          Watcher.Event.EventType eventType);
+                          ZKEventType eventType);
 
 }

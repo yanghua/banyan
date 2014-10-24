@@ -1,8 +1,10 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.model.MessageCarryType;
+import com.freedom.messagebus.common.CONSTS;
 
 /**
  * abstract class of message carryer
@@ -29,7 +31,12 @@ public abstract class AbstractMessageCarryer {
      * @param context the message context
      */
     public void carry(MessageContext context) {
-        IHandlerChain handlerChain = new MessageCarryHandlerChain(carryType, this.context);
-        handlerChain.handle(context);
+        //check server state
+        if (ConfigManager.getInstance().getServerState().equals(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED)) {
+            IHandlerChain handlerChain = new MessageCarryHandlerChain(carryType, this.context);
+            handlerChain.handle(context);
+        } else {
+            throw new RuntimeException("the server is closed. Message can not be carried now!");
+        }
     }
 }

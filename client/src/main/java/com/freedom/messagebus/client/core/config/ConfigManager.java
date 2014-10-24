@@ -34,7 +34,8 @@ public class ConfigManager {
     private static final Log logger = LogFactory.getLog(ConfigManager.class);
 
     private boolean inited = false;
-    public static volatile ConfigManager instance;
+    private static volatile ConfigManager instance;
+    private volatile String serverState = CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
     @NotNull
@@ -136,6 +137,7 @@ public class ConfigManager {
         }
     }
 
+
     @NotNull
     public List<HandlerModel> getProduceHandlerModels() {
         return produceHandlerModels;
@@ -226,6 +228,7 @@ public class ConfigManager {
         return clientConfigMap;
     }
 
+    @Deprecated
     public void updateHandlerChain(String path, byte[] data) {
         //TODO:test
         String binaryname = "com.freedom.messagebus.client.handler.produce.MessageSizeValidator";
@@ -245,6 +248,14 @@ public class ConfigManager {
             logger.error("[updateHandlerChain] occurs a IllegalAccessException : " + e.getMessage());
         }
 
+    }
+
+    public synchronized String getServerState() {
+        return serverState;
+    }
+
+    public synchronized void setServerState(String serverState) {
+        this.serverState = serverState;
     }
 
     @NotNull

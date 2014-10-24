@@ -1,20 +1,13 @@
-package com.freedom.messagebus.client.core.config;
+package com.freedom.messagebus.interactor.zookeeper;
 
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +35,6 @@ public class LongLiveZookeeper {
     private void init() {
         try {
             zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
-            this.fetchNewZookeeperData();
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }
@@ -78,6 +70,7 @@ public class LongLiveZookeeper {
                     try {
                         zooKeeper.close();
                         zooKeeper = null;
+                        longLiveZookeeper = null;
                     } catch (InterruptedException e) {
                         logger.error("[close] occurs a InterruptedException : " + e.getMessage());
                     }
@@ -89,6 +82,8 @@ public class LongLiveZookeeper {
     public void watchPaths(String[] paths, IConfigChangedListener listener) {
         try {
             PathWatcher watcher = new PathWatcher(zooKeeper, listener);
+            logger.debug("paths :" + paths);
+            logger.debug("zooKeeper : " + zooKeeper);
             for (String path : paths) {
                 zooKeeper.exists(path, watcher);
             }
@@ -96,6 +91,8 @@ public class LongLiveZookeeper {
             logger.error("[KeeperException] occurs a KeeperException : " + e.getMessage());
         } catch (InterruptedException e) {
             logger.error("[InterruptedException] occurs a InterruptedException : " + e.getMessage());
+        } catch (Exception e) {
+            ExceptionHelper.logException(logger, e, "[watchPaths]");
         }
     }
 
@@ -145,12 +142,11 @@ public class LongLiveZookeeper {
                     case NodeCreated:
                     case NodeDeleted:
                         byte[] data = this.zooKeeper.getData(path, false, null);
-                        this.processPathChange(path, data);
-                        this.listener.onChanged(path, data, watchedEvent.getType());
+                        this.listener.onChanged(path, data, new ZKEventType(watchedEvent.getType()));
                         break;
 
                 }
-            } catch (KeeperException | IOException | InterruptedException e) {
+            } catch (KeeperException | InterruptedException e) {
                 logger.error("[process] occurs a Exception : " + e.getMessage());
             } finally {
                 try {
@@ -161,10 +157,6 @@ public class LongLiveZookeeper {
                     logger.error("[process] finally occurs a InterruptedException : " + e.getMessage());
                 }
             }
-        }
-
-        private void processPathChange(String path, byte[] newData) throws IOException {
-            refreshLocalCachedFile(path, newData);
         }
 
     }
@@ -186,45 +178,30 @@ public class LongLiveZookeeper {
         return new byte[0];
     }
 
-    private void fetchNewZookeeperData() throws IOException {
-        //get new config info
-        byte[] routerData = this.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
-        byte[] configData = this.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
-        //refresh local
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER, routerData);
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG, configData);
+    public void setConfig(@NotNull String path, @NotNull byte[] newData, boolean ifNotThenCreate) {
+        try {
+            logger.info("[setConfig] path is : " + path);
+            Stat stat = this.zooKeeper.exists(path, false);
+            if (stat == null) {
+                if (ifNotThenCreate)
+                    this.zooKeeper.create(path, newData, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                else
+                    throw new IllegalStateException(" the path : " + path + "is not exists!");
+            } else {
+                int version = stat.getVersion();
+                this.zooKeeper.setData(path, newData, version);
+            }
+        } catch (KeeperException e) {
+            logger.error("[setConfig] occurs a KeeperException : " + e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("[setConfig] occurs a InterruptedException : " + e.getMessage());
+        }
     }
 
-    private void refreshLocalCachedFile(String path, byte[] newData) throws IOException {
-        String filePath;
-        if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
-            filePath = CONSTS.EXPORTED_NODE_FILE_PATH;
-        } else if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG)) {
-            filePath = CONSTS.EXPORTED_CONFIG_FILE_PATH;
-        } else {
-            return;
-        }
-
-        Path routerFilePath = FileSystems.getDefault().getPath(filePath);
-        FileOutputStream fos = null;
-        try {
-            if (!Files.exists(routerFilePath)) { //override
-                Files.createFile(routerFilePath);
-            }
-
-            fos = new FileOutputStream(filePath);
-            fos.write(newData);
-        } catch (IOException e) {
-            logger.error("[refreshLocalCachedRouterFile] occurs a IOException : " + e.getMessage());
-            throw new IOException(e);
-        } finally {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                logger.error("[refreshLocalCachedRouterFile] finally block occurs a IOException : " + e.getMessage());
-            }
-        }
+    public void createNode(@NotNull String path) throws Exception {
+        Stat stat = this.zooKeeper.exists(path, false);
+        if (stat == null)
+            this.zooKeeper.create(path, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     }
 
 }

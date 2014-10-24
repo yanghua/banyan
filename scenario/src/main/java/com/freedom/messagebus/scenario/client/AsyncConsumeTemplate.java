@@ -30,7 +30,7 @@ public class AsyncConsumeTemplate {
 
         //blocking main-thread for seeing effect
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(60);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -74,7 +74,8 @@ public class AsyncConsumeTemplate {
                 e.printStackTrace();
             } finally {
                 logger.info("close client");
-                consumerCloser.close();
+                if (consumerCloser != null)
+                    consumerCloser.close();
                 client.close();
             }
         }

@@ -1,8 +1,8 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.config.LongLiveZookeeper;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
+import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.jetbrains.annotations.NotNull;

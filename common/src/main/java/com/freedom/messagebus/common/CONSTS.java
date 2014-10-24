@@ -48,6 +48,10 @@ public class CONSTS {
 
     public static String ZOOKEEPER_ROOT_PATH_FOR_EVENT = "/event";
 
+    public static String MESSAGEBUS_SERVER_EVENT_STARTED = "started";
+    public static String MESSAGEBUS_SERVER_EVENT_STOPPED = "stopped";
+
+
     public static final String PROXY_EXCHANGE_NAME      = "exchange.proxy";
     public static       String DEFAULT_FILE_QUEUE_NAME  = "queue.proxy.log.file";
     public static       String PUBSUB_ROUTING_KEY       = "routingkey.proxy.message.pubsub.#";
