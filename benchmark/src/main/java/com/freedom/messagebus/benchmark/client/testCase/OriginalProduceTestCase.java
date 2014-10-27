@@ -9,6 +9,7 @@ import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
 import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
 import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
+import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,13 +22,12 @@ public class OriginalProduceTestCase extends Benchmark {
     private static class BasicProduce extends AbstractInitializer implements Runnable, ITerminater, IFetcher {
 
         private Message               msg;
-        private double                msgBodySize;
         private String                routingkey;
         private IMessageBodyProcessor msgBodyProcessor;
         private boolean flag    = true;
         private long    counter = 0;
 
-        private BasicProduce(String host) {
+        private BasicProduce(String host, double msgBodySize) {
             super(host);
             msg = TestMessageFactory.create(MessageType.QueueMessage, msgBodySize);
         }
@@ -41,13 +41,15 @@ public class OriginalProduceTestCase extends Benchmark {
         public void run() {
             try {
                 this.init();
+                msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msg.getMessageType());
+                byte[] msgBodyOfBytes = msgBodyProcessor.box(msg.getMessageBody());
+                AMQP.BasicProperties header = MessageHeaderProcessor.box(msg.getMessageHeader());
                 while (flag) {
-                    msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msg.getMessageType());
                     ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
                                           this.channel,
                                           this.getRoutingkey(),
-                                          msgBodyProcessor.box(msg.getMessageBody()),
-                                          MessageHeaderProcessor.box(msg.getMessageHeader()));
+                                          msgBodyOfBytes,
+                                          header);
                     ++counter;
                 }
             } catch (IOException e) {
@@ -66,14 +68,6 @@ public class OriginalProduceTestCase extends Benchmark {
             return counter;
         }
 
-        public double getMsgBodySize() {
-            return msgBodySize;
-        }
-
-        public void setMsgBodySize(double msgBodySize) {
-            this.msgBodySize = msgBodySize;
-        }
-
         public String getRoutingkey() {
             return routingkey;
         }
@@ -88,12 +82,12 @@ public class OriginalProduceTestCase extends Benchmark {
 
         String host = "172.16.206.30";
 
-        BasicProduce task = new BasicProduce(host);
-        task.setMsgBodySize(TestConfigConstant.MSG_BODY_SIZE_OF_KB);
+        BasicProduce task = new BasicProduce(host, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
         task.setRoutingkey("routingkey.proxy.message.business.crm");
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS,
-                      TestConfigConstant.FETCH_NUM, "single_thread_original_produce_one_by_one");
+                      TestConfigConstant.FETCH_NUM, "single_thread_original_produce_one_by_one_" +
+                TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
     }
 
 

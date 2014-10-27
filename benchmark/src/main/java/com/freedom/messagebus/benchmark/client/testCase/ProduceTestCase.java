@@ -24,7 +24,7 @@ public class ProduceTestCase extends Benchmark {
         private long    counter = 0;
 
         private BasicProduce(double msgBodySize) {
-            msg = TestMessageFactory.create(MessageType.QueueMessage, msgBodySize);       //generate a 1KB message body
+            msg = TestMessageFactory.create(MessageType.QueueMessage, msgBodySize);
             client = Messagebus.getInstance(TestConfigConstant.APP_KEY);
             client.setZkHost(TestConfigConstant.HOST);
             client.setZkPort(TestConfigConstant.PORT);
@@ -58,13 +58,13 @@ public class ProduceTestCase extends Benchmark {
         }
     }
 
-
     public static void main(String[] args) {
         ProduceTestCase testCase = new ProduceTestCase();
 
         Runnable task = new BasicProduce(TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS,
-                      TestConfigConstant.FETCH_NUM, "single_thread_produce_one_by_one");
+                      TestConfigConstant.FETCH_NUM, "single_thread_produce_one_by_one_size_" +
+                TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
     }
 }

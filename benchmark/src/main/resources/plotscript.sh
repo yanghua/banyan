@@ -1,27 +1,29 @@
-#! /usr/bin/gnuplot
+#! /usr/bin/env gnuplot
 reset
 set terminal png
 
-#write your output base dir path
-BASE_DIR=""
+#write you image dir path
+set output ""
 
-set output "../plots/producePerformance.png"
+#set logscale x
+#set logscale y
 
-set logscale x
-set logscale y
-
-set xlabel "time in ms"
+set xlabel "time (ms)"
 set ylabel "records num"
 
-set title "single thread produce performance test"
+set title "single thread produce performance test "
 
 set key reverse Left outside
 set grid
 
 set style data linespoints
 
-set yrange [10000:1000000]
-set xrange [1000:100000]
+set yrange [0:400000]
+set xrange [0:60000]
 
-plot "/tmp/single_thread_produce_one_by_one.data" using 1:2 title "client",\
-	 "/tmp/single_thread_original_produce_one_by_one.data" using 1:2 title "original";
+plot "/tmp/single_thread_produce_one_by_one_size_0.5_KB.data" using 1:2 title "client-0.5KB",\
+	 "/tmp/single_thread_original_produce_one_by_one_0.5_KB.data" using 1:2 title "original-0.5KB",\
+	 "/tmp/single_thread_produce_one_by_one_size_1.0_KB.data" using 1:2 title "client-1KB",\
+	 "/tmp/single_thread_original_produce_one_by_one_1.0_KB.data" using 1:2 title "original-1KB",\
+	 "/tmp/single_thread_produce_one_by_one_size_5.0_KB.data" using 1:2 title "client-5KB",\
+	 "/tmp/single_thread_original_produce_one_by_one_5.0_KB.data" using 1:2 title "original-5KB";
