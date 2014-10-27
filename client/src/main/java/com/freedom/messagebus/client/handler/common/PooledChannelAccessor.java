@@ -54,10 +54,12 @@ public class PooledChannelAccessor extends AbstractHandler {
             }
         });
 
-        try {
-            context.getChannel().basicRecover();
-        } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
+        if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
+            try {
+                context.getChannel().basicRecover();
+            } catch (IOException e) {
+                logger.error("[handle] occurs a IOException : " + e.getMessage());
+            }
         }
 
         chain.handle(context);

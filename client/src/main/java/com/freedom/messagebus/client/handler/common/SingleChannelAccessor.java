@@ -4,6 +4,7 @@ import com.freedom.messagebus.client.IChannelDestroyer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,6 @@ public class SingleChannelAccessor extends AbstractHandler {
     private Channel channel;
 
     private boolean isInited = false;
-
 
     private void init(MessageContext context) {
         try {
@@ -62,10 +62,12 @@ public class SingleChannelAccessor extends AbstractHandler {
             }
         });
 
-        try {
-            context.getChannel().basicRecover();
-        } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
+        if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
+            try {
+                context.getChannel().basicRecover();
+            } catch (IOException e) {
+                logger.error("[handle] occurs a IOException : " + e.getMessage());
+            }
         }
 
         chain.handle(context);

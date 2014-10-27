@@ -8,7 +8,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 public class ChannelPoolConfig extends GenericObjectPoolConfig {
 
     public ChannelPoolConfig() {
-        setTestWhileIdle(true);
+        setTestWhileIdle(false);
         setMinEvictableIdleTimeMillis(60000);
         setTimeBetweenEvictionRunsMillis(30000);
         setNumTestsPerEvictionRun(-1);

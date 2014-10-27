@@ -30,6 +30,8 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     public void produce(@NotNull Message msg,
                         @NotNull String to) {
         MessageContext ctx = this.innerProduce(super.context.getAppId(), to);
+//        //TODO
+//        ctx.setChannel(super.context.getTestChannel());
         ctx.setMessages(new Message[]{msg});
         carry(ctx);
     }

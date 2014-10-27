@@ -13,6 +13,10 @@
             <handler-name>Pooled-Channel-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.common.PooledChannelAccessor</handler-path>
         </handler>
+        <!--<handler>-->
+            <!--<handler-name>Single-Channel-Accessor</handler-name>-->
+            <!--<handler-path>com.freedom.messagebus.client.handler.common.SingleChannelAccessor</handler-path>-->
+        <!--</handler>-->
         <handler>
             <handler-name>Real-Produce-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.produce.RealProducer</handler-path>

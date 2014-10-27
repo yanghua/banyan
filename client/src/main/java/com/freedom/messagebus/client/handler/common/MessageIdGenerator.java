@@ -32,14 +32,14 @@ public class MessageIdGenerator extends AbstractHandler {
             || context.getCarryType().equals(MessageCarryType.BROADCAST))) {
             for (Message msg : msgs) {
                 UUIDGenerator generator = new UUIDGenerator(context.getQueueNode().getGeneratedId(), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
-                logger.info("message id is : " + generator.nextId());
+                logger.debug("message id is : " + generator.nextId());
                 msg.getMessageHeader().setMessageId(generator.nextId());
             }
         } else {
             Random random = new Random();
             for (Message msg : msgs) {
                 UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
-                logger.info("message id is : " + generator.nextId());
+                logger.debug("message id is : " + generator.nextId());
                 msg.getMessageHeader().setMessageId(generator.nextId());
             }
         }
