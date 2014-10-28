@@ -83,5 +83,5 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 ![img 3][3]
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/benchmark-class-diagram.png
-[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/singleThreadClientVSOriginal.png
-[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/singleThreadClientVSOriginal.png
+[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadClientVSOriginal.png
+[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadClientVSOriginal.png
