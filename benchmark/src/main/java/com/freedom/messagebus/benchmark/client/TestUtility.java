@@ -1,5 +1,11 @@
 package com.freedom.messagebus.benchmark.client;
 
+import com.freedom.messagebus.client.IProducer;
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.MessagebusConnectedFailedException;
+import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +64,28 @@ public class TestUtility {
             e.printStackTrace();
         }
 
+    }
+
+    public static void produce(long total) {
+        Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
+
+        Messagebus client = Messagebus.getInstance(TestConfigConstant.APP_KEY);
+        client.setZkHost(TestConfigConstant.HOST);
+        client.setZkPort(TestConfigConstant.PORT);
+        try {
+            client.open();
+            IProducer producer = client.getProducer();
+
+            for (int i = 0; i < total; i++) {
+                producer.produce(msg, TestConfigConstant.QUEUE_NAME);
+            }
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        } catch (MessagebusUnOpenException e) {
+            e.printStackTrace();
+        } finally {
+            client.close();
+        }
     }
 
 }

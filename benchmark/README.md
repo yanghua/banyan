@@ -82,6 +82,16 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 
 ![img 3][3]
 
+###consume
+
+>所有消息以接收后，拆包封装为 `Message` 对象后，为接收完成
+
+* 单线程，不同大小的消息体，异步接收，对比：
+
+![img 4][4]
+
+
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/benchmark-class-diagram.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadClientVSOriginal.png
 [3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadOptionPool.png
+[4]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/consume/singleThreadClientVSOriginal.png
