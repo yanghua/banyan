@@ -29,6 +29,7 @@ JDK Version : 1.7.0_72
 ##实现说明
 测试模块的相关类图：
 
+![img 1][1]
 
 
 测试逻辑由一个个测试用例构成，测试用例都是形如XXXTestCase的Java文件，所有的TestCase都继承自 `Benchmark` 类，它提供了一个 `test` 方法：
@@ -51,7 +52,6 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 * testTask的关闭
 * 采集数据写入文件
 
-> 如无特殊情况，该方法基本无需override
 
 每个继承自 `Benchmark` 的 testcase 都包含有若干个 testTask (它们都是静态内部类，都实现了 `Runnable`接口，如上图的 `BasicProduce`)，每个testcase都包含有一个 `main` 入口方法，该方法用于运行测试。
 对于每一个testTask，它们通常都会实现两个接口：
@@ -72,7 +72,11 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 ###produce
 * 单线程，不同大小的消息体，循环发送，对比：
 
+![img 2][2]
+
 * 单线程，相同大小的消息体，是否使用client channel pool，对比：
 
 
 
+[1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/benchmark-class-diagram.png
+[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/singleThreadClientVSOriginal.png
