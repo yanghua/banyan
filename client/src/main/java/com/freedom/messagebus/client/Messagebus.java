@@ -150,11 +150,6 @@ public class Messagebus {
         context.setConfigManager(this.configManager);
         context.setZooKeeper(this.zookeeper);
         context.setConnection(this.connection);
-//        try {
-//            context.setTestChannel(this.connection.createChannel());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
         producer = new GenericProducer(context);
         consumer = new GenericConsumer(context);

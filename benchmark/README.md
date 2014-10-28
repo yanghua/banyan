@@ -70,13 +70,18 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 
 ##scenario
 ###produce
+
+> orignal : native-java-client 发送，但也走server的topology route，测试时共享一个channel
+> client : 如无特殊说明，client发送时都基于pool-channel模式
+
 * 单线程，不同大小的消息体，循环发送，对比：
 
 ![img 2][2]
 
 * 单线程，相同大小的消息体，是否使用client channel pool，对比：
 
-
+![img 3][3]
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/benchmark-class-diagram.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/singleThreadClientVSOriginal.png
+[3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/singleThreadClientVSOriginal.png

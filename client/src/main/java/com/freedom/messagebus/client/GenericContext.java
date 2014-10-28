@@ -23,8 +23,6 @@ public class GenericContext {
     @NotNull
     private String                appId;
 
-    private Channel               testChannel;
-
     public GenericContext() {
     }
 
@@ -70,14 +68,6 @@ public class GenericContext {
 
     public void setAppId(@NotNull String appId) {
         this.appId = appId;
-    }
-
-    public Channel getTestChannel() {
-        return testChannel;
-    }
-
-    public void setTestChannel(Channel testChannel) {
-        this.testChannel = testChannel;
     }
 
     @Override
