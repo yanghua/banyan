@@ -1,9 +1,6 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
-import com.freedom.messagebus.benchmark.client.Benchmark;
-import com.freedom.messagebus.benchmark.client.IFetcher;
-import com.freedom.messagebus.benchmark.client.ITerminater;
-import com.freedom.messagebus.benchmark.client.TestConfigConstant;
+import com.freedom.messagebus.benchmark.client.*;
 import com.freedom.messagebus.common.AbstractInitializer;
 import com.freedom.messagebus.common.message.Message;
 import com.freedom.messagebus.common.message.MessageFactory;
@@ -109,7 +106,7 @@ public class OriginalConsumeTestCase extends Benchmark {
 
     public static void main(String[] args) {
         //produce some message for consuming
-//        TestUtility.produce(100_0000);
+//        TestUtility.produce(50_0000);
 //
 //        try {
 //            TimeUnit.SECONDS.sleep(30);

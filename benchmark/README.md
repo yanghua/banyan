@@ -84,14 +84,25 @@ public void test(Runnable testTask, int holdTime, int fetchNum, String fileName)
 
 ###consume
 
->所有消息以接收后，拆包封装为 `Message` 对象后，为接收完成
+>所有消息以接收后拆包封装为 `Message` 对象，为接收完成，所有的测试都基于rabbitmq server中预先生成 **50W** 条消息为基础
 
 * 单线程，不同大小的消息体，异步接收，对比：
 
 ![img 4][4]
+
+* 单线程，相同大小的消息体，是否使用client channel pool，对比：
+
+![img 5][5]
+
+>由于在异步消费的时候，本身就是使用单个channel的长连接事件循环，所以此处基本没有体现出差异。
+
+###其他通信方式
+
+由于其他两种消息通信方式都是由produce/consume演变而来，因此其他场景下的 **单方面** 的性能跟以上相当！
 
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/benchmark-class-diagram.png
 [2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadClientVSOriginal.png
 [3]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/produce/singleThreadOptionPool.png
 [4]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/consume/singleThreadClientVSOriginal.png
+[5]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/benchmark/consume/singleThreadOptionPool.png

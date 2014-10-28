@@ -1,15 +1,13 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
-import com.freedom.messagebus.benchmark.client.Benchmark;
-import com.freedom.messagebus.benchmark.client.IFetcher;
-import com.freedom.messagebus.benchmark.client.ITerminater;
-import com.freedom.messagebus.benchmark.client.TestConfigConstant;
+import com.freedom.messagebus.benchmark.client.*;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class ConsumeTestCase extends Benchmark {
 
@@ -73,7 +71,7 @@ public class ConsumeTestCase extends Benchmark {
     public static void main(String[] args) {
 //        produce some message for consuming
 //        TestUtility.produce(50_0000);
-//
+
 //        try {
 //            TimeUnit.SECONDS.sleep(30);
 //        } catch (InterruptedException e) {
@@ -84,7 +82,7 @@ public class ConsumeTestCase extends Benchmark {
 
         Runnable task = new BasicConsume();
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS, TestConfigConstant.FETCH_NUM,
-                      "single_thread_consume_async_size_" + TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
+                      "single_thread_consume_async_" + TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
     }
 
 }
