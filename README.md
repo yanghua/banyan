@@ -63,7 +63,7 @@
 * client加入更多的filter，配合动态配置，实现对client更细化的控制
 * 实现授权/认证检查(appId 对应的授权发送队列与接收队列)
 * ~~考虑加入Pub/Sub的实现~~
-* client/httpbridge性能测试的量化数据（进行中）
+* ~~client/httpbridge性能测试的量化数据~~
 
 
 

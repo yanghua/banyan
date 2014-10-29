@@ -38,7 +38,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
                                    @NotNull IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
-        ctx.setAppId(super.context.getAppId());
+        ctx.setAppId(this.context.getAppId());
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
         ctx.setQueueNode(node);
 
