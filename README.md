@@ -64,6 +64,7 @@
 * 实现授权/认证检查(appId 对应的授权发送队列与接收队列)
 * ~~考虑加入Pub/Sub的实现~~
 * ~~client/httpbridge性能测试的量化数据~~
+* web管控台，注册节点后，向server发送：更新命令（server将数据库的更新数据主动push到客户端）
 
 
 
