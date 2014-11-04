@@ -1,8 +1,12 @@
 package com.freedom.managesystem.service.impl;
 
 import com.freedom.managesystem.core.ConfigManager;
+import com.freedom.managesystem.pojo.rabbitHTTP.Queue;
 import com.freedom.managesystem.service.IQueueService;
 import com.freedom.messagebus.common.HttpHelper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -12,36 +16,34 @@ import java.util.Map;
 @Service("queueService")
 public class QueueServiceImpl implements IQueueService {
 
-    //region integrated service
-    @Override
-    public void load(String appId, Map<String, Object> params) {
-
-    }
-
-    @Override
-    public void unLoad(String appId, Map<String, Object> params) {
-
-    }
-
-    @Override
-    public void enable(String appId, Map<String, Object> params) {
-
-    }
-
-    @Override
-    public void disable(String appId, Map<String, Object> params) {
-
-    }
-    //endregion
-
     //region http service
     @NotNull
-    public String listAll() {
+    public Queue[] list() {
         Map<String, Object> requestParamDic = new HashMap<>(3);
         requestParamDic.put("host", ConfigManager.HOST);
         requestParamDic.put("port", ConfigManager.PORT);
         requestParamDic.put("path", ConfigManager.HTTP_API_QUEUES);
-        return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+        String remoteData = HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+
+        if (remoteData.isEmpty())
+            return new Queue[0];
+        else {
+            Queue[] queues;
+            com.google.gson.JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(remoteData);
+            if (element.isJsonArray()) {
+                JsonArray queueJsonArr = element.getAsJsonArray();
+                queues = new Queue[queueJsonArr.size()];
+                for (int i = 0; i < queues.length; i++) {
+                    Queue queue = Queue.parse(queueJsonArr.get(i));
+                    queues[i] = queue;
+                }
+            } else {
+                queues = new Queue[0];
+            }
+
+            return queues;
+        }
     }
 
     //endregion

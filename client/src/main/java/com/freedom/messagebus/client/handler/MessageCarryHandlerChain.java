@@ -60,11 +60,13 @@ public class MessageCarryHandlerChain implements IHandlerChain {
      */
     @Override
     public void handle(MessageContext context) {
-        if (this.pos < handlerChain.size()) {
-            AbstractHandler currentHandler = handlerChain.get(pos++);
-            currentHandler.handle(context, this);
-        } else if (this.enableRepeat) {
-            this.pos = this.repeatPos;
+        if (this.repeatPos != Integer.MIN_VALUE) {
+            if (this.pos < handlerChain.size()) {
+                AbstractHandler currentHandler = handlerChain.get(pos++);
+                currentHandler.handle(context, this);
+            } else if (this.enableRepeat) {
+                this.pos = this.repeatPos;
+            }
         }
     }
 
@@ -73,7 +75,7 @@ public class MessageCarryHandlerChain implements IHandlerChain {
         if (this.enableRepeat) {
             this.repeatPos = this.pos;
         } else {
-            this.repeatPos = -1;
+            this.repeatPos = Integer.MIN_VALUE;
         }
     }
 }

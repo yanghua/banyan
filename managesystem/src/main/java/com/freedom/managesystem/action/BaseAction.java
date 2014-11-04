@@ -42,7 +42,7 @@ public class BaseAction extends ActionSupport {
     }
 
     protected String generateCreateSuccessJSONStr(String recordsJsonStr) {
-        return "{\"Result\":\"OK\",\"Record\":" + recordsJsonStr + "}";
+        return "{\"Result\":\"OK\",\"Record\":\"" + recordsJsonStr + "\"}";
     }
 
     protected String generateUpdateSuccessJSONStr() {

@@ -10,7 +10,7 @@
 
     <include file="struts-default.xml"/>
 
-    <package name="managesystem" extends="struts-default">
+    <package name="home" extends="struts-default" namespace="/home">
 
         <interceptors>
             <interceptor-stack name="appDefaultStack">
@@ -32,21 +32,136 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="" class="com.freedom.managesystem.action.global.IndexAction" method="index">
+        <action name="/dashboard/*" class="com.freedom.managesystem.action.home.DashboardAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
 
-        <action name="index" class="com.freedom.managesystem.action.global.IndexAction" method="index">
+    </package>
+
+    <!-- permission -->
+    <package name="permission" extends="struts-default" namespace="/permission">
+        <interceptors>
+            <interceptor-stack name="appDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appDefaultStack"/>
+
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception"
+                               result="error"/>
+        </global-exception-mappings>
+
+        <action name="/module/*" class="com.freedom.managesystem.action.permission.ModuleAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
+    </package>
 
-        <action name="/*/*/*" class="com.freedom.managesystem.action.{1}.{2}Action" method="{3}">
+    <!-- monitor -->
+    <package name="monitor" extends="struts-default" namespace="/monitor">
+        <interceptors>
+            <interceptor-stack name="appDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appDefaultStack"/>
+
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception"
+                               result="error"/>
+        </global-exception-mappings>
+
+        <action name="/channel/*" class="com.freedom.managesystem.action.monitor.ChannelAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
 
+        <action name="/queue/*" class="com.freedom.managesystem.action.monitor.QueueAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
+
+        <action name="/exchange/*" class="com.freedom.managesystem.action.monitor.ExchangeAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
     </package>
 
+    <!-- maintain -->
+    <package name="maintain" extends="struts-default" namespace="/maintain">
+        <interceptors>
+            <interceptor-stack name="appDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appDefaultStack"/>
+
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception"
+                               result="error"/>
+        </global-exception-mappings>
+
+        <action name="/topology/*" class="com.freedom.managesystem.action.maintain.TopologyAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
+        
+        <action name="/node/*" class="com.freedom.managesystem.action.maintain.NodeAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
+    </package>
+
+    <!-- alarm -->
+    <package name="alarm" extends="struts-default" namespace="/alarm">
+        <interceptors>
+            <interceptor-stack name="appDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appDefaultStack"/>
+
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception"
+                               result="error"/>
+        </global-exception-mappings>
+    </package>
 
 </struts>

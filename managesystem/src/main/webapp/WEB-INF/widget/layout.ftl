@@ -7,7 +7,8 @@
     <title>消息总线管理系统</title>
     <link type="text/css" rel="stylesheet" href="../../resources/stylesheet/css.css"/>
     <script type="text/javascript" src="/resources/component/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="/resources/js/layout.js"></script>
+    <script type="text/javascript" src="/resources/component/layer/layer.min.js"></script>
+    <script type="text/javascript" src="/resources/js/layout/layout.js"></script>
 </head>
 <body>
     <div class="header">

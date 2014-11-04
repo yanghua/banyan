@@ -12,4 +12,5 @@ public class MessagebusAction extends ActionSupport {
 
     }
 
+
 }

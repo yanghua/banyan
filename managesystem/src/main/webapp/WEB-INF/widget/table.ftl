@@ -153,7 +153,7 @@
                 </div>
                 <div id="tabCot_product_2" class="tabCot" style="display: none;"> 2222222222</div>
                 <div id="tabCot_product_3" class="tabCot" style="display: none;"> 3333333333</div>
-                <script language="JavaScript" type="text/javascript" src="../../resources/js/tab.js"></script>
+                <script language="JavaScript" type="text/javascript" src="../../resources/js/layout/tab.js"></script>
             </div>
         </div>
     </div>

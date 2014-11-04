@@ -71,18 +71,18 @@ public class ConsumeTestCase extends Benchmark {
     public static void main(String[] args) {
 //        produce some message for consuming
 //        TestUtility.produce(50_0000);
-
+//
 //        try {
 //            TimeUnit.SECONDS.sleep(30);
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
 
-        ConsumeTestCase testCase = new ConsumeTestCase();
-
-        Runnable task = new BasicConsume();
-        testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS, TestConfigConstant.FETCH_NUM,
-                      "single_thread_consume_async_" + TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
+//        ConsumeTestCase testCase = new ConsumeTestCase();
+//
+//        Runnable task = new BasicConsume();
+//        testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS, TestConfigConstant.FETCH_NUM,
+//                      "single_thread_consume_async_" + TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
     }
 
 }

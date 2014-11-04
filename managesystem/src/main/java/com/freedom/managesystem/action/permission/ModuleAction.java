@@ -24,14 +24,14 @@ public class ModuleAction extends BaseAction {
     }
 
     public void list() throws IOException {
-        HttpServletRequest request = ServletActionContext.getRequest();
+        HttpServletRequest req = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
         int offset, pageSize;
         List<Module> moduleList = null;
 
         try {
-            offset = Integer.valueOf(request.getParameter("jtStartIndex"));
-            pageSize = Integer.valueOf(request.getParameter("jtPageSize"));
+            offset = Integer.valueOf(req.getParameter("jtStartIndex"));
+            pageSize = Integer.valueOf(req.getParameter("jtPageSize"));
 
             moduleList = moduleService.getWithPaging(offset, pageSize);
             String jsonArr = gson.toJson(moduleList);
@@ -110,7 +110,7 @@ public class ModuleAction extends BaseAction {
     }
 
     public void parentModuleInfo() throws IOException {
-        HttpServletRequest request = ServletActionContext.getRequest();
+        HttpServletRequest req = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
         List<Module> moduleList = moduleService.getParentModule();
         DropdownlistModel[] parentModuleList = new DropdownlistModel[moduleList.size()];

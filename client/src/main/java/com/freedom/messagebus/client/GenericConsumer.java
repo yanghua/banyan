@@ -47,7 +47,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         ctx.setListener(receiveListener);
         ctx.setSync(false);
 
-        //launch
+        //launch pipeline
         carry(ctx);
 
         return new IReceiverCloser() {

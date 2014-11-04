@@ -1,4 +1,4 @@
-package com.freedom.managesystem.action.global;
+package com.freedom.managesystem.action.home;
 
 import com.opensymphony.xwork2.ActionSupport;
 

@@ -479,7 +479,7 @@ button.link:hover {
 
 .leftLabel li,.rightLabel li {
     width:74%!important;
-    /*padding-top:9px;*/
+    padding-top:9px;
 }
 
 .leftLabel .desc,.rightLabel .desc {

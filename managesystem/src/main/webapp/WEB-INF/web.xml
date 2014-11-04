@@ -17,6 +17,8 @@
     <filter-mapping>
         <filter-name>struts2</filter-name>
         <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
 
     <!-- spring -->
@@ -34,5 +36,9 @@
         <servlet-class>org.apache.struts2.views.JspSupportServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+    <welcome-file-list>
+        <welcome-file>/goIndex.jsp</welcome-file>
+    </welcome-file-list>
 
 </web-app>

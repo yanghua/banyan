@@ -1,10 +1,9 @@
 package com.freedom.managesystem.service;
 
-import org.jetbrains.annotations.NotNull;
+import com.freedom.managesystem.pojo.rabbitHTTP.Channel;
 
 public interface IChannelService {
 
-    @NotNull
-    public String list();
+    public Channel[] list();
 
 }

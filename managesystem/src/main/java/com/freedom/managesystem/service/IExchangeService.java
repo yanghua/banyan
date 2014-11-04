@@ -1,10 +1,9 @@
 package com.freedom.managesystem.service;
 
-import org.jetbrains.annotations.NotNull;
+import com.freedom.managesystem.pojo.rabbitHTTP.Exchange;
 
 public interface IExchangeService {
 
-    @NotNull
-    public String list();
+    public Exchange[] list();
 
 }

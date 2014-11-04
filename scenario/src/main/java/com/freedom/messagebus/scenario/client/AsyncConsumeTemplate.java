@@ -60,7 +60,7 @@ public class AsyncConsumeTemplate {
                     consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                            logger.debug("[" + message.getMessageHeader().getMessageId() +
+                            logger.info("[" + message.getMessageHeader().getMessageId() +
                                             "]-[" + message.getMessageHeader().getType() + "]");
                         }
                     });

@@ -110,7 +110,7 @@
     $(document).ready(function () {
         $.ajax({
             type : 'GET',
-            url  : '/maintain/Topology/generatedtreedata',
+            url  : '/maintain/topology/generatedtreedata',
             success : function (data) {
                 drawTopologyTree(data);
             },

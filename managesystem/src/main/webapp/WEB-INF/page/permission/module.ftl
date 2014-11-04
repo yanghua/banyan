@@ -1,20 +1,20 @@
 <div id="moduleTableContainer"></div>
-<#include "/WEB-INF/widget/jtable.ftl" />
+<#include "/WEB-INF/widget/resource/jtable.ftl" />
 <script>
     var MODULE = {
-        parentModule :null
+        parentModule : null
     };
 
     $(document).ready(function () {
         $('#moduleTableContainer').jtable({
             title: '模块列表',
             paging: true,
-            pageSize: 15,
+            pageSize: 10,
             actions: {
-                listAction: '/permission/Module/list',
-                createAction: '/permission/Module/create',
-                updateAction: '/permission/Module/update',
-                deleteAction: '/permission/Module/delete'
+                listAction: '/permission/module/list',
+                createAction: '/permission/module/create',
+                updateAction: '/permission/module/update',
+                deleteAction: '/permission/module/delete'
             },
             recordAdded: function (event, data) {
                 getParentModules(null, true);
@@ -69,7 +69,7 @@
             return MODULE.parentModule;
         else {
             $.ajax({
-                url: '/permission/Module/parentModuleInfo',
+                url: '/permission/module/parentModuleInfo',
                 type: "POST",
                 contentType: 'application/json;charset=utf-8',
                 async: false,
@@ -83,7 +83,7 @@
                         });
                         MODULE.parentModule = data.Options;
                     } else {
-                        return [];
+                        MODULE.parentModule = [];
                     }
                 },
                 error: function (err) {

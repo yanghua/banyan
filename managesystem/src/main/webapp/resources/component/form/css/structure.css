@@ -21,7 +21,7 @@ border:1px solid #ccc;
 -moz-box-shadow:rgba(0,0,0,0.2) 0 0 5px;
 -o-box-shadow:rgba(0,0,0,0.2) 0 0 5px;
 box-shadow:rgba(0,0,0,0.2) 0 0 5px;
-width:640px;
+width: 100%;
 margin:0 auto 0px;
 }
 

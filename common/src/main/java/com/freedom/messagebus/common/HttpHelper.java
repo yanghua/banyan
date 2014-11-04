@@ -24,9 +24,8 @@ public class HttpHelper {
 
     private static final Log logger = LogFactory.getLog(HttpHelper.class);
 
-    public static
     @NotNull
-    String syncHTTPGet(@NotNull Map<String, Object> requestParamDic, @NotNull AuthInfo authInfo) {
+    public static String syncHTTPGet(@NotNull Map<String, Object> requestParamDic, @NotNull AuthInfo authInfo) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         CloseableHttpResponse response = null;

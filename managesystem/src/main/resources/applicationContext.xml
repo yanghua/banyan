@@ -16,8 +16,6 @@
 
     <context:component-scan base-package="com.freedom.managesystem"/>
 
-    <tx:annotation-driven/>
-
     <context:property-placeholder location="classpath:jdbc.properties"/>
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
@@ -48,5 +46,6 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <tx:annotation-driven transaction-manager="transactionManager" />
 
 </beans>
