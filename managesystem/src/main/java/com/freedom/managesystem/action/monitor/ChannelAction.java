@@ -1,6 +1,6 @@
 package com.freedom.managesystem.action.monitor;
 
-import com.freedom.managesystem.action.BaseAction;
+import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.pojo.rabbitHTTP.Channel;
 import com.freedom.managesystem.service.IChannelService;
 import org.apache.commons.logging.Log;

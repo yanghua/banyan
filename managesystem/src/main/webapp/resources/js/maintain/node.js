@@ -26,10 +26,7 @@ NODE.initJTable = function () {
             ]
         },
         actions: {
-            listAction: '/maintain/node/list',
-//                createAction: '/maintain/node/create',
-//                updateAction: '/maintain/node/update',
-            deleteAction: '/maintain/node/delete'
+            listAction: '/maintain/node/list'
         },
         recordAdded: function (event, data) {
             NODE.getParentNodes(null, true);
@@ -41,7 +38,7 @@ NODE.initJTable = function () {
             NODE.getParentNodes(null, true);
         },
         fields: {
-            generatedId: {
+            nodeId: {
                 title: "编号",
                 key: true,
                 list: false,
@@ -50,7 +47,7 @@ NODE.initJTable = function () {
             },
             name: {
                 title: '节点名称',
-                width: '10%',
+                width: '6%',
                 edit: true
             },
             value: {
@@ -60,26 +57,141 @@ NODE.initJTable = function () {
             },
             parentId: {
                 title: '父节点',
-                width: '10%',
+                width: '6%',
                 options: NODE.getParentNodes
             },
             type: {
                 title: '类型',
-                width : '10%',
-                options: { 0 : '交换器', 1 : '队列'}
+                width: '5%',
+                options: { 0: '交换器', 1: '队列'}
             },
-            level : {
-                title: '层级',
-                width: '10%'
+            appId: {
+                list: false
+            },
+            routingKey: {
+                list: false
+            },
+            inner: {
+                title: '内部节点',
+                width: '6%',
+                display: function (data) {
+                    if (data.record.inner) {
+                        return $('<span>是</span>');
+                    } else {
+                        return $('<span>否</span>');
+                    }
+                }
             },
             routerType: {
                 title: '路由类型',
-                width: '10%',
-                options: { fanout : 'fanout', topic : 'topic', head : 'head', direct : 'direct'}
+                width: '6%',
+                options: { fanout: 'fanout', topic: 'topic', head: 'head', direct: 'direct'}
             },
-            routingKey: {
-                title: '路由路径',
-                width: '10%'
+            detail: {
+                width: '2%',
+                display: function (data) {
+                    //detail
+                    var detailBtn = $('<img src="/resources/image/detail.png" alt="详情" class="clickStyle" />');
+                    detailBtn.click(function () {
+                        NODE.popDetailLayer(data.record);
+                    });
+                    return detailBtn;
+                }
+            },
+            activate: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        var availableBtn;
+                        if (data.record.available) {
+                            availableBtn = $('<img flag="1" alt="激活" src="/resources/image/enable.png" class="clickStyle" />');
+                        } else {
+                            availableBtn = $('<img flag="0" alt="禁用" src="/resources/image/unenable.png" class="clickStyle" />');
+                        }
+
+                        availableBtn.click(function () {
+                            NODE.activateNodeOrNot($(this), data.record.nodeId);
+                        });
+
+                        return availableBtn;
+                    }
+                }
+            },
+            reset: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        //reset appid
+                        var resetBtn;
+                        resetBtn = $('<img alt="重置" class="clickStyle" src="/resources/image/reset.png" />');
+
+                        resetBtn.click(function () {
+                            NODE.reset($(this), data.record);
+                        });
+
+                        return resetBtn;
+                    }
+                }
+            },
+            outPermission: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        //out permission
+                        var outPermissionHtml;
+                        outPermissionHtml = '<img src="/resources/image/out.png" class="clickStyle" alt="发送授权" />';
+                        $(outPermissionHtml).click(function () {
+
+                        });
+
+                        return $(outPermissionHtml);
+                    }
+                }
+            },
+            inPermission: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        //in permission
+                        var inPermissionHtml;
+                        inPermissionHtml = '<img src="/resources/image/in.png" class="clickStyle" alt="接收授权" />';
+                        $(inPermissionHtml).click(function () {
+
+                        });
+
+                        return $(inPermissionHtml);
+                    }
+                }
+            },
+            update: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        var updateHtml;
+                        updateHtml = '<img alt="更新" class="clickStyle" src="/resources/image/edit.png" />';
+
+                        $(updateHtml).click(function () {
+
+                        });
+
+                        return $(updateHtml);
+                    }
+                }
+            },
+            delete: {
+                width: '2%',
+                display: function (data) {
+                    if (!data.record.inner) {
+                        //delete
+                        var deleteHtml;
+                        deleteHtml = '<img alt="删除" class="clickStyle" src="/resources/image/delete.png" />';
+                        $(deleteHtml).click(function () {
+
+                        });
+
+                        return $(deleteHtml);
+                    }
+                }
             }
         }
     });
@@ -143,8 +255,8 @@ NODE.popNodeLayer = function (isCreate) {
         title: false,
         border: [1],
         shadeClose: false,
-        area: ['500px', '300px'],
-        page: { dom : '#popNodeLayer'},
+        area: ['540px', '300px'],
+        page: { dom : '#nodeLayer'},
         close: function () {
             //reload data
             $('#nodeTableContainer').jtable('reload');
@@ -232,4 +344,106 @@ NODE.clearPopNodeLayerState = function () {
     $('#select_node_parentId').get(0).selectedIndex = 0;
 
     $('#tip').text('');
+};
+
+NODE.activateNodeOrNot = function (jqObj, nodeId) {
+    var isAvailable = (jqObj.attr('flag') == '1');
+
+    var urlAction = isAvailable ? "unactivate" : "activate";
+    var urlStr = "/maintain/node/" + urlAction;
+
+    $.ajax({
+        url: urlStr,
+        type: 'POST',
+        data: { 'nodeId' : nodeId },
+        success: function (data) {
+            if (data.Result === 'OK') {
+                if (isAvailable) {
+                    jqObj.attr('flag', '0');
+                    jqObj.attr('src', '/resources/image/unenable.png');
+                } else {
+                    jqObj.attr('flag', '1');
+                    jqObj.attr('src', '/resources/image/enable.png');
+                }
+            } else {
+                layer.alert('操作失败!', 8);
+            }
+        },
+        error: function (err) {
+            layer.alert('操作失败!', 8);
+        }
+    });
+};
+
+NODE.popDetailLayer = function (record) {
+    var jqNodeName = $('#lblNodeName');
+    var jqNodeValue = $('#lblNodeValue');
+    var jqRouterType = $('#lblRouterType');
+    var jqParentId = $('#lblParentNode');
+    var jqType = $('#lblType');
+    var jqInner = $('#lblInner');
+    var jqRoutingKey = $('#lblRoutingKey');
+    var jqAvailable = $('#lblAvailable');
+    var jqAppId = $('#lblAppId');
+
+    //clear state
+    jqNodeName.text('');
+    jqNodeValue.text('');
+    jqRouterType.text('');
+    jqParentId.text('');
+    jqType.text('');
+    jqInner.text('');
+    jqRoutingKey.text('');
+    jqAppId.text('');
+
+    //set
+    jqNodeName.text(record.name);
+    jqNodeValue.text(record.value);
+    jqRouterType.text(record.routerType);
+
+    if (NODE.parentNode) {
+        var parentNodeName = "";
+        for (var i = 0; i < NODE.parentNode.length; i++) {
+            if (NODE.parentNode[i].Value == record.parentId) {
+                parentNodeName = NODE.parentNode[i].DisplayText;
+                break;
+            }
+        }
+        jqParentId.text(parentNodeName);
+    }
+
+    jqType.text((record.type == 0 ? "交换器" : "队列"));
+    jqInner.text((record.inner == 0 ? "否" : "是"));
+    jqRoutingKey.text(record.routingKey);
+    jqAvailable.text((record.available == 0 ? "未激活" : "已激活"));
+    jqAppId.text(record.appId);
+
+
+    $.layer({
+        type: 1,
+        title: false,
+        border: [1],
+        shadeClose: false,
+        area: ['540px', '300px'],
+        page: { dom : '#detailLayer'}
+    });
+};
+
+NODE.reset = function (jqObj, record) {
+    $.ajax({
+        url: '/maintain/node/reset',
+        type: 'POST',
+        data: { nodeId : record.nodeId },
+        success: function (data) {
+            if (data.Result == 'OK') {
+                layer.alert('操作成功!', 8);
+                $('#nodeTableContainer').jtable('reload');
+            } else {
+                layer.alert('操作失败!', 8);
+            }
+        },
+        error: function (err) {
+            layer.alert('操作失败!', 8);
+        }
+    });
 };

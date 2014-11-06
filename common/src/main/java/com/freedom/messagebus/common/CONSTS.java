@@ -37,10 +37,10 @@ public class CONSTS {
     public static int DEFAULT_AUTH_REQUEST_TIMEOUT_SECONDS = 30;
 
     public static String EXPORTED_NODE_FILE_PATH  = "/var/tmp/messagebus_router_for_zookeeper.xml";
-    public static String EXPORTED_NODE_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X messagebus_sys_db NODE> ";
+    public static String EXPORTED_NODE_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X --hex-blob messagebus_sys_db NODE> ";
 
     public static String EXPORTED_CONFIG_FILE_PATH  = "/var/tmp/messagebus_config_for_zookeeper.xml";
-    public static String EXPORTED_CONFIG_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X messagebus_sys_db CONFIG> ";
+    public static String EXPORTED_CONFIG_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X --hex-blob messagebus_sys_db CONFIG> ";
 
     public static String ZOOKEEPER_ROOT_PATH_FOR_ROUTER = "/router";
 

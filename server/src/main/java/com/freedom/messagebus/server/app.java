@@ -10,6 +10,7 @@ import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
 import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;
+import com.freedom.messagebus.server.daemon.impl.SentinelService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
@@ -87,16 +88,16 @@ public class App {
             logger.error("[main] occurs a InterruptedException : " + e.getMessage());
         }
 
-        //load and start daemon service
-        Map<String, Object> context = new ConcurrentHashMap<>();
-        context.put(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST,
-                    config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
-        ServiceLoader serviceLoader = ServiceLoader.getInstance(context);
-        serviceLoader.launch();
-
         boolean mqIsAlive = RabbitmqServerManager.defaultManager(config).isAlive();
 
         if (mqIsAlive) {
+            //load and start daemon service
+            Map<String, Object> context = new ConcurrentHashMap<>();
+            context.put(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST,
+                        config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
+            ServiceLoader serviceLoader = ServiceLoader.getInstance(context);
+            serviceLoader.launch();
+
             App app = new App();
             broadcastEvent(config, CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
 
@@ -186,7 +187,7 @@ public class App {
     }
 
     private static void broadcastEvent(Properties properties, final String eventTypeStr, final App lockObj) {
-        LongLiveZookeeper zookeeper = LongLiveZookeeper.getZKInstance(
+        LongLiveZookeeper zookeeper = new LongLiveZookeeper(
             properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST),
             Integer.valueOf(properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT))
                                                                      );

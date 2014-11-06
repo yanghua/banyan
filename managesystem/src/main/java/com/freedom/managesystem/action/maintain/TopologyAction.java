@@ -1,6 +1,6 @@
 package com.freedom.managesystem.action.maintain;
 
-import com.freedom.managesystem.action.BaseAction;
+import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.service.INodeService;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
@@ -61,7 +61,7 @@ public class TopologyAction extends BaseAction {
     private Map<Integer, Node> buildHashmap() {
         Map<Integer, Node> hashedNodeMap = new HashMap<>(this.getNodeList().size());
         for (Node n : this.getNodeList()) {
-            hashedNodeMap.put(n.getGeneratedId(), n);
+            hashedNodeMap.put(n.getNodeId(), n);
         }
 
         return hashedNodeMap;

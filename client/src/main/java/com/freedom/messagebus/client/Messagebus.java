@@ -95,7 +95,7 @@ public class Messagebus {
      */
     public synchronized void open() throws MessagebusConnectedFailedException {
         //load class
-        this.zookeeper = LongLiveZookeeper.getZKInstance(this.getZkHost(), this.getZkPort());
+        this.zookeeper = new LongLiveZookeeper(this.getZkHost(), this.getZkPort());
 
         if (!this.zookeeper.isAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");

@@ -25,4 +25,9 @@ public interface INodeService {
 
     public String generateRoutingKey(Node node) throws IllegalStateException;
 
+    public void activate(int nodeId) throws SQLException;
+
+    public void unactivate(int nodeId) throws SQLException;
+
+    public String resetAppId(int nodeId) throws SQLException;
 }

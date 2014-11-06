@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class NodeServiceImpl implements INodeService {
@@ -26,7 +27,16 @@ public class NodeServiceImpl implements INodeService {
     @Transactional
     public void create(@NotNull Node node) throws SQLException {
         //create for end-to-end
+        boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) !=null);
+
+        if (isNodeNameExists){
+            logger.error("creating node failed : the node with name " + node.getName() +" exists.");
+            throw new SQLException("creating node failed : the node with name " + node.getName() +" exists.");
+        }
+
+        node.setInner(false);
         nodeMapper.save(node);
+        this.resetAppId(node.getNodeId());
 
         if (node.getType() == Constants.QUEUE_TYPE) {
             //create a pair queue for pubsub
@@ -36,10 +46,13 @@ public class NodeServiceImpl implements INodeService {
             newQueueForPubsub.setName(node.getName() + Constants.SUFFIX_OF_PUBSUB);
             newQueueForPubsub.setValue(pubsubNode.getValue().replace("exchange", "queue")
                                            + "." + node.getName());
-            newQueueForPubsub.setParentId(pubsubNode.getGeneratedId());
+            newQueueForPubsub.setParentId(pubsubNode.getNodeId());
             newQueueForPubsub.setType((short) Constants.QUEUE_TYPE);
             newQueueForPubsub.setLevel(node.getLevel());
+            newQueueForPubsub.setInner(false);
             nodeMapper.save(newQueueForPubsub);
+
+            this.resetAppId(newQueueForPubsub.getNodeId());
         }
     }
 
@@ -61,7 +74,15 @@ public class NodeServiceImpl implements INodeService {
         //remove a node
         Node deletingNode = nodeMapper.find(id);
         if (deletingNode == null) {
-            throw new SQLException("can not find a item with generatedId : " + id);
+            logger.error("can not find a item with nodeId : " + id);
+            throw new SQLException("can not find a item with nodeId : " + id);
+        }
+
+        if (deletingNode.isInner()) {
+            logger.error("can not delete a node with name : " + deletingNode.getName()
+                             + " because it's inner node.");
+            throw new SQLException("can not delete a node with name : " + deletingNode.getName()
+                                       + " because it's inner node.");
         }
 
         nodeMapper.delete(id);
@@ -79,7 +100,7 @@ public class NodeServiceImpl implements INodeService {
                 throw new SQLException("illegal state : a queue should have a pair, " +
                                            "one for end-2-end, one for pubsub ");
             }
-            nodeMapper.delete(anotherDeletingNode.getGeneratedId());
+            nodeMapper.delete(anotherDeletingNode.getNodeId());
         }
     }
 
@@ -140,5 +161,72 @@ public class NodeServiceImpl implements INodeService {
         }
 
         return "routingkey" + value.substring(firstDotIdx);
+    }
+
+    @Override
+    public void activate(int nodeId) throws SQLException {
+        Node updatingNode = nodeMapper.find(nodeId);
+        if (updatingNode == null) {
+            logger.error("reset node id :" + nodeId + "can not map a Node item");
+            throw new SQLException("reset node id :" + nodeId + "can not map a Node item");
+        }
+
+        updatingNode.setAvailable(true);
+        nodeMapper.update(updatingNode);
+    }
+
+    @Override
+    public void unactivate(int nodeId) throws SQLException {
+        Node updatingNode = nodeMapper.find(nodeId);
+        if (updatingNode == null) {
+            logger.error("reset node id :" + nodeId + "can not map a Node item");
+            throw new SQLException("reset node id :" + nodeId + "can not map a Node item");
+        }
+
+        updatingNode.setAvailable(false);
+        nodeMapper.update(updatingNode);
+    }
+
+    @Override
+    public String resetAppId(int nodeId) throws SQLException {
+        Node updatingNode = nodeMapper.find(nodeId);
+        if (updatingNode == null) {
+            logger.error("reset node id :" + nodeId + "can not map a Node item");
+            throw new SQLException("reset node id :" + nodeId + "can not map a Node item");
+        }
+
+        //generate a 32-bit app id
+        String appId = generateAppId(32);
+        updatingNode.setAppId(appId);
+        nodeMapper.update(updatingNode);
+        updatingNode = nodeMapper.find(nodeId);
+        return updatingNode.getAppId();
+    }
+
+    private String generateAppId(int length) {
+        StringBuilder sb = new StringBuilder();
+        Random rand = new Random();
+        Random randdata = new Random();
+        int data = 0;
+
+        for (int i = 0; i < length; i++) {
+            int index = rand.nextInt(3);
+            switch (index) {
+                case 0:
+                    data = randdata.nextInt(10);
+                    sb.append(data);
+                    break;
+                case 1:
+                    data = randdata.nextInt(26) + 65;
+                    sb.append((char) data);
+                    break;
+                case 2:
+                    data = randdata.nextInt(26) + 97;
+                    sb.append((char) data);
+                    break;
+            }
+        }
+
+        return sb.toString();
     }
 }

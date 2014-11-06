@@ -7,24 +7,27 @@ import java.io.Serializable;
  */
 public class Node implements Serializable, Comparable<Node> {
 
-    private int    generatedId;
-    private String name;
-    private String value;
-    private int    parentId;
-    private short  type;         //0: exchange 1: queue
-    private String routerType;
-    private String routingKey;
-    private short  level;
+    private int     nodeId;
+    private String  name;
+    private String  value;
+    private int     parentId;
+    private short   type;         //0: exchange 1: queue
+    private String  routerType;
+    private String  routingKey;
+    private short   level;
+    private boolean available;
+    private String  appId;
+    private boolean inner;
 
     public Node() {
     }
 
-    public int getGeneratedId() {
-        return generatedId;
+    public int getNodeId() {
+        return nodeId;
     }
 
-    public void setGeneratedId(int generatedId) {
-        this.generatedId = generatedId;
+    public void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
     }
 
     public String getName() {
@@ -83,11 +86,35 @@ public class Node implements Serializable, Comparable<Node> {
         this.level = level;
     }
 
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public boolean isInner() {
+        return inner;
+    }
+
+    public void setInner(boolean inner) {
+        this.inner = inner;
+    }
+
     @Override
     public int compareTo(Node o) {
-        if (this.generatedId == o.getGeneratedId())
+        if (this.nodeId == o.getNodeId())
             return 0;
-        else if (this.generatedId < o.getGeneratedId())
+        else if (this.nodeId < o.getNodeId())
             return -1;
         else
             return 1;
@@ -96,7 +123,7 @@ public class Node implements Serializable, Comparable<Node> {
     @Override
     public String toString() {
         return "Node{" +
-            "generatedId=" + generatedId +
+            "nodeId=" + nodeId +
             ", name='" + name + '\'' +
             ", value='" + value + '\'' +
             ", parentId=" + parentId +
@@ -104,6 +131,9 @@ public class Node implements Serializable, Comparable<Node> {
             ", routerType='" + routerType + '\'' +
             ", routingKey='" + routingKey + '\'' +
             ", level=" + level +
+            ", available=" + available +
+            ", appId='" + appId + '\'' +
+            ", inner=" + inner +
             '}';
     }
 }

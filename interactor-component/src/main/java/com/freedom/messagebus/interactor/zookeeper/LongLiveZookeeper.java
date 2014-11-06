@@ -26,27 +26,16 @@ public class LongLiveZookeeper {
     private String    host;
     private int       port;
 
-    private LongLiveZookeeper(String host, int port) {
-        this.host = host;
-        this.port = port;
-        this.init();
-    }
-
-    private void init() {
-        try {
-            zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
-        } catch (IOException e) {
-            throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
-        }
-    }
-
-    public static LongLiveZookeeper getZKInstance(String h, int p) {
+    public LongLiveZookeeper(String host, int port) {
         if (longLiveZookeeper == null) {
             synchronized (LongLiveZookeeper.class) {
                 if (longLiveZookeeper == null) {
 
                     latch = new CountDownLatch(1);
-                    longLiveZookeeper = new LongLiveZookeeper(h, p);
+
+                    this.host = host;
+                    this.port = port;
+                    this.init();
 
                     try {
                         latch.await(30, TimeUnit.SECONDS);
@@ -59,8 +48,14 @@ public class LongLiveZookeeper {
                 }
             }
         }
+    }
 
-        return longLiveZookeeper;
+    private void init() {
+        try {
+            zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
+        } catch (IOException e) {
+            throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
+        }
     }
 
     public void close() {

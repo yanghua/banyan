@@ -16,7 +16,8 @@ import java.util.Random;
 
 public class MessageIdGenerator extends AbstractHandler {
 
-    private static final Log logger = LogFactory.getLog(MessageIdGenerator.class);
+    private static final Log    logger = LogFactory.getLog(MessageIdGenerator.class);
+    private static final Random random = new Random();
 
     @Override
     public void init(@NotNull HandlerModel handlerModel) {
@@ -26,22 +27,10 @@ public class MessageIdGenerator extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
         Message[] msgs = context.getMessages();
-        //if non-response
-        if (!(context.getCarryType().equals(MessageCarryType.RESPONSE)
-            || context.getCarryType().equals(MessageCarryType.PUBLISH)
-            || context.getCarryType().equals(MessageCarryType.BROADCAST))) {
-            for (Message msg : msgs) {
-                UUIDGenerator generator = new UUIDGenerator(context.getQueueNode().getGeneratedId(), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
-                logger.debug("message id is : " + generator.nextId());
-                msg.getMessageHeader().setMessageId(generator.nextId());
-            }
-        } else {
-            Random random = new Random();
-            for (Message msg : msgs) {
-                UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
-                logger.debug("message id is : " + generator.nextId());
-                msg.getMessageHeader().setMessageId(generator.nextId());
-            }
+        for (Message msg : msgs) {
+            UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
+            logger.debug("message id is : " + generator.nextId());
+            msg.getMessageHeader().setMessageId(generator.nextId());
         }
 
         chain.handle(context);

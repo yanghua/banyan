@@ -67,7 +67,7 @@ public class DBAccessor {
 
             while (rs.next()) {
                 Node node = new Node();
-                node.setGeneratedId(rs.getInt("generatedId"));
+                node.setNodeId(rs.getInt("nodeId"));
                 node.setName(rs.getString("name"));
                 node.setValue(rs.getString("value"));
                 node.setLevel(rs.getShort("level"));

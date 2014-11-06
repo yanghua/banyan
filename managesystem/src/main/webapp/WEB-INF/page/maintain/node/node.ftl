@@ -1,5 +1,6 @@
 <div id="nodeTableContainer"></div>
-<div id="popNodeLayer" class="ltr" style="display: none; width: 540px; height: 300px">
+<!-- create and update -->
+<div id="nodeLayer" class="ltr" style="display: none; width: 540px; height: 300px">
     <form id="nodeForm" name="nodeForm" class="wufoo leftLabel page" accept-charset="UTF-8" autocomplete="off"
           enctype="multipart/form-data" novalidate>
         <ul>
@@ -59,7 +60,7 @@
                         </option>
                         <#if nodeList?exists >
                             <#list nodeList as node>
-                                <option value="${node.generatedId}" level="${node.level}">
+                                <option value="${node.nodeId}" level="${node.level}">
                                 ${node.name}
                                 </option>
                             </#list>
@@ -78,6 +79,85 @@
             </li>
             <li id="desc" style="margin-top: 60px;" >
                 <label id="tip"></label>
+            </li>
+        </ul>
+    </form>
+</div>
+<!-- detail -->
+<div id="detailLayer" class="ltr" style="display: none; width: 540px; height: 300px">
+    <form id="displayForm" name="displayForm" class="wufoo leftLabel page" >
+        <ul>
+            <li class="notranslate ">
+                <label class="desc" >
+                    节点名称
+                </label>
+                <div>
+                    <label id="lblNodeName" class="desc" >节点名称</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc" >
+                    内部名称
+                </label>
+                <div>
+                    <label id="lblNodeValue" class="desc" ></label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc" >
+                    路由类型
+                </label>
+                <div>
+                    <label id="lblRouterType" class="desc" >路由类型</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    父节点
+                </label>
+                <div>
+                    <label id="lblParentNode" class="desc" >父节点</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    类型
+                </label>
+                <div>
+                    <label id="lblType" class="desc" >类型</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    是否内部节点
+                </label>
+                <div>
+                    <label id="lblInner" class="desc" >是否内部节点</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    路由路径
+                </label>
+                <div>
+                    <label id="lblRoutingKey" class="desc" >路由路径</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    是否已激活
+                </label>
+                <div>
+                    <label id="lblAvailable" class="desc" >是否已激活</label>
+                </div>
+            </li>
+            <li class="notranslate ">
+                <label class="desc">
+                    appId
+                </label>
+                <div>
+                    <label id="lblAppId" class="desc" ></label>
+                </div>
             </li>
         </ul>
     </form>

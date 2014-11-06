@@ -1,7 +1,7 @@
 package com.freedom.managesystem.action.maintain;
 
-import com.freedom.managesystem.action.BaseAction;
-import com.freedom.managesystem.action.DropdownlistModel;
+import com.freedom.managesystem.action.other.BaseAction;
+import com.freedom.managesystem.action.other.DropdownlistModel;
 import com.freedom.managesystem.service.Constants;
 import com.freedom.managesystem.service.INodeService;
 import com.freedom.messagebus.common.model.Node;
@@ -125,9 +125,9 @@ public class NodeAction extends BaseAction {
         HttpServletRequest req = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
 
-        String pNodeId = req.getParameter("generatedId");
+        String pNodeId = req.getParameter("nodeId");
         if (Strings.isNullOrEmpty(pNodeId)) {
-            responseJTableData(resp, generateErrorJSONStr("field : generatedId can not be empty "));
+            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
             return;
         }
         int nodeId = Integer.valueOf(pNodeId);
@@ -140,6 +140,66 @@ public class NodeAction extends BaseAction {
         }
     }
 
+    public void activate() throws IOException {
+        HttpServletRequest req = ServletActionContext.getRequest();
+        HttpServletResponse resp = ServletActionContext.getResponse();
+
+        String pNodeId = req.getParameter("nodeId");
+        if (Strings.isNullOrEmpty(pNodeId)) {
+            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
+            return;
+        }
+        int nodeId = Integer.valueOf(pNodeId);
+
+        try {
+            nodeService.activate(nodeId);
+            responseJTableData(resp, generateUpdateSuccessJSONStr());
+        } catch (SQLException e) {
+            logger.error("[activate] occurs a SQLException : " + e.getMessage());
+            responseJTableData(resp, generateErrorJSONStr("activate failed."));
+        }
+    }
+
+    public void unactivate() throws IOException {
+        HttpServletRequest req = ServletActionContext.getRequest();
+        HttpServletResponse resp = ServletActionContext.getResponse();
+
+        String pNodeId = req.getParameter("nodeId");
+        if (Strings.isNullOrEmpty(pNodeId)) {
+            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
+            return;
+        }
+        int nodeId = Integer.valueOf(pNodeId);
+
+        try {
+            nodeService.unactivate(nodeId);
+            responseJTableData(resp, generateUpdateSuccessJSONStr());
+        } catch (SQLException e) {
+            logger.error("[activate] occurs a SQLException : " + e.getMessage());
+            responseJTableData(resp, generateErrorJSONStr("activate failed."));
+        }
+    }
+
+    public void reset() throws IOException {
+        HttpServletRequest req = ServletActionContext.getRequest();
+        HttpServletResponse resp = ServletActionContext.getResponse();
+
+        String pNodeId = req.getParameter("nodeId");
+        if (Strings.isNullOrEmpty(pNodeId)) {
+            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
+            return;
+        }
+        int nodeId = Integer.valueOf(pNodeId);
+
+        try {
+            String appId = nodeService.resetAppId(nodeId);
+            responseJTableData(resp, generateCreateSuccessJSONStr(appId));
+        } catch (SQLException e) {
+            logger.error("[activate] occurs a SQLException : " + e.getMessage());
+            responseJTableData(resp, generateErrorJSONStr("activate failed."));
+        }
+    }
+
     public void parentNodeInfo() throws IOException {
         HttpServletRequest req = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
@@ -148,7 +208,7 @@ public class NodeAction extends BaseAction {
 
         for (int i = 0; i < parentNodes.size(); i++) {
             DropdownlistModel parentNode = new DropdownlistModel();
-            parentNode.setValue(String.valueOf(parentNodes.get(i).getGeneratedId()));
+            parentNode.setValue(String.valueOf(parentNodes.get(i).getNodeId()));
             parentNode.setDisplayText(parentNodes.get(i).getName());
 
             parentNodeList[i] = parentNode;

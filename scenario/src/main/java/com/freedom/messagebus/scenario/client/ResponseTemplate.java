@@ -14,7 +14,7 @@ public class ResponseTemplate {
     private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
     private static final String appid  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
 
-    private static final String host = "115.29.96.85";
+    private static final String host = "172.16.206.30";
     private static final int    port = 2181;
 
     public static void main(String[] args) {
@@ -38,7 +38,7 @@ public class ResponseTemplate {
 
         Messagebus client = Messagebus.getInstance(appid);
 
-        String          appName        = "crm";
+        String          appName        = "server";
         IReceiverCloser consumerCloser = null;
         private final Object lockObj = new Object();
 

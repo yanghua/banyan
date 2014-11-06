@@ -10,4 +10,14 @@ public class Constants {
 
     public static final String EXCHANGE_TYPE_OF_STRING = "0";
     public static final String QUEUE_TYPE_OF_STRING    = "1";
+
+    public static final String MESSAGEBUS_KEY    = "messagebus";
+    public static final String SERVER_QUEUE_NAME = "server";
+
+    public static final long PING_SERVER_TIME_INTERVAL = 10_000;
+
+    public static final String IS_SERVER_ONLINE = "isServerOnline";
+
+    public static final String ZK_HOST = "172.16.206.30";
+    public static final int    ZK_PORT = 2181;
 }

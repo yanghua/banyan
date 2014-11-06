@@ -453,7 +453,7 @@ public class ConfigManager {
         for (Element row : rowElements) {
             Node anode = new Node();
 
-            anode.setGeneratedId(Integer.valueOf(row.selectSingleNode("field[@name='generatedId']").getStringValue()));
+            anode.setNodeId(Integer.valueOf(row.selectSingleNode("field[@name='nodeId']").getStringValue()));
             anode.setName(row.selectSingleNode("field[@name='name']").getStringValue());
             anode.setValue(row.selectSingleNode("field[@name='value']").getStringValue());
             anode.setParentId(Integer.valueOf(row.selectSingleNode("field[@name='parentId']").getStringValue()));

@@ -20,4 +20,13 @@ public class Constants {
 
     public static final String KEY_ARG_COMMAND = "cmd";
 
+    public static final String WEB_QUEUE_NAME = "web";
+
+    public static final String SERVER_QUEUE_NAME = "server";
+
+    public static final String SERVER_APP_ID = "l0c6f1W7vydEftLt0cYrcqUfGWw915Qi";
+
+    public static final String ZK_HOST = "172.16.206.30";
+    public static final int    ZK_PORT = 2181;
+
 }

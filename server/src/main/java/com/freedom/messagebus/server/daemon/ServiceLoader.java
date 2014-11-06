@@ -51,7 +51,7 @@ public class ServiceLoader {
     public void launch() {
         if (runOnceServiceMap.size() != 0) {
             ExecutorService executorService =
-                Executors.newFixedThreadPool(runOnceServiceMap.size());
+                new ExceptionCatchThreadPool(runOnceServiceMap.size());
             for (Map.Entry<String, IService> entry : this.runOnceServiceMap.entrySet()) {
                 executorService.submit((Runnable) entry.getValue());
             }

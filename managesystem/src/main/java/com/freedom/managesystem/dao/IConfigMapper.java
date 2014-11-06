@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-public interface ConfigMapper {
+public interface IConfigMapper {
 
     @Insert("INSERT INTO CONFIG(KEY, VALUE) values (#{key}, #{value})")
     public void save(Config configItem);

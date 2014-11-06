@@ -1,6 +1,6 @@
 package com.freedom.managesystem.action.home;
 
-import com.freedom.managesystem.action.BaseAction;
+import com.freedom.managesystem.action.other.BaseAction;
 import org.apache.struts2.ServletActionContext;
 
 public class DashboardAction extends BaseAction {

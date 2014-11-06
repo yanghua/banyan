@@ -1,6 +1,6 @@
 package com.freedom.managesystem.action.monitor;
 
-import com.freedom.managesystem.action.BaseAction;
+import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.pojo.rabbitHTTP.Queue;
 import com.freedom.managesystem.service.IQueueService;
 import org.apache.struts2.ServletActionContext;

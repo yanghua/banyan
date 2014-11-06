@@ -1,4 +1,4 @@
-package com.freedom.managesystem.action;
+package com.freedom.managesystem.action.other;
 
 import com.freedom.managesystem.pojo.Module;
 import com.freedom.managesystem.service.IModuleService;

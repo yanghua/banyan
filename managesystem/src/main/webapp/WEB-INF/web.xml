@@ -36,6 +36,11 @@
         <servlet-class>org.apache.struts2.views.JspSupportServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
+    <!-- messagebus server sentinel listener -->
+    <listener>
+        <listener-class>com.freedom.managesystem.action.other.MBServerSentinelListener</listener-class>
+    </listener>
     
     <welcome-file-list>
         <welcome-file>/goIndex.jsp</welcome-file>

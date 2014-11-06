@@ -65,6 +65,9 @@
 * ~~考虑加入Pub/Sub的实现~~
 * ~~client/httpbridge性能测试的量化数据~~
 * web管控台，注册节点后，向server发送：更新命令（server将数据库的更新数据主动push到客户端）
+* 将各个module内的常量定义配置到数据库
+* 将zookeeper推送到客户端的配置信息加密
+* 重新整理 `server` 端的配置、让 `server` 直接依赖 `client` 
 
 
 

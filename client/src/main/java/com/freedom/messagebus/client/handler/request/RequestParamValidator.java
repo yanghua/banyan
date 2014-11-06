@@ -6,9 +6,12 @@ import com.freedom.messagebus.client.handler.ParamValidateFailedException;
 import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.message.Message;
+import com.freedom.messagebus.common.message.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Date;
 
 public class RequestParamValidator extends AbstractParamValidator {
 
@@ -44,8 +47,26 @@ public class RequestParamValidator extends AbstractParamValidator {
                 throw new ParamValidateFailedException("[handle] the context field : queueNode is illegal. " +
                                                            "the name can not be null or empty");
             }
+            this.validateMessagesProperties(context);
         }
 
         chain.handle(context);
+    }
+
+    private void validateMessagesProperties(@NotNull MessageContext context) {
+        Date currentDate = new Date();
+        for (Message msg : context.getMessages()) {
+            //app id
+            if (msg.getMessageHeader().getAppId() == null || msg.getMessageHeader().getAppId().isEmpty())
+                msg.getMessageHeader().setAppId(context.getAppId());
+
+            //timestamp
+            if (msg.getMessageHeader().getTimestamp() == null)
+                msg.getMessageHeader().setTimestamp(currentDate);
+
+            if (!MessageType.QueueMessage.getType().equals(msg.getMessageHeader().getType())) {
+                logger.error("[validateMessagesProperites] there is a message is not  `QueueMessage`. ");
+            }
+        }
     }
 }

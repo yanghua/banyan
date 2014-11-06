@@ -1,4 +1,4 @@
-package com.freedom.managesystem.action;
+package com.freedom.managesystem.action.other;
 
 public class DropdownlistModel {
 

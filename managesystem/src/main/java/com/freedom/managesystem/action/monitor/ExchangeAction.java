@@ -1,6 +1,6 @@
 package com.freedom.managesystem.action.monitor;
 
-import com.freedom.managesystem.action.BaseAction;
+import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.pojo.rabbitHTTP.Exchange;
 import com.freedom.managesystem.service.IExchangeService;
 import org.apache.commons.logging.Log;

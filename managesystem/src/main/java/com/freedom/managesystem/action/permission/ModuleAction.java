@@ -1,7 +1,7 @@
 package com.freedom.managesystem.action.permission;
 
-import com.freedom.managesystem.action.BaseAction;
-import com.freedom.managesystem.action.DropdownlistModel;
+import com.freedom.managesystem.action.other.BaseAction;
+import com.freedom.managesystem.action.other.DropdownlistModel;
 import com.freedom.managesystem.pojo.Module;
 import com.freedom.managesystem.service.IModuleService;
 import org.apache.struts2.ServletActionContext;

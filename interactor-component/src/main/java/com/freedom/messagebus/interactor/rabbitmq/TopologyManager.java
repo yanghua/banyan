@@ -108,7 +108,7 @@ public class TopologyManager extends AbstractInitializer {
     private Map<Integer, Node> buildNodeMap(TreeSet<Node> nodes) {
         Map<Integer, Node> nodeMap = new HashMap<>(nodes.size());
         for (Node node : nodes) {
-            nodeMap.put(node.getGeneratedId(), node);
+            nodeMap.put(node.getNodeId(), node);
         }
 
         return nodeMap;

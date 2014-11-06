@@ -11,7 +11,7 @@ import com.freedom.messagebus.common.message.QueueMessage;
 public class ProduceTemplate {
 
     private static final String appId = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
-    private static final String host   = "115.29.96.85";
+    private static final String host   = "172.16.206.30";
     private static final int    port   = 2181;
 
     /**
@@ -21,7 +21,7 @@ public class ProduceTemplate {
      * (3)如果发生的消息量大，可使用多线程发送
      */
     public static void produce() {
-        String queueName = "crm";
+        String queueName = "server";
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setReplyTo(queueName);

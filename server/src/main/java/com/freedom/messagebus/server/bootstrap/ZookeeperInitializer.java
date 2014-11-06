@@ -55,7 +55,7 @@ public class ZookeeperInitializer {
 
     private void init(String host, int port) {
         try {
-            this.zookeeper = LongLiveZookeeper.getZKInstance(host, port);
+            this.zookeeper = new LongLiveZookeeper(host, port);
             this.initNodes();
             this.isInited = true;
         } catch (Exception e) {
