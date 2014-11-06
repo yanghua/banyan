@@ -4,7 +4,11 @@
 
 ![img 1][1]
 
-因此 `managesystem`跟 `server` 都是 `client` 的使用者。它们可以看作是两个demo。
+ `managesystem`跟 `server` 都是 `client` 的使用者。 `web` 是请求者，它另起一个线程向 `server` 定期（目前暂定10秒钟） **request** ***PING*** , `server` 上有个独立的服务 `Sentinel` daemon service，专门用于 **response** ***PONG***, 如果 `web`在预设的超时时间内(目前暂定10秒钟)，没有收到 `server`的响应，则认为 `server` 的状态异常。
+ 
+ ![img 2][2]
+ 
+ 示意图如上所示，它们通信的模型基于 **request/response**
 
 ##技术说明
 
@@ -37,6 +41,7 @@
 
 
 [1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/managesystem/web-server-queue.png
+[2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/managesystem/web-server-sentinel.png
 [1_1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/managesystem/maintain_topology.png
 [1_2]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/managesystem/maintain_node.png
 [5_1]:https://raw.githubusercontent.com/yanghua/messagebus/master/screenshots/managesystem/permission_module.png
