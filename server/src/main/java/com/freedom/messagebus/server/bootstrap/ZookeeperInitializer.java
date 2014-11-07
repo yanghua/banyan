@@ -1,9 +1,9 @@
 package com.freedom.messagebus.server.bootstrap;
 
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.ShellHelper;
 import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.freedom.messagebus.server.Constants;
+import com.freedom.messagebus.server.dataaccess.DBAccessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -11,9 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
 
 public class ZookeeperInitializer {
@@ -23,16 +21,14 @@ public class ZookeeperInitializer {
 
     private LongLiveZookeeper zookeeper;
     private boolean isInited = false;
-    private static Properties config;
+    private Properties          config;
+    private Map<String, Object> context;
 
-    public static ZookeeperInitializer getInstance(@NotNull Properties configProperties) {
+    public static ZookeeperInitializer getInstance(Map<String, Object> context) {
         if (instance == null) {
             synchronized (ZookeeperInitializer.class) {
                 if (instance == null) {
-                    config = configProperties;
-                    instance = new ZookeeperInitializer(
-                        config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST),
-                        Integer.valueOf(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT)));
+                    instance = new ZookeeperInitializer(context);
                 }
             }
         }
@@ -40,8 +36,11 @@ public class ZookeeperInitializer {
         return instance;
     }
 
-    private ZookeeperInitializer(String host, int port) {
-        this.init(host, port);
+    private ZookeeperInitializer(Map<String, Object> context) {
+        this.context = context;
+        this.config = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
+        this.zookeeper = (LongLiveZookeeper) this.context.get(Constants.GLOBAL_ZOOKEEPER_OBJECT);
+        this.init();
     }
 
     public void launch() throws IOException, InterruptedException {
@@ -50,16 +49,14 @@ public class ZookeeperInitializer {
 
         this.dumpDbForZookeeper();
         this.loadSettingToZookeeper();
-        this.zookeeper.close();
     }
 
-    private void init(String host, int port) {
+    private void init() {
         try {
-            this.zookeeper = new LongLiveZookeeper(host, port);
             this.initNodes();
             this.isInited = true;
         } catch (Exception e) {
-            logger.error("[init] initialized zookeeper instance failed : " + e.getMessage());
+            logger.error("[init] initialized failed : " + e.getMessage());
             this.isInited = false;
         }
     }
@@ -71,32 +68,16 @@ public class ZookeeperInitializer {
     }
 
     private void dumpDbForZookeeper() throws IOException, InterruptedException {
-        this.dumpDbInfo(CONSTS.EXPORTED_NODE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH);
-        this.dumpDbInfo(CONSTS.EXPORTED_CONFIG_CMD_FORMAT, CONSTS.EXPORTED_CONFIG_FILE_PATH);
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(this.config);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_NODE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_CONFIG_CMD_FORMAT, CONSTS.EXPORTED_CONFIG_FILE_PATH);
     }
 
     private void loadSettingToZookeeper() throws IOException {
-        this.setDbInfoToZK(CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
-        this.setDbInfoToZK(CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+        setDbInfoToZK(CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
+        setDbInfoToZK(CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
     }
 
-    private void dumpDbInfo(String cmdFormat, String filePath) throws IOException, InterruptedException {
-        String partOfcmdStr = String.format(cmdFormat,
-                                            config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),
-                                            config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_USER),
-                                            config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD));
-        String cmdStr = partOfcmdStr + filePath;
-        logger.debug("dump database info cmd : " + cmdStr);
-        ShellHelper.exec(cmdStr);
-
-        Path path = FileSystems.getDefault().getPath(filePath);
-        if (!Files.exists(path)) {
-            logger.error("the file for initialize zookeeper node at path : " +
-                             filePath + " is not exists!");
-            throw new RuntimeException("the file for initialize zookeeper node at path : " +
-                                           filePath + " is not exists!");
-        }
-    }
 
     private void setDbInfoToZK(String filePath, String zkNode) throws IOException {
         FileReader reader = new FileReader(filePath);

@@ -1,5 +1,7 @@
 package com.freedom.messagebus.server.daemon;
 
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,9 +89,8 @@ public class ServiceLoader {
                             switch (daemonService.policy()) {
                                 case ONCE: {
                                     if (hasParamedCstor) {
-                                        Constructor<IService> constructor = clazz.getConstructor(String.class);
-                                        service = constructor.newInstance(
-                                            (String) this.context.get(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
+                                        Constructor<IService> constructor = clazz.getConstructor(Map.class);
+                                        service = constructor.newInstance(this.context);
                                     } else
                                         service = clazz.newInstance();
 
@@ -99,12 +100,12 @@ public class ServiceLoader {
 
                                 case CYCLE_SCHEDULED: {
                                     if (hasParamedCstor) {
-                                        Constructor<IService> constructor = clazz.getConstructor(String.class);
-                                        service = constructor.newInstance(
-                                            (String) this.context.get(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
+                                        Constructor<IService> constructor = clazz.getConstructor(Map.class);
+                                        service = constructor.newInstance(this.context);
                                     } else
                                         service = clazz.newInstance();
-                                    scheduleCycleServiceMap.put(daemonService.value(), clazz.newInstance());
+
+                                    scheduleCycleServiceMap.put(daemonService.value(), service);
                                 }
                                 break;
 
@@ -117,7 +118,7 @@ public class ServiceLoader {
                 }
             }
         } catch (Exception e) {
-            logger.error("[scan] occurs a Exception : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "[scan]");
         }
     }
 
@@ -235,7 +236,7 @@ public class ServiceLoader {
         Constructor[] cstors = clazz.getConstructors();
         for (Constructor cstor : cstors) {
             Class[] paramClasses = cstor.getParameterTypes();
-            if (paramClasses.length == 1 && paramClasses[0].getName().equals(String.class.getName()))
+            if (paramClasses.length == 1 && paramClasses[0].getName().equals(Map.class.getName()))
                 return true;
         }
 

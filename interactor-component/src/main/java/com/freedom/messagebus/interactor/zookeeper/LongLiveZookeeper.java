@@ -19,35 +19,15 @@ public class LongLiveZookeeper {
 
     private static final Log logger = LogFactory.getLog(LongLiveZookeeper.class);
 
-    private static volatile LongLiveZookeeper longLiveZookeeper = null;
-    private static          CountDownLatch    latch             = new CountDownLatch(1);
+    private static CountDownLatch latch = new CountDownLatch(1);
 
     private ZooKeeper zooKeeper;
     private String    host;
     private int       port;
 
     public LongLiveZookeeper(String host, int port) {
-        if (longLiveZookeeper == null) {
-            synchronized (LongLiveZookeeper.class) {
-                if (longLiveZookeeper == null) {
-
-                    latch = new CountDownLatch(1);
-
-                    this.host = host;
-                    this.port = port;
-                    this.init();
-
-                    try {
-                        latch.await(30, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        logger.error("[getZKInstance] occurs a InterruptedException : " + e.getMessage());
-                    } finally {
-                        latch = null;
-                    }
-
-                }
-            }
-        }
+        this.host = host;
+        this.port = port;
     }
 
     private void init() {
@@ -58,19 +38,28 @@ public class LongLiveZookeeper {
         }
     }
 
-    public void close() {
-        if (zooKeeper != null) {
-            synchronized (LongLiveZookeeper.class) {
-                if (zooKeeper != null) {
-                    try {
-                        zooKeeper.close();
-                        zooKeeper = null;
-                        longLiveZookeeper = null;
-                    } catch (InterruptedException e) {
-                        logger.error("[close] occurs a InterruptedException : " + e.getMessage());
-                    }
-                }
+    public synchronized void open() {
+        latch = new CountDownLatch(1);
+
+        this.init();
+
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("[getZKInstance] occurs a InterruptedException : " + e.getMessage());
+        } finally {
+            latch = null;
+        }
+    }
+
+    public synchronized void close() {
+        try {
+            if (this.zooKeeper != null) {
+                zooKeeper.close();
+                zooKeeper = null;
             }
+        } catch (InterruptedException e) {
+            logger.error("[close] occurs a InterruptedException : " + e.getMessage());
         }
     }
 
@@ -92,7 +81,7 @@ public class LongLiveZookeeper {
     }
 
     public boolean isAlive() {
-        return this.zooKeeper.getState().isAlive();
+        return this.zooKeeper != null && this.zooKeeper.getState().isAlive();
     }
 
     /**

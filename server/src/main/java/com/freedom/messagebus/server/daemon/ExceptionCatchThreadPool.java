@@ -24,7 +24,7 @@ public class ExceptionCatchThreadPool extends ThreadPoolExecutor {
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
 
-        if (t!= null) {
+        if (t != null) {
             ExceptionHelper.logException(logger, t, "[afterExecute]");
         }
     }

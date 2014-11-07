@@ -1,89 +1,61 @@
 package com.freedom.messagebus.server.daemon.impl;
 
-import com.freedom.messagebus.common.AbstractInitializer;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.client.*;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.common.message.IMessageHeader;
 import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
-import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
+import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.daemon.DaemonService;
-import com.freedom.messagebus.server.daemon.IService;
 import com.freedom.messagebus.server.daemon.RunPolicy;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
-public class MsgLogService extends AbstractInitializer implements Runnable, IService {
+public class MsgLogService extends AbstractService {
 
-    private static final Log    logger      = LogFactory.getLog("msgLog");
-    private static final String consumerTag = "tag.consumer.msgLog";
+    private static final Log logger = LogFactory.getLog("msgLog");
+    private Messagebus client;
 
-    public MsgLogService(String host) {
-        super(host);
+    private Properties serverConfig;
+
+    public MsgLogService(Map<String, Object> context) {
+        super(context);
+
+        serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
+
+        client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
     }
 
     @Override
     public void run() {
+        IReceiverCloser closer = null;
         try {
-            super.init();
-            QueueingConsumer consumer = ProxyConsumer.consume(this.channel,
-                                                              CONSTS.DEFAULT_FILE_QUEUE_NAME,
-                                                              consumerTag);
-            if (consumer == null)
-                throw new IOException(" consumer is null ");
+            synchronized (this) {
+                IConsumer consumer = client.getConsumer();
+                closer = consumer.consume(Constants.LOG_OF_FILE_QUEUE_NAME, new IMessageReceiveListener() {
+                    @Override
+                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                        logger.info(formatLog(message.getMessageHeader()));
+                    }
+                });
 
-            while (true) {
-                QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-
-                AMQP.BasicProperties properties = delivery.getProperties();
-                byte[] msgBody = delivery.getBody();
-
-                this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-
-                String msgTypeStr = properties.getType();
-                if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-                    logger.error("[run] message type is null or empty");
-                }
-
-                MessageType msgType = null;
-                try {
-                    msgType = MessageType.lookup(msgTypeStr);
-                } catch (UnknownError unknownError) {
-                    throw new RuntimeException("unknown message type : " + msgTypeStr);
-                }
-                Message msg = MessageFactory.createMessage(msgType);
-                initMessage(msg, msgType, properties, msgBody);
-
-                //log message
-                logger.info(formatLog(msg.getMessageHeader()));
+                //block all time
+                this.wait(0);
             }
+        } catch (MessagebusUnOpenException e) {
+            ExceptionHelper.logException(logger, e, "[run]");
         } catch (IOException e) {
-            logger.error("[run] occurs a IOException : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "[run]");
         } catch (InterruptedException e) {
             logger.info(" consumer closed! ");
         } finally {
-            try {
-                this.channel.basicCancel(consumerTag);
-                super.close();
-            } catch (IOException e) {
-                logger.error("[run] occurs a IOException : " + e.getMessage());
-            }
+            if (closer != null)
+                closer.close();
         }
-    }
-
-    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
-
-        IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
-        msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
     }
 
     private String formatLog(IMessageHeader msgHeader) {

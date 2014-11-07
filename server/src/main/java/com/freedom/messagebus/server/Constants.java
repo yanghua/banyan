@@ -24,9 +24,14 @@ public class Constants {
 
     public static final String SERVER_QUEUE_NAME = "server";
 
+    public static final String LOG_OF_FILE_QUEUE_NAME = "file";
+
     public static final String SERVER_APP_ID = "l0c6f1W7vydEftLt0cYrcqUfGWw915Qi";
 
-    public static final String ZK_HOST = "172.16.206.30";
-    public static final int    ZK_PORT = 2181;
+    public static final String KEY_SERVER_CONFIG = "SERVER_CONFIG";
+
+    public static final String GLOBAL_CLIENT_OBJECT = "client";
+
+    public static final String GLOBAL_ZOOKEEPER_OBJECT = "zookeeper";
 
 }

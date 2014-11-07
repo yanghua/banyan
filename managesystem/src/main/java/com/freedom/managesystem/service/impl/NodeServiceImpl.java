@@ -3,6 +3,7 @@ package com.freedom.managesystem.service.impl;
 import com.freedom.managesystem.dao.INodeMapper;
 import com.freedom.managesystem.service.Constants;
 import com.freedom.managesystem.service.INodeService;
+import com.freedom.managesystem.service.MessagebusService;
 import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-public class NodeServiceImpl implements INodeService {
+public class NodeServiceImpl extends MessagebusService implements INodeService {
 
     private static final Log logger = LogFactory.getLog(NodeServiceImpl.class);
 
@@ -35,8 +36,8 @@ public class NodeServiceImpl implements INodeService {
         }
 
         node.setInner(false);
+        node.setAppId(this.generateAppId());
         nodeMapper.save(node);
-        this.resetAppId(node.getNodeId());
 
         if (node.getType() == Constants.QUEUE_TYPE) {
             //create a pair queue for pubsub
@@ -50,10 +51,11 @@ public class NodeServiceImpl implements INodeService {
             newQueueForPubsub.setType((short) Constants.QUEUE_TYPE);
             newQueueForPubsub.setLevel(node.getLevel());
             newQueueForPubsub.setInner(false);
+            newQueueForPubsub.setAppId(this.generateAppId());
             nodeMapper.save(newQueueForPubsub);
-
-            this.resetAppId(newQueueForPubsub.getNodeId());
         }
+
+        this.produceDBOperate("CREATE", "NODE");
     }
 
     @NotNull
@@ -102,6 +104,8 @@ public class NodeServiceImpl implements INodeService {
             }
             nodeMapper.delete(anotherDeletingNode.getNodeId());
         }
+
+        this.produceDBOperate("DELETE", "NODE");
     }
 
     @Override
@@ -112,6 +116,7 @@ public class NodeServiceImpl implements INodeService {
     @Override
     public void modify(Node node) throws SQLException {
         nodeMapper.update(node);
+        this.produceDBOperate("UPDATE", "NODE");
     }
 
     @Override
@@ -173,6 +178,7 @@ public class NodeServiceImpl implements INodeService {
 
         updatingNode.setAvailable(true);
         nodeMapper.update(updatingNode);
+        this.produceDBOperate("UPDATE", "NODE");
     }
 
     @Override
@@ -185,6 +191,7 @@ public class NodeServiceImpl implements INodeService {
 
         updatingNode.setAvailable(false);
         nodeMapper.update(updatingNode);
+        this.produceDBOperate("UPDATE", "NODE");
     }
 
     @Override
@@ -196,14 +203,19 @@ public class NodeServiceImpl implements INodeService {
         }
 
         //generate a 32-bit app id
-        String appId = generateAppId(32);
+        String appId = generateAppId();
         updatingNode.setAppId(appId);
         nodeMapper.update(updatingNode);
         updatingNode = nodeMapper.find(nodeId);
+        this.produceDBOperate("UPDATE", "NODE");
         return updatingNode.getAppId();
     }
 
-    private String generateAppId(int length) {
+    private String generateAppId() {
+        return generate(32);
+    }
+
+    private String generate(int length) {
         StringBuilder sb = new StringBuilder();
         Random rand = new Random();
         Random randdata = new Random();

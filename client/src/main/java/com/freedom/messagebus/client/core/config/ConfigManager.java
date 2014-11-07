@@ -505,7 +505,7 @@ public class ConfigManager {
         for (Node node : nodes) {
             if (node.getType() == 0)
                 this.exchangeNodeMap.put(node.getName(), node);
-            else if (node.getType() == 1 && !node.getValue().contains("pubsub") && node.getRoutingKey().length() != 0)
+            else if (node.getType() == 1 && !node.getValue().contains("pubsub"))
                 this.queueNodeMap.put(node.getName(), node);
             else if (node.getType() == 1 && node.getValue().contains("pubsub"))
                 this.pubsubNodeMap.put(node.getName(), node);

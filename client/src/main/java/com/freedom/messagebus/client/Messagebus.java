@@ -94,8 +94,12 @@ public class Messagebus {
      * @throws MessagebusConnectedFailedException
      */
     public synchronized void open() throws MessagebusConnectedFailedException {
+        if (this.isOpen())
+            return;
+
         //load class
         this.zookeeper = new LongLiveZookeeper(this.getZkHost(), this.getZkPort());
+        this.zookeeper.open();
 
         if (!this.zookeeper.isAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
@@ -171,6 +175,9 @@ public class Messagebus {
      * current context.
      */
     public synchronized void close() {
+        if (!this.isOpen())
+            return;
+
         //release all resource
         try {
             if (this.configManager != null)

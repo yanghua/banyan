@@ -1,16 +1,15 @@
 package com.freedom.messagebus.server;
 
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
-import com.freedom.messagebus.interactor.zookeeper.IConfigChangedListener;
 import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
-import com.freedom.messagebus.interactor.zookeeper.ZKEventType;
 import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
 import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;
-import com.freedom.messagebus.server.daemon.impl.SentinelService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
@@ -22,15 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class App {
 
     private static final Log    logger                             = LogFactory.getLog(App.class);
     private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
+
+    private static  LongLiveZookeeper globalZookeeper;
+    private static  Properties config;
 
     public static void main(String[] args) {
         //debug args
@@ -45,40 +43,39 @@ public class App {
         else if (Files.exists(Paths.get(DEFAULT_SERVER_LOG4J_PROPERTY_PATH)))
             PropertyConfigurator.configure(DEFAULT_SERVER_LOG4J_PROPERTY_PATH);
 
+        prepareEnv(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+
         String cmd = argMap.get(Constants.KEY_ARG_COMMAND);
         invokeCommand(cmd, argMap);
     }
 
-    public static void startup(String configFilePathStr) {
+    public static void startup() {
         /*
         invoke bootstrap service
          */
 
-        //configuration
-        ConfigurationLoader configurationLoader = ConfigurationLoader.defaultLoader();
-        configurationLoader.setConfigFilePathStr(configFilePathStr);
-
-        try {
-            configurationLoader.launch();
-        } catch (IOException e) {
-            logger.error("[main] ConfigurationLoader#launch occurs a IOException : " + e.getMessage());
-            logger.error("please check the config file's exists at path : /etc/message.server.config.properties");
-            return;
-        }
-
-        Properties config = configurationLoader.getConfigProperties();
-
         //rabbitmq
+        logger.debug("** bootstrap service : RabbitmqInitializer **");
         RabbitmqInitializer rabbitmqInitializer = RabbitmqInitializer.getInstance(config);
         try {
             rabbitmqInitializer.launch();
         } catch (IOException e) {
             logger.error("[main] RabbitmqInitializer#launch occurs a IOException : " + e.getMessage());
-            return;
+            System.exit(1);
+        }
+
+        Map<String, Object> context = null;
+        try {
+            context = buildContext(config);
+        } catch (MessagebusConnectedFailedException e) {
+            ExceptionHelper.logException(logger, e, "[main]");
+            logger.error("server shutdown because of buildContext failed.");
+            System.exit(1);
         }
 
         //zookeeper
-        ZookeeperInitializer zookeeperInitializer = ZookeeperInitializer.getInstance(config);
+        logger.info("** bootstrap service : ZookeeperInitializer **");
+        ZookeeperInitializer zookeeperInitializer = ZookeeperInitializer.getInstance(context);
         try {
             zookeeperInitializer.launch();
         } catch (IOException e) {
@@ -90,16 +87,15 @@ public class App {
 
         boolean mqIsAlive = RabbitmqServerManager.defaultManager(config).isAlive();
 
+        logger.debug("** MQ is alive : " + mqIsAlive);
         if (mqIsAlive) {
+            App app = new App();
+            broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
+
             //load and start daemon service
-            Map<String, Object> context = new ConcurrentHashMap<>();
-            context.put(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST,
-                        config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_MQ_HOST));
+            logger.debug("** daemon service : ServiceLoader **");
             ServiceLoader serviceLoader = ServiceLoader.getInstance(context);
             serviceLoader.launch();
-
-            App app = new App();
-            broadcastEvent(config, CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
 
             synchronized (app) {
                 try {
@@ -107,6 +103,8 @@ public class App {
                     app.wait(0);
                 } catch (InterruptedException e) {
                     logger.info("[main] occurs a InterruptedException . the server has be quited!");
+                } finally {
+                    destroy(context);
                 }
             }
         } else {
@@ -116,25 +114,13 @@ public class App {
         }
     }
 
-    public static void stop(String configFilePathStr) {
-        //configuration
-        ConfigurationLoader configurationLoader = ConfigurationLoader.defaultLoader();
-        configurationLoader.setConfigFilePathStr(configFilePathStr);
-
-        try {
-            configurationLoader.launch();
-        } catch (IOException e) {
-            logger.error("[main] ConfigurationLoader#launch occurs a IOException : " + e.getMessage());
-            logger.error("please check the config file's exists at path : /etc/message.server.config.properties");
-            return;
-        }
-
-        Properties config = configurationLoader.getConfigProperties();
+    public static void stop() {
         RabbitmqServerManager serverManager = RabbitmqServerManager.defaultManager(config);
         if (serverManager.isAlive()) {
             App app = new App();
-            broadcastEvent(config, CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
+            broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
             serverManager.stop();
+            destroy(null);
         }
     }
 
@@ -160,19 +146,43 @@ public class App {
         return argMap;
     }
 
+    private static void prepareEnv(String configFilePathStr) {
+        logger.info("** prepareEnv **");
+        //configuration
+        ConfigurationLoader configurationLoader = ConfigurationLoader.defaultLoader();
+        configurationLoader.setConfigFilePathStr(configFilePathStr);
+
+        try {
+            configurationLoader.launch();
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "[prepareEnv]");
+            logger.error(" ConfigurationLoader#launch occurs a IOException : " + e.getMessage());
+            logger.error("please check the config file's exists at path : /etc/message.server.config.properties");
+            System.exit(1);
+        }
+
+        config = configurationLoader.getConfigProperties();
+
+        //init zookeeper
+        String zkHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
+        int zkPort = Integer.valueOf(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+        globalZookeeper = new LongLiveZookeeper(zkHost, zkPort);
+        globalZookeeper.open();
+    }
+
     private static void invokeCommand(String cmd, Map<String, String> argMap) {
         if (cmd == null) {
-            startup(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+            startup();
             return;
         }
 
         switch (cmd) {
             case "start":
-                startup(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+                startup();
                 break;
 
             case "stop":
-                stop(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+                stop();
                 break;
 
             case "restart":
@@ -186,22 +196,47 @@ public class App {
         }
     }
 
-    private static void broadcastEvent(Properties properties, final String eventTypeStr, final App lockObj) {
-        LongLiveZookeeper zookeeper = new LongLiveZookeeper(
-            properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST),
-            Integer.valueOf(properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT))
-                                                                     );
+    private static Map<String, Object> buildContext(Properties serverConfig) throws MessagebusConnectedFailedException {
+        Map<String, Object> context = new ConcurrentHashMap<>();
+        context.put(Constants.KEY_SERVER_CONFIG, serverConfig);
 
+        //message bus client
+        Messagebus commonClient = Messagebus.getInstance(Constants.SERVER_APP_ID);
+
+        String zkHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
+        int zkPort = Integer.valueOf(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+
+        commonClient.setZkHost(zkHost);
+        commonClient.setZkPort(zkPort);
+        commonClient.open();
+
+        context.put(Constants.GLOBAL_CLIENT_OBJECT, commonClient);
+
+        context.put(Constants.GLOBAL_ZOOKEEPER_OBJECT, globalZookeeper);
+
+        return context;
+    }
+
+    private static void destroy(Map<String, Object> context) {
+        if (context != null && context.containsKey(Constants.GLOBAL_CLIENT_OBJECT)
+            && context.get(Constants.GLOBAL_CLIENT_OBJECT) != null) {
+            Messagebus client = (Messagebus)context.get(Constants.GLOBAL_CLIENT_OBJECT);
+            if (client.isOpen())
+                client.close();
+        }
+
+        if (globalZookeeper != null && globalZookeeper.isAlive())
+            globalZookeeper.close();
+    }
+
+    private static void broadcastEvent(final String eventTypeStr, final App lockObj) {
         try {
             synchronized (lockObj) {
                 logger.debug("broadcast event : " + eventTypeStr);
-                zookeeper.setConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr.getBytes(), true);
-
+                globalZookeeper.setConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr.getBytes(), true);
             }
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "[broadcastEvent]");
-        } finally {
-            zookeeper.close();
         }
     }
 }

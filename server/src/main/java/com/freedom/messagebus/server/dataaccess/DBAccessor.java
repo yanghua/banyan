@@ -1,11 +1,16 @@
 package com.freedom.messagebus.server.dataaccess;
 
+import com.freedom.messagebus.common.ShellHelper;
 import com.freedom.messagebus.common.model.Node;
 import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +36,6 @@ public class DBAccessor {
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD)
                                        );
 
-//        this.jdbcUrlStr = "jdbc:mysql://172.16.206.30:3306/messagebus_sys_db?user=root&password=123456&useunicode=true&characterEncoding=utf8";
         logger.debug("jdbc url is : " + this.jdbcUrlStr);
 
         try {
@@ -101,4 +105,21 @@ public class DBAccessor {
         }
     }
 
+    public void dumpDbInfo(String cmdFormat, String filePath) throws IOException, InterruptedException {
+        String partOfcmdStr = String.format(cmdFormat,
+                                            this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),
+                                            this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_USER),
+                                            this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD));
+        String cmdStr = partOfcmdStr + filePath;
+        logger.debug("dump database info cmd : " + cmdStr);
+        ShellHelper.exec(cmdStr);
+
+        Path path = FileSystems.getDefault().getPath(filePath);
+        if (!Files.exists(path)) {
+            logger.error("the file for initialize zookeeper node at path : " +
+                             filePath + " is not exists!");
+            throw new RuntimeException("the file for initialize zookeeper node at path : " +
+                                           filePath + " is not exists!");
+        }
+    }
 }
