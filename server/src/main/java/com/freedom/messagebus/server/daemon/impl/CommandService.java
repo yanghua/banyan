@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Properties;
 
 @DaemonService(value = "sentinelService", policy = RunPolicy.ONCE)
-public class SentinelService extends AbstractService {
+public class CommandService extends AbstractService {
 
-    private static final Log logger = LogFactory.getLog(SentinelService.class);
+    private static final Log logger = LogFactory.getLog(CommandService.class);
 
     private       IReceiverCloser consumerCloser = null;
     private final Object          lockObj        = new Object();
@@ -34,7 +34,7 @@ public class SentinelService extends AbstractService {
     private LongLiveZookeeper zookeeper;
     private Properties        serverConfig;
 
-    public SentinelService(Map<String, Object> context) {
+    public CommandService(Map<String, Object> context) {
         super(context);
 
         serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
