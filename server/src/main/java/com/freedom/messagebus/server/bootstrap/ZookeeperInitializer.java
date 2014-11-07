@@ -6,7 +6,6 @@ import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.dataaccess.DBAccessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -27,8 +27,8 @@ public class App {
     private static final Log    logger                             = LogFactory.getLog(App.class);
     private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
 
-    private static  LongLiveZookeeper globalZookeeper;
-    private static  Properties config;
+    private static LongLiveZookeeper globalZookeeper;
+    private static Properties        config;
 
     public static void main(String[] args) {
         //debug args
@@ -220,7 +220,7 @@ public class App {
     private static void destroy(Map<String, Object> context) {
         if (context != null && context.containsKey(Constants.GLOBAL_CLIENT_OBJECT)
             && context.get(Constants.GLOBAL_CLIENT_OBJECT) != null) {
-            Messagebus client = (Messagebus)context.get(Constants.GLOBAL_CLIENT_OBJECT);
+            Messagebus client = (Messagebus) context.get(Constants.GLOBAL_CLIENT_OBJECT);
             if (client.isOpen())
                 client.close();
         }

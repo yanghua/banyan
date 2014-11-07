@@ -32,7 +32,7 @@ public class SentinelService extends AbstractService {
     private Messagebus        client;
     private QueueMessage      responseMsg;
     private LongLiveZookeeper zookeeper;
-    private Properties serverConfig;
+    private Properties        serverConfig;
 
     public SentinelService(Map<String, Object> context) {
         super(context);
@@ -40,7 +40,7 @@ public class SentinelService extends AbstractService {
         serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
 
         //set zookeeper info
-        client = (Messagebus)this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
+        client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
 
         responseMsg = (QueueMessage) MessageFactory.createMessage(MessageType.QueueMessage);
         Map<String, Object> headers = new HashMap<>(1);
@@ -52,7 +52,7 @@ public class SentinelService extends AbstractService {
         body.setContent(new byte[0]);
         responseMsg.setMessageBody(body);
 
-        zookeeper = (LongLiveZookeeper)context.get(Constants.GLOBAL_ZOOKEEPER_OBJECT);
+        zookeeper = (LongLiveZookeeper) context.get(Constants.GLOBAL_ZOOKEEPER_OBJECT);
     }
 
 
