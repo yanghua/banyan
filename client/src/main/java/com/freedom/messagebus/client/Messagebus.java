@@ -36,8 +36,6 @@ public class Messagebus {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    private static volatile Messagebus instance = null;
-
     @NotNull
     private String       appId;
     @NotNull
@@ -74,16 +72,8 @@ public class Messagebus {
         this.appId = appId;
     }
 
-    public static Messagebus getInstance(String appId) {
-        if (instance == null) {
-            synchronized (Messagebus.class) {
-                if (instance == null) {
-                    instance = new Messagebus(appId);
-                }
-            }
-        }
-
-        return instance;
+    public static Messagebus createClient(String appId) {
+        return new Messagebus(appId);
     }
 
     /**

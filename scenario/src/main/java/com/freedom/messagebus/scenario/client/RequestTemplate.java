@@ -16,7 +16,7 @@ public class RequestTemplate {
     private static final int    port   = 2181;
 
     public static void main(String[] args) {
-        Messagebus messagebus = Messagebus.getInstance(appId);
+        Messagebus messagebus = Messagebus.createClient(appId);
         messagebus.setZkHost(host);
         messagebus.setZkPort(port);
 

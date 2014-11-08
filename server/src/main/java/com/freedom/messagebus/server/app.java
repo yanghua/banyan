@@ -201,7 +201,7 @@ public class App {
         context.put(Constants.KEY_SERVER_CONFIG, serverConfig);
 
         //message bus client
-        Messagebus commonClient = Messagebus.getInstance(Constants.SERVER_APP_ID);
+        Messagebus commonClient = Messagebus.createClient(Constants.SERVER_APP_ID);
 
         String zkHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
         int zkPort = Integer.valueOf(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));

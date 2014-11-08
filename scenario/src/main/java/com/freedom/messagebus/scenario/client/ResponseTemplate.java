@@ -36,7 +36,7 @@ public class ResponseTemplate {
 
     public static class ResponseService extends Thread {
 
-        Messagebus client = Messagebus.getInstance(appid);
+        Messagebus client = Messagebus.createClient(appid);
 
         String          appName        = "server";
         IReceiverCloser consumerCloser = null;

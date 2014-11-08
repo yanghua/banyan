@@ -12,10 +12,8 @@ import org.apache.commons.logging.LogFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MBServerSentinelListener implements ServletContextListener {
@@ -26,7 +24,7 @@ public class MBServerSentinelListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = Messagebus.getInstance("5hW0M5wl9H0wO35Eva1tgM9D0p3OL2N8");
+        Messagebus messagebus = Messagebus.createClient("5hW0M5wl9H0wO35Eva1tgM9D0p3OL2N8");
         //TODO:
         messagebus.setZkHost(Constants.ZK_HOST);
         messagebus.setZkPort(Constants.ZK_PORT);

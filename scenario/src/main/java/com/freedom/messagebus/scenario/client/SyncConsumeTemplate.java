@@ -23,7 +23,7 @@ public class SyncConsumeTemplate {
     private static final String appName = "crm";
 
     public static void main(String[] args) {
-        Messagebus client = Messagebus.getInstance(appId);
+        Messagebus client = Messagebus.createClient(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

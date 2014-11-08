@@ -33,7 +33,7 @@ public class ProduceTemplate {
 
         msg.setMessageBody(body);
 
-        Messagebus client = Messagebus.getInstance(appId);
+        Messagebus client = Messagebus.createClient(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

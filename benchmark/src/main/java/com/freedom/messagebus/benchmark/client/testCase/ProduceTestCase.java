@@ -25,7 +25,7 @@ public class ProduceTestCase extends Benchmark {
 
         private BasicProduce(double msgBodySize) {
             msg = TestMessageFactory.create(MessageType.QueueMessage, msgBodySize);
-            client = Messagebus.getInstance(TestConfigConstant.APP_KEY);
+            client = Messagebus.createClient(TestConfigConstant.APP_KEY);
             client.setZkHost(TestConfigConstant.HOST);
             client.setZkPort(TestConfigConstant.PORT);
         }

@@ -36,7 +36,7 @@ public class SubscribeTemplate {
 
     public static class SubscribeService extends Thread {
 
-        Messagebus client = Messagebus.getInstance(appId);
+        Messagebus client = Messagebus.createClient(appId);
 
         String            receiveQueueName = "crm";
         List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});

@@ -7,7 +7,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class ConsumeTestCase extends Benchmark {
 
@@ -21,7 +20,7 @@ public class ConsumeTestCase extends Benchmark {
         private       long   counter = 0;
 
         private BasicConsume() {
-            client = Messagebus.getInstance(TestConfigConstant.APP_KEY);
+            client = Messagebus.createClient(TestConfigConstant.APP_KEY);
             client.setZkHost(TestConfigConstant.HOST);
             client.setZkPort(TestConfigConstant.PORT);
         }

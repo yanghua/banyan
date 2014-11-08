@@ -447,3 +447,23 @@ NODE.reset = function (jqObj, record) {
         }
     });
 };
+
+NODE.initOuterPermNodeJTable = function () {
+    $('#outerPermNodeTableContainer').jtable({
+        title: '节点列表',
+        paging: true,
+        pageSize: 10,
+        actions: {
+
+        },
+        field: {
+            
+        }
+    });
+};
+
+NODE.initInnerPermNodeJTable = function () {
+    $('#innerPermNodeTableContainer').jtable({
+
+    });
+};

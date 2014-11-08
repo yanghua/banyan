@@ -1,6 +1,5 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.rabbitHTTP.Queue;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
@@ -21,7 +20,7 @@ public class MessagebusService {
     private Messagebus client;
 
     public MessagebusService() {
-        client = Messagebus.getInstance(Constants.MESSAGEBUS_WEB_APP_ID);
+        client = Messagebus.createClient(Constants.MESSAGEBUS_WEB_APP_ID);
         client.setZkHost(Constants.ZK_HOST);
         client.setZkPort(Constants.ZK_PORT);
     }

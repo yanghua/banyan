@@ -69,7 +69,7 @@ public class TestUtility {
     public static void produce(long total) {
         Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
-        Messagebus client = Messagebus.getInstance(TestConfigConstant.APP_KEY);
+        Messagebus client = Messagebus.createClient(TestConfigConstant.APP_KEY);
         client.setZkHost(TestConfigConstant.HOST);
         client.setZkPort(TestConfigConstant.PORT);
         try {

@@ -25,7 +25,7 @@ public class BroadcastTemplate {
         body.setContent("test".getBytes());
         msg.setMessageBody(body);
 
-        Messagebus client = Messagebus.getInstance(appId);
+        Messagebus client = Messagebus.createClient(appId);
         client.setZkHost(host);
         client.setZkPort(port);
 

@@ -41,7 +41,7 @@ public class AsyncConsumeTemplate {
 
     public static class ConsumerService extends Thread {
 
-        Messagebus client = Messagebus.getInstance(appid);
+        Messagebus client = Messagebus.createClient(appid);
 
         String          appName        = "file";
         IReceiverCloser consumerCloser = null;
