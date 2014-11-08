@@ -457,7 +457,7 @@ NODE.initOuterPermNodeJTable = function () {
 
         },
         field: {
-            
+
         }
     });
 };
