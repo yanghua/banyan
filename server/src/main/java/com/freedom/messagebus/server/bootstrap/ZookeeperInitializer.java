@@ -61,20 +61,33 @@ public class ZookeeperInitializer {
     }
 
     private void initNodes() throws Exception {
+        //1th
         this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
         this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
         this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT);
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH);
+
+        //2th
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
+        this.zookeeper.createNode(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
+
     }
 
     private void dumpDbForZookeeper() throws IOException, InterruptedException {
         DBAccessor dbAccessor = DBAccessor.defaultAccessor(this.config);
-        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_NODE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH);
-        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_CONFIG_CMD_FORMAT, CONSTS.EXPORTED_CONFIG_FILE_PATH);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.DB_TABLE_OF_NODE);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.DB_TABLE_OF_CONFIG);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH,
+                              CONSTS.DB_TABLE_OF_SEND_PERMISSION);
+        dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH,
+                              CONSTS.DB_TABLE_OF_RECEIVE_PERMISSION);
     }
 
     private void loadSettingToZookeeper() throws IOException {
         setDbInfoToZK(CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
         setDbInfoToZK(CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+        setDbInfoToZK(CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
+        setDbInfoToZK(CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
     }
 
 

@@ -20,10 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -80,6 +77,12 @@ public class ConfigManager {
     @NotNull
     private Map<String, Config> clientConfigMap;
 
+    private Map<String, String> sendPermissionMap;
+    private Map<String, String> receivePermissionMap;
+
+    private Map<String, byte[]> sendPermByteQueryArrMap;
+    private Map<String, byte[]> receivePermByteQueryArrMap;
+
     private ConfigManager() {
         this.inited = this.init();
     }
@@ -129,6 +132,8 @@ public class ConfigManager {
 
             this.parseRouterInfo();
             this.parseConfigInfo();
+            this.parseSendPermission();
+            this.parseReceivePermission();
 
             return true;
         } catch (IOException e) {
@@ -226,6 +231,22 @@ public class ConfigManager {
     @NotNull
     public Map<String, Config> getClientConfigMap() {
         return clientConfigMap;
+    }
+
+    public Map<String, String> getSendPermissionMap() {
+        return sendPermissionMap;
+    }
+
+    public Map<String, String> getReceivePermissionMap() {
+        return receivePermissionMap;
+    }
+
+    public Map<String, byte[]> getSendPermByteQueryArrMap() {
+        return sendPermByteQueryArrMap;
+    }
+
+    public Map<String, byte[]> getReceivePermByteQueryArrMap() {
+        return receivePermByteQueryArrMap;
     }
 
     @Deprecated
@@ -497,6 +518,94 @@ public class ConfigManager {
         this.extractClientConfigs(configItems);
     }
 
+    public synchronized void parseSendPermission() throws MalformedURLException {
+        SAXReader reader = new SAXReader();
+        File routerFile = new File(CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH);
+        URL url = routerFile.toURI().toURL();
+        Document doc = null;
+
+        try {
+            doc = reader.read(url);
+        } catch (DocumentException e) {
+            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
+        }
+
+        Element rootElement = doc.getRootElement();
+        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
+
+        List<Element> rowElements = databaseNode.selectNodes("//row");
+        sendPermissionMap = new ConcurrentHashMap<>(rowElements.size());
+
+        int maxSendPermGrantId = 0;
+
+        for (Element row : rowElements) {
+            String targetId = row.selectSingleNode("field[@name='targetId']").getStringValue();
+            if (!sendPermissionMap.containsKey(targetId)) {
+                sendPermissionMap.put(targetId, "");
+            }
+
+            String joinedGrantIds = sendPermissionMap.get(targetId);
+            String grantId = row.selectSingleNode("field[@name='grantId']").getStringValue();
+            sendPermissionMap.put(targetId, joinedGrantIds + grantId + ",");
+
+            //get max send-permission grant id
+            maxSendPermGrantId = Math.max(maxSendPermGrantId, Integer.valueOf(grantId));
+        }
+
+        sendPermByteQueryArrMap = new ConcurrentHashMap<>(sendPermissionMap.size());
+        for (Map.Entry<String, String> sendPermItem : this.sendPermissionMap.entrySet()) {
+            sendPermByteQueryArrMap.put(sendPermItem.getKey(),
+                                        this.buildQueryArray(maxSendPermGrantId,
+                                                             sendPermItem.getKey(),
+                                                             this.sendPermissionMap)
+                                       );
+        }
+    }
+
+    public synchronized void parseReceivePermission() throws MalformedURLException {
+        SAXReader reader = new SAXReader();
+        File routerFile = new File(CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH);
+        URL url = routerFile.toURI().toURL();
+        Document doc = null;
+
+        try {
+            doc = reader.read(url);
+        } catch (DocumentException e) {
+            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
+        }
+
+        Element rootElement = doc.getRootElement();
+        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
+
+        List<Element> rowElements = databaseNode.selectNodes("//row");
+        receivePermissionMap = new ConcurrentHashMap<>(rowElements.size());
+
+        int maxReceivePermGrantId = 0;
+
+        for (Element row : rowElements) {
+            String targetId = row.selectSingleNode("field[@name='targetId']").getStringValue();
+            if (!receivePermissionMap.containsKey(targetId)) {
+                receivePermissionMap.put(targetId, "");
+            }
+
+            String joinedGrantIds = receivePermissionMap.get(targetId);
+            String grantId = row.selectSingleNode("field[@name='grantId']").getStringValue();
+            receivePermissionMap.put(targetId, joinedGrantIds + grantId + ",");
+
+            //get max receive-permission grant id
+            maxReceivePermGrantId = Math.max(maxReceivePermGrantId, Integer.valueOf(grantId));
+        }
+
+        receivePermByteQueryArrMap = new ConcurrentHashMap<>(receivePermissionMap.size());
+        for (Map.Entry<String, String> receivePermItem : receivePermissionMap.entrySet()) {
+            receivePermByteQueryArrMap.put(receivePermItem.getKey(),
+                                           this.buildQueryArray(maxReceivePermGrantId,
+                                                                receivePermItem.getKey(),
+                                                                this.receivePermissionMap)
+                                          );
+        }
+    }
+
     private void extractDifferentNodes(List<Node> nodes) {
         this.exchangeNodeMap = new ConcurrentHashMap<>();
         this.queueNodeMap = new ConcurrentHashMap<>();
@@ -519,5 +628,27 @@ public class ConfigManager {
             if (config.getKey().contains("client"))
                 this.clientConfigMap.put(config.getKey(), config);
         }
+    }
+
+    private byte[] buildQueryArray(int maxGrantId, String targetIdStr, Map<String, String> map) {
+        //from 1 - maxGrantId
+        byte[] permissionQueryBytes = new byte[maxGrantId + 1];
+
+        String[] grantIds = map.get(targetIdStr).toString().split(",");
+
+        permissionQueryBytes[0] = 0;
+        for (int i = 0; i <= maxGrantId; i++) {
+            permissionQueryBytes[i] = 0;
+
+            for (int j = 0; j < grantIds.length; j++) {
+                int current = Integer.valueOf(grantIds[j]);
+                if (i == current) {
+                    permissionQueryBytes[i] = 1;
+                    break;
+                }
+            }
+        }
+
+        return permissionQueryBytes;
     }
 }

@@ -105,11 +105,12 @@ public class DBAccessor {
         }
     }
 
-    public void dumpDbInfo(String cmdFormat, String filePath) throws IOException, InterruptedException {
+    public void dumpDbInfo(String cmdFormat, String filePath, String tbName) throws IOException, InterruptedException {
         String partOfcmdStr = String.format(cmdFormat,
                                             this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),
                                             this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_USER),
-                                            this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD));
+                                            this.properties.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD),
+                                            tbName);
         String cmdStr = partOfcmdStr + filePath;
         logger.debug("dump database info cmd : " + cmdStr);
         ShellHelper.exec(cmdStr);

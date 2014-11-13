@@ -162,14 +162,7 @@
         </ul>
     </form>
 </div>
-<!-- outer permission -->
-<div id="outerPermissionLayer" class="ltr" style="display: none; width: 400px; height: 400px;">
-    <div id="outerPermNodeTableContainer"></div>
-</div>
-<!-- inner permission -->
-<div id="innerPermissionLayer" class="ltr" style="display: none; widows: 400px; height: 400px;">
-    <div id="innerPermNodeTableContainer"></div>
-</div>
+
 
 <#include "/WEB-INF/widget/resource/jtable.ftl" />
 <#include "/WEB-INF/widget/resource/wufoo.ftl" />

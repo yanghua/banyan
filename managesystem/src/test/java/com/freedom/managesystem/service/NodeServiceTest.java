@@ -32,6 +32,6 @@ public class NodeServiceTest extends AbstractTransactionalJUnit4SpringContextTes
         node.setParentId(-1);
         node.setLevel((short) 0);
         node.setType((short) 0);
-        nodeService.create(node);
+        nodeService.save(node);
     }
 }

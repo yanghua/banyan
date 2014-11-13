@@ -36,21 +36,30 @@ public class CONSTS {
 
     public static int DEFAULT_AUTH_REQUEST_TIMEOUT_SECONDS = 30;
 
-    public static String EXPORTED_NODE_FILE_PATH  = "/var/tmp/messagebus_router_for_zookeeper.xml";
-    public static String EXPORTED_NODE_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X --hex-blob messagebus_sys_db NODE> ";
 
-    public static String EXPORTED_CONFIG_FILE_PATH  = "/var/tmp/messagebus_config_for_zookeeper.xml";
-    public static String EXPORTED_CONFIG_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X --hex-blob messagebus_sys_db CONFIG> ";
+    public static String EXPORTED_TABLE_CMD_FORMAT = "mysqldump -h%s -u%s -p%s -X --hex-blob messagebus_sys_db %s> ";
 
-    public static String ZOOKEEPER_ROOT_PATH_FOR_ROUTER = "/router";
+    public static final String EXPORTED_NODE_FILE_PATH               = "/var/tmp/messagebus_router_for_zookeeper.xml";
+    public static final String EXPORTED_CONFIG_FILE_PATH             = "/var/tmp/messagebus_config_for_zookeeper.xml";
+    public static final String EXPORTED_SEND_PERMISSION_FILE_PATH    = "/var/tmp/messagebus_sendpermission_for_zookeeper.xml";
+    public static final String EXPORTED_RECEIVE_PERMISSION_FILE_PATH = "/var/tmp/messagebus_receivepermission_for_zookeeper.xml";
 
-    public static String ZOOKEEPER_ROOT_PATH_FOR_CONFIG = "/config";
+    public static final String ZOOKEEPER_ROOT_PATH_FOR_ROUTER = "/router";
+    public static final String ZOOKEEPER_ROOT_PATH_FOR_CONFIG = "/config";
+    public static final String ZOOKEEPER_ROOT_PATH_FOR_EVENT  = "/event";
+    public static final String ZOOKEEPER_ROOT_PATH_FOR_AUTH   = "/auth";
 
-    public static String ZOOKEEPER_ROOT_PATH_FOR_EVENT = "/event";
+    //second path
+    public static final String ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION    = "/auth/sendpermission";
+    public static final String ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION = "/auth/receivepermission";
 
-    public static String MESSAGEBUS_SERVER_EVENT_STARTED = "started";
-    public static String MESSAGEBUS_SERVER_EVENT_STOPPED = "stopped";
+    public static final String MESSAGEBUS_SERVER_EVENT_STARTED = "started";
+    public static final String MESSAGEBUS_SERVER_EVENT_STOPPED = "stopped";
 
+    public static final String DB_TABLE_OF_NODE               = "NODE";
+    public static final String DB_TABLE_OF_CONFIG             = "CONFIG";
+    public static final String DB_TABLE_OF_SEND_PERMISSION    = "SEND_PERMISSION";
+    public static final String DB_TABLE_OF_RECEIVE_PERMISSION = "RECEIVE_PERMISSION";
 
     public static final String PROXY_EXCHANGE_NAME      = "exchange.proxy";
     public static       String DEFAULT_FILE_QUEUE_NAME  = "queue.proxy.log.file";

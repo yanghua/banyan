@@ -102,7 +102,10 @@ public class Messagebus {
             new String[]{
                 CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER,
                 CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG,
-                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT
+                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT,
+                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH,
+                CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION,
+                CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION
             },
             new IConfigChangedListener() {
                 @Override
@@ -112,14 +115,35 @@ public class Messagebus {
                     logger.debug("path : " + path + " has changed!");
 
                     try {
-                        if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
-                            refreshLocalCachedFile(path, newData);
-                            ConfigManager.getInstance().parseRouterInfo();
-                        } else if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT)) {
-                            String newState = new String(newData);
-                            logger.info("messagebus server event : " + newState);
-                            ConfigManager.getInstance().setServerState(newState);
+                        switch (path) {
+                            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER:
+                                refreshLocalCachedFile(path, newData);
+                                ConfigManager.getInstance().parseRouterInfo();
+                                break;
+
+                            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT: {
+                                String newState = new String(newData);
+                                logger.info("messagebus server event : " + newState);
+                                ConfigManager.getInstance().setServerState(newState);
+                            }
+                                break;
+
+                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION:{
+                                refreshLocalCachedFile(path, newData);
+                                ConfigManager.getInstance().parseSendPermission();
+                            }
+                                break;
+
+                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION: {
+                                refreshLocalCachedFile(path, newData);
+                                ConfigManager.getInstance().parseReceivePermission();
+                            }
+                                break;
+
+                            default:
+                                logger.error("unsupported path : " + path);
                         }
+
                     } catch (Exception e) {
                         logger.error("[onChanged] occurs a Exception : " + e.getMessage());
                     }
@@ -316,20 +340,37 @@ public class Messagebus {
         byte[] routerData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
         byte[] configData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
         byte[] eventData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT);
+        byte[] sendPermissionData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
+        byte[] receivePermissionData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
         //refresh local
         this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER, routerData);
         this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG, configData);
+        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION, sendPermissionData);
+        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION, receivePermissionData);
         ConfigManager.getInstance().setServerState(new String(eventData));
     }
 
     private synchronized void refreshLocalCachedFile(String path, byte[] newData) {
         String filePath;
-        if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER)) {
-            filePath = CONSTS.EXPORTED_NODE_FILE_PATH;
-        } else if (path.equals(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG)) {
-            filePath = CONSTS.EXPORTED_CONFIG_FILE_PATH;
-        } else {
-            return;
+        switch (path) {
+            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER:
+                filePath = CONSTS.EXPORTED_NODE_FILE_PATH;
+                break;
+
+            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG:
+                filePath = CONSTS.EXPORTED_CONFIG_FILE_PATH;
+                break;
+
+            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION:
+                filePath = CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH;
+                break;
+
+            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION:
+                filePath = CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH;
+                break;
+
+            default:
+                return;
         }
 
         Path routerFilePath = FileSystems.getDefault().getPath(filePath);

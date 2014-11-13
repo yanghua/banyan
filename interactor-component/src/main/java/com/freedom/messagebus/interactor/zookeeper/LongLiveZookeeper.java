@@ -118,6 +118,9 @@ public class LongLiveZookeeper {
         @Override
         public void process(WatchedEvent watchedEvent) {
             String path = watchedEvent.getPath();
+            if (path == null)
+                return;
+
             logger.debug("[process] path : " + path + "changed");
 
             try {

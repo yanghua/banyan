@@ -63,6 +63,10 @@
         <action name="/module/*" class="com.freedom.managesystem.action.permission.ModuleAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
+
+        <action name="/queue/*" class="com.freedom.managesystem.action.permission.QueueAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+        </action>
     </package>
 
     <!-- monitor -->
@@ -162,6 +166,12 @@
             <exception-mapping exception="java.lang.Exception"
                                result="error"/>
         </global-exception-mappings>
+
+        <action name="/queue/*" class="com.freedom.managesystem.action.alarm.QueueAction" method="{1}">
+            <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
+            <result name="success">/success.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
     </package>
 
 </struts>

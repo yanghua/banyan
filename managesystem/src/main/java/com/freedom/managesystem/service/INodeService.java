@@ -4,10 +4,11 @@ import com.freedom.messagebus.common.model.Node;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface INodeService {
 
-    public void create(Node node) throws SQLException;
+    public void save(Node node) throws SQLException;
 
     public List<Node> getAll();
 
@@ -15,11 +16,19 @@ public interface INodeService {
 
     public Node get(int id);
 
+    public List<Node> getWithType(int type, int offset, int pageSize);
+
+    public List<Node> getQueues(int nodeId, boolean isPubsub);
+
     public void modify(Node node) throws SQLException;
 
     public void remove(int id) throws SQLException;
 
     public int countAll();
+
+    public int countAvailableQueues();
+
+    public int countSpecialAvailableQueues(int targetId, boolean isPubsub);
 
     public String generateNodeValue(Node node) throws IllegalStateException;
 

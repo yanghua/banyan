@@ -5,6 +5,7 @@ import com.freedom.managesystem.service.Constants;
 import com.freedom.managesystem.service.INodeService;
 import com.freedom.managesystem.service.MessagebusService;
 import com.freedom.messagebus.common.model.Node;
+import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
 
     @Override
     @Transactional
-    public void create(@NotNull Node node) throws SQLException {
+    public void save(@NotNull Node node) throws SQLException {
         //create for end-to-end
         boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) !=null);
 
@@ -37,7 +38,7 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
 
         node.setInner(false);
         node.setAppId(this.generateAppId());
-        nodeMapper.save(node);
+        nodeMapper.create(node);
 
         if (node.getType() == Constants.QUEUE_TYPE) {
             //create a pair queue for pubsub
@@ -52,7 +53,7 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
             newQueueForPubsub.setLevel(node.getLevel());
             newQueueForPubsub.setInner(false);
             newQueueForPubsub.setAppId(this.generateAppId());
-            nodeMapper.save(newQueueForPubsub);
+            nodeMapper.create(newQueueForPubsub);
         }
 
         this.produceDBOperate("CREATE", "NODE");
@@ -68,6 +69,27 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
     @Override
     public Node get(int id) {
         return nodeMapper.find(id);
+    }
+
+    @Override
+    public List<Node> getWithPaging(int offset, int pageSize) {
+        return nodeMapper.findWithPaging(offset, pageSize);
+    }
+
+    @Override
+    public List<Node> getWithType(int type, int offset, int pageSize) {
+        return nodeMapper.findWithType(offset, pageSize, type);
+    }
+
+    @Override
+    public List<Node> getQueues(int nodeId, boolean isPubsub) {
+        return nodeMapper.findSpecialQueuesExcludeSelf(nodeId, isPubsub);
+    }
+
+    @Override
+    public void modify(Node node) throws SQLException {
+        nodeMapper.update(node);
+        this.produceDBOperate("UPDATE", "NODE");
     }
 
     @Override
@@ -109,19 +131,18 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
     }
 
     @Override
-    public List<Node> getWithPaging(int offset, int pageSize) {
-        return nodeMapper.findWithPaging(offset, pageSize);
-    }
-
-    @Override
-    public void modify(Node node) throws SQLException {
-        nodeMapper.update(node);
-        this.produceDBOperate("UPDATE", "NODE");
-    }
-
-    @Override
     public int countAll() {
         return nodeMapper.countAll();
+    }
+
+    @Override
+    public int countAvailableQueues() {
+        return nodeMapper.countAvailableQueues();
+    }
+
+    @Override
+    public int countSpecialAvailableQueues(int targetId, boolean isPubsub) {
+        return nodeMapper.countSpecialAvailableQueues(targetId, isPubsub);
     }
 
     @Override

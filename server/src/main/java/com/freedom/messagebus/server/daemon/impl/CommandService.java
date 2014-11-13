@@ -132,6 +132,14 @@ public class CommandService extends AbstractService {
                 this.processConfig();
                 break;
 
+            case "SEND_PERMISSION":
+                this.processSendPermission();
+                break;
+
+            case "RECEIVE_PERMISSION":
+                this.processReceivePermission();
+                break;
+
             default:
                 logger.error("[process] unsupported table name : " + tableName);
         }
@@ -140,7 +148,7 @@ public class CommandService extends AbstractService {
     private void processNode() {
         DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
         try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_NODE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH);
+            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.DB_TABLE_OF_NODE);
             setDbInfoToZK(CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
         } catch (IOException e) {
             logger.error("[processNode] occurs a IOException : " + e.getMessage());
@@ -150,11 +158,40 @@ public class CommandService extends AbstractService {
     }
 
     private void processConfig() {
-        Properties serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
         DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
         try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_CONFIG_CMD_FORMAT, CONSTS.EXPORTED_CONFIG_FILE_PATH);
+            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
+                                  CONSTS.EXPORTED_CONFIG_FILE_PATH,
+                                  CONSTS.DB_TABLE_OF_CONFIG);
             setDbInfoToZK(CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+        } catch (IOException e) {
+            logger.error("[processNode] occurs a IOException : " + e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
+        }
+    }
+
+    private void processSendPermission() {
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
+        try {
+            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
+                                  CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH,
+                                  CONSTS.DB_TABLE_OF_SEND_PERMISSION);
+            setDbInfoToZK(CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
+        } catch (IOException e) {
+            logger.error("[processNode] occurs a IOException : " + e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
+        }
+    }
+
+    private void processReceivePermission() {
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
+        try {
+            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
+                                  CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH,
+                                  CONSTS.DB_TABLE_OF_RECEIVE_PERMISSION);
+            setDbInfoToZK(CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
         } catch (IOException e) {
             logger.error("[processNode] occurs a IOException : " + e.getMessage());
         } catch (InterruptedException e) {

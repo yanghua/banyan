@@ -30,7 +30,7 @@ public class NodeAction extends BaseAction {
     public String index() {
         super.index();
         ServletActionContext.getRequest().setAttribute("pageName", "maintain/node/node");
-        nodeList = nodeService.getAll();
+//        nodeList = nodeService.getAll();
         return "index";
     }
 
@@ -91,7 +91,7 @@ public class NodeAction extends BaseAction {
         }
 
         try {
-            nodeService.create(node);
+            nodeService.save(node);
             responseJTableData(resp, generateCreateSuccessJSONStr("create success."));
         } catch (SQLException e) {
             logger.error("[create] occurs a SQLException : " + e.getMessage());
@@ -137,66 +137,6 @@ public class NodeAction extends BaseAction {
         } catch (SQLException e) {
             logger.error("[delete] occurs a SQLException : " + e.getMessage());
             responseJTableData(resp, generateErrorJSONStr(e.getMessage()));
-        }
-    }
-
-    public void activate() throws IOException {
-        HttpServletRequest req = ServletActionContext.getRequest();
-        HttpServletResponse resp = ServletActionContext.getResponse();
-
-        String pNodeId = req.getParameter("nodeId");
-        if (Strings.isNullOrEmpty(pNodeId)) {
-            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
-            return;
-        }
-        int nodeId = Integer.valueOf(pNodeId);
-
-        try {
-            nodeService.activate(nodeId);
-            responseJTableData(resp, generateUpdateSuccessJSONStr());
-        } catch (SQLException e) {
-            logger.error("[activate] occurs a SQLException : " + e.getMessage());
-            responseJTableData(resp, generateErrorJSONStr("activate failed."));
-        }
-    }
-
-    public void unactivate() throws IOException {
-        HttpServletRequest req = ServletActionContext.getRequest();
-        HttpServletResponse resp = ServletActionContext.getResponse();
-
-        String pNodeId = req.getParameter("nodeId");
-        if (Strings.isNullOrEmpty(pNodeId)) {
-            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
-            return;
-        }
-        int nodeId = Integer.valueOf(pNodeId);
-
-        try {
-            nodeService.unactivate(nodeId);
-            responseJTableData(resp, generateUpdateSuccessJSONStr());
-        } catch (SQLException e) {
-            logger.error("[activate] occurs a SQLException : " + e.getMessage());
-            responseJTableData(resp, generateErrorJSONStr("activate failed."));
-        }
-    }
-
-    public void reset() throws IOException {
-        HttpServletRequest req = ServletActionContext.getRequest();
-        HttpServletResponse resp = ServletActionContext.getResponse();
-
-        String pNodeId = req.getParameter("nodeId");
-        if (Strings.isNullOrEmpty(pNodeId)) {
-            responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
-            return;
-        }
-        int nodeId = Integer.valueOf(pNodeId);
-
-        try {
-            String appId = nodeService.resetAppId(nodeId);
-            responseJTableData(resp, generateCreateSuccessJSONStr(appId));
-        } catch (SQLException e) {
-            logger.error("[activate] occurs a SQLException : " + e.getMessage());
-            responseJTableData(resp, generateErrorJSONStr("activate failed."));
         }
     }
 

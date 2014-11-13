@@ -67,7 +67,9 @@
 * web管控台，注册节点后，向server发送：更新命令（server将数据库的更新数据主动push到客户端）
 * 将各个module内的常量定义配置到数据库
 * 将zookeeper推送到客户端的配置信息加密
-* 重新整理 `server` 端的配置、让 `server` 直接依赖 `client` 
+* ~~重新整理 `server` 端的配置、让 `server` 直接依赖 `client` ~~
+* 优化从数据库dump并设置到zookeeper中要推送给客户端的数据（目前是采用mysqldump导出，冗余信息较多），这也可以将部分数据改用redis来存储，然后借助于其 pub/sub来进行优化
+* 处理在windows系统下，从zookeeper内dump出来的数据存储问题（系统的公共位置）
 
 
 
