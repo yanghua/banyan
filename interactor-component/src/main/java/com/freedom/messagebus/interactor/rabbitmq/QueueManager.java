@@ -1,6 +1,5 @@
 package com.freedom.messagebus.interactor.rabbitmq;
 
-import com.freedom.messagebus.common.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;

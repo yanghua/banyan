@@ -1,6 +1,6 @@
 package com.freedom.messagebus.benchmark.client;
 
-import com.freedom.messagebus.common.message.*;
+import com.freedom.messagebus.business.message.model.*;
 
 public class TestMessageFactory {
 

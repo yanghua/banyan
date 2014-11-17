@@ -1,9 +1,9 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.model.Node;
 import org.jetbrains.annotations.NotNull;
 
 public class GenericRequester extends AbstractMessageCarryer implements IRequester {
@@ -28,8 +28,10 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.REQUEST);
         cxt.setAppId(super.context.getAppId());
+
+        cxt.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
-        cxt.setQueueNode(node);
+        cxt.setTargetNode(node);
         cxt.setTimeout(timeout);
         cxt.setMessages(new Message[]{msg});
 

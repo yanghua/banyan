@@ -1,5 +1,6 @@
 package com.freedom.messagebus.client.handler.common;
 
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
@@ -25,7 +26,19 @@ public abstract class AbstractParamValidator extends AbstractHandler {
     public void handle(@NotNull MessageContext context,
                        @NotNull IHandlerChain chain) {
         if (context.getAppId().length() == 0)
-            throw new ParamValidateFailedException(" the field : appkey of MessageContext can not be empty");
+            throw new ParamValidateFailedException(" the field : appId of MessageContext can not be empty");
 
+        Node sourceNode = context.getSourceNode();
+        if (sourceNode == null) {
+            throw new ParamValidateFailedException(" the appId is illegal. ");
+        }
+
+        if (sourceNode.getType() == 0) {
+            throw new ParamValidateFailedException(" the appId's owner must be a queue node");
+        }
+
+        if (!sourceNode.isAvailable()) {
+            throw new ParamValidateFailedException(" the appid's owner is not available");
+        }
     }
 }

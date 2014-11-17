@@ -1,7 +1,8 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,6 +19,7 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
         MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.PUBLISH);
         ctx.setAppId(this.context.getAppId());
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
         ctx.setMessages(msgs);
 
         ctx.setPool(this.context.getPool());

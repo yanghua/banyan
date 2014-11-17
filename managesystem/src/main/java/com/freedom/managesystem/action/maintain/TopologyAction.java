@@ -2,7 +2,7 @@ package com.freedom.managesystem.action.maintain;
 
 import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.service.INodeService;
-import com.freedom.messagebus.common.model.Node;
+import com.freedom.messagebus.business.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;

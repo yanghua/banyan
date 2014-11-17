@@ -1,11 +1,11 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consume.OriginalReceiver;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.model.Node;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
@@ -48,7 +48,9 @@ public class MessageContext {
     @NotNull
     private MessageCarryType carryType;                 //produce or consume
     @NotNull
-    private Node             queueNode;                 //store current carry node
+    private Node             sourceNode;                //store represent self
+    @NotNull
+    private Node             targetNode;                 //store represent current carry node
 
     @NotNull
     private Channel                           channel;
@@ -148,12 +150,21 @@ public class MessageContext {
     }
 
     @NotNull
-    public Node getQueueNode() {
-        return queueNode;
+    public Node getTargetNode() {
+        return targetNode;
     }
 
-    public void setQueueNode(@NotNull Node queueNode) {
-        this.queueNode = queueNode;
+    public void setTargetNode(@NotNull Node targetNode) {
+        this.targetNode = targetNode;
+    }
+
+    @NotNull
+    public Node getSourceNode() {
+        return sourceNode;
+    }
+
+    public void setSourceNode(@NotNull Node sourceNode) {
+        this.sourceNode = sourceNode;
     }
 
     @NotNull

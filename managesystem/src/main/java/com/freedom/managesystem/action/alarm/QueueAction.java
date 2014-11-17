@@ -3,7 +3,7 @@ package com.freedom.managesystem.action.alarm;
 import com.freedom.managesystem.action.other.BaseAction;
 import com.freedom.managesystem.service.Constants;
 import com.freedom.managesystem.service.INodeService;
-import com.freedom.messagebus.common.model.Node;
+import com.freedom.messagebus.business.model.Node;
 import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

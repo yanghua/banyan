@@ -1,14 +1,17 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
-import com.freedom.messagebus.benchmark.client.*;
-import com.freedom.messagebus.common.AbstractInitializer;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
+import com.freedom.messagebus.benchmark.client.Benchmark;
+import com.freedom.messagebus.benchmark.client.IFetcher;
+import com.freedom.messagebus.benchmark.client.ITerminater;
+import com.freedom.messagebus.benchmark.client.TestConfigConstant;
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageFactory;
+import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
+import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
@@ -89,9 +92,9 @@ public class OriginalConsumeTestCase extends Benchmark {
         }
 
         private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-            MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
+            MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
 
-            IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
+            IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msgType);
             msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
         }
 

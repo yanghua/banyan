@@ -1,10 +1,10 @@
 package com.freedom.messagebus.scenario.client;
 
+import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.client.IConsumer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
-import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,10 +15,10 @@ import java.util.List;
  */
 public class SyncConsumeTemplate {
 
-    private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
-    private static final String appId  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final Log logger = LogFactory.getLog(AsyncConsumeTemplate.class);
 
-    private static final String host    = "115.29.96.85";
+    private static final String appId   = "6vifQNkw225U6dS8cI92rS2eS1o7ZehQ";            //ucp
+    private static final String host    = "172.16.206.30";
     private static final int    port    = 2181;
     private static final String appName = "crm";
 

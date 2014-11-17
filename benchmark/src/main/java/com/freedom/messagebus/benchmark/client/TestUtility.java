@@ -1,11 +1,11 @@
 package com.freedom.messagebus.benchmark.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;

@@ -1,9 +1,9 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -39,8 +39,10 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(this.context.getAppId());
+
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
-        ctx.setQueueNode(node);
+        ctx.setTargetNode(node);
 
         ctx.setPool(this.context.getPool());
         ctx.setConnection(this.context.getConnection());
@@ -76,8 +78,11 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(super.context.getAppId());
+
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(queueName);
-        ctx.setQueueNode(node);
+        ctx.setTargetNode(node);
+
         ctx.setPool(this.context.getPool());
         ctx.setConnection(this.context.getConnection());
         ctx.setConsumeMsgNum(num);

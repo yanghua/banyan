@@ -1,12 +1,12 @@
 package com.freedom.messagebus.client.core.config;
 
+import com.freedom.messagebus.business.model.Config;
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.classLoader.RemoteClassLoader;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.model.Config;
-import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -74,6 +77,8 @@ public class ConfigManager {
     private Map<String, Node>   queueNodeMap;
     @NotNull
     private Map<String, Node>   pubsubNodeMap;
+    @NotNull
+    private Map<String, Node>   appIdQueueMap;
     @NotNull
     private Map<String, Config> clientConfigMap;
 
@@ -143,6 +148,7 @@ public class ConfigManager {
     }
 
 
+    //region handler model
     @NotNull
     public List<HandlerModel> getProduceHandlerModels() {
         return produceHandlerModels;
@@ -177,7 +183,9 @@ public class ConfigManager {
     public List<HandlerModel> getBroadcastHandlerModels() {
         return broadcastHandlerModels;
     }
+    //endregion
 
+    //region handler chain list
     @NotNull
     public List<AbstractHandler> getProduceHandlerChain() {
         return produceHandlerChain;
@@ -212,7 +220,9 @@ public class ConfigManager {
     public List<AbstractHandler> getBroadcastHandlerChain() {
         return broadcastHandlerChain;
     }
+    //endregion
 
+    //region node map
     @NotNull
     public Map<String, Node> getExchangeNodeMap() {
         return exchangeNodeMap;
@@ -229,10 +239,18 @@ public class ConfigManager {
     }
 
     @NotNull
+    public Map<String, Node> getAppIdQueueMap() {
+        return appIdQueueMap;
+    }
+    //endregion
+
+    @NotNull
     public Map<String, Config> getClientConfigMap() {
         return clientConfigMap;
     }
 
+
+    //region permission
     public Map<String, String> getSendPermissionMap() {
         return sendPermissionMap;
     }
@@ -248,6 +266,7 @@ public class ConfigManager {
     public Map<String, byte[]> getReceivePermByteQueryArrMap() {
         return receivePermByteQueryArrMap;
     }
+    //endregion
 
     @Deprecated
     public void updateHandlerChain(String path, byte[] data) {
@@ -482,6 +501,9 @@ public class ConfigManager {
             anode.setLevel(Short.valueOf(row.selectSingleNode("field[@name='level']").getStringValue()));
             anode.setRouterType(row.selectSingleNode("field[@name='routerType']").getStringValue());
             anode.setRoutingKey(row.selectSingleNode("field[@name='routingKey']").getStringValue());
+            anode.setAppId(row.selectSingleNode("field[@name='appId']").getStringValue());
+            anode.setAvailable(row.selectSingleNode("field[@name='available']").getStringValue().equals("1"));
+            anode.setInner(row.selectSingleNode("field[@name='inner']").getStringValue().equals("1"));
 
             nodes.add(anode);
         }
@@ -610,14 +632,19 @@ public class ConfigManager {
         this.exchangeNodeMap = new ConcurrentHashMap<>();
         this.queueNodeMap = new ConcurrentHashMap<>();
         this.pubsubNodeMap = new ConcurrentHashMap<>();
+        this.appIdQueueMap = new ConcurrentHashMap<>();
 
         for (Node node : nodes) {
             if (node.getType() == 0)
                 this.exchangeNodeMap.put(node.getName(), node);
-            else if (node.getType() == 1 && !node.getValue().contains("pubsub"))
-                this.queueNodeMap.put(node.getName(), node);
-            else if (node.getType() == 1 && node.getValue().contains("pubsub"))
-                this.pubsubNodeMap.put(node.getName(), node);
+            else {
+                this.appIdQueueMap.put(node.getAppId(), node);
+                if (node.getType() == 1 && !node.getValue().contains("pubsub"))
+                    this.queueNodeMap.put(node.getName(), node);
+                else if (node.getType() == 1 && node.getValue().contains("pubsub"))
+                    this.pubsubNodeMap.put(node.getName(), node);
+            }
+
         }
     }
 

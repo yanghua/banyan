@@ -1,7 +1,7 @@
 package com.freedom.managesystem.dao;
 
 import com.freedom.managesystem.dao.sqlprovider.NodeProvider;
-import com.freedom.messagebus.common.model.Node;
+import com.freedom.messagebus.business.model.Node;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

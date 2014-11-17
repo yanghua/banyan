@@ -1,12 +1,12 @@
 package com.freedom.messagebus.client.handler.response;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -28,9 +28,9 @@ public class ResponseSender extends AbstractHandler {
     @Override
     public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
         Message responseMsg = context.getMessages()[0];
-        IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(responseMsg.getMessageType());
+        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(responseMsg.getMessageType());
         byte[] msgBody = msgBodyProcessor.box(responseMsg.getMessageBody());
-        AMQP.BasicProperties properties = MessageHeaderProcessor.box(responseMsg.getMessageHeader());
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(responseMsg.getMessageHeader());
         try {
             ProxyProducer.produce("",
                                   context.getChannel(),

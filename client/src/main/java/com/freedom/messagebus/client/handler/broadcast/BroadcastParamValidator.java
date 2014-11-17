@@ -1,10 +1,10 @@
 package com.freedom.messagebus.client.handler.broadcast;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;

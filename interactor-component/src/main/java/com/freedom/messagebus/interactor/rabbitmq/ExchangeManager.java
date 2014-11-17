@@ -1,7 +1,5 @@
 package com.freedom.messagebus.interactor.rabbitmq;
 
-import com.freedom.messagebus.common.AbstractInitializer;
-import com.freedom.messagebus.common.RouterType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,18 +29,18 @@ public class ExchangeManager extends AbstractInitializer {
         return instance;
     }
 
-    public void create(@NotNull String exchangeName, RouterType routerType) throws IOException {
+    public void create(@NotNull String exchangeName, String routerType) throws IOException {
         super.init();
-        this.channel.exchangeDeclare(exchangeName, routerType.toString(), true);
+        this.channel.exchangeDeclare(exchangeName, routerType, true);
         super.close();
     }
 
     public void create(@NotNull String exchangeName,
-                       RouterType routerType,
+                       String routerType,
                        String bindTo,
                        String routingKey) throws IOException {
         super.init();
-        this.channel.exchangeDeclare(exchangeName, routerType.toString(), true);
+        this.channel.exchangeDeclare(exchangeName, routerType, true);
 
         //bind
         if (bindTo != null && !bindTo.isEmpty() && this.innerExists(bindTo, channel))

@@ -1,10 +1,10 @@
 package com.freedom.messagebus.httpbridge.controller;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageJSONSerializer;
+import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageJSONSerializer;
-import com.freedom.messagebus.common.message.MessageType;
 import com.freedom.messagebus.httpbridge.util.Constants;
 import com.freedom.messagebus.httpbridge.util.ResponseUtil;
 import org.apache.commons.logging.Log;

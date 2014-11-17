@@ -1,13 +1,12 @@
 package com.freedom.messagebus.client.handler.common;
 
+import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.HandlerModel;
-import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.UUIDGenerator;
-import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;

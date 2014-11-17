@@ -1,10 +1,9 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.messagebus.common.model.Node;
+import com.freedom.messagebus.business.model.Node;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 public interface INodeService {
 

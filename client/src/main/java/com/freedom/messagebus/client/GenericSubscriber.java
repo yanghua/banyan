@@ -3,7 +3,6 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -20,19 +19,12 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
     }
 
     public ISubscribeManager subscribe(@NotNull List<String> subQueueNames,
-                                       @NotNull String receiveQueueName,
                                        @NotNull IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
-        ctx.setAppId(super.context.getAppId());
-        Node node = null;
-        if (!receiveQueueName.contains(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX)) {
-            String realReceiveQueueName = receiveQueueName + CONSTS.PUBSUB_QUEUE_NAME_SUFFIX;
-            node = ConfigManager.getInstance().getPubsubNodeMap().get(realReceiveQueueName);
-        } else {
-            node = ConfigManager.getInstance().getPubsubNodeMap().get(receiveQueueName);
-        }
-        ctx.setQueueNode(node);
+        ctx.setAppId(this.context.getAppId());
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
+
         ctx.setPool(this.context.getPool());
         ctx.setConnection(this.context.getConnection());
         ctx.setListener(receiveListener);

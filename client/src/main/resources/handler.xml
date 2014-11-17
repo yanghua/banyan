@@ -2,20 +2,24 @@
 <handler-plugins xmlns="http://com.freedom.messagebus">
     <produce>
         <handler>
-            <handler-name>MessageId-Generator</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
-        </handler>
-        <handler>
             <handler-name>Validate-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.produce.ProduceParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Produce-Permission-Checker</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.produce.ProducePermission</handler-path>
+        </handler>
+        <handler>
+            <handler-name>MessageId-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.common.PooledChannelAccessor</handler-path>
         </handler>
         <!--<handler>-->
-            <!--<handler-name>Single-Channel-Accessor</handler-name>-->
-            <!--<handler-path>com.freedom.messagebus.client.handler.common.SingleChannelAccessor</handler-path>-->
+        <!--<handler-name>Single-Channel-Accessor</handler-name>-->
+        <!--<handler-path>com.freedom.messagebus.client.handler.common.SingleChannelAccessor</handler-path>-->
         <!--</handler>-->
         <handler>
             <handler-name>Real-Produce-Handler</handler-name>
@@ -24,12 +28,16 @@
     </produce>
     <consumer>
         <handler>
-            <handler-name>Consumer-Tag-Generator</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumerTagGenerator</handler-path>
-        </handler>
-        <handler>
             <handler-name>Validate-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.consume.ConsumeParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Consume-Permission-Checker</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumePermission</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Consumer-Tag-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.consume.ConsumerTagGenerator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>
@@ -54,12 +62,16 @@
     </consumer>
     <request>
         <handler>
-            <handler-name>MessageId-Generator</handler-name>
-            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
-        </handler>
-        <handler>
             <handler-name>Validate-Handler</handler-name>
             <handler-path>com.freedom.messagebus.client.handler.request.RequestParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Request-Permission-Checker</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.request.RequestPermission</handler-path>
+        </handler>
+        <handler>
+            <handler-name>MessageId-Generator</handler-name>
+            <handler-path>com.freedom.messagebus.client.handler.common.MessageIdGenerator</handler-path>
         </handler>
         <handler>
             <handler-name>Pooled-Channel-Handler</handler-name>

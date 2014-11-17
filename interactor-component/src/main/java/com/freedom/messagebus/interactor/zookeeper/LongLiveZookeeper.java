@@ -1,6 +1,5 @@
 package com.freedom.messagebus.interactor.zookeeper;
 
-import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.*;
@@ -76,7 +75,7 @@ public class LongLiveZookeeper {
         } catch (InterruptedException e) {
             logger.error("[InterruptedException] occurs a InterruptedException : " + e.getMessage());
         } catch (Exception e) {
-            ExceptionHelper.logException(logger, e, "[watchPaths]");
+            logger.error("[watchPaths] occurs a Exception : " + e.getMessage());
         }
     }
 

@@ -1,8 +1,8 @@
 package com.freedom.messagebus.server.bootstrap;
 
 
-import com.freedom.messagebus.common.AbstractInitializer;
-import com.freedom.messagebus.common.model.Node;
+import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.dataaccess.DBAccessor;

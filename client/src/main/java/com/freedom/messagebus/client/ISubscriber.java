@@ -8,7 +8,6 @@ import java.util.List;
 public interface ISubscriber {
 
     public ISubscribeManager subscribe(@NotNull List<String> subQueueNames,
-                                       @NotNull String queueName,
                                        @NotNull IMessageReceiveListener receiveListener) throws IOException;
 
 }

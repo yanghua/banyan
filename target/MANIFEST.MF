@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Build-Jdk: 1.7.0_45
-Built-By: yanghua
-Created-By: IntelliJ IDEA
-

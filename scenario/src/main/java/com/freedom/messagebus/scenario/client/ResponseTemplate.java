@@ -1,8 +1,8 @@
 package com.freedom.messagebus.scenario.client;
 
 
+import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -1,14 +1,14 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
 import com.freedom.messagebus.benchmark.client.*;
-import com.freedom.messagebus.common.AbstractInitializer;
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
+import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,9 +21,9 @@ public class OriginalProduceTestCase extends Benchmark {
 
     private static class BasicProduce extends AbstractInitializer implements Runnable, ITerminater, IFetcher {
 
-        private Message               msg;
-        private String                routingkey;
-        private IMessageBodyProcessor msgBodyProcessor;
+        private Message              msg;
+        private String               routingkey;
+        private IMessageBodyTransfer msgBodyProcessor;
         private boolean flag    = true;
         private long    counter = 0;
 
@@ -41,9 +41,9 @@ public class OriginalProduceTestCase extends Benchmark {
         public void run() {
             try {
                 this.init();
-                msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msg.getMessageType());
+                msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());
                 byte[] msgBodyOfBytes = msgBodyProcessor.box(msg.getMessageBody());
-                AMQP.BasicProperties header = MessageHeaderProcessor.box(msg.getMessageHeader());
+                AMQP.BasicProperties header = MessageHeaderTransfer.box(msg.getMessageHeader());
                 while (flag) {
                     ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
                                           this.channel,

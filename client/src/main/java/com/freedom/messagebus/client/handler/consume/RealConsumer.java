@@ -31,7 +31,7 @@ public class RealConsumer extends AbstractHandler {
             QueueingConsumer consumer = null;
             try {
                 consumer = ProxyConsumer.consume(context.getChannel(),
-                                                 context.getQueueNode().getValue(),
+                                                 context.getTargetNode().getValue(),
                                                  context.getConsumerTag());
             } catch (IOException e) {
                 logger.error("[handler] occurs a IOException : " + e.getMessage());

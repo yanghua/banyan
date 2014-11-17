@@ -1,7 +1,8 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
 
 public class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster {
 
@@ -14,6 +15,7 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
         MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.BROADCAST);
         ctx.setAppId(this.context.getAppId());
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
         ctx.setMessages(msgs);
 
         ctx.setPool(this.context.getPool());

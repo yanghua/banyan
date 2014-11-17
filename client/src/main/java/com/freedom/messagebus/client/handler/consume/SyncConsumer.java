@@ -1,14 +1,14 @@
 package com.freedom.messagebus.client.handler.consume;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageFactory;
+import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
@@ -39,7 +39,7 @@ public class SyncConsumer extends AbstractHandler {
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
-                                                                              context.getQueueNode().getValue());
+                                                                              context.getTargetNode().getValue());
 
                     if (response == null)
                         continue;
@@ -77,9 +77,9 @@ public class SyncConsumer extends AbstractHandler {
     }
 
     private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
+        MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
 
-        IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
+        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msgType);
         msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
     }
 }

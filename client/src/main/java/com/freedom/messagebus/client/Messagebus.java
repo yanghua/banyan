@@ -1,19 +1,16 @@
 package com.freedom.messagebus.client;
 
-import com.freedom.messagebus.client.core.authorize.Authorizer;
+import com.freedom.messagebus.business.model.Config;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.model.Config;
 import com.freedom.messagebus.interactor.zookeeper.IConfigChangedListener;
 import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.freedom.messagebus.interactor.zookeeper.ZKEventType;
+import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -73,6 +70,9 @@ public class Messagebus {
     }
 
     public static Messagebus createClient(String appId) {
+        if (Strings.isNullOrEmpty(appId))
+            throw new NullPointerException("the param : appId can not be null or empty");
+
         return new Messagebus(appId);
     }
 
@@ -126,19 +126,19 @@ public class Messagebus {
                                 logger.info("messagebus server event : " + newState);
                                 ConfigManager.getInstance().setServerState(newState);
                             }
-                                break;
+                            break;
 
-                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION:{
+                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION: {
                                 refreshLocalCachedFile(path, newData);
                                 ConfigManager.getInstance().parseSendPermission();
                             }
-                                break;
+                            break;
 
                             case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION: {
                                 refreshLocalCachedFile(path, newData);
                                 ConfigManager.getInstance().parseReceivePermission();
                             }
-                                break;
+                            break;
 
                             default:
                                 logger.error("unsupported path : " + path);
@@ -153,7 +153,9 @@ public class Messagebus {
 
         this.initConnection();
 
-        this.doAuth();
+        boolean isAuthorized = this.doAuth();
+        if (!isAuthorized)
+            throw new PermissionException("the appId : " + this.appId + " is illegal.");
 
         this.useChannelPool =
             Boolean.valueOf(configManager.getClientConfigMap().get("messagebus.client.useChannelPool").getValue());
@@ -189,9 +191,6 @@ public class Messagebus {
      * current context.
      */
     public synchronized void close() {
-        if (!this.isOpen())
-            return;
-
         //release all resource
         try {
             if (this.configManager != null)
@@ -200,15 +199,13 @@ public class Messagebus {
             if (this.useChannelPool && pool != null)
                 pool.destroy();
 
-            if (this.connection.isOpen())
+            if (this.connection != null && this.connection.isOpen())
                 this.connection.close();
 
-            this.zookeeper.close();
+            if (this.zookeeper != null && this.zookeeper.isAlive())
+                this.zookeeper.close();
 
-            boolean success = this.isOpen.compareAndSet(true, false);
-            if (!success) {
-                logger.error("occurs a non-consistency : the field isOpen should be true but it's actually false");
-            }
+            this.isOpen.compareAndSet(true, false);
         } catch (IOException e) {
             logger.error("[close] occurs a IOException : " + e.getMessage());
         }
@@ -326,13 +323,8 @@ public class Messagebus {
     }
 
     private boolean doAuth() {
-        //auth request
-        Message authReqMsg = MessageFactory.createMessage(MessageType.AuthreqMessage);
-        Authorizer authorizer = Authorizer.getInstance();
-//        authorizer.syncRequestAuthorize();
-
-        //TODO
-        return false;
+        ConfigManager config = ConfigManager.getInstance();
+        return config.getAppIdQueueMap().containsKey(this.appId);
     }
 
     private synchronized void fetchNewZookeeperData() {

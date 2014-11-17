@@ -1,7 +1,7 @@
 package com.freedom.messagebus.scenario.client;
 
+import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,7 +38,6 @@ public class SubscribeTemplate {
 
         Messagebus client = Messagebus.createClient(appId);
 
-        String            receiveQueueName = "crm";
         List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
         ISubscribeManager subscribeManager = null;
         final Object lockObj = new Object();
@@ -53,7 +52,7 @@ public class SubscribeTemplate {
 
                     client.open();
                     ISubscriber subscriber = client.getSubscriber();
-                    subscribeManager = subscriber.subscribe(subQueueNames, receiveQueueName, new IMessageReceiveListener() {
+                    subscribeManager = subscriber.subscribe(subQueueNames, new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message, IReceiverCloser consumerCloser) {
                             logger.info("[" + message.getMessageHeader().getMessageId() +

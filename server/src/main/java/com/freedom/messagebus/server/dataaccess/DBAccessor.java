@@ -1,7 +1,7 @@
 package com.freedom.messagebus.server.dataaccess;
 
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.common.ShellHelper;
-import com.freedom.messagebus.common.model.Node;
 import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,6 +79,10 @@ public class DBAccessor {
                 node.setParentId(rs.getInt("parentId"));
                 node.setRoutingKey(rs.getString("routingKey") == null ? "" : rs.getString("routingKey"));
                 node.setRouterType(rs.getString("routerType"));
+                node.setAppId(rs.getString("appId"));
+                node.setAvailable(rs.getBoolean("available"));
+                node.setInner(rs.getBoolean("inner"));
+
                 nodes.add(node);
             }
         } catch (SQLException e) {
@@ -88,6 +92,41 @@ public class DBAccessor {
         }
 
         return nodes;
+    }
+
+    public Node getNodeWithId(int nodeId) {
+        Node node = new Node();
+
+        try {
+            this.openConnection();
+
+            String sql = "SELECT * FROM NODE WHERE nodeId = ?";
+            PreparedStatement statement = this.dbConnection.prepareStatement(sql);
+            statement.setInt(1, nodeId);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                node.setNodeId(rs.getInt("nodeId"));
+                node.setName(rs.getString("name"));
+                node.setValue(rs.getString("value"));
+                node.setLevel(rs.getShort("level"));
+                node.setType(rs.getShort("type"));
+                node.setParentId(rs.getInt("parentId"));
+                node.setRoutingKey(rs.getString("routingKey") == null ? "" : rs.getString("routingKey"));
+                node.setRouterType(rs.getString("routerType"));
+                node.setAppId(rs.getString("appId"));
+                node.setAvailable(rs.getBoolean("available"));
+                node.setInner(rs.getBoolean("inner"));
+
+            }
+
+        } catch (SQLException e) {
+            logger.error("[getNodeWithId] occurs a SQLException : " + e.getMessage());
+        } finally {
+            this.closeConnection();
+        }
+
+        return node;
     }
 
     private void openConnection() throws SQLException {

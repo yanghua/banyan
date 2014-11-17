@@ -1,15 +1,15 @@
 package com.freedom.messagebus.client.handler.request;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageFactory;
+import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.HandlerModel;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.interactor.message.IMessageBodyProcessor;
-import com.freedom.messagebus.interactor.message.MessageBodyProcessorFactory;
-import com.freedom.messagebus.interactor.message.MessageHeaderProcessor;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.freedom.messagebus.interactor.rabbitmq.QueueManager;
 import com.rabbitmq.client.AMQP;
@@ -101,9 +101,9 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
     }
 
     private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderProcessor.unbox(properties, msgType, msg.getMessageHeader());
+        MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
 
-        IMessageBodyProcessor msgBodyProcessor = MessageBodyProcessorFactory.createMsgBodyProcessor(msgType);
+        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msgType);
         msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
     }
 }

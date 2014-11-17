@@ -61,7 +61,7 @@
 * ~~考虑将zookeeper的部分操作封装到 `interactor-component`~~
 * 在各Module中加入异常收集功能，抛出的异常，自动回发到 `queue.proxy.message.sys.exception-collector` 中（进行中）
 * client加入更多的filter，配合动态配置，实现对client更细化的控制
-* 实现授权/认证检查(appId 对应的授权发送队列与接收队列)
+* ~~实现授权/认证检查(appId 对应的授权发送队列与接收队列)~~
 * ~~考虑加入Pub/Sub的实现~~
 * ~~client/httpbridge性能测试的量化数据~~
 * web管控台，注册节点后，向server发送：更新命令（server将数据库的更新数据主动push到客户端）
@@ -70,6 +70,8 @@
 * ~~重新整理 `server` 端的配置、让 `server` 直接依赖 `client` ~~
 * 优化从数据库dump并设置到zookeeper中要推送给客户端的数据（目前是采用mysqldump导出，冗余信息较多），这也可以将部分数据改用redis来存储，然后借助于其 pub/sub来进行优化
 * 处理在windows系统下，从zookeeper内dump出来的数据存储问题（系统的公共位置）
+* 将zookeeper 推送的内容从原始的数据库xml数据表示，修改为java序列化对象
+* 将很多横向处理的变化点(很多switch)，修改为继承的可扩展模式
 
 
 

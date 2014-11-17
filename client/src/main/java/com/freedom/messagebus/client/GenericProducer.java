@@ -1,9 +1,9 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -85,8 +85,10 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
         MessageContext context = new MessageContext();
         context.setCarryType(MessageCarryType.PRODUCE);
         context.setAppId(appId);
+
+        context.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(appId));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
-        context.setQueueNode(node);
+        context.setTargetNode(node);
 
         context.setPool(this.context.getPool());
         context.setConnection(this.context.getConnection());

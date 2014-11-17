@@ -2,10 +2,10 @@ package com.freedom.managesystem.action.other;
 
 import com.freedom.managesystem.service.Constants;
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.message.Message;
-import com.freedom.messagebus.common.message.MessageFactory;
-import com.freedom.messagebus.common.message.MessageType;
-import com.freedom.messagebus.common.message.QueueMessage;
+import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.business.message.model.MessageFactory;
+import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.business.message.model.QueueMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

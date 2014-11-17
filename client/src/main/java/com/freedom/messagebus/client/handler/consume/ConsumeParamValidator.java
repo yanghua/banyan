@@ -18,25 +18,25 @@ public class ConsumeParamValidator extends AbstractParamValidator {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.CONSUME)) {
-            if (context.getQueueNode().getValue() == null || context.getQueueNode().getValue().isEmpty()) {
+            if (context.getTargetNode().getValue() == null || context.getTargetNode().getValue().isEmpty()) {
                 logger.error("[handle] the context field : queueNode is illegal. the value can not be null or empty");
                 throw new ParamValidateFailedException("[handle] the context field : queueNode is illegal. " +
                                                            "the value can not be null or empty");
             }
 
-            if (context.getQueueNode() == null) {
+            if (context.getTargetNode() == null) {
                 logger.error("[handle] the context field : queueNode is illegal. it can not be null");
                 throw new ParamValidateFailedException("the context field : queueNode is illegal. " +
                                                            "it can not be null ");
             }
 
-            if (context.getQueueNode().getType() == 0) {
+            if (context.getTargetNode().getType() == 0) {
                 logger.error("[handle] the context field : queueNode is illegal. it must be a queue type");
                 throw new ParamValidateFailedException("[handle] the context field : queueNode is illegal. " +
                                                            "it must be a queue type");
             }
 
-            if (context.getQueueNode().getName() == null || context.getQueueNode().getName().isEmpty()) {
+            if (context.getTargetNode().getName() == null || context.getTargetNode().getName().isEmpty()) {
                 logger.error("[handle] the context field : queueNode is illegal. the name can not be null or empty");
                 throw new ParamValidateFailedException("[handle] the context field : queueNode is illegal. " +
                                                            "the name can not be null or empty");

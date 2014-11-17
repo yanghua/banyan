@@ -27,33 +27,37 @@ PERMISSION_QUEUE.initJTable = function () {
             },
             name: {
                 title: '节点名称',
-                width: '10%'
+                width: '48%'
             },
             value: {
-                title: '内部名称'
+                title: '内部名称',
+                width: '48%'
             },
             sendPermission: {
                 width: '2%',
                 display: function (data) {
                     if (!data.record.inner) {
+                        if (data.record.name.lastIndexOf("pubsub") != -1) {
+                            return $('<img src="/resources/image/send_unable.png" disable="disabled" title="失效" class="clickStyle"  />');
+                        } else {
+                            //send permission
+                            var sendPermBtn = $('<img src="/resources/image/send.png" title="发送授权" class="clickStyle"  />');
+                            sendPermBtn.click(function () {
+                                $('#selectedTargetId').val(data.record.nodeId);
 
-                        //send permission
-                        var sendPermBtn = $('<img src="/resources/image/send.png" class="clickStyle" alt="发送授权" />');
-                        sendPermBtn.click(function () {
-                            $('#selectedTargetId').val(data.record.nodeId);
+                                if (!PERMISSION_QUEUE.isSendPermissionJTableInited) {
+                                    PERMISSION_QUEUE.initSendPermNodeJTable();
+                                    $('#sendPermNodeTableContainer').jtable('load');
+                                    PERMISSION_QUEUE.isSendPermissionJTableInited = true;
+                                } else {
+                                    $('#sendPermNodeTableContainer').jtable('reload');
+                                }
 
-                            if (!PERMISSION_QUEUE.isSendPermissionJTableInited) {
-                                PERMISSION_QUEUE.initSendPermNodeJTable();
-                                $('#sendPermNodeTableContainer').jtable('load');
-                                PERMISSION_QUEUE.isSendPermissionJTableInited = true;
-                            } else {
-                                $('#sendPermNodeTableContainer').jtable('reload');
-                            }
+                                PERMISSION_QUEUE.popSendPermissionNodeLayer();
+                            });
 
-                            PERMISSION_QUEUE.popSendPermissionNodeLayer();
-                        });
-
-                        return sendPermBtn;
+                            return sendPermBtn;
+                        }
                     }
                 }
             },
@@ -63,7 +67,7 @@ PERMISSION_QUEUE.initJTable = function () {
                     if (!data.record.inner) {
                         //in permission
                         var receivePermBtn;
-                        receivePermBtn = $('<img src="/resources/image/receive.png" class="clickStyle" alt="接收授权" />');
+                        receivePermBtn = $('<img src="/resources/image/receive.png" class="clickStyle" title="接收授权" alt="接收授权" />');
                         receivePermBtn.click(function () {
                             $('#selectedTargetId').val(data.record.nodeId);
 

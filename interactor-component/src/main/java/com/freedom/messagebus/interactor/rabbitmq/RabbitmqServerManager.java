@@ -1,6 +1,6 @@
 package com.freedom.messagebus.interactor.rabbitmq;
 
-import com.freedom.messagebus.common.ShellHelper;
+import com.freedom.messagebus.interactor.util.ShellHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
