@@ -26,24 +26,22 @@
 消息总线项目各Module（子项目）依赖关系图：
 ![img 2][2]
 
-> 此图根据maven的module dependency生成，其实 `httpbridge` 不直接依赖 `interactor-component`，上图的依赖关系是因为 `httpbridge` **只** 直接依赖于 `client`，而 `client` 又依赖于 `interactor-component`而导致的间接依赖关系。
+> 此图根据maven的module dependency生成（它除了分析了直接依赖关系，同时还分析了间接依赖关系）。 `httpbridge`、`server`、`managesystem`都是 `client` 的使用者，因此它们都直接依赖 `client`（不直接依赖 `interactor-component`）。因此， 这里具有层次化的抽象关系：`interactor-component` 抽象了跟Message Broker最原始的交互，client使用 `interactor-component` 实现与Message Broker的交互，同时加入其他控制逻辑，形参了对Message Bus交互的抽象层。`server`、`managesystem`需要跟Message Bus进行交互，它们只能使用client；而 `httpbridge` 本身就是 `client` 的Proxy用于提供http形式的访问。 这也是上面提到的，它们三者都是 `client` 的client。
 
-其中，两个为组件：
+其中，三个为组件（前两个是业务无关的组件，第三个是业务组件）：
 
-* common : 通用底层组件，定义了一些基本的数据结构，如果消息、消息头、消息体等
-* interactor-component : 交互组件，用于解耦其他各Module跟rabbitmq的依赖
+* common-component : 通用组件，提供了公共的utility、helper工具类。处于它之上的每个高层Module，都可以直接依赖它。（它是最稳定的）
+* interactor-component : 交互组件，用于解耦其他各Module跟Message Broker(rabbitmq)、ZooKeeper的依赖，抽象它的意义在于，后面升级这些开源组件的版本时，对其进行的适配与更改动作，对 `client` 透明（它只能被client依赖）
+* business-component : 定义了一些基本的公共数据结构，如果消息、消息头、消息体、节点、配置等，它与业务逻辑、实现逻辑有关
 
-另外的四个为项目：
+另外的四个Module：
 
 - client : 消息总线的客户端，提供给其他应用访问消息总线的接口
 - server : 服务端，包含了rabbitmq管理，系统监控，日志记录等，一个daemon server
-- managesystem : web管理系统，主要用于配合 **server** 进行一些可视化的监控以及提供一些管理功能
+- managesystem : web管理系统，主要用于配合 **server** 进行一些可视化的监控、提供管理功能
 - httpbridge : 消息总线的http访问接口，用于实现异构系统环境中（非java语言环境）访问消息总线，可以将其看成client的代理
 
-> managesystem 与 server共享数据库。主要是因为server的部分功能跟managesystem互为补充，它们通过数据库交互。比如通过managesystem的管理界面设置预警阈值，但真正的处理、判断逻辑还是由server来完成。但server是消息总线的必备组成部分，而managesystem是可选的。
-
-##核心交互组件
-由于除common不需要跟rabbitmq交互之外，以上其他的module都有跟rabbitmq交互的需求。因此从降低依赖的角度出发，可以通过 ***组件化*** 的手段，来达到封装变化的目的。在消息总线中，所有跟rabbitmq交互的操作都被封装在 `interactor-component` 中。这样后面任何关于rabbitmq-java-client的变化，都只需修改该组件。
+> managesystem 与 server共享数据库。主要是因为server的部分功能跟managesystem互为补充，但它们并不直接交互，它们都是 `client`的client，它们之间通过Message Bus交互。但server是消息总线的必备组成部分，而managesystem是可选的。
 
 
 ##实践说明
