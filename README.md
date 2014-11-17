@@ -26,12 +26,12 @@
 消息总线项目各Module（子项目）依赖关系图：
 ![img 2][2]
 
-> 此图根据maven的module dependency生成（它除了分析了直接依赖关系，同时还分析了间接依赖关系）。 `httpbridge`、`server`、`managesystem`都是 `client` 的使用者，因此它们都直接依赖 `client`（不直接依赖 `interactor-component`）。因此， 这里具有层次化的抽象关系：`interactor-component` 抽象了跟Message Broker最原始的交互，client使用 `interactor-component` 实现与Message Broker的交互，同时加入其他控制逻辑，形参了对Message Bus交互的抽象层。`server`、`managesystem`需要跟Message Bus进行交互，它们只能使用client；而 `httpbridge` 本身就是 `client` 的Proxy用于提供http形式的访问。 这也是上面提到的，它们三者都是 `client` 的client。
+> 此图根据maven的module dependency生成（它除了分析了直接依赖关系，同时还分析了间接依赖关系）。 `httpbridge`、`server`、`managesystem`都是 `client` 的使用者，因此它们都直接依赖 `client`。这里具有层次化的抽象关系：`interactor-component` 抽象了跟Message Broker、ZooKeeper最原始的交互，client使用 `interactor-component` 实现与Message Broker的交互，同时加入其他控制逻辑，形参了对Message Bus交互的抽象层。`server`、`managesystem`需要跟Message Bus进行交互，它们只能使用client(因为 `server` 承担了对Message Broker、ZooKeeper生命周期管理，所有它也依赖 `interactor-component`)；而 `httpbridge` 本身就是 `client` 的Proxy用于提供http形式的访问。 这也是上面提到的，它们三者都是 `client` 的client。
 
 其中，三个为组件（前两个是业务无关的组件，第三个是业务组件）：
 
 * common-component : 通用组件，提供了公共的utility、helper工具类。处于它之上的每个高层Module，都可以直接依赖它。（它是最稳定的）
-* interactor-component : 交互组件，用于解耦其他各Module跟Message Broker(rabbitmq)、ZooKeeper的依赖，抽象它的意义在于，后面升级这些开源组件的版本时，对其进行的适配与更改动作，对 `client` 透明（它只能被client依赖）
+* interactor-component : 交互组件，用于解耦其他各Module跟Message Broker(rabbitmq)、ZooKeeper的依赖，抽象它的意义在于，后面升级这些开源组件的版本时，对其进行的适配与更改动作，对 `client` 以及 `server` 透明
 * business-component : 定义了一些基本的公共数据结构，如果消息、消息头、消息体、节点、配置等，它与业务逻辑、实现逻辑有关
 
 另外的四个Module：
