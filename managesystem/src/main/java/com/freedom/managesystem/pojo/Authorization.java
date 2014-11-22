@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Authorization implements Serializable {
 
-    private int nodeId;
+    private int    nodeId;
     private String appId;
 
     public Authorization() {

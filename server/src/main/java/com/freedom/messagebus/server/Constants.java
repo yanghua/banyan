@@ -14,6 +14,8 @@ public class Constants {
 
     public static final String KEY_MESSAGEBUS_SERVER_DB_PASSWORD = "messagebus.server.db.password";
 
+    public static final String KEY_MESSAGEBUS_SERVER_APP_ID = "message.server.appId";
+
     public static final String KEY_ARG_CONFIG_FILE_PATH = "configFilePath";
 
     public static final String KEY_ARG_SERVER_LOG4J_PROPERTY_PATH = "serverLog4jPropertyPath";
@@ -26,12 +28,12 @@ public class Constants {
 
     public static final String LOG_OF_FILE_QUEUE_NAME = "file";
 
-    public static final String SERVER_APP_ID = "l0c6f1W7vydEftLt0cYrcqUfGWw915Qi";
-
     public static final String KEY_SERVER_CONFIG = "SERVER_CONFIG";
 
     public static final String GLOBAL_CLIENT_OBJECT = "client";
 
     public static final String GLOBAL_ZOOKEEPER_OBJECT = "zookeeper";
+
+    public static final String GLOBAL_ZKEXCHANGE_MANAGER = "zkExchangeManager";
 
 }

@@ -1,21 +1,17 @@
 package com.freedom.messagebus.server.daemon.impl;
 
+import com.freedom.messagebus.business.exchanger.ExchangerManager;
 import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.business.message.model.MessageFactory;
 import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.business.message.model.QueueMessage;
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.daemon.DaemonService;
 import com.freedom.messagebus.server.daemon.RunPolicy;
-import com.freedom.messagebus.server.dataaccess.DBAccessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +25,10 @@ public class CommandService extends AbstractService {
     private       IReceiverCloser consumerCloser = null;
     private final Object          lockObj        = new Object();
 
-    private Messagebus        client;
-    private QueueMessage      responseMsg;
-    private LongLiveZookeeper zookeeper;
-    private Properties        serverConfig;
+    private Messagebus       client;
+    private QueueMessage     responseMsg;
+    private Properties       serverConfig;
+    private ExchangerManager zkExchangeManager;
 
     public CommandService(Map<String, Object> context) {
         super(context);
@@ -46,13 +42,14 @@ public class CommandService extends AbstractService {
         Map<String, Object> headers = new HashMap<>(1);
         headers.put("COMMAND", "PONG");
         responseMsg.getMessageHeader().setHeaders(headers);
-        responseMsg.getMessageHeader().setAppId(Constants.SERVER_APP_ID);
-        responseMsg.getMessageHeader().setReplyTo(Constants.SERVER_APP_ID);
+        String appId = this.serverConfig.get(Constants.KEY_MESSAGEBUS_SERVER_APP_ID).toString();
+        responseMsg.getMessageHeader().setAppId(appId);
+        responseMsg.getMessageHeader().setReplyTo(appId);
         QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
         body.setContent(new byte[0]);
         responseMsg.setMessageBody(body);
 
-        zookeeper = (LongLiveZookeeper) context.get(Constants.GLOBAL_ZOOKEEPER_OBJECT);
+        this.zkExchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_ZKEXCHANGE_MANAGER);
     }
 
 
@@ -123,95 +120,11 @@ public class CommandService extends AbstractService {
     }
 
     private void process(String tableName) {
-        switch (tableName) {
-            case "NODE":
-                this.processNode();
-                break;
-
-            case "CONFIG":
-                this.processConfig();
-                break;
-
-            case "SEND_PERMISSION":
-                this.processSendPermission();
-                break;
-
-            case "RECEIVE_PERMISSION":
-                this.processReceivePermission();
-                break;
-
-            default:
-                logger.error("[process] unsupported table name : " + tableName);
-        }
-    }
-
-    private void processNode() {
-        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
         try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT, CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.DB_TABLE_OF_NODE);
-            setDbInfoToZK(CONSTS.EXPORTED_NODE_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
+            this.zkExchangeManager.uploadWithTable(tableName);
         } catch (IOException e) {
-            logger.error("[processNode] occurs a IOException : " + e.getMessage());
-        } catch (InterruptedException e) {
-            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
+            logger.error("[process] occurs a IOException : " + e.getMessage());
         }
     }
 
-    private void processConfig() {
-        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
-        try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
-                                  CONSTS.EXPORTED_CONFIG_FILE_PATH,
-                                  CONSTS.DB_TABLE_OF_CONFIG);
-            setDbInfoToZK(CONSTS.EXPORTED_CONFIG_FILE_PATH, CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
-        } catch (IOException e) {
-            logger.error("[processNode] occurs a IOException : " + e.getMessage());
-        } catch (InterruptedException e) {
-            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
-        }
-    }
-
-    private void processSendPermission() {
-        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
-        try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
-                                  CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH,
-                                  CONSTS.DB_TABLE_OF_SEND_PERMISSION);
-            setDbInfoToZK(CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
-        } catch (IOException e) {
-            logger.error("[processNode] occurs a IOException : " + e.getMessage());
-        } catch (InterruptedException e) {
-            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
-        }
-    }
-
-    private void processReceivePermission() {
-        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
-        try {
-            dbAccessor.dumpDbInfo(CONSTS.EXPORTED_TABLE_CMD_FORMAT,
-                                  CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH,
-                                  CONSTS.DB_TABLE_OF_RECEIVE_PERMISSION);
-            setDbInfoToZK(CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH, CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
-        } catch (IOException e) {
-            logger.error("[processNode] occurs a IOException : " + e.getMessage());
-        } catch (InterruptedException e) {
-            logger.error("[processNode] occurs a InterruptedException : " + e.getMessage());
-        }
-    }
-
-    private void setDbInfoToZK(String filePath, String zkNode) throws IOException {
-        FileReader reader = new FileReader(filePath);
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        StringBuilder sb = new StringBuilder();
-
-        String tmp = null;
-        while ((tmp = bufferedReader.readLine()) != null) {
-            sb.append(tmp);
-        }
-
-        String totalStr = sb.toString();
-        this.zookeeper.setConfig(zkNode,
-                                 totalStr.getBytes(),
-                                 true);
-    }
 }

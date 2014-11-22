@@ -1,6 +1,6 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.SendPermission;
+import com.freedom.messagebus.business.model.SendPermission;
 
 import java.sql.SQLException;
 import java.util.List;

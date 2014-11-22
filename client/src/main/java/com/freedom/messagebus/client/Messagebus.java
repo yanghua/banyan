@@ -1,5 +1,6 @@
 package com.freedom.messagebus.client;
 
+import com.freedom.messagebus.business.exchanger.ExchangerManager;
 import com.freedom.messagebus.business.model.Config;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
@@ -7,9 +8,6 @@ import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.interactor.zookeeper.IConfigChangedListener;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
-import com.freedom.messagebus.interactor.zookeeper.ZKEventType;
 import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -18,11 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -50,8 +44,7 @@ public class Messagebus {
     @NotNull
     private IBroadcaster broadcaster;
 
-    @NotNull
-    private LongLiveZookeeper     zookeeper;
+    private ExchangerManager      zkExchangeManager;
     @NotNull
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
@@ -87,69 +80,27 @@ public class Messagebus {
         if (this.isOpen())
             return;
 
-        //load class
-        this.zookeeper = new LongLiveZookeeper(this.getZkHost(), this.getZkPort());
-        this.zookeeper.open();
+        this.zkExchangeManager = ExchangerManager.defaultExchangerManager(this.getZkHost(), this.getZkPort());
 
-        if (!this.zookeeper.isAlive())
+        if (!this.zkExchangeManager.isZKAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
-        else {
-            fetchNewZookeeperData();
-        }
 
         this.configManager = ConfigManager.getInstance();
-        this.zookeeper.watchPaths(
-            new String[]{
-                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER,
-                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG,
-                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT,
-                CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH,
-                CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION,
-                CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION
-            },
-            new IConfigChangedListener() {
-                @Override
-                public void onChanged(String path,
-                                      byte[] newData,
-                                      ZKEventType eventType) {
-                    logger.debug("path : " + path + " has changed!");
+        this.configManager.setZKExchangeManager(this.zkExchangeManager);
+        this.zkExchangeManager.registerWithMultiPaths(new String[]{
+            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER,
+            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG,
+            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT,
+            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH,
+            CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION,
+            CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION
+        }, this.configManager);
 
-                    try {
-                        switch (path) {
-                            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER:
-                                refreshLocalCachedFile(path, newData);
-                                ConfigManager.getInstance().parseRouterInfo();
-                                break;
-
-                            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT: {
-                                String newState = new String(newData);
-                                logger.info("messagebus server event : " + newState);
-                                ConfigManager.getInstance().setServerState(newState);
-                            }
-                            break;
-
-                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION: {
-                                refreshLocalCachedFile(path, newData);
-                                ConfigManager.getInstance().parseSendPermission();
-                            }
-                            break;
-
-                            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION: {
-                                refreshLocalCachedFile(path, newData);
-                                ConfigManager.getInstance().parseReceivePermission();
-                            }
-                            break;
-
-                            default:
-                                logger.error("unsupported path : " + path);
-                        }
-
-                    } catch (Exception e) {
-                        logger.error("[onChanged] occurs a Exception : " + e.getMessage());
-                    }
-                }
-            }
-                                 );
+        try {
+            this.configManager.parseZKData();
+        } catch (IOException e) {
+            throw new MessagebusConnectedFailedException(e);
+        }
 
         this.initConnection();
 
@@ -168,7 +119,6 @@ public class Messagebus {
         context.setAppId(appId);
         context.setPool(this.pool);
         context.setConfigManager(this.configManager);
-        context.setZooKeeper(this.zookeeper);
         context.setConnection(this.connection);
 
         producer = new GenericProducer(context);
@@ -193,6 +143,9 @@ public class Messagebus {
     public synchronized void close() {
         //release all resource
         try {
+            if (this.zkExchangeManager != null)
+                this.zkExchangeManager.removeRegister(this.configManager);
+
             if (this.configManager != null)
                 this.configManager.destroy();
 
@@ -201,9 +154,6 @@ public class Messagebus {
 
             if (this.connection != null && this.connection.isOpen())
                 this.connection.close();
-
-            if (this.zookeeper != null && this.zookeeper.isAlive())
-                this.zookeeper.close();
 
             this.isOpen.compareAndSet(true, false);
         } catch (IOException e) {
@@ -327,62 +277,4 @@ public class Messagebus {
         return config.getAppIdQueueMap().containsKey(this.appId);
     }
 
-    private synchronized void fetchNewZookeeperData() {
-        //get new config info
-        byte[] routerData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
-        byte[] configData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
-        byte[] eventData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT);
-        byte[] sendPermissionData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
-        byte[] receivePermissionData = this.zookeeper.getConfig(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
-        //refresh local
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER, routerData);
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG, configData);
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION, sendPermissionData);
-        this.refreshLocalCachedFile(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION, receivePermissionData);
-        ConfigManager.getInstance().setServerState(new String(eventData));
-    }
-
-    private synchronized void refreshLocalCachedFile(String path, byte[] newData) {
-        String filePath;
-        switch (path) {
-            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER:
-                filePath = CONSTS.EXPORTED_NODE_FILE_PATH;
-                break;
-
-            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG:
-                filePath = CONSTS.EXPORTED_CONFIG_FILE_PATH;
-                break;
-
-            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION:
-                filePath = CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH;
-                break;
-
-            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION:
-                filePath = CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH;
-                break;
-
-            default:
-                return;
-        }
-
-        Path routerFilePath = FileSystems.getDefault().getPath(filePath);
-        FileOutputStream fos = null;
-        try {
-            if (!Files.exists(routerFilePath)) { //override
-                Files.createFile(routerFilePath);
-            }
-
-            fos = new FileOutputStream(filePath);
-            fos.write(newData);
-        } catch (IOException e) {
-            logger.error("[refreshLocalCachedRouterFile] occurs a IOException : " + e.getMessage());
-        } finally {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                logger.error("[refreshLocalCachedRouterFile] finally block occurs a IOException : " + e.getMessage());
-            }
-        }
-    }
 }

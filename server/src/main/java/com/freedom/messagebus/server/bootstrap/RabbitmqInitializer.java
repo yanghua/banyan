@@ -6,6 +6,7 @@ import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.dataaccess.DBAccessor;
+import com.freedom.messagebus.server.dataaccess.NodeFetcher;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +50,9 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     private void initTopologyComponent() throws IOException {
-        List<Node> sortedNodes = DBAccessor.defaultAccessor(this.properties).getAllSortedNodes(true);
+        DBAccessor dbAccessor = new DBAccessor(this.properties);
+        NodeFetcher nodeFetcher = new NodeFetcher(dbAccessor);
+        List<Node> sortedNodes = nodeFetcher.fetchData();
         Map<Integer, Node> nodeMap = this.buildNodeMap(sortedNodes);
         TreeSet<Node> sortedExchangeNodes = this.extractExchangeNodes(sortedNodes);
         TreeSet<Node> sortedQueueNodes = this.extractQueueNodes(sortedNodes);

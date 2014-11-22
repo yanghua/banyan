@@ -29,12 +29,12 @@ public interface IModuleMapper {
     public int countAll();
 
     @Insert("INSERT INTO MODULE VALUES(rand_string(4), #{moduleName}, " +
-                "#{moduleValue}, #{linkUrl}, #{parentModule}, #{sortIndex}, #{remark})")
+        "#{moduleValue}, #{linkUrl}, #{parentModule}, #{sortIndex}, #{remark})")
     public void save(Module module);
 
     @Update("UPDATE MODULE SET moduleName = #{moduleName}, moduleValue = #{moduleValue}," +
-                " linkUrl = #{linkUrl}, parentModule = #{parentModule}, sortIndex = #{sortIndex}, remark = #{remark} " +
-                " WHERE moduleCode = #{moduleCode} ")
+        " linkUrl = #{linkUrl}, parentModule = #{parentModule}, sortIndex = #{sortIndex}, remark = #{remark} " +
+        " WHERE moduleCode = #{moduleCode} ")
     public void update(Module module);
 
     @Delete("DELETE FROM MODULE WHERE moduleCode = #{moduleCode}")

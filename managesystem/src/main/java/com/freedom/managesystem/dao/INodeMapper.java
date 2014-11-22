@@ -9,7 +9,7 @@ import java.util.List;
 public interface INodeMapper {
 
     @Insert("INSERT INTO NODE(name, value, parentId, type, level, routerType, routingKey, available, appId, `inner`) VALUES (#{name}, " +
-                "#{value}, #{parentId}, #{type}, #{level}, #{routerType}, #{routingKey}, #{available}, #{appId}, #{inner})")
+        "#{value}, #{parentId}, #{type}, #{level}, #{routerType}, #{routingKey}, #{available}, #{appId}, #{inner})")
     public void create(Node node);
 
     @Select("SELECT * FROM NODE ORDER BY level")
@@ -48,9 +48,9 @@ public interface INodeMapper {
                                            @Param("isPubsub") boolean isPubsub);
 
     @Update("UPDATE NODE SET name = #{name}, value = #{value}, type = #{type}, " +
-                "level = #{level}, routerType = #{routerType}, routingKey = #{routingKey}, " +
-                "available = #{available}, appId = #{appId}, `inner` = #{inner} " +
-                " WHERE nodeId = #{nodeId}")
+        "level = #{level}, routerType = #{routerType}, routingKey = #{routingKey}, " +
+        "available = #{available}, appId = #{appId}, `inner` = #{inner} " +
+        " WHERE nodeId = #{nodeId}")
     public void update(Node node);
 
 }

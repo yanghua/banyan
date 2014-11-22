@@ -1,9 +1,9 @@
 package com.freedom.managesystem.service.impl;
 
 import com.freedom.managesystem.dao.ISendPermissionMapper;
-import com.freedom.managesystem.pojo.SendPermission;
 import com.freedom.managesystem.service.ISendPermissionService;
 import com.freedom.managesystem.service.MessagebusService;
+import com.freedom.messagebus.business.model.SendPermission;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;

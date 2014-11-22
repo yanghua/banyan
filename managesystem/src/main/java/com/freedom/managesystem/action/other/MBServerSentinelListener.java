@@ -1,11 +1,11 @@
 package com.freedom.managesystem.action.other;
 
 import com.freedom.managesystem.service.Constants;
-import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.business.message.model.MessageFactory;
 import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.business.message.model.QueueMessage;
+import com.freedom.messagebus.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,9 +51,9 @@ public class MBServerSentinelListener implements ServletContextListener {
 
     private static class Sentinel extends Thread {
 
-        private Thread currentThread;
-        private Messagebus messagebus;
-        private Message pingCmdMsg;
+        private Thread              currentThread;
+        private Messagebus          messagebus;
+        private Message             pingCmdMsg;
         private ServletContextEvent servletContextEvent;
 
         private Sentinel(Messagebus mb, ServletContextEvent contextEvent) {
@@ -78,8 +78,8 @@ public class MBServerSentinelListener implements ServletContextListener {
                 IRequester requester = messagebus.getRequester();
                 while (true) {
                     try {
-                        QueueMessage responseMsg = (QueueMessage)requester.request(pingCmdMsg, Constants.SERVER_QUEUE_NAME,
-                                                                                   Constants.PING_SERVER_TIME_INTERVAL);
+                        QueueMessage responseMsg = (QueueMessage) requester.request(pingCmdMsg, Constants.SERVER_QUEUE_NAME,
+                                                                                    Constants.PING_SERVER_TIME_INTERVAL);
                         Map<String, Object> msgHeaders = responseMsg.getMessageHeader().getHeaders();
 
                         if (msgHeaders != null) {
@@ -107,7 +107,7 @@ public class MBServerSentinelListener implements ServletContextListener {
             }
         }
 
-        public void startMonitor () {
+        public void startMonitor() {
             this.currentThread.start();
         }
 

@@ -1,13 +1,13 @@
 package com.freedom.managesystem.action.permission;
 
 import com.freedom.managesystem.action.other.BaseAction;
-import com.freedom.managesystem.pojo.ReceivePermission;
-import com.freedom.managesystem.pojo.SendPermission;
 import com.freedom.managesystem.service.Constants;
 import com.freedom.managesystem.service.INodeService;
 import com.freedom.managesystem.service.IReceivePermissionService;
 import com.freedom.managesystem.service.ISendPermissionService;
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.business.model.ReceivePermission;
+import com.freedom.messagebus.business.model.SendPermission;
 import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

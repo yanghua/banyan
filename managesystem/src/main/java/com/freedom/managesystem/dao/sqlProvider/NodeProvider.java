@@ -1,6 +1,5 @@
 package com.freedom.managesystem.dao.sqlprovider;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;

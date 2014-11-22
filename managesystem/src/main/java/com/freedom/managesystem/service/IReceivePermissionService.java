@@ -1,6 +1,7 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.ReceivePermission;
+import com.freedom.messagebus.business.model.ReceivePermission;
+
 import java.sql.SQLException;
 import java.util.List;
 

@@ -1,13 +1,13 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.messagebus.client.IProducer;
-import com.freedom.messagebus.client.Messagebus;
-import com.freedom.messagebus.client.MessagebusConnectedFailedException;
-import com.freedom.messagebus.client.MessagebusUnOpenException;
 import com.freedom.messagebus.business.message.model.Message;
 import com.freedom.messagebus.business.message.model.MessageFactory;
 import com.freedom.messagebus.business.message.model.MessageType;
 import com.freedom.messagebus.business.message.model.QueueMessage;
+import com.freedom.messagebus.client.IProducer;
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.MessagebusConnectedFailedException;
+import com.freedom.messagebus.client.MessagebusUnOpenException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,7 +41,7 @@ public class MessagebusService {
     }
 
     public void produceDBOperate(String cmd, String tbName) {
-        QueueMessage operateMsg = (QueueMessage)MessageFactory.createMessage(MessageType.QueueMessage);
+        QueueMessage operateMsg = (QueueMessage) MessageFactory.createMessage(MessageType.QueueMessage);
         Map<String, Object> headerMap = new HashMap<>(2);
         headerMap.put("COMMAND", cmd);
         headerMap.put("TABLE", tbName);

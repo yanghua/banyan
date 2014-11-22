@@ -1,6 +1,6 @@
 package com.freedom.managesystem.dao;
 
-import com.freedom.managesystem.pojo.Config;
+import com.freedom.messagebus.business.model.Config;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;

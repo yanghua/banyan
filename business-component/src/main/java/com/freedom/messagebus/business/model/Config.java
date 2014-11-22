@@ -1,6 +1,8 @@
 package com.freedom.messagebus.business.model;
 
-public class Config {
+import java.io.Serializable;
+
+public class Config implements Serializable {
 
     private String key;
     private String value;

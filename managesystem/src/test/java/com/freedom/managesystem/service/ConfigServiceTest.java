@@ -1,6 +1,6 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.managesystem.pojo.Config;
+import com.freedom.messagebus.business.model.Config;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

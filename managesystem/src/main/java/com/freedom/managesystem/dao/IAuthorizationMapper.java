@@ -8,7 +8,7 @@ import java.util.List;
 public interface IAuthorizationMapper {
 
     @Insert("INSERT INTO AUTHORIZATION (nodeId, appId) VALUES (#{nodeId}, " +
-                "#{appId})")
+        "#{appId})")
     public void save(Authorization authorization);
 
     @Select("SELECT * FROM AUTHORIZATION")

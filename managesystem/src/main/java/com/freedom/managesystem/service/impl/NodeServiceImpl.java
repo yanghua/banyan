@@ -28,11 +28,11 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
     @Transactional
     public void save(@NotNull Node node) throws SQLException {
         //create for end-to-end
-        boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) !=null);
+        boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) != null);
 
-        if (isNodeNameExists){
-            logger.error("creating node failed : the node with name " + node.getName() +" exists.");
-            throw new SQLException("creating node failed : the node with name " + node.getName() +" exists.");
+        if (isNodeNameExists) {
+            logger.error("creating node failed : the node with name " + node.getName() + " exists.");
+            throw new SQLException("creating node failed : the node with name " + node.getName() + " exists.");
         }
 
         node.setInner(false);

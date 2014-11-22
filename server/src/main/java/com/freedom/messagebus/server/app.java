@@ -1,15 +1,17 @@
 package com.freedom.messagebus.server;
 
+import com.freedom.messagebus.business.exchanger.IDataFetcher;
+import com.freedom.messagebus.business.exchanger.ExchangerManager;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
 import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;
+import com.freedom.messagebus.server.dataaccess.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
@@ -27,8 +29,8 @@ public class App {
     private static final Log    logger                             = LogFactory.getLog(App.class);
     private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
 
-    private static LongLiveZookeeper globalZookeeper;
-    private static Properties        config;
+    private static ExchangerManager globalZKExchangeManager;
+    private static Properties       config;
 
     public static void main(String[] args) {
         //debug args
@@ -64,14 +66,9 @@ public class App {
             System.exit(1);
         }
 
+        logger.debug("building context ...");
         Map<String, Object> context = null;
-        try {
-            context = buildContext(config);
-        } catch (MessagebusConnectedFailedException e) {
-            ExceptionHelper.logException(logger, e, "[main]");
-            logger.error("server shutdown because of buildContext failed.");
-            System.exit(1);
-        }
+        context = buildContext(config);
 
         //zookeeper
         logger.info("** bootstrap service : ZookeeperInitializer **");
@@ -83,6 +80,14 @@ public class App {
             return;
         } catch (InterruptedException e) {
             logger.error("[main] occurs a InterruptedException : " + e.getMessage());
+        }
+
+        try {
+            buildCommonClient(context);
+        } catch (MessagebusConnectedFailedException e) {
+            ExceptionHelper.logException(logger, e, "[main]");
+            logger.error("server shutdown because of buildContext failed.");
+            System.exit(1);
         }
 
         boolean mqIsAlive = RabbitmqServerManager.defaultManager(config).isAlive();
@@ -166,8 +171,8 @@ public class App {
         //init zookeeper
         String zkHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
         int zkPort = Integer.valueOf(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
-        globalZookeeper = new LongLiveZookeeper(zkHost, zkPort);
-        globalZookeeper.open();
+
+        globalZKExchangeManager = ExchangerManager.defaultExchangerManager(zkHost, zkPort);
     }
 
     private static void invokeCommand(String cmd, Map<String, String> argMap) {
@@ -196,12 +201,30 @@ public class App {
         }
     }
 
-    private static Map<String, Object> buildContext(Properties serverConfig) throws MessagebusConnectedFailedException {
+    private static Map<String, Object> buildContext(Properties serverConfig) {
         Map<String, Object> context = new ConcurrentHashMap<>();
         context.put(Constants.KEY_SERVER_CONFIG, serverConfig);
+//        context.put(Constants.GLOBAL_ZOOKEEPER_OBJECT, globalZookeeper);
 
+        DBAccessor dbAccessor = new DBAccessor(serverConfig);
+        Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<>();
+        tableDataFetcherMap.put("NODE", new NodeFetcher(dbAccessor));
+        tableDataFetcherMap.put("CONFIG", new ConfigFetcher(dbAccessor));
+        tableDataFetcherMap.put("SEND_PERMISSION", new SendPermissionFetcher(dbAccessor));
+        tableDataFetcherMap.put("RECEIVE_PERMISSION", new ReceivePermissionFetcher(dbAccessor));
+
+        globalZKExchangeManager.setTableDataFetcherMap(tableDataFetcherMap);
+
+        context.put(Constants.GLOBAL_ZKEXCHANGE_MANAGER, globalZKExchangeManager);
+
+        return context;
+    }
+
+    private static void buildCommonClient(Map<String, Object> context) throws MessagebusConnectedFailedException {
+        Properties serverConfig = (Properties) context.get(Constants.KEY_SERVER_CONFIG);
         //message bus client
-        Messagebus commonClient = Messagebus.createClient(Constants.SERVER_APP_ID);
+        String appId = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_APP_ID);
+        Messagebus commonClient = Messagebus.createClient(appId);
 
         String zkHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
         int zkPort = Integer.valueOf(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
@@ -211,10 +234,6 @@ public class App {
         commonClient.open();
 
         context.put(Constants.GLOBAL_CLIENT_OBJECT, commonClient);
-
-        context.put(Constants.GLOBAL_ZOOKEEPER_OBJECT, globalZookeeper);
-
-        return context;
     }
 
     private static void destroy(Map<String, Object> context) {
@@ -225,15 +244,15 @@ public class App {
                 client.close();
         }
 
-        if (globalZookeeper != null && globalZookeeper.isAlive())
-            globalZookeeper.close();
+//        if (globalZookeeper != null && globalZookeeper.isAlive())
+//            globalZookeeper.close();
     }
 
     private static void broadcastEvent(final String eventTypeStr, final App lockObj) {
         try {
             synchronized (lockObj) {
                 logger.debug("broadcast event : " + eventTypeStr);
-                globalZookeeper.setConfig(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr.getBytes(), true);
+                globalZKExchangeManager.uploadWithPath(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr);
             }
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "[broadcastEvent]");

@@ -1,9 +1,9 @@
 package com.freedom.managesystem.service.impl;
 
 import com.freedom.managesystem.dao.IReceivePermissionMapper;
-import com.freedom.managesystem.pojo.ReceivePermission;
 import com.freedom.managesystem.service.IReceivePermissionService;
 import com.freedom.managesystem.service.MessagebusService;
+import com.freedom.messagebus.business.model.ReceivePermission;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;

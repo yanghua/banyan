@@ -1,5 +1,5 @@
 var PERMISSION_QUEUE = {
-    isSendPermissionJTableInited : false,
+    isSendPermissionJTableInited: false,
     isInnerPermissionJTableInited: false
 };
 
@@ -173,10 +173,8 @@ PERMISSION_QUEUE.initSendPermNodeJTable = function () {
             selectedGrantIdsJQObj.val(tmp);
         },
         recordsLoaded: function (event, data) {
-            $('#originalGrantIds').val(data.serverResponse.Others.map(function (id) {
-                return id + ",";
-            }));
-            var selectedRows = data.serverResponse.Others.map(function(id) {
+            $('#originalGrantIds').val(data.serverResponse.Others.join(','));
+            var selectedRows = data.serverResponse.Others.map(function (id) {
                 return $('#sendPermNodeTableContainer').jtable('getRowByKey', id)[0];
             });
 
@@ -242,10 +240,8 @@ PERMISSION_QUEUE.initReceivePermNodeJTable = function () {
             selectedGrantIdsJQObj.val(tmp);
         },
         recordsLoaded: function (event, data) {
-            $('#originalGrantIds').val(data.serverResponse.Others.map(function (id) {
-                return id + ",";
-            }));
-            var selectedRows = data.serverResponse.Others.map(function(id) {
+            $('#originalGrantIds').val(data.serverResponse.Others.join(','));
+            var selectedRows = data.serverResponse.Others.map(function (id) {
                 return $('#receivePermNodeTableContainer').jtable('getRowByKey', id)[0];
             });
 
@@ -278,9 +274,9 @@ PERMISSION_QUEUE.authCommonProcess = function (url) {
         type: 'POST',
         async: false,
         data: {
-            grantIds : $('#selectedGrantIds').val(),
-            targetId : targetId,
-            originalGrantIds : $('#originalGrantIds').val()
+            grantIds: $('#selectedGrantIds').val(),
+            targetId: targetId,
+            originalGrantIds: $('#originalGrantIds').val()
         },
         success: function (data) {
             if (data.Result === 'OK') {

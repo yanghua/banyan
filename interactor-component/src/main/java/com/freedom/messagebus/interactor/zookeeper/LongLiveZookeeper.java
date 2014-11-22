@@ -7,6 +7,8 @@ import org.apache.zookeeper.data.Stat;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +26,8 @@ public class LongLiveZookeeper {
     private String    host;
     private int       port;
 
+    private List<String> watchedPaths;
+
     public LongLiveZookeeper(String host, int port) {
         this.host = host;
         this.port = port;
@@ -32,6 +36,7 @@ public class LongLiveZookeeper {
     private void init() {
         try {
             zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
+            watchedPaths = new ArrayList<>();
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }
@@ -67,8 +72,12 @@ public class LongLiveZookeeper {
             PathWatcher watcher = new PathWatcher(zooKeeper, listener);
             logger.debug("paths :" + paths);
             logger.debug("zooKeeper : " + zooKeeper);
+
             for (String path : paths) {
-                zooKeeper.exists(path, watcher);
+                if (!watchedPaths.contains(path)) {
+                    zooKeeper.exists(path, watcher);
+                    watchedPaths.add(path);
+                }
             }
         } catch (KeeperException e) {
             logger.error("[KeeperException] occurs a KeeperException : " + e.getMessage());
@@ -80,7 +89,8 @@ public class LongLiveZookeeper {
     }
 
     public boolean isAlive() {
-        return this.zooKeeper != null && this.zooKeeper.getState().isAlive();
+        return this.zooKeeper != null
+            && this.zooKeeper.getState().equals(ZooKeeper.States.CONNECTED);
     }
 
     /**

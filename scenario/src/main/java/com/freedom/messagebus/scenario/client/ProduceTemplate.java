@@ -21,7 +21,7 @@ public class ProduceTemplate {
      * (3)如果发生的消息量大，可使用多线程发送
      */
     public static void produce() {
-        String queueName = "erp";
+        String queueName = "crm";
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setReplyTo(queueName);

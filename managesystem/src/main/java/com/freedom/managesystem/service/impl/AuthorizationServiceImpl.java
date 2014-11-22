@@ -1,12 +1,7 @@
 package com.freedom.managesystem.service.impl;
 
-import com.freedom.managesystem.dao.IAuthorizationMapper;
-import com.freedom.managesystem.pojo.Authorization;
 import com.freedom.managesystem.service.IAuthorizationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLException;
 
 @Service
 public class AuthorizationServiceImpl implements IAuthorizationService {

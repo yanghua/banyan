@@ -1,18 +1,17 @@
-package com.freedom.managesystem.pojo;
+package com.freedom.messagebus.business.model;
 
 import java.io.Serializable;
 
-public class SendPermission implements Serializable {
+public class ReceivePermission implements Serializable {
 
     private int targetId;
     private int grantId;
 
-    private String targetName;
-    private String grantName;
+    private transient String targetName;
+    private transient String grantName;
 
-    public SendPermission() {
+    public ReceivePermission() {
     }
-
 
     public int getTargetId() {
         return targetId;
@@ -48,7 +47,7 @@ public class SendPermission implements Serializable {
 
     @Override
     public String toString() {
-        return "SendPermission{" +
+        return "ReceivePermission{" +
             "targetId=" + targetId +
             ", grantId=" + grantId +
             ", targetName='" + targetName + '\'' +
