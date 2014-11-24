@@ -1,6 +1,6 @@
 package com.freedom.messagebus.client.handler.common;
 
-import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;

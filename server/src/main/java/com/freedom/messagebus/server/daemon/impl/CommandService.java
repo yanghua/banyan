@@ -1,10 +1,10 @@
 package com.freedom.messagebus.server.daemon.impl;
 
 import com.freedom.messagebus.business.exchanger.ExchangerManager;
-import com.freedom.messagebus.business.message.model.Message;
-import com.freedom.messagebus.business.message.model.MessageFactory;
-import com.freedom.messagebus.business.message.model.MessageType;
-import com.freedom.messagebus.business.message.model.QueueMessage;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.QueueMessage;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.daemon.DaemonService;

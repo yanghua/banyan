@@ -1,8 +1,8 @@
 package com.freedom.messagebus.httpbridge.controller;
 
-import com.freedom.messagebus.business.message.model.Message;
-import com.freedom.messagebus.business.message.model.MessageJSONSerializer;
-import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageJSONSerializer;
+import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.httpbridge.util.Constants;

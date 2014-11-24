@@ -1,4 +1,4 @@
-package com.freedom.messagebus.business.message.model;
+package com.freedom.messagebus.client.message.model;
 
 public class ExceptionMessage extends AbstractMessage {
 

@@ -1,7 +1,7 @@
 package com.freedom.messagebus.server.daemon.impl;
 
-import com.freedom.messagebus.business.message.model.IMessageHeader;
-import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.message.model.IMessageHeader;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.server.Constants;

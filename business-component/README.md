@@ -14,7 +14,6 @@
 目前`business-component`对三个方面给出了定义：
 
 * model : 需要在各个module中使用的变更对象的数据结构
-* message : 消息总线内的消息对象的定义，以及他们的“转换器”（封送、解封送）
 * exchanger : 变更数据的交换器
 
 ###Exchanger

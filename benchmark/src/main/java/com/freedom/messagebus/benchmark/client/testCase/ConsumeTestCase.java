@@ -4,7 +4,7 @@ import com.freedom.messagebus.benchmark.client.Benchmark;
 import com.freedom.messagebus.benchmark.client.IFetcher;
 import com.freedom.messagebus.benchmark.client.ITerminater;
 import com.freedom.messagebus.benchmark.client.TestConfigConstant;
-import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

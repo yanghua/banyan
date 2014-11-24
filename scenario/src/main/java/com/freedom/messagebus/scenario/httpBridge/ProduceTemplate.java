@@ -1,6 +1,6 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
-import com.freedom.messagebus.business.message.model.*;
+import com.freedom.messagebus.client.message.model.*;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

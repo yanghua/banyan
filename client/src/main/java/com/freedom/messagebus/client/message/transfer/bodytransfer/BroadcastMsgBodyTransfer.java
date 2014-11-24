@@ -1,8 +1,8 @@
-package com.freedom.messagebus.business.message.transfer.bodytransfer;
+package com.freedom.messagebus.client.message.transfer.bodytransfer;
 
-import com.freedom.messagebus.business.message.model.BroadcastMessage;
-import com.freedom.messagebus.business.message.model.IMessageBody;
-import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.client.message.model.BroadcastMessage;
+import com.freedom.messagebus.client.message.model.IMessageBody;
+import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 
 public class BroadcastMsgBodyTransfer implements IMessageBodyTransfer {
 

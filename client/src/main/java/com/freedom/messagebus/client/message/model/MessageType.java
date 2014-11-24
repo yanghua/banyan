@@ -1,4 +1,4 @@
-package com.freedom.messagebus.business.message.model;
+package com.freedom.messagebus.client.message.model;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

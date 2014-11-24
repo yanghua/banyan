@@ -1,6 +1,6 @@
-package com.freedom.messagebus.business.message.transfer;
+package com.freedom.messagebus.client.message.transfer;
 
-import com.freedom.messagebus.business.message.model.IMessageBody;
+import com.freedom.messagebus.client.message.model.IMessageBody;
 
 public interface IMessageBodyTransfer {
 

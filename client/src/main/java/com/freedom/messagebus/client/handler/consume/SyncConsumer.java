@@ -1,11 +1,11 @@
 package com.freedom.messagebus.client.handler.consume;
 
-import com.freedom.messagebus.business.message.model.Message;
-import com.freedom.messagebus.business.message.model.MessageFactory;
-import com.freedom.messagebus.business.message.model.MessageType;
-import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
-import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
-import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;

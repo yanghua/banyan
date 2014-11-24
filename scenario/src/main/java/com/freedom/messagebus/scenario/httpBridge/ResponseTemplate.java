@@ -1,6 +1,6 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
-import com.freedom.messagebus.business.message.model.*;
+import com.freedom.messagebus.client.message.model.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

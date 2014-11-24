@@ -1,9 +1,9 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
-import com.freedom.messagebus.business.message.model.Message;
-import com.freedom.messagebus.business.message.model.MessageFactory;
-import com.freedom.messagebus.business.message.model.MessageType;
-import com.freedom.messagebus.business.message.model.QueueMessage;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.QueueMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;

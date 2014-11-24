@@ -1,11 +1,11 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
 import com.freedom.messagebus.benchmark.client.*;
-import com.freedom.messagebus.business.message.model.Message;
-import com.freedom.messagebus.business.message.model.MessageType;
-import com.freedom.messagebus.business.message.transfer.IMessageBodyTransfer;
-import com.freedom.messagebus.business.message.transfer.MessageBodyTransferFactory;
-import com.freedom.messagebus.business.message.transfer.MessageHeaderTransfer;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;

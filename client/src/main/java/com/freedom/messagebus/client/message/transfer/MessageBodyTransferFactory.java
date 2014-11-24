@@ -1,10 +1,10 @@
-package com.freedom.messagebus.business.message.transfer;
+package com.freedom.messagebus.client.message.transfer;
 
 
-import com.freedom.messagebus.business.message.model.MessageType;
-import com.freedom.messagebus.business.message.transfer.bodytransfer.BroadcastMsgBodyTransfer;
-import com.freedom.messagebus.business.message.transfer.bodytransfer.PubSubMsgBodyTransfer;
-import com.freedom.messagebus.business.message.transfer.bodytransfer.QueueMsgBodyTransfer;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.transfer.bodytransfer.BroadcastMsgBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.bodytransfer.PubSubMsgBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.bodytransfer.QueueMsgBodyTransfer;
 
 public class MessageBodyTransferFactory {
 

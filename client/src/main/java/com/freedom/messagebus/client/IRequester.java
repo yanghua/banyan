@@ -1,6 +1,6 @@
 package com.freedom.messagebus.client;
 
-import com.freedom.messagebus.business.message.model.Message;
+import com.freedom.messagebus.client.message.model.Message;
 import org.jetbrains.annotations.NotNull;
 
 public interface IRequester {

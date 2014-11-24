@@ -1,7 +1,7 @@
-package com.freedom.messagebus.business.message.transfer;
+package com.freedom.messagebus.client.message.transfer;
 
-import com.freedom.messagebus.business.message.model.IMessageHeader;
-import com.freedom.messagebus.business.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.IMessageHeader;
+import com.freedom.messagebus.client.message.model.MessageType;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
