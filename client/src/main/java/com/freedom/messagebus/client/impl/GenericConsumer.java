@@ -1,5 +1,6 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
@@ -14,12 +15,12 @@ import java.util.List;
 /**
  * a generic consumer which implements IConsumer
  */
-class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
+public class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
 
     private static final Log logger = LogFactory.getLog(GenericConsumer.class);
 
-    public GenericConsumer(GenericContext context) {
-        super(MessageCarryType.CONSUME, context);
+    public GenericConsumer() {
+        super(MessageCarryType.CONSUME);
     }
 
     /**

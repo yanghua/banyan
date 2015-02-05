@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * the interface of producer
  */
-public interface IProducer {
+public interface IProducer extends IBasicOperator {
 
     /**
      * simple producer just produces a message

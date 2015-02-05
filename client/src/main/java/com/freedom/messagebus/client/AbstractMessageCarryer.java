@@ -19,9 +19,8 @@ public abstract class AbstractMessageCarryer {
 
     }
 
-    public AbstractMessageCarryer(MessageCarryType carryType, GenericContext context) {
+    public AbstractMessageCarryer(MessageCarryType carryType) {
         this.carryType = carryType;
-        this.context = context;
     }
 
     /**
@@ -33,10 +32,18 @@ public abstract class AbstractMessageCarryer {
     public void carry(MessageContext context) {
         //check server state
         if (ConfigManager.getInstance().getServerState().equals(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED)) {
-            IHandlerChain handlerChain = new MessageCarryHandlerChain(carryType, this.context);
+            IHandlerChain handlerChain = new MessageCarryHandlerChain(carryType, this.getContext());
             handlerChain.handle(context);
         } else {
             throw new RuntimeException("the server is closed. Message can not be carried now!");
         }
+    }
+
+    public GenericContext getContext() {
+        return context;
+    }
+
+    public void setContext(GenericContext context) {
+        this.context = context;
     }
 }

@@ -1,5 +1,9 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.AbstractMessageCarryer;
+import com.freedom.messagebus.client.GenericContext;
+import com.freedom.messagebus.client.IResponser;
+import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
@@ -7,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class GenericResponser extends AbstractMessageCarryer implements IResponser {
 
-    public GenericResponser(GenericContext context) {
-        super(MessageCarryType.RESPONSE, context);
+    public GenericResponser() {
+        super(MessageCarryType.RESPONSE);
     }
 
     /**

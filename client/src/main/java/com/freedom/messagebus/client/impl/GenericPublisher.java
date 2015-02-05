@@ -1,5 +1,9 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.AbstractMessageCarryer;
+import com.freedom.messagebus.client.GenericContext;
+import com.freedom.messagebus.client.IPublisher;
+import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
@@ -10,8 +14,8 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
 
     private static final Log logger = LogFactory.getLog(GenericPublisher.class);
 
-    public GenericPublisher(GenericContext context) {
-        super(MessageCarryType.PUBLISH, context);
+    public GenericPublisher() {
+        super(MessageCarryType.PUBLISH);
     }
 
     @Override

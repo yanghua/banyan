@@ -1,13 +1,17 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.AbstractMessageCarryer;
+import com.freedom.messagebus.client.GenericContext;
+import com.freedom.messagebus.client.IBroadcaster;
+import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
 
 public class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster {
 
-    public GenericBroadcaster(GenericContext context) {
-        super(MessageCarryType.BROADCAST, context);
+    public GenericBroadcaster() {
+        super(MessageCarryType.BROADCAST);
     }
 
     @Override

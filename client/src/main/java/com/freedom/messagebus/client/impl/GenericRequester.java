@@ -1,5 +1,6 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
@@ -8,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
-    public GenericRequester(GenericContext context) {
-        super(MessageCarryType.REQUEST, context);
+    public GenericRequester() {
+        super(MessageCarryType.REQUEST);
     }
 
     /**

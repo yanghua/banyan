@@ -3,7 +3,7 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.client.message.model.Message;
 import org.jetbrains.annotations.NotNull;
 
-public interface IRequester {
+public interface IRequester extends IBasicOperator {
 
     /**
      * send a request and got a response

@@ -4,7 +4,7 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.client.message.model.Message;
 import org.jetbrains.annotations.NotNull;
 
-public interface IResponser {
+public interface IResponser extends IBasicOperator {
 
     /**
      * response a temp message to a named queue

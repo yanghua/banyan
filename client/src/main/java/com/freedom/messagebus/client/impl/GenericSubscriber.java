@@ -1,5 +1,6 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
@@ -14,8 +15,8 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
 
     private static final Log logger = LogFactory.getLog(GenericSubscriber.class);
 
-    public GenericSubscriber(GenericContext context) {
-        super(MessageCarryType.SUBSCRIBE, context);
+    public GenericSubscriber() {
+        super(MessageCarryType.SUBSCRIBE);
     }
 
     public ISubscribeManager subscribe(@NotNull List<String> subQueueNames,

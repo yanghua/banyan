@@ -7,6 +7,7 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
+import com.freedom.messagebus.client.impl.*;
 import com.freedom.messagebus.common.CONSTS;
 import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -121,13 +123,33 @@ public class Messagebus {
         context.setConfigManager(this.configManager);
         context.setConnection(this.connection);
 
-        producer = new GenericProducer(context);
-        consumer = new GenericConsumer(context);
-        requester = new GenericRequester(context);
-        responser = new GenericResponser(context);
-        publisher = new GenericPublisher(context);
-        subscriber = new GenericSubscriber(context);
-        broadcaster = new GenericBroadcaster(context);
+        ServiceLoader<IProducer> producerLoader = ServiceLoader.load(IProducer.class);
+        producer = producerLoader.iterator().next();
+        producer.setContext(context);
+
+        ServiceLoader<IConsumer> consumerLoader = ServiceLoader.load(IConsumer.class);
+        consumer = consumerLoader.iterator().next();
+        consumer.setContext(context);
+
+        ServiceLoader<IRequester> requestLoader = ServiceLoader.load(IRequester.class);
+        requester = requestLoader.iterator().next();
+        requester.setContext(context);
+
+        ServiceLoader<IResponser> responseLoader = ServiceLoader.load(IResponser.class);
+        responser = responseLoader.iterator().next();
+        responser.setContext(context);
+
+        ServiceLoader<IPublisher> publisherLoader = ServiceLoader.load(IPublisher.class);
+        publisher = publisherLoader.iterator().next();
+        publisher.setContext(context);
+
+        ServiceLoader<ISubscriber> subscriberLoader = ServiceLoader.load(ISubscriber.class);
+        subscriber = subscriberLoader.iterator().next();
+        subscriber.setContext(context);
+
+        ServiceLoader<IBroadcaster> broadcasterLoader = ServiceLoader.load(IBroadcaster.class);
+        broadcaster = broadcasterLoader.iterator().next();
+        broadcaster.setContext(context);
 
         boolean success = this.isOpen.compareAndSet(false, true);
         if (!success) {

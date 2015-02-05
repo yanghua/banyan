@@ -1,5 +1,9 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.impl;
 
+import com.freedom.messagebus.client.AbstractMessageCarryer;
+import com.freedom.messagebus.client.GenericContext;
+import com.freedom.messagebus.client.IProducer;
+import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
@@ -11,13 +15,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * a generic producer implements the IProducer interface
  */
-class GenericProducer extends AbstractMessageCarryer implements IProducer {
+public class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
 
 
-    public GenericProducer(GenericContext context) {
-        super(MessageCarryType.PRODUCE, context);
+    public GenericProducer() {
+        super(MessageCarryType.PRODUCE);
     }
 
     /**
@@ -95,4 +99,6 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
         return context;
     }
+
+
 }

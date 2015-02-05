@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * the interface of consumer
  */
-public interface IConsumer {
+public interface IConsumer extends IBasicOperator {
 
     /**
      * consume message
