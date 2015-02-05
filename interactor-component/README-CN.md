@@ -1,11 +1,12 @@
 #overview
 
-该module封装了所有需要跟rabbitmq交互的逻辑（rabbitmq-java-client调用）。它用于屏蔽其他module对rabbitmq-java-client的直接依赖。
-它目前大致包括三个主要部分，分别位于三个package中：
+the module encapsulated the interaction with RabbitMW (used rabbitmq-java-client). and stop the direct dependency of rabbitmq-java-client
 
-* rabbitmq : 封装了对rabbitmq中exchange/queue/channel/topology的操作接口
-* proxy : 提供了生产消息跟消费消息的封装接口，偏底层的接口，第三方可扩展实现
-* message : 提供了message header / body 的adapter，对消息对象提供拆包与封包的实现
+now it contains three parts:
+
+* rabbitmq : encapsoluted rabbitmq中exchange/queue/channel/topology operate interface
+* proxy : provided produce and consume message's api
+* message : provided message header / body 's adapter and box and unbox message
 
 ##message
 这里应对于message header / body的结构，分别为它们提供了processor，如下图：

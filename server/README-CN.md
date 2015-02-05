@@ -1,11 +1,11 @@
 #overview
-消息总线的完整功能离不开围绕在MQ周围的一些核心服务。这些服务作为长时间任务，宿主在某一服务器上。 `server` Module就定义以及处理了这些逻辑。server本身也是 `client` 的使用者，默认情况下它对应于 `proxy.message.system.server` 队列。
+the message bus also depends some core service build around the RabbitMQ. These service run as a long-time deamon service host in a server. the service itself is the user of `client` and it use queue `proxy.message.system.server`.
 
-`server` 包含三大部分：
+`server` contains three parts：
 
-- app : 为server的入口，提供了server的启动逻辑；
-- bootstrap : 为server最先启动的核心服务，通常包括了比如：rabbitmq-server的启动/zookeeper的启动；它们是同步启动；并且不允许失败的
-- daemon : package内部定义了系统其他的后台服务
+- app : the enter of server and supported the start-logic 
+- bootstrap : server's core service，Generally it contains：rabbitmq-server's startup/zookeeper's startup；they start sychorizely and can noe be failure.
+- daemon : defined some daemon service
 
 ##bootstrap-service
 它定义了系统核心组件的启动逻辑，是消息总线可靠运行以及其他一切的前提。它们必须顺序、同步启动；如果没有这个前提，后续所有的东西都不会发生。
