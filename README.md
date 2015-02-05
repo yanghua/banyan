@@ -1,5 +1,5 @@
 #overview
-message bus can be used to communicate and integrate over multi-app. It used a RabbitMQ as backend broker(message exchanger). Most scenario:
+message bus can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
 
 * enterprise information Integration
 * oriented-component & oriented-module distributed developer
@@ -13,7 +13,7 @@ the necessity of encapsulating with RabbitMQ:
 
 
 ##router with tree topology structure
-the message bus's implementation is based on rabbitmq. It can take advantage of multiple message exchange-types rabbitmq provided and build many kinds of router pattern. the message bus's router topology list below:
+the message bus's implementation is based on Rabbitmq. It can takes advantage of multiple message exchange-types rabbitmq provided and builds many kinds of router pattern. The message bus's router topology lists below:
 
 
 ![img 3][3]
