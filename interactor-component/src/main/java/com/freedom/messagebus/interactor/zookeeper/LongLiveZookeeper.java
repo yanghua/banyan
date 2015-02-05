@@ -114,7 +114,7 @@ public class LongLiveZookeeper {
     /**
      * path watcher for watching znode's change
      */
-    private class PathWatcher implements Watcher {
+    private static class PathWatcher implements Watcher {
 
         private ZooKeeper              zooKeeper;
         private IConfigChangedListener listener;

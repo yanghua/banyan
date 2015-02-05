@@ -170,7 +170,7 @@ public class App {
 
         //init zookeeper
         String zkHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
-        int zkPort = Integer.valueOf(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+        int zkPort = Integer.parseInt(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
 
         globalZKExchangeManager = ExchangerManager.defaultExchangerManager(zkHost, zkPort);
     }
@@ -227,7 +227,7 @@ public class App {
         Messagebus commonClient = Messagebus.createClient(appId);
 
         String zkHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
-        int zkPort = Integer.valueOf(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+        int zkPort = Integer.parseInt(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
 
         commonClient.setZkHost(zkHost);
         commonClient.setZkPort(zkPort);

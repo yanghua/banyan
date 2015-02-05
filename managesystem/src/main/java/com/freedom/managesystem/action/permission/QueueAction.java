@@ -45,8 +45,8 @@ public class QueueAction extends BaseAction {
         List<Node> nodeList = null;
 
         try {
-            offset = Integer.valueOf(req.getParameter("jtStartIndex"));
-            pageSize = Integer.valueOf(req.getParameter("jtPageSize"));
+            offset = Integer.parseInt(req.getParameter("jtStartIndex"));
+            pageSize = Integer.parseInt(req.getParameter("jtPageSize"));
 
             nodeList = nodeService.getWithType(Constants.QUEUE_TYPE, offset, pageSize);
             String jsonArr = gson.toJson(nodeList);
@@ -71,7 +71,7 @@ public class QueueAction extends BaseAction {
         int targetId = -1;
 
         try {
-            targetId = Integer.valueOf(targetIdStr);
+            targetId = Integer.parseInt(targetIdStr);
         } catch (NumberFormatException e) {
             responseJTableData(resp, generateErrorJSONStr("the field : nodeid is illegal."));
             return;
@@ -109,7 +109,7 @@ public class QueueAction extends BaseAction {
         int targetId = -1;
 
         try {
-            targetId = Integer.valueOf(targetIdStr);
+            targetId = Integer.parseInt(targetIdStr);
         } catch (NumberFormatException e) {
             responseJTableData(resp, generateErrorJSONStr("the field : nodeid is illegal."));
             return;
@@ -157,7 +157,7 @@ public class QueueAction extends BaseAction {
             return;
         }
 
-        int targetId = Integer.valueOf(targetIdStr);
+        int targetId = Integer.parseInt(targetIdStr);
 
         Map<String, List<Integer>> filterMap = this.filterGrantIds(originalGrantIds, joinedGrantIds);
         SendPermission sendPermission = new SendPermission();
@@ -203,7 +203,7 @@ public class QueueAction extends BaseAction {
             return;
         }
 
-        int targetId = Integer.valueOf(targetIdStr);
+        int targetId = Integer.parseInt(targetIdStr);
 
         Map<String, List<Integer>> filterMap = this.filterGrantIds(originalGrantIds, joinedGrantIds);
         ReceivePermission receivePermission = new ReceivePermission();

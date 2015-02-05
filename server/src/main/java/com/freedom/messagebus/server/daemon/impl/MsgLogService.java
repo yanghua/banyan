@@ -20,12 +20,8 @@ public class MsgLogService extends AbstractService {
     private static final Log logger = LogFactory.getLog("msgLog");
     private Messagebus client;
 
-    private Properties serverConfig;
-
     public MsgLogService(Map<String, Object> context) {
         super(context);
-
-        serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
 
         client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
     }

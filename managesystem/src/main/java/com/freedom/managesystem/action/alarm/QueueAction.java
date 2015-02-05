@@ -36,7 +36,7 @@ public class QueueAction extends BaseAction {
 
         try {
             offset = Integer.valueOf(req.getParameter("jtStartIndex"));
-            pageSize = Integer.valueOf(req.getParameter("jtPageSize"));
+            pageSize = Integer.parseInt(req.getParameter("jtPageSize"));
 
             nodeList = nodeService.getWithType(Constants.QUEUE_TYPE, offset, pageSize);
             String jsonArr = gson.toJson(nodeList);
@@ -60,7 +60,7 @@ public class QueueAction extends BaseAction {
             responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
             return;
         }
-        int nodeId = Integer.valueOf(pNodeId);
+        int nodeId = Integer.parseInt(pNodeId);
 
         try {
             nodeService.activate(nodeId);
@@ -80,7 +80,7 @@ public class QueueAction extends BaseAction {
             responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
             return;
         }
-        int nodeId = Integer.valueOf(pNodeId);
+        int nodeId = Integer.parseInt(pNodeId);
 
         try {
             nodeService.unactivate(nodeId);
@@ -100,7 +100,7 @@ public class QueueAction extends BaseAction {
             responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
             return;
         }
-        int nodeId = Integer.valueOf(pNodeId);
+        int nodeId = Integer.parseInt(pNodeId);
 
         try {
             String appId = nodeService.resetAppId(nodeId);

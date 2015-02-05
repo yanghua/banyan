@@ -32,7 +32,7 @@ public class HttpHelper {
             URI uri = new URIBuilder()
                 .setScheme("http")
                 .setHost(requestParamDic.get("host").toString())
-                .setPort(Integer.valueOf(requestParamDic.get("port").toString()))
+                .setPort(Integer.parseInt(requestParamDic.get("port").toString()))
                 .setPath(requestParamDic.get("path").toString())
                 .setUserInfo(authInfo.getUserName(), authInfo.getPassword())
                 .build();

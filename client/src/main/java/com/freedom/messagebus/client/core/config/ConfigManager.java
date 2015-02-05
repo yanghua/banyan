@@ -760,7 +760,7 @@ public class ConfigManager implements IExchangerListener {
             sendPermissionMap.put(targetId, joinedGrantIds + grantId + ",");
 
             //get max send-permission grant id
-            maxSendPermGrantId = Math.max(maxSendPermGrantId, Integer.valueOf(grantId));
+            maxSendPermGrantId = Math.max(maxSendPermGrantId, Integer.parseInt(grantId));
         }
 
         sendPermByteQueryArrMap = new ConcurrentHashMap<>(sendPermissionMap.size());
@@ -789,7 +789,7 @@ public class ConfigManager implements IExchangerListener {
             receivePermissionMap.put(targetId, joinedGrantIds + grantId + ",");
 
             //get max receive-permission grant id
-            maxReceivePermGrantId = Math.max(maxReceivePermGrantId, Integer.valueOf(grantId));
+            maxReceivePermGrantId = Math.max(maxReceivePermGrantId, Integer.parseInt(grantId));
         }
 
         receivePermByteQueryArrMap = new ConcurrentHashMap<>(receivePermissionMap.size());
@@ -813,7 +813,7 @@ public class ConfigManager implements IExchangerListener {
             permissionQueryBytes[i] = 0;
 
             for (int j = 0; j < grantIds.length; j++) {
-                int current = Integer.valueOf(grantIds[j]);
+                int current = Integer.parseInt(grantIds[j]);
                 if (i == current) {
                     permissionQueryBytes[i] = 1;
                     break;

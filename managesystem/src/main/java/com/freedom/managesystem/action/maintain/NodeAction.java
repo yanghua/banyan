@@ -66,7 +66,7 @@ public class NodeAction extends BaseAction {
             responseJTableData(resp, generateErrorJSONStr("field : node.parentId can not be empty"));
             return;
         }
-        node.setParentId(Integer.valueOf(pParentId));
+        node.setParentId(Integer.parseInt(pParentId));
 
         if (node.getType() == Constants.EXCHANGE_TYPE) {
             if (Strings.isNullOrEmpty(pRouterType)) {
@@ -106,8 +106,8 @@ public class NodeAction extends BaseAction {
         List<Node> nodeList = null;
 
         try {
-            offset = Integer.valueOf(req.getParameter("jtStartIndex"));
-            pageSize = Integer.valueOf(req.getParameter("jtPageSize"));
+            offset = Integer.parseInt(req.getParameter("jtStartIndex"));
+            pageSize = Integer.parseInt(req.getParameter("jtPageSize"));
 
             nodeList = nodeService.getWithPaging(offset, pageSize);
             String jsonArr = gson.toJson(nodeList);
@@ -130,7 +130,7 @@ public class NodeAction extends BaseAction {
             responseJTableData(resp, generateErrorJSONStr("field : nodeId can not be empty "));
             return;
         }
-        int nodeId = Integer.valueOf(pNodeId);
+        int nodeId = Integer.parseInt(pNodeId);
         try {
             nodeService.remove(nodeId);
             responseJTableData(resp, generateUpdateSuccessJSONStr());

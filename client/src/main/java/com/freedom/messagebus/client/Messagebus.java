@@ -162,7 +162,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IProducer getProducer() throws MessagebusUnOpenException {
+    public synchronized IProducer getProducer() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException
                 ("Illegal State: please call Messagebus#open() first!");
@@ -171,7 +171,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IConsumer getConsumer() throws MessagebusUnOpenException {
+    public synchronized IConsumer getConsumer() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException
                 ("Illegal State: please call Messagebus#open() first!");
@@ -180,7 +180,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IRequester getRequester() throws MessagebusUnOpenException {
+    public synchronized IRequester getRequester() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
@@ -188,7 +188,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IResponser getResponser() throws MessagebusUnOpenException {
+    public synchronized IResponser getResponser() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
@@ -196,7 +196,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IPublisher getPublisher() throws MessagebusUnOpenException {
+    public synchronized IPublisher getPublisher() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
@@ -204,7 +204,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public ISubscriber getSubscriber() throws MessagebusUnOpenException {
+    public synchronized ISubscriber getSubscriber() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
@@ -212,7 +212,7 @@ public class Messagebus {
     }
 
     @NotNull
-    public IBroadcaster getBroadcaster() throws MessagebusUnOpenException {
+    public synchronized IBroadcaster getBroadcaster() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
@@ -263,9 +263,9 @@ public class Messagebus {
         Map<String, Config> clientConfigs = this.configManager.getClientConfigMap();
 
         ChannelPoolConfig config = new ChannelPoolConfig();
-        config.setMaxTotal(Integer.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxTotal").getValue()));
-        config.setMaxIdle(Integer.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxIdle").getValue()));
-        config.setMaxWaitMillis(Long.valueOf(clientConfigs.get("messagebus.client.channel.pool.maxWait").getValue()));
+        config.setMaxTotal(Integer.parseInt(clientConfigs.get("messagebus.client.channel.pool.maxTotal").getValue()));
+        config.setMaxIdle(Integer.parseInt(clientConfigs.get("messagebus.client.channel.pool.maxIdle").getValue()));
+        config.setMaxWaitMillis(Long.parseLong(clientConfigs.get("messagebus.client.channel.pool.maxWait").getValue()));
         config.setTestOnBorrow(Boolean.valueOf(clientConfigs.get("messagebus.client.channel.pool.testOnBorrow").getValue()));
         config.setTestOnReturn(Boolean.valueOf(clientConfigs.get("messagebus.client.channel.pool.testOnReturn").getValue()));
 

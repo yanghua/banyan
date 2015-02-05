@@ -30,8 +30,8 @@ public class ModuleAction extends BaseAction {
         List<Module> moduleList = null;
 
         try {
-            offset = Integer.valueOf(req.getParameter("jtStartIndex"));
-            pageSize = Integer.valueOf(req.getParameter("jtPageSize"));
+            offset = Integer.parseInt(req.getParameter("jtStartIndex"));
+            pageSize = Integer.parseInt(req.getParameter("jtPageSize"));
 
             moduleList = moduleService.getWithPaging(offset, pageSize);
             String jsonArr = gson.toJson(moduleList);
@@ -59,7 +59,7 @@ public class ModuleAction extends BaseAction {
         if (sortIndexStr == null || sortIndexStr.isEmpty())
             sortIndexStr = "0";
 
-        newModule.setSortIndex(Integer.valueOf(sortIndexStr));
+        newModule.setSortIndex(Integer.parseInt(sortIndexStr));
 
         Module existsModule = moduleService.getWithModuleValue(newModule.getModuleValue());
         if (existsModule == null) {
@@ -92,7 +92,7 @@ public class ModuleAction extends BaseAction {
         if (sortIndexStr == null || sortIndexStr.isEmpty())
             sortIndexStr = "0";
 
-        module.setSortIndex(Integer.valueOf(sortIndexStr));
+        module.setSortIndex(Integer.parseInt(sortIndexStr));
         moduleService.modify(module);
         super.refreshMenu(ServletActionContext.getRequest().getSession());
         responseJTableData(resp, generateUpdateSuccessJSONStr());

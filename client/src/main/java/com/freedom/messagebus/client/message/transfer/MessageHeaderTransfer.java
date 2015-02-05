@@ -40,7 +40,7 @@ public class MessageHeaderTransfer {
         msgHeader.setTimestamp(properties.getTimestamp());
         String msgIdStr = properties.getMessageId();
         if (msgIdStr != null && !msgIdStr.isEmpty())
-            msgHeader.setMessageId(Long.valueOf(msgIdStr));
+            msgHeader.setMessageId(Long.parseLong(msgIdStr));
         else
             logger.error("[unbox] illegal message id (can not be null) ");
 

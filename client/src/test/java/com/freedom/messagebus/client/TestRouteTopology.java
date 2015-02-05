@@ -24,7 +24,7 @@ public class TestRouteTopology extends TestCase {
     protected Channel           consumerChannel;
 
     private String host = "";
-    private Gson   gson = new Gson();
+//    private Gson   gson = new Gson();
 
     //region exchange definition
     //proxy exchange

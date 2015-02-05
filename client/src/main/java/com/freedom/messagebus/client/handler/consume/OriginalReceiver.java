@@ -55,7 +55,7 @@ public class OriginalReceiver extends AbstractHandler {
         }
     }
 
-    public class ReceiveEventLoop implements Runnable {
+    public static class ReceiveEventLoop implements Runnable {
 
         @NotNull
         private QueueingConsumer currentConsumer;

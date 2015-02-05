@@ -139,7 +139,7 @@ public class HttpBridge extends HttpServlet {
                 throw new NullPointerException("param : timeout can not be null or empty");
 
             long timeout;
-            timeout = Long.valueOf(timeoutStr);
+            timeout = Long.parseLong(timeoutStr);
 
             if (timeout < Constants.MIN_REQUEST_TIMEOUT || timeout > Constants.MAX_REQUEST_TIMEOUT)
                 throw new InvalidParameterException("invalid param : timeout it should be greater than :" +
@@ -206,7 +206,7 @@ public class HttpBridge extends HttpServlet {
                 throw new NullPointerException("[syncConsume] param : num can not be null or empty");
 
             try {
-                num = Integer.valueOf(numStr);
+                num = Integer.parseInt(numStr);
             } catch (NumberFormatException e) {
                 throw new InvalidParameterException("[syncConsume] invalidate param : num, it must be a integer!");
             }
