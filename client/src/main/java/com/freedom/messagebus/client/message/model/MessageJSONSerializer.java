@@ -3,7 +3,6 @@ package com.freedom.messagebus.client.message.model;
 import com.google.gson.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -13,14 +12,14 @@ public class MessageJSONSerializer {
     private static final Gson gson   = new GsonBuilder().serializeNulls().create();
 
 
-    public static String serialize( Message msg) {
+    public static String serialize(Message msg) {
         checkMessageType(msg.getMessageType());
 
         return gson.toJson(msg);
     }
 
 
-    public static Message deSerialize( String msgStr,  MessageType type) {
+    public static Message deSerialize(String msgStr, MessageType type) {
         checkMessageType(type);
 
         JsonParser parser = new JsonParser();
@@ -39,7 +38,7 @@ public class MessageJSONSerializer {
         return msg;
     }
 
-    public static Message deSerialize( JsonElement msgElement,  MessageType type) {
+    public static Message deSerialize(JsonElement msgElement, MessageType type) {
         checkMessageType(type);
 
         JsonObject obj = msgElement.getAsJsonObject();
@@ -56,7 +55,7 @@ public class MessageJSONSerializer {
     }
 
 
-    public static String serializeMessages( Collection<Message> msgs) {
+    public static String serializeMessages(Collection<Message> msgs) {
         for (Message msg : msgs) {
             checkMessageType(msg.getMessageType());
         }
@@ -65,7 +64,7 @@ public class MessageJSONSerializer {
     }
 
 
-    public static Message[] deSerializeMessages( String msgArrStr,  MessageType type) {
+    public static Message[] deSerializeMessages(String msgArrStr, MessageType type) {
         checkMessageType(type);
 
         int i = 0;
@@ -97,7 +96,7 @@ public class MessageJSONSerializer {
         return msgs;
     }
 
-    private static void checkMessageType( MessageType type) {
+    private static void checkMessageType(MessageType type) {
         if (!type.equals(MessageType.QueueMessage)) {
             logger.error("[serialize] unsupport message type : " + type.toString() +
                              ", now just support QueueMessage");

@@ -7,14 +7,13 @@ import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 public class ResponseParamValidator extends AbstractParamValidator {
 
     private static Log logger = LogFactory.getLog(ResponseParamValidator.class);
 
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.RESPONSE)) {

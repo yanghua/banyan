@@ -4,7 +4,6 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -29,7 +28,7 @@ public class QueueManager extends AbstractInitializer {
         return instance;
     }
 
-    public void create( String queueName) throws IOException {
+    public void create(String queueName) throws IOException {
         super.init();
         if (queueName.isEmpty()) {
             logger.error("[create] queueName param is empty");
@@ -39,7 +38,7 @@ public class QueueManager extends AbstractInitializer {
         super.close();
     }
 
-    public void create( String queueName, String bindTo, String routingKey) throws IOException {
+    public void create(String queueName, String bindTo, String routingKey) throws IOException {
         super.init();
         if (queueName.isEmpty()) {
             logger.error("[create] queueName param is empty");
@@ -52,7 +51,7 @@ public class QueueManager extends AbstractInitializer {
         super.close();
     }
 
-    public void bind( String queueName,  String bindTo, String routingKey) throws IOException {
+    public void bind(String queueName, String bindTo, String routingKey) throws IOException {
         super.init();
         if (!this.innerExists(queueName, this.channel)) {
             logger.error("[bind] queue : " + queueName + " is not exists!");
@@ -68,7 +67,7 @@ public class QueueManager extends AbstractInitializer {
         super.close();
     }
 
-    public void unbind( String queueName,  String unbindTo, String routingKey) throws IOException {
+    public void unbind(String queueName, String unbindTo, String routingKey) throws IOException {
         super.init();
         if (queueName.isEmpty()) {
             logger.error("[unbind] queueName is empty");
@@ -92,7 +91,7 @@ public class QueueManager extends AbstractInitializer {
         super.close();
     }
 
-    public void delete( String queueName) throws IOException {
+    public void delete(String queueName) throws IOException {
         super.init();
         if (queueName.isEmpty()) {
             logger.error("[delete] queueName is empty");

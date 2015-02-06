@@ -9,7 +9,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,7 +23,7 @@ public class HttpHelper {
     private static final Log logger = LogFactory.getLog(HttpHelper.class);
 
 
-    public static String syncHTTPGet( Map<String, Object> requestParamDic,  AuthInfo authInfo) {
+    public static String syncHTTPGet(Map<String, Object> requestParamDic, AuthInfo authInfo) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         CloseableHttpResponse response = null;
@@ -66,31 +65,31 @@ public class HttpHelper {
         return "";
     }
 
-    public static void asyncHTTPGet(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPGet(String urlStr, AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPPut(String urlStr,  AuthInfo authInfo) {
+    public static void syncHTTPPut(String urlStr, AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPPut(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPPut(String urlStr, AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPPost(String urlStr,  AuthInfo authInfo) {
+    public static void syncHTTPPost(String urlStr, AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPPost(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPPost(String urlStr, AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPDelete(String urlStr,  AuthInfo authInfo) {
+    public static void syncHTTPDelete(String urlStr, AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPDelete(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPDelete(String urlStr, AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 

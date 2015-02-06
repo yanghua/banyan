@@ -1,10 +1,10 @@
 package com.freedom.messagebus.scenario.client;
 
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.model.QueueMessage;
-import com.freedom.messagebus.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -3,7 +3,6 @@ package com.freedom.managesystem.service.impl;
 import com.freedom.managesystem.core.ConfigManager;
 import com.freedom.managesystem.service.IRabbitmqService;
 import com.freedom.messagebus.common.HttpHelper;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;

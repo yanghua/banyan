@@ -1,7 +1,7 @@
 package com.freedom.messagebus.client.core.config;
 
-import com.freedom.messagebus.business.exchanger.IExchangerListener;
 import com.freedom.messagebus.business.exchanger.ExchangerManager;
+import com.freedom.messagebus.business.exchanger.IExchangerListener;
 import com.freedom.messagebus.business.model.Config;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.business.model.ReceivePermission;
@@ -18,7 +18,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.XPath;
 import org.dom4j.io.SAXReader;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -75,13 +74,13 @@ public class ConfigManager implements IExchangerListener {
     //endregion
 
 
-    private Map<String, Node>   exchangeNodeMap;
+    private Map<String, Node> exchangeNodeMap;
 
-    private Map<String, Node>   queueNodeMap;
+    private Map<String, Node> queueNodeMap;
 
-    private Map<String, Node>   pubsubNodeMap;
+    private Map<String, Node> pubsubNodeMap;
 
-    private Map<String, Node>   appIdQueueMap;
+    private Map<String, Node> appIdQueueMap;
 
     private Map<String, Config> clientConfigMap;
 

@@ -1,10 +1,10 @@
 package com.freedom.messagebus.scenario.client;
 
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.IConsumer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

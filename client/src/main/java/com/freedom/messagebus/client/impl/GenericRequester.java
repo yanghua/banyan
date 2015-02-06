@@ -1,11 +1,13 @@
 package com.freedom.messagebus.client.impl;
 
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.client.AbstractMessageCarryer;
+import com.freedom.messagebus.client.IRequester;
+import com.freedom.messagebus.client.MessageContext;
+import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import org.jetbrains.annotations.NotNull;
 
 public class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
@@ -23,8 +25,8 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
      * @throws com.freedom.messagebus.client.MessageResponseTimeoutException
      */
     @Override
-    public Message request( Message msg,
-                            String to,
+    public Message request(Message msg,
+                           String to,
                            long timeout) throws MessageResponseTimeoutException {
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.REQUEST);

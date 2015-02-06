@@ -8,7 +8,6 @@ import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -42,8 +41,8 @@ public class SingleChannelAccessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,
-                        IHandlerChain chain) {
+    public void handle(MessageContext context,
+                       IHandlerChain chain) {
         this.init(context);
         if (!this.isInited) {
             logger.error("[handle]: the [init] method invoked failed.");
@@ -52,7 +51,7 @@ public class SingleChannelAccessor extends AbstractHandler {
         context.setChannel(this.channel);
         context.setDestroyer(new IChannelDestroyer() {
             @Override
-            public void destroy( Channel channel) {
+            public void destroy(Channel channel) {
                 try {
                     if (channel.isOpen())
                         channel.close();

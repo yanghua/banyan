@@ -1,19 +1,18 @@
 package com.freedom.messagebus.client.handler.subscribe;
 
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.PermissionChecker;
-import org.jetbrains.annotations.NotNull;
+import com.freedom.messagebus.client.message.model.Message;
 
 import java.util.List;
 
 public class SubscribePermission extends PermissionChecker {
 
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
         List<String> subQueueNames = context.getSubQueueNames();
         Message msg = context.getConsumedMsg();
 

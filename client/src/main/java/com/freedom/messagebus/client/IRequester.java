@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.message.model.Message;
-import org.jetbrains.annotations.NotNull;
 
 public interface IRequester extends IBasicOperator {
 
@@ -14,7 +13,7 @@ public interface IRequester extends IBasicOperator {
      * @return Message the response message
      * @throws MessageResponseTimeoutException
      */
-    public Message request( Message msg,  String to, long timeout)
+    public Message request(Message msg, String to, long timeout)
         throws MessageResponseTimeoutException;
 
 }

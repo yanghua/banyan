@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.rabbitmq.client.Channel;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * the interface of channel destroyer used to destroy the channel
@@ -14,6 +13,6 @@ public interface IChannelDestroyer {
      *
      * @param channel the channel between the client and the rabbitmq-server
      */
-    public void destroy( Channel channel);
+    public void destroy(Channel channel);
 
 }

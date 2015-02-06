@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * generic context. contains both general object
@@ -14,14 +13,14 @@ import org.jetbrains.annotations.NotNull;
 public class GenericContext {
 
 
-    private LongLiveZookeeper     zooKeeper;
+    private LongLiveZookeeper zooKeeper;
 
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
 
-    private Connection            connection;
+    private Connection connection;
 
-    private String                appId;
+    private String appId;
 
     public GenericContext() {
     }
@@ -31,7 +30,7 @@ public class GenericContext {
         return zooKeeper;
     }
 
-    public void setZooKeeper( LongLiveZookeeper zooKeeper) {
+    public void setZooKeeper(LongLiveZookeeper zooKeeper) {
         this.zooKeeper = zooKeeper;
     }
 
@@ -40,7 +39,7 @@ public class GenericContext {
         return configManager;
     }
 
-    public void setConfigManager( ConfigManager configManager) {
+    public void setConfigManager(ConfigManager configManager) {
         this.configManager = configManager;
     }
 
@@ -57,7 +56,7 @@ public class GenericContext {
         return connection;
     }
 
-    public void setConnection( Connection connection) {
+    public void setConnection(Connection connection) {
         this.connection = connection;
     }
 
@@ -66,7 +65,7 @@ public class GenericContext {
         return appId;
     }
 
-    public void setAppId( String appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 

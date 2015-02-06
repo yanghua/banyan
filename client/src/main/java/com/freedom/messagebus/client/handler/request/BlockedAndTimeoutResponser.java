@@ -1,14 +1,14 @@
 package com.freedom.messagebus.client.handler.request;
 
+import com.freedom.messagebus.client.MessageContext;
+import com.freedom.messagebus.client.handler.AbstractHandler;
+import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.handler.AbstractHandler;
-import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.freedom.messagebus.interactor.rabbitmq.QueueManager;
@@ -16,7 +16,6 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -30,7 +29,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      * @param handlerModel the model of handler element
      */
     @Override
-    public void init( HandlerModel handlerModel) {
+    public void init(HandlerModel handlerModel) {
 
     }
 
@@ -41,7 +40,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
         long msgId = context.getMessages()[0].getMessageHeader().getMessageId();
 
         try {

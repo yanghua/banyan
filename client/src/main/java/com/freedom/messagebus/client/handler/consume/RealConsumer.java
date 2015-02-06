@@ -7,7 +7,6 @@ import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -25,8 +24,8 @@ public class RealConsumer extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,
-                        IHandlerChain chain) {
+    public void handle(MessageContext context,
+                       IHandlerChain chain) {
         if (!context.isSync()) {
             QueueingConsumer consumer = null;
             try {

@@ -1,7 +1,7 @@
 package com.freedom.messagebus.server;
 
-import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.exchanger.ExchangerManager;
+import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.common.CONSTS;

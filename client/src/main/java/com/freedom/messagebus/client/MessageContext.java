@@ -1,16 +1,15 @@
 package com.freedom.messagebus.client;
 
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.consume.OriginalReceiver;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,13 +23,13 @@ public class MessageContext {
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
 
-    public  Connection connection;
+    public Connection connection;
 
-    private String     host;
-    private boolean    isAuthorized;
-    private boolean    enableTransaction;
+    private String  host;
+    private boolean isAuthorized;
+    private boolean enableTransaction;
 
-    private String     appId;
+    private String appId;
 
     /**
      * for produce
@@ -45,21 +44,20 @@ public class MessageContext {
     private String  consumerTag;
 
 
-
     private MessageCarryType carryType;                 //produce or consume
 
-    private Node             sourceNode;                //store represent self
+    private Node sourceNode;                //store represent self
 
-    private Node             targetNode;                 //store represent current carry node
+    private Node targetNode;                 //store represent current carry node
 
 
-    private Channel                           channel;
+    private Channel channel;
 
     private OriginalReceiver.ReceiveEventLoop receiveEventLoop;
 
-    private IChannelDestroyer                 destroyer;
+    private IChannelDestroyer destroyer;
 
-    private IMessageReceiveListener           listener;
+    private IMessageReceiveListener listener;
 
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
@@ -93,7 +91,7 @@ public class MessageContext {
         return connection;
     }
 
-    public void setConnection( Connection connection) {
+    public void setConnection(Connection connection) {
         this.connection = connection;
     }
 
@@ -118,7 +116,7 @@ public class MessageContext {
         return messages;
     }
 
-    public void setMessages( Message[] messages) {
+    public void setMessages(Message[] messages) {
         this.messages = messages;
     }
 
@@ -127,7 +125,7 @@ public class MessageContext {
         return channel;
     }
 
-    public void setChannel( Channel channel) {
+    public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
@@ -136,7 +134,7 @@ public class MessageContext {
         return receiveEventLoop;
     }
 
-    public void setReceiveEventLoop( OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
+    public void setReceiveEventLoop(OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
         this.receiveEventLoop = receiveEventLoop;
     }
 
@@ -145,7 +143,7 @@ public class MessageContext {
         return carryType;
     }
 
-    public void setCarryType( MessageCarryType carryType) {
+    public void setCarryType(MessageCarryType carryType) {
         this.carryType = carryType;
     }
 
@@ -154,7 +152,7 @@ public class MessageContext {
         return targetNode;
     }
 
-    public void setTargetNode( Node targetNode) {
+    public void setTargetNode(Node targetNode) {
         this.targetNode = targetNode;
     }
 
@@ -163,7 +161,7 @@ public class MessageContext {
         return sourceNode;
     }
 
-    public void setSourceNode( Node sourceNode) {
+    public void setSourceNode(Node sourceNode) {
         this.sourceNode = sourceNode;
     }
 
@@ -177,7 +175,7 @@ public class MessageContext {
         return appId;
     }
 
-    public void setAppId( String appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 
@@ -186,7 +184,7 @@ public class MessageContext {
         return destroyer;
     }
 
-    public void setDestroyer( IChannelDestroyer destroyer) {
+    public void setDestroyer(IChannelDestroyer destroyer) {
         this.destroyer = destroyer;
     }
 
@@ -203,7 +201,7 @@ public class MessageContext {
         return listener;
     }
 
-    public void setListener( IMessageReceiveListener listener) {
+    public void setListener(IMessageReceiveListener listener) {
         this.listener = listener;
     }
 
@@ -236,7 +234,7 @@ public class MessageContext {
         return tempQueueName;
     }
 
-    public void setTempQueueName( String tempQueueName) {
+    public void setTempQueueName(String tempQueueName) {
         this.tempQueueName = tempQueueName;
     }
 

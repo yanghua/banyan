@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * the abstract pool
@@ -19,13 +18,13 @@ public abstract class AbstractPool<T> {
 
     protected GenericObjectPool<T> internalPool;
 
-    public AbstractPool( final GenericObjectPoolConfig poolConfig,
-                         PooledObjectFactory<T> factory) {
+    public AbstractPool(final GenericObjectPoolConfig poolConfig,
+                        PooledObjectFactory<T> factory) {
         this.initPool(poolConfig, factory);
     }
 
-    private void initPool( final GenericObjectPoolConfig poolConfig,
-                           PooledObjectFactory<T> factory) {
+    private void initPool(final GenericObjectPoolConfig poolConfig,
+                          PooledObjectFactory<T> factory) {
         if (this.internalPool != null) {
             closeInternalPool();
         }
@@ -42,15 +41,15 @@ public abstract class AbstractPool<T> {
         }
     }
 
-    public void returnResourceObject( final T resource) {
+    public void returnResourceObject(final T resource) {
         internalPool.returnObject(resource);
     }
 
-    public void returnBrokenResource( final T resource) {
+    public void returnBrokenResource(final T resource) {
         returnBrokenResourceObject(resource);
     }
 
-    public void returnResource( final T resource) {
+    public void returnResource(final T resource) {
         returnResourceObject(resource);
     }
 
@@ -58,7 +57,7 @@ public abstract class AbstractPool<T> {
         closeInternalPool();
     }
 
-    protected void returnBrokenResourceObject( final T resource) {
+    protected void returnBrokenResourceObject(final T resource) {
         try {
             internalPool.invalidateObject(resource);
         } catch (Exception e) {

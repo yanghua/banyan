@@ -1,12 +1,12 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
 import com.freedom.messagebus.benchmark.client.*;
-import com.freedom.messagebus.client.message.model.Message;
-import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

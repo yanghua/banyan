@@ -1,13 +1,12 @@
 package com.freedom.messagebus.client.impl;
 
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,8 +34,8 @@ public class GenericConsumer extends AbstractMessageCarryer implements IConsumer
      */
 
     @Override
-    public IReceiverCloser consume( String queueName,
-                                    IMessageReceiveListener receiveListener) throws IOException {
+    public IReceiverCloser consume(String queueName,
+                                   IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(this.context.getAppId());
@@ -75,7 +74,7 @@ public class GenericConsumer extends AbstractMessageCarryer implements IConsumer
      */
 
     @Override
-    public List<Message> consume( String queueName, int num) {
+    public List<Message> consume(String queueName, int num) {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(super.context.getAppId());

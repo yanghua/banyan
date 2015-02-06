@@ -7,14 +7,13 @@ import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 public class ConsumeParamValidator extends AbstractParamValidator {
 
     private static final Log logger = LogFactory.getLog(ConsumeParamValidator.class);
 
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.CONSUME)) {

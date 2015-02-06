@@ -2,27 +2,26 @@ package com.freedom.messagebus.interactor.proxy;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
 
 public class ProxyProducer {
 
-    public static void produce( String exchangeName,
-                                Channel channel,
-                                String routingKey,
-                                byte[] data,
-                                AMQP.BasicProperties properties
+    public static void produce(String exchangeName,
+                               Channel channel,
+                               String routingKey,
+                               byte[] data,
+                               AMQP.BasicProperties properties
                               ) throws IOException {
         channel.basicPublish(exchangeName, routingKey, properties, data);
     }
 
-    public static void produceWithTX( String exchangeName,
-                                      Channel channel,
+    public static void produceWithTX(String exchangeName,
+                                     Channel channel,
                                      String routingKey,
-                                      byte[] data,
-                                      AMQP.BasicProperties properties
+                                     byte[] data,
+                                     AMQP.BasicProperties properties
                                     ) throws IOException {
 
         //transaction begin
@@ -35,21 +34,21 @@ public class ProxyProducer {
         channel.txCommit();
     }
 
-    public static void batchProduce( String exchangeName,
-                                     Channel channel,
-                                     String routingKey,
-                                     List<byte[]> dataList,
-                                     AMQP.BasicProperties properties
+    public static void batchProduce(String exchangeName,
+                                    Channel channel,
+                                    String routingKey,
+                                    List<byte[]> dataList,
+                                    AMQP.BasicProperties properties
                                    ) throws IOException {
         for (byte[] bytes : dataList)
             produce(exchangeName, channel, routingKey, bytes, properties);
     }
 
-    public static void batchProduceWithTX( String exchangeName,
-                                           Channel channel,
-                                           String routingKey,
-                                           List<byte[]> dataList,
-                                           AMQP.BasicProperties properties
+    public static void batchProduceWithTX(String exchangeName,
+                                          Channel channel,
+                                          String routingKey,
+                                          List<byte[]> dataList,
+                                          AMQP.BasicProperties properties
                                          ) throws IOException {
         for (byte[] bytes : dataList)
             produceWithTX(exchangeName, channel, routingKey, bytes, properties);

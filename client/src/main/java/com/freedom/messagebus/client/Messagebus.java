@@ -7,7 +7,6 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
-import com.freedom.messagebus.client.impl.*;
 import com.freedom.messagebus.common.CONSTS;
 import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
@@ -15,7 +14,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,28 +28,28 @@ public class Messagebus {
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
 
-    private String       appId;
+    private String appId;
 
-    private IProducer    producer;
+    private IProducer producer;
 
-    private IConsumer    consumer;
+    private IConsumer consumer;
 
-    private IRequester   requester;
+    private IRequester requester;
 
-    private IResponser   responser;
+    private IResponser responser;
 
-    private IPublisher   publisher;
+    private IPublisher publisher;
 
-    private ISubscriber  subscriber;
+    private ISubscriber subscriber;
 
     private IBroadcaster broadcaster;
 
-    private ExchangerManager      zkExchangeManager;
+    private ExchangerManager zkExchangeManager;
 
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
 
-    private Connection            connection;
+    private Connection connection;
 
     private AtomicBoolean isOpen         = new AtomicBoolean(false);
     private boolean       useChannelPool = false;
@@ -253,7 +251,7 @@ public class Messagebus {
         return zkHost;
     }
 
-    public void setZkHost( String zkHost) {
+    public void setZkHost(String zkHost) {
         this.zkHost = zkHost;
     }
 

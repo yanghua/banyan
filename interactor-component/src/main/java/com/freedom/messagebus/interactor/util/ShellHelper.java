@@ -2,7 +2,6 @@ package com.freedom.messagebus.interactor.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -12,7 +11,7 @@ public class ShellHelper {
 
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
-    public static ExecResult exec( String cmdStr) throws IOException, InterruptedException {
+    public static ExecResult exec(String cmdStr) throws IOException, InterruptedException {
         String[] cmd = {"/bin/sh", "-c", cmdStr};
         Process process = Runtime.getRuntime().exec(cmd);
         process.waitFor();

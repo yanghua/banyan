@@ -1,13 +1,11 @@
 package com.freedom.messagebus.client.impl;
 
 import com.freedom.messagebus.client.AbstractMessageCarryer;
-import com.freedom.messagebus.client.GenericContext;
 import com.freedom.messagebus.client.IResponser;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import org.jetbrains.annotations.NotNull;
 
 public class GenericResponser extends AbstractMessageCarryer implements IResponser {
 
@@ -22,7 +20,7 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
      * @param queueName the temp queue name
      */
     @Override
-    public void responseTmpMessage( Message msg,  String queueName) {
+    public void responseTmpMessage(Message msg, String queueName) {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.RESPONSE);
 

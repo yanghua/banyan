@@ -1,13 +1,13 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.messagebus.client.message.model.Message;
-import com.freedom.messagebus.client.message.model.MessageFactory;
-import com.freedom.messagebus.client.message.model.MessageType;
-import com.freedom.messagebus.client.message.model.QueueMessage;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.QueueMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

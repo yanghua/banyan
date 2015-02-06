@@ -2,7 +2,6 @@ package com.freedom.messagebus.client.handler;
 
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.model.HandlerModel;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * the abstract handler
@@ -14,7 +13,7 @@ public abstract class AbstractHandler {
      *
      * @param handlerModel the model of handler element
      */
-    public void init( HandlerModel handlerModel) {
+    public void init(HandlerModel handlerModel) {
     }
 
     /**
@@ -23,8 +22,8 @@ public abstract class AbstractHandler {
      * @param context the message context
      * @param chain   the instance of IHandlerChain
      */
-    public abstract void handle( MessageContext context,
-                                 IHandlerChain chain);
+    public abstract void handle(MessageContext context,
+                                IHandlerChain chain);
 
     /**
      * resource clear after the handler would not be used

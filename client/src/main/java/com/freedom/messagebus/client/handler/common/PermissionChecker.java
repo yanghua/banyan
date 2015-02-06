@@ -7,7 +7,6 @@ import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public class PermissionChecker extends AbstractHandler {
     private static final Log logger = LogFactory.getLog(PermissionChecker.class);
 
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
     }
 
     protected boolean commonCheck(Node source, Node target, boolean isSend) {

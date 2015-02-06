@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.common.RouterType;
-import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

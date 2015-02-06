@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.IReceiverCloser;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * message processor. it will trigger the receiver listener's onMessage event
@@ -32,8 +31,8 @@ public class MessageProcessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,
-                        IHandlerChain chain) {
+    public void handle(MessageContext context,
+                       IHandlerChain chain) {
         if (!context.isSync() && context.getConsumedMsg() != null) {
             this.context = context;
             IMessageReceiveListener receiveListener = context.getListener();

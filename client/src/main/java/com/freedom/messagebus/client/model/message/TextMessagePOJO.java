@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client.model.message;
 
 import com.freedom.messagebus.client.core.message.TextMessage;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * the POJO that implements the TextMessage interface
@@ -21,7 +20,7 @@ public class TextMessagePOJO implements TextMessage {
     }
 
     @Override
-    public void setMessageBody( String body) {
+    public void setMessageBody(String body) {
         this.body = body;
     }
 }

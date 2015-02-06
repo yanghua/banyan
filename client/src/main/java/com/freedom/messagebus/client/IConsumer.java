@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.message.model.Message;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,8 +21,8 @@ public interface IConsumer extends IBasicOperator {
      * @throws IOException
      */
 
-    public IReceiverCloser consume( String queueName,
-                                    IMessageReceiveListener receiveListener) throws IOException;
+    public IReceiverCloser consume(String queueName,
+                                   IMessageReceiveListener receiveListener) throws IOException;
 
     /**
      * consume with sync-mode, when received messages' num equal the given num
@@ -34,6 +33,6 @@ public interface IConsumer extends IBasicOperator {
      * @return received message
      */
 
-    public List<Message> consume( String queueName, int num);
+    public List<Message> consume(String queueName, int num);
 
 }

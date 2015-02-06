@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.message.model.Message;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * the interface of producer
@@ -14,7 +13,7 @@ public interface IProducer extends IBasicOperator {
      * @param msg a general message
      * @param to  the message's destination
      */
-    public void produce( Message msg,  String to);
+    public void produce(Message msg, String to);
 
 
     /**
@@ -24,7 +23,7 @@ public interface IProducer extends IBasicOperator {
      * @param msg a general message
      * @param to  the message's destination
      */
-    public void produceWithTX( Message msg,  String to);
+    public void produceWithTX(Message msg, String to);
 
 
     /**
@@ -33,7 +32,7 @@ public interface IProducer extends IBasicOperator {
      * @param msgs a general message's array
      * @param to   the message's destination
      */
-    public void batchProduce( Message[] msgs,  String to);
+    public void batchProduce(Message[] msgs, String to);
 
 
     /**
@@ -43,6 +42,6 @@ public interface IProducer extends IBasicOperator {
      * @param msgs a general message's array
      * @param to   the message's destination
      */
-    public void batchProduceWithTX( Message[] msgs,  String to);
+    public void batchProduceWithTX(Message[] msgs, String to);
 
 }

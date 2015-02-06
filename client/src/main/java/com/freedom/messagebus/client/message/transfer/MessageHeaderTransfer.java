@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.message.model.MessageType;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 public class MessageHeaderTransfer {
 
@@ -31,7 +30,7 @@ public class MessageHeaderTransfer {
                       .build();
     }
 
-    public static IMessageHeader unbox( AMQP.BasicProperties properties,
+    public static IMessageHeader unbox(AMQP.BasicProperties properties,
                                        MessageType msgType,
                                        IMessageHeader msgHeader) {
         //common properties

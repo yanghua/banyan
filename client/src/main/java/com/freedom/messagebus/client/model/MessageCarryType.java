@@ -1,7 +1,5 @@
 package com.freedom.messagebus.client.model;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,7 +31,7 @@ public enum MessageCarryType {
     }
 
 
-    public static MessageCarryType lookup( String strType) {
+    public static MessageCarryType lookup(String strType) {
         MessageCarryType result = lookups.get(strType);
 
         if (result == null)

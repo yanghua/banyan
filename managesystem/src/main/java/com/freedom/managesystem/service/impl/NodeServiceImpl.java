@@ -7,7 +7,6 @@ import com.freedom.managesystem.service.MessagebusService;
 import com.freedom.messagebus.business.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,7 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
 
     @Override
     @Transactional
-    public void save( Node node) throws SQLException {
+    public void save(Node node) throws SQLException {
         //create for end-to-end
         boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) != null);
 

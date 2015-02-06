@@ -1,8 +1,8 @@
 package com.freedom.messagebus.server.daemon.impl;
 
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.message.model.IMessageHeader;
 import com.freedom.messagebus.client.message.model.Message;
-import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.daemon.DaemonService;
@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
 public class MsgLogService extends AbstractService {

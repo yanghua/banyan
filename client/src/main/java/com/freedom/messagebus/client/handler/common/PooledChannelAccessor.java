@@ -9,7 +9,6 @@ import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -28,8 +27,8 @@ public class PooledChannelAccessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( final MessageContext context,
-                        final IHandlerChain chain) {
+    public void handle(final MessageContext context,
+                       final IHandlerChain chain) {
         final AbstractPool<Channel> pool = context.getPool();
 
         context.setChannel(pool.getResource());
@@ -37,7 +36,7 @@ public class PooledChannelAccessor extends AbstractHandler {
         //set channel destroyer , just return here
         context.setDestroyer(new IChannelDestroyer() {
             @Override
-            public void destroy( Channel channel) {
+            public void destroy(Channel channel) {
                 //if carry is consume or request then release current consumer
                 if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
                     if (context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()) {

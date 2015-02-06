@@ -6,7 +6,6 @@ import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.CONSTS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,8 +18,8 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
         super(MessageCarryType.SUBSCRIBE);
     }
 
-    public ISubscribeManager subscribe( List<String> subQueueNames,
-                                        IMessageReceiveListener receiveListener) throws IOException {
+    public ISubscribeManager subscribe(List<String> subQueueNames,
+                                       IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
         ctx.setAppId(this.context.getAppId());
@@ -62,7 +61,7 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
         };
     }
 
-    private void preProcessSubQueueNames( List<String> subQueueNames) {
+    private void preProcessSubQueueNames(List<String> subQueueNames) {
         for (int i = 0; i < subQueueNames.size(); i++) {
             String subQueueName = subQueueNames.get(i);
             if (subQueueName.endsWith(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX))

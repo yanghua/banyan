@@ -7,7 +7,6 @@ import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.ParamValidateFailedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * parameter validate handler
@@ -23,8 +22,8 @@ public abstract class AbstractParamValidator extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,
-                        IHandlerChain chain) {
+    public void handle(MessageContext context,
+                       IHandlerChain chain) {
         if (context.getAppId().length() == 0)
             throw new ParamValidateFailedException(" the field : appId of MessageContext can not be empty");
 

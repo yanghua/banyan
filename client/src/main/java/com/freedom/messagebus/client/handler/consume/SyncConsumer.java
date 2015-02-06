@@ -1,20 +1,19 @@
 package com.freedom.messagebus.client.handler.consume;
 
+import com.freedom.messagebus.client.MessageContext;
+import com.freedom.messagebus.client.handler.AbstractHandler;
+import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.handler.AbstractHandler;
-import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class SyncConsumer extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle( MessageContext context,  IHandlerChain chain) {
+    public void handle(MessageContext context, IHandlerChain chain) {
         if (context.isSync()) {
             List<Message> consumeMsgs = new ArrayList<>(context.getConsumeMsgNum());
             context.setConsumeMsgs(consumeMsgs);

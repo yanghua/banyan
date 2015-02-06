@@ -1,14 +1,13 @@
 package com.freedom.messagebus.benchmark.client;
 
-import com.freedom.messagebus.client.message.model.Message;
-import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
@@ -16,7 +15,7 @@ public class TestUtility {
 
     private final static Log logger = LogFactory.getLog(TestUtility.class);
 
-    public static void writeFile( String fileName,  long[] xArr,  long[] yArr) {
+    public static void writeFile(String fileName, long[] xArr, long[] yArr) {
         String filePath = String.format(TestConfigConstant.OUTPUT_FILE_PATH_FORMAT, fileName);
 
         PrintWriter out = null;

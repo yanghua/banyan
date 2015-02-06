@@ -1,7 +1,5 @@
 package com.freedom.messagebus.common;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Random;
 
 public class RandomHelper {

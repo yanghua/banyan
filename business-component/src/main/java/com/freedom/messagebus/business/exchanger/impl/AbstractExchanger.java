@@ -1,7 +1,7 @@
 package com.freedom.messagebus.business.exchanger.impl;
 
-import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.exchanger.IDataExchanger;
+import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

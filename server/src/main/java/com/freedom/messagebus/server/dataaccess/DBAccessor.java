@@ -3,7 +3,6 @@ package com.freedom.messagebus.server.dataaccess;
 import com.freedom.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +18,7 @@ public class DBAccessor {
     private Properties properties;
     private String     jdbcUrlStr;
 
-    public DBAccessor( Properties config) {
+    public DBAccessor(Properties config) {
         this.properties = config;
         this.jdbcUrlStr = String.format(jdbcUrlFormatStr,
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),
