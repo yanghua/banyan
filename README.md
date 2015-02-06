@@ -1,5 +1,5 @@
 #overview
-message bus can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
+rabbitmq-messagebus can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
 
 * enterprise information Integration
 * oriented-component & oriented-module distributed developer
@@ -12,7 +12,7 @@ the necessity of encapsulating with RabbitMQ:
 * removed create & delete & update operation from client, replaced with central-register mode
 
 
-##router with tree topology structure
+##tree topology structure
 the message bus's implementation is based on Rabbitmq. It can takes advantage of multiple message exchange-types rabbitmq provided and builds many kinds of router pattern. The message bus's router topology lists below:
 
 
@@ -281,12 +281,14 @@ response :
 }
 ```
 
-##scenario
+##scenario & usage
 scenario is used to show:
 
 * message bus's client use-scenario
 * test message bus's function
 * test message bus's client api
+
+###produce
 
 ```java
 public static void produce() {
@@ -311,6 +313,9 @@ public static void produce() {
     }
 ```
 
+###consume
+
+####async mode
 
 ```java
 public static class ConsumerService extends Thread {
@@ -365,7 +370,538 @@ public static class ConsumerService extends Thread {
     }
 ```
 
-more scenario please see the module `scenario`
+####sync mode
+
+```java
+public static void main(String[] args) {
+        Messagebus client = Messagebus.getInstance(appkey);
+        client.setZkHost(host);
+        client.setZkPort(port);
+
+        IConsumer consumer = null;
+        try {
+            client.open();
+            consumer = client.getConsumer();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        } catch (MessagebusUnOpenException e) {
+            e.printStackTrace();
+        }
+
+        //consume
+        List<Message> msgs = consumer.consume(appName, 2, 10_000);
+        client.close();
+
+        for (Message msg : msgs) {
+            logger.info("message id : " + msg.getMessageHeader().getMessageId());
+        }
+
+    }
+```
+
+###request
+
+```java
+public static void main(String[] args) {
+        Messagebus messagebus = Messagebus.getInstance(appkey);
+        messagebus.setZkHost(host);
+        messagebus.setZkPort(port);
+
+        Message msg = MessageFactory.createMessage(MessageType.AppMessage);
+        String queueName = "crm";
+
+        AppMessageBody appMessageBody = (AppMessageBody) msg.getMessageBody();
+        appMessageBody.setMessageBody("test".getBytes());
+
+        Message respMsg = null;
+
+        try {
+            messagebus.open();
+            IRequester requester = messagebus.getRequester();
+
+            respMsg = requester.request(msg, queueName, 10);
+            //use response message...
+            logger.info("response message : [" + respMsg.getMessageHeader().getMessageId() + "]");
+        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException |
+            MessageResponseTimeoutException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            messagebus.close();
+        }
+    }
+```
+
+###response
+
+```java
+public static class ResponseService extends Thread {
+
+        Messagebus client = Messagebus.getInstance(appkey);
+
+        String          appName        = "crm";
+        IConsumerCloser consumerCloser = null;
+        private final Object lockObj = new Object();
+
+        @Override
+        public void run() {
+            try {
+                synchronized (lockObj) {
+                    //set zookeeper info
+                    client.setZkHost(host);
+                    client.setZkPort(port);
+
+                    client.open();
+                    IConsumer consumer = client.getConsumer();
+                    final IResponser responser = client.getResponser();
+                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
+                        @Override
+                        public void onMessage(Message message) {
+                            //handle message
+                            String msgId = String.valueOf(message.getMessageHeader().getMessageId());
+                            logger.info("[" + msgId +
+                                            "]-[" + message.getMessageHeader().getType() + "]");
+
+                            //send response
+                            responser.responseTmpMessage(message, msgId);
+                        }
+                    });
+
+                    logger.info("blocked for receiving message!");
+                    lockObj.wait(0);
+                    logger.info("released object lock!");
+                }
+            } catch (IOException | MessagebusUnOpenException |
+                MessagebusConnectedFailedException | InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                logger.info("close client");
+                consumerCloser.closeConsumer();
+                client.close();
+            }
+        }
+
+        public void stopService() {
+            //style 1 : use lock released
+            synchronized (lockObj) {
+                lockObj.notifyAll();
+            }
+
+            //style 2 : use interrupt
+//            this.interrupt();
+        }
+    }
+```
+
+###publish
+
+```java
+public static void publish() {
+        Message msg = MessageFactory.createMessage(MessageType.PubSubMessage);
+        msg.getMessageHeader().setReplyTo("crm");
+        msg.getMessageHeader().setContentType("text/plain");
+        msg.getMessageHeader().setContentEncoding("utf-8");
+
+        PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
+
+        Messagebus client = Messagebus.createClient(appId);
+        client.setZkHost(host);
+        client.setZkPort(port);
+
+        try {
+            client.open();
+            client.getPublisher().publish(new Message[]{msg});
+        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
+            e.printStackTrace();
+        } finally {
+            client.close();
+        }
+    }
+```
+
+###subscirbe
+
+```java
+public static class SubscribeService extends Thread {
+
+        Messagebus client = Messagebus.createClient(appId);
+
+        List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
+        ISubscribeManager subscribeManager = null;
+        final Object lockObj = new Object();
+
+        @Override
+        public void run() {
+            try {
+                synchronized (lockObj) {
+                    //set zookeeper info
+                    client.setZkHost(host);
+                    client.setZkPort(port);
+
+                    client.open();
+                    ISubscriber subscriber = client.getSubscriber();
+                    subscribeManager = subscriber.subscribe(subQueueNames, new IMessageReceiveListener() {
+                        @Override
+                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                            logger.info("[" + message.getMessageHeader().getMessageId() +
+                                            "]-[" + message.getMessageHeader().getType() + "]");
+                        }
+                    });
+
+                    logger.info("blocked for receiving message!");
+                    lockObj.wait(0);
+                    logger.info("released object lock!");
+                }
+            } catch (IOException | MessagebusUnOpenException |
+                MessagebusConnectedFailedException | InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                logger.info("close client");
+                subscribeManager.close();
+                client.close();
+            }
+        }
+```
+
+###broadcast
+
+```java
+public static void broadcast() {
+        String queueName = "crm";
+        Message msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
+        msg.getMessageHeader().setReplyTo(queueName);
+        msg.getMessageHeader().setContentType("text/plain");
+        msg.getMessageHeader().setContentEncoding("utf-8");
+
+        BroadcastMessage.BroadcastMessageBody body = new BroadcastMessage.BroadcastMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
+
+        Messagebus client = Messagebus.createClient(appId);
+        client.setZkHost(host);
+        client.setZkPort(port);
+
+        try {
+            client.open();
+            client.getBroadcaster().broadcast(new Message[]{msg});
+        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
+            e.printStackTrace();
+        } finally {
+            client.close();
+        }
+    }
+```
+
+###http-resut
+
+####produce
+
+```java
+public class ProduceTemplate {
+
+    private static final Log logger = LogFactory.getLog(ProduceTemplate.class);
+
+    private static final Gson gson = new Gson();
+
+    private static String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?appkey=%s&type=produce";
+    private static String testHost      = "localhost";
+    private static int    testPort      = 8081;
+    private static String testQueue     = "crm";
+    private static String appkey        = "jahksjdfhakjdflkasdjflk";
+
+    public static void main(String[] args) {
+        String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey);
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        CloseableHttpResponse response = null;
+
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.getMessageHeader().setReplyTo(testQueue);
+
+        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
+
+        List<Message> msgs = new ArrayList<>(1);
+        msgs.add(msg);
+        String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
+
+        try {
+            HttpPost postRequest = new HttpPost(url);
+            List<NameValuePair> nvps = new ArrayList<>();
+            nvps.add(new BasicNameValuePair("messages", msgs2json));
+            postRequest.setEntity(new UrlEncodedFormEntity(nvps));
+
+            response = httpClient.execute(postRequest);
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                logger.info("response is : " + EntityUtils.toString(entity));
+                long len = entity.getContentLength();
+                if (len == -1)
+                    logger.error("there is no response data.");
+                else if (len < 2 * 1024 * 1024) {
+                    logger.info("response is : " + EntityUtils.toString(entity));
+                } else {
+                    logger.error("[syncHTTPGet] response length is too large : (" + len + ") B " +
+                                     "; and the url is : " + url);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
+        } finally {
+            if (response != null)
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                }
+        }
+    }
+
+}
+```
+
+####request
+
+```java
+public class RequestTemplate {
+
+    private static final Log logger = LogFactory.getLog(RequestTemplate.class);
+
+    private static String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?appkey=%s&type=request&timeout=%s";
+    private static String testHost      = "localhost";
+    private static int    testPort      = 8081;
+    private static String testQueue     = "crm";
+    private static String appkey        = "jahksjdfhakjdflkasdjflk";
+    private static long   timeout       = 5000;
+
+    public static void main(String[] args) {
+        String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey, timeout);
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        CloseableHttpResponse response = null;
+
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.getMessageHeader().setReplyTo(testQueue);
+
+        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        body.setContent("test".getBytes());
+        msg.setMessageBody(body);
+
+        String msg2json = MessageJSONSerializer.serialize(testMsg);
+
+        try {
+            HttpPost postRequest = new HttpPost(url);
+            List<NameValuePair> nvps = new ArrayList<>();
+            nvps.add(new BasicNameValuePair("message", msg2json));
+            postRequest.setEntity(new UrlEncodedFormEntity(nvps));
+
+            response = httpClient.execute(postRequest);
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                long len = entity.getContentLength();
+                if (len == -1)
+                    logger.error("there is no response data.");
+                else if (len < 2 * 1024 * 1024) {
+                    logger.info("response is : " + EntityUtils.toString(entity));
+                } else {
+                    logger.error("[syncHTTPGet] response length is too large : (" + len + ") B " +
+                                     "; and the url is : " + url);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
+        } finally {
+            if (response != null)
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                }
+        }
+    }
+
+}
+```
+
+####response
+
+```java
+public class ResponseTemplate {
+
+    //there are two end points, follow there steps:
+    /*
+        send a request (end point 1)
+        get a response (end point 2)
+        send a response (end point 2)
+        get a response (end point 1)
+    */
+
+    private static final Log logger = LogFactory.getLog(ResponseTemplate.class);
+
+    private static String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?appkey=%s&type=%s&timeout=%s";
+    private static String testHost      = "localhost";
+    private static int    testPort      = 8081;
+    private static String testQueue     = "crm";
+    private static String appkey        = "jahksjdfhakjdflkasdjflk";
+    private static long   timeout       = 30000;
+
+    private static volatile Object lockObj = new Object();
+
+    public static void main(String[] args) {
+        try {
+            EndPoint1 e1 = new EndPoint1();
+            e1.start();
+
+            TimeUnit.SECONDS.sleep(3);
+
+            EndPoint2 e2 = new EndPoint2();
+            e2.start();
+
+            //block 30s
+            TimeUnit.SECONDS.sleep(40);
+        } catch (InterruptedException e) {
+
+        }
+    }
+
+    private static class EndPoint1 extends Thread {
+
+        @Override
+        public void run() {
+            CloseableHttpResponse response = null;
+            try {
+                String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey, "request", timeout);
+
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+
+                Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                body.setContent("test".getBytes());
+                testMsg.setMessageBody(body);
+
+                String msg2json = MessageJSONSerializer.serialize(testMsg);
+
+                HttpPost postRequest = new HttpPost(url);
+                List<NameValuePair> nvps = new ArrayList<>();
+                nvps.add(new BasicNameValuePair("message", msg2json));
+                postRequest.setEntity(new UrlEncodedFormEntity(nvps));
+
+                response = httpClient.execute(postRequest);
+
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    logger.info("end point 1 received response : " + EntityUtils.toString(entity));
+                }
+            } catch (IOException e) {
+                logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
+            } finally {
+                if (response != null)
+                    try {
+                        response.close();
+                    } catch (IOException e) {
+                        logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                    }
+            }
+        }
+    }
+
+    private static class EndPoint2 extends Thread {
+
+        @Override
+        public void run() {
+            CloseableHttpResponse response = null;
+            CloseableHttpResponse resp = null;
+            try {
+                synchronized (lockObj) {
+                    String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey, "consume", timeout);
+                    url += "&mode=sync&num=1";
+
+                    CloseableHttpClient httpClient = HttpClients.createDefault();
+                    HttpGet get = new HttpGet(url);
+
+                    //get request
+                    response = httpClient.execute(get);
+                    HttpEntity entity = response.getEntity();
+                    if (entity != null) {
+                        String responseData = EntityUtils.toString(entity);
+                        logger.info("end point 2 : received response : " + responseData);
+
+                        Message msg = extractRequestMsg(responseData);
+
+                        String tmpQueueName = String.valueOf(msg.getMessageHeader().getMessageId());
+
+                        String responseUrl = String.format(testUrlFormat, testHost, testPort,
+                                                           tmpQueueName, appkey, "response", timeout);
+
+                        //send response
+                        CloseableHttpClient responseHttpClient = HttpClients.createDefault();
+
+
+                        Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                        body.setContent("test".getBytes());
+                        testMsg.setMessageBody(body);
+
+                        String msg2json = MessageJSONSerializer.serialize(testMsg);
+
+                        HttpPost postRequest = new HttpPost(responseUrl);
+                        List<NameValuePair> nvps = new ArrayList<>();
+                        nvps.add(new BasicNameValuePair("message", msg2json));
+                        postRequest.setEntity(new UrlEncodedFormEntity(nvps));
+
+                        resp = responseHttpClient.execute(postRequest);
+                        HttpEntity responseEntity = response.getEntity();
+
+                        lockObj.notify();
+                    }
+                }
+            } catch (IOException e) {
+                logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
+            } finally {
+                if (response != null)
+                    try {
+                        response.close();
+                    } catch (IOException e) {
+                        logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                    }
+
+                if (resp != null)
+                    try {
+                        resp.close();
+                    } catch (IOException e) {
+                        logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                    }
+            }
+        }
+    }
+
+    private static Message extractRequestMsg(String respData) {
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(respData);
+        JsonObject object = element.getAsJsonObject();
+        JsonElement dataElement = object.get("data");
+        if (!dataElement.isJsonArray()) {
+            return null;
+        }
+
+        JsonElement msgElement = dataElement.getAsJsonArray().get(0);
+
+        return MessageJSONSerializer.deSerialize(msgElement, MessageType.QueueMessage);
+    }
+
+
+}
+```
 
 ##benchmark
 it shows the  `client` performance:
@@ -406,6 +942,16 @@ JDK Version : 1.7.0_72
 * single thread，same message size，use client channel pool or not，compare：
 
 ![img 13][13]
+
+##licence
+Copyright (c) 2014-2015 yanghua. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+```
+http://www.apache.org/licenses/LICENSE-2.0
+```
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 
 
