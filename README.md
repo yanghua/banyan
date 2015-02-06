@@ -1,5 +1,10 @@
 #overview
-rabbitmq-messagebus can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
+
+```
+banyan is a tree has thick branches which grows in the East Asia.
+```
+
+it can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
 
 * enterprise information Integration
 * oriented-component & oriented-module distributed developer
