@@ -25,8 +25,8 @@ public class RealConsumer extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
-                       @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,
+                        IHandlerChain chain) {
         if (!context.isSync()) {
             QueueingConsumer consumer = null;
             try {

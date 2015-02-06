@@ -16,7 +16,7 @@ public class PermissionChecker extends AbstractHandler {
     private static final Log logger = LogFactory.getLog(PermissionChecker.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
     }
 
     protected boolean commonCheck(Node source, Node target, boolean isSend) {

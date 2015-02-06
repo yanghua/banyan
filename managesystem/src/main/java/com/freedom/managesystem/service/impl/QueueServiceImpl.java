@@ -17,7 +17,7 @@ import java.util.Map;
 public class QueueServiceImpl implements IQueueService {
 
     //region http service
-    @NotNull
+
     public Queue[] list() {
         Map<String, Object> requestParamDic = new HashMap<>(3);
         requestParamDic.put("host", ConfigManager.HOST);

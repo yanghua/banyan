@@ -20,7 +20,7 @@ public class SingleChannelAccessor extends AbstractHandler {
 
     private static final Log logger = LogFactory.getLog(SingleChannelAccessor.class);
 
-    @NotNull
+
     private Channel channel;
 
     private boolean isInited = false;
@@ -42,8 +42,8 @@ public class SingleChannelAccessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
-                       @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,
+                        IHandlerChain chain) {
         this.init(context);
         if (!this.isInited) {
             logger.error("[handle]: the [init] method invoked failed.");
@@ -52,7 +52,7 @@ public class SingleChannelAccessor extends AbstractHandler {
         context.setChannel(this.channel);
         context.setDestroyer(new IChannelDestroyer() {
             @Override
-            public void destroy(@NotNull Channel channel) {
+            public void destroy( Channel channel) {
                 try {
                     if (channel.isOpen())
                         channel.close();

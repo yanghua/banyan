@@ -26,7 +26,7 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
 
     @Override
     @Transactional
-    public void save(@NotNull Node node) throws SQLException {
+    public void save( Node node) throws SQLException {
         //create for end-to-end
         boolean isNodeNameExists = (nodeMapper.findWithName(node.getName()) != null);
 
@@ -58,13 +58,13 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
         this.produceDBOperate("CREATE", "NODE");
     }
 
-    @NotNull
+
     @Override
     public List<Node> getAll() {
         return nodeMapper.findAll();
     }
 
-    @NotNull
+
     @Override
     public Node get(int id) {
         return nodeMapper.find(id);

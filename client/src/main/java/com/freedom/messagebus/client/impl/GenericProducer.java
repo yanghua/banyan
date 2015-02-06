@@ -31,8 +31,8 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param to  the message's destination
      */
     @Override
-    public void produce(@NotNull Message msg,
-                        @NotNull String to) {
+    public void produce( Message msg,
+                         String to) {
         MessageContext ctx = this.innerProduce(super.context.getAppId(), to);
         ctx.setMessages(new Message[]{msg});
         carry(ctx);
@@ -46,8 +46,8 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param to  the message's destination
      */
     @Override
-    public void produceWithTX(@NotNull Message msg,
-                              @NotNull String to) {
+    public void produceWithTX( Message msg,
+                               String to) {
         MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(new Message[]{msg});
         context.setEnableTransaction(true);
@@ -61,8 +61,8 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param to   the message's destination
      */
     @Override
-    public void batchProduce(@NotNull Message[] msgs,
-                             @NotNull String to) {
+    public void batchProduce( Message[] msgs,
+                              String to) {
         MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(msgs);
         carry(context);
@@ -76,16 +76,16 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param to   the message's destination
      */
     @Override
-    public void batchProduceWithTX(@NotNull Message[] msgs,
-                                   @NotNull String to) {
+    public void batchProduceWithTX( Message[] msgs,
+                                    String to) {
         MessageContext context = this.innerProduce(super.context.getAppId(), to);
         context.setMessages(msgs);
         context.setEnableTransaction(true);
         carry(context);
     }
 
-    private MessageContext innerProduce(@NotNull String appId,
-                                        @NotNull String to) {
+    private MessageContext innerProduce( String appId,
+                                         String to) {
         MessageContext context = new MessageContext();
         context.setCarryType(MessageCarryType.PRODUCE);
         context.setAppId(appId);

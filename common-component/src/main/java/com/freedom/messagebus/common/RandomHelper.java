@@ -12,7 +12,7 @@ public class RandomHelper {
      * @param length the sequence's length that will be generated
      * @return generated sequence
      */
-    @NotNull
+
     public static String randomNumberAndCharacter(int length) {
         StringBuilder sb = new StringBuilder();
         Random rand = new Random();

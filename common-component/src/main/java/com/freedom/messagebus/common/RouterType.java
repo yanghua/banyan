@@ -30,7 +30,7 @@ public enum RouterType {
     }
 
 
-    public static String fromEnum(@NotNull RouterType item) {
+    public static String fromEnum( RouterType item) {
         for (Map.Entry<String, RouterType> entry : lookups.entrySet()) {
             if (entry.getValue().equals(item))
                 return entry.getKey();
@@ -39,7 +39,7 @@ public enum RouterType {
         throw new IllegalArgumentException("illegal param : " + item.toString());
     }
 
-    public static RouterType lookup(@NotNull String produceModeStr) {
+    public static RouterType lookup( String produceModeStr) {
         for (Map.Entry<String, RouterType> entry : lookups.entrySet()) {
             if (entry.getKey().equals(produceModeStr))
                 return entry.getValue();

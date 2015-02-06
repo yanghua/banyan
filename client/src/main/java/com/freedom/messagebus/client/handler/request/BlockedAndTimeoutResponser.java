@@ -30,7 +30,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      * @param handlerModel the model of handler element
      */
     @Override
-    public void init(@NotNull HandlerModel handlerModel) {
+    public void init( HandlerModel handlerModel) {
 
     }
 
@@ -41,7 +41,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         long msgId = context.getMessages()[0].getMessageHeader().getMessageId();
 
         try {

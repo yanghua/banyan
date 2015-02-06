@@ -33,10 +33,10 @@ public class GenericConsumer extends AbstractMessageCarryer implements IConsumer
      * (actually, the message receiver is needed to be controlled)
      * @throws IOException
      */
-    @NotNull
+
     @Override
-    public IReceiverCloser consume(@NotNull String queueName,
-                                   @NotNull IMessageReceiveListener receiveListener) throws IOException {
+    public IReceiverCloser consume( String queueName,
+                                    IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(this.context.getAppId());
@@ -73,9 +73,9 @@ public class GenericConsumer extends AbstractMessageCarryer implements IConsumer
      * @param num       the num which the client expected (the result's num may not be equals to the given num)
      * @return received message
      */
-    @NotNull
+
     @Override
-    public List<Message> consume(@NotNull String queueName, int num) {
+    public List<Message> consume( String queueName, int num) {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setAppId(super.context.getAppId());

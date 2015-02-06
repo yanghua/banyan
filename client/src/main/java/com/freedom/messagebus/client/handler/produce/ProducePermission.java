@@ -14,7 +14,7 @@ public class ProducePermission extends PermissionChecker {
     private static final Log logger = LogFactory.getLog(ProducePermission.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         Node sourceNode = context.getSourceNode();
         Node targetNode = context.getTargetNode();
 

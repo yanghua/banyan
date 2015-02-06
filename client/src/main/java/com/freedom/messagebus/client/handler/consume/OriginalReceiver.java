@@ -36,8 +36,8 @@ public class OriginalReceiver extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
-                       @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,
+                        IHandlerChain chain) {
         if (!context.isSync()) {
             ReceiveEventLoop eventLoop = new ReceiveEventLoop();
             eventLoop.setChain(chain);
@@ -57,16 +57,16 @@ public class OriginalReceiver extends AbstractHandler {
 
     public static class ReceiveEventLoop implements Runnable {
 
-        @NotNull
+
         private QueueingConsumer currentConsumer;
 
-        @NotNull
+
         private IChannelDestroyer channelDestroyer;
-        @NotNull
+
         private MessageContext    context;
-        @NotNull
+
         private IHandlerChain     chain;
-        @NotNull
+
         private Thread            currentThread;
 
         private ReceiveEventLoop() {
@@ -146,39 +146,39 @@ public class OriginalReceiver extends AbstractHandler {
             msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
         }
 
-        @NotNull
+
         public QueueingConsumer getCurrentConsumer() {
             return currentConsumer;
         }
 
-        public void setCurrentConsumer(@NotNull QueueingConsumer currentConsumer) {
+        public void setCurrentConsumer( QueueingConsumer currentConsumer) {
             this.currentConsumer = currentConsumer;
         }
 
-        @NotNull
+
         public IChannelDestroyer getChannelDestroyer() {
             return channelDestroyer;
         }
 
-        public void setChannelDestroyer(@NotNull IChannelDestroyer channelDestroyer) {
+        public void setChannelDestroyer( IChannelDestroyer channelDestroyer) {
             this.channelDestroyer = channelDestroyer;
         }
 
-        @NotNull
+
         public MessageContext getContext() {
             return context;
         }
 
-        public void setContext(@NotNull MessageContext context) {
+        public void setContext( MessageContext context) {
             this.context = context;
         }
 
-        @NotNull
+
         public IHandlerChain getChain() {
             return chain;
         }
 
-        public void setChain(@NotNull IHandlerChain chain) {
+        public void setChain( IHandlerChain chain) {
             this.chain = chain;
         }
     }

@@ -22,7 +22,7 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
      * @param queueName the temp queue name
      */
     @Override
-    public void responseTmpMessage(@NotNull Message msg, @NotNull String queueName) {
+    public void responseTmpMessage( Message msg,  String queueName) {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.RESPONSE);
 

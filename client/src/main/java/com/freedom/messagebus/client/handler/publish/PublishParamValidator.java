@@ -16,7 +16,7 @@ public class PublishParamValidator extends AbstractParamValidator {
     private static Log logger = LogFactory.getLog(PublishParamValidator.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         super.handle(context, chain);
 
         this.validateMessageProperties(context);
@@ -24,7 +24,7 @@ public class PublishParamValidator extends AbstractParamValidator {
         chain.handle(context);
     }
 
-    private void validateMessageProperties(@NotNull MessageContext context) {
+    private void validateMessageProperties( MessageContext context) {
         Date currentDate = new Date();
         for (Message msg : context.getMessages()) {
             //app id

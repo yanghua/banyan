@@ -29,34 +29,34 @@ public class Messagebus {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    @NotNull
+
     private String       appId;
-    @NotNull
+
     private IProducer    producer;
-    @NotNull
+
     private IConsumer    consumer;
-    @NotNull
+
     private IRequester   requester;
-    @NotNull
+
     private IResponser   responser;
-    @NotNull
+
     private IPublisher   publisher;
-    @NotNull
+
     private ISubscriber  subscriber;
-    @NotNull
+
     private IBroadcaster broadcaster;
 
     private ExchangerManager      zkExchangeManager;
-    @NotNull
+
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
-    @NotNull
+
     private Connection            connection;
 
     private AtomicBoolean isOpen         = new AtomicBoolean(false);
     private boolean       useChannelPool = false;
 
-    @NotNull
+
     private String zkHost;
     private int    zkPort;
 
@@ -183,7 +183,7 @@ public class Messagebus {
         }
     }
 
-    @NotNull
+
     public synchronized IProducer getProducer() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException
@@ -192,7 +192,7 @@ public class Messagebus {
         return producer;
     }
 
-    @NotNull
+
     public synchronized IConsumer getConsumer() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException
@@ -201,7 +201,7 @@ public class Messagebus {
         return consumer;
     }
 
-    @NotNull
+
     public synchronized IRequester getRequester() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
@@ -209,7 +209,7 @@ public class Messagebus {
         return requester;
     }
 
-    @NotNull
+
     public synchronized IResponser getResponser() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
@@ -217,7 +217,7 @@ public class Messagebus {
         return responser;
     }
 
-    @NotNull
+
     public synchronized IPublisher getPublisher() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
@@ -225,7 +225,7 @@ public class Messagebus {
         return publisher;
     }
 
-    @NotNull
+
     public synchronized ISubscriber getSubscriber() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
@@ -233,7 +233,7 @@ public class Messagebus {
         return subscriber;
     }
 
-    @NotNull
+
     public synchronized IBroadcaster getBroadcaster() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
@@ -245,7 +245,7 @@ public class Messagebus {
         return this.isOpen.get();
     }
 
-    @NotNull
+
     public String getZkHost() {
         if (this.zkHost == null || this.zkHost.isEmpty())
             this.zkHost = "localhost";
@@ -253,7 +253,7 @@ public class Messagebus {
         return zkHost;
     }
 
-    public void setZkHost(@NotNull String zkHost) {
+    public void setZkHost( String zkHost) {
         this.zkHost = zkHost;
     }
 

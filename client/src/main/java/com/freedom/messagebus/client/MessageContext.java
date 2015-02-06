@@ -23,19 +23,19 @@ public class MessageContext {
 
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
-    @NotNull
+
     public  Connection connection;
-    @NotNull
+
     private String     host;
     private boolean    isAuthorized;
     private boolean    enableTransaction;
-    @NotNull
+
     private String     appId;
 
     /**
      * for produce
      */
-    @NotNull
+
     private Message[] messages;
 
     /**
@@ -45,22 +45,22 @@ public class MessageContext {
     private String  consumerTag;
 
 
-    @NotNull
+
     private MessageCarryType carryType;                 //produce or consume
-    @NotNull
+
     private Node             sourceNode;                //store represent self
-    @NotNull
+
     private Node             targetNode;                 //store represent current carry node
 
-    @NotNull
+
     private Channel                           channel;
-    @NotNull
+
     private OriginalReceiver.ReceiveEventLoop receiveEventLoop;
-    @NotNull
+
     private IChannelDestroyer                 destroyer;
-    @NotNull
+
     private IMessageReceiveListener           listener;
-    @NotNull
+
     private Map<String, Object> otherParams = new HashMap<String, Object>();
 
     private AbstractPool<Channel> pool;
@@ -71,7 +71,7 @@ public class MessageContext {
     private List<Message> consumeMsgs;
     private boolean isSync = false;
 
-    @NotNull
+
     private String tempQueueName;                       //for response
 
     private List<String> subQueueNames;
@@ -79,7 +79,7 @@ public class MessageContext {
     public MessageContext() {
     }
 
-    @NotNull
+
     public String getHost() {
         if (this.host == null) {
             this.host = ConfigManager.getInstance().getClientConfigMap().get("messagebus.client.host").getValue();
@@ -88,12 +88,12 @@ public class MessageContext {
         return this.host;
     }
 
-    @NotNull
+
     public Connection getConnection() {
         return connection;
     }
 
-    public void setConnection(@NotNull Connection connection) {
+    public void setConnection( Connection connection) {
         this.connection = connection;
     }
 
@@ -113,80 +113,80 @@ public class MessageContext {
         this.enableTransaction = enableTransaction;
     }
 
-    @NotNull
+
     public Message[] getMessages() {
         return messages;
     }
 
-    public void setMessages(@NotNull Message[] messages) {
+    public void setMessages( Message[] messages) {
         this.messages = messages;
     }
 
-    @NotNull
+
     public Channel getChannel() {
         return channel;
     }
 
-    public void setChannel(@NotNull Channel channel) {
+    public void setChannel( Channel channel) {
         this.channel = channel;
     }
 
-    @NotNull
+
     public OriginalReceiver.ReceiveEventLoop getReceiveEventLoop() {
         return receiveEventLoop;
     }
 
-    public void setReceiveEventLoop(@NotNull OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
+    public void setReceiveEventLoop( OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
         this.receiveEventLoop = receiveEventLoop;
     }
 
-    @NotNull
+
     public MessageCarryType getCarryType() {
         return carryType;
     }
 
-    public void setCarryType(@NotNull MessageCarryType carryType) {
+    public void setCarryType( MessageCarryType carryType) {
         this.carryType = carryType;
     }
 
-    @NotNull
+
     public Node getTargetNode() {
         return targetNode;
     }
 
-    public void setTargetNode(@NotNull Node targetNode) {
+    public void setTargetNode( Node targetNode) {
         this.targetNode = targetNode;
     }
 
-    @NotNull
+
     public Node getSourceNode() {
         return sourceNode;
     }
 
-    public void setSourceNode(@NotNull Node sourceNode) {
+    public void setSourceNode( Node sourceNode) {
         this.sourceNode = sourceNode;
     }
 
-    @NotNull
+
     public Map<String, Object> getOtherParams() {
         return otherParams;
     }
 
-    @NotNull
+
     public String getAppId() {
         return appId;
     }
 
-    public void setAppId(@NotNull String appId) {
+    public void setAppId( String appId) {
         this.appId = appId;
     }
 
-    @NotNull
+
     public IChannelDestroyer getDestroyer() {
         return destroyer;
     }
 
-    public void setDestroyer(@NotNull IChannelDestroyer destroyer) {
+    public void setDestroyer( IChannelDestroyer destroyer) {
         this.destroyer = destroyer;
     }
 
@@ -198,12 +198,12 @@ public class MessageContext {
         this.consumedMsg = consumedMsg;
     }
 
-    @NotNull
+
     public IMessageReceiveListener getListener() {
         return listener;
     }
 
-    public void setListener(@NotNull IMessageReceiveListener listener) {
+    public void setListener( IMessageReceiveListener listener) {
         this.listener = listener;
     }
 
@@ -231,12 +231,12 @@ public class MessageContext {
         this.hasTimeout = hasTimeout;
     }
 
-    @NotNull
+
     public String getTempQueueName() {
         return tempQueueName;
     }
 
-    public void setTempQueueName(@NotNull String tempQueueName) {
+    public void setTempQueueName( String tempQueueName) {
         this.tempQueueName = tempQueueName;
     }
 

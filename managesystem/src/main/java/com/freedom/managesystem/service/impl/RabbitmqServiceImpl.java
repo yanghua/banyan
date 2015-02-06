@@ -14,7 +14,7 @@ public class RabbitmqServiceImpl implements IRabbitmqService {
 
 
     //region http service
-    @NotNull
+
     @Override
     public String overview() {
         Map<String, Object> requestParamDic = new HashMap<>(3);
@@ -24,7 +24,7 @@ public class RabbitmqServiceImpl implements IRabbitmqService {
         return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
     }
 
-    @NotNull
+
     @Override
     public String nodelistOfcluster() {
         Map<String, Object> requestParamDic = new HashMap<>(3);

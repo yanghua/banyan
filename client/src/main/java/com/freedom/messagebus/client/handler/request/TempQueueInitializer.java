@@ -21,7 +21,7 @@ public class TempQueueInitializer extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         long msgId = context.getMessages()[0].getMessageHeader().getMessageId();
         QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());
         try {

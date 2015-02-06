@@ -14,7 +14,7 @@ public interface IProducer extends IBasicOperator {
      * @param msg a general message
      * @param to  the message's destination
      */
-    public void produce(@NotNull Message msg, @NotNull String to);
+    public void produce( Message msg,  String to);
 
 
     /**
@@ -24,7 +24,7 @@ public interface IProducer extends IBasicOperator {
      * @param msg a general message
      * @param to  the message's destination
      */
-    public void produceWithTX(@NotNull Message msg, @NotNull String to);
+    public void produceWithTX( Message msg,  String to);
 
 
     /**
@@ -33,7 +33,7 @@ public interface IProducer extends IBasicOperator {
      * @param msgs a general message's array
      * @param to   the message's destination
      */
-    public void batchProduce(@NotNull Message[] msgs, @NotNull String to);
+    public void batchProduce( Message[] msgs,  String to);
 
 
     /**
@@ -43,6 +43,6 @@ public interface IProducer extends IBasicOperator {
      * @param msgs a general message's array
      * @param to   the message's destination
      */
-    public void batchProduceWithTX(@NotNull Message[] msgs, @NotNull String to);
+    public void batchProduceWithTX( Message[] msgs,  String to);
 
 }

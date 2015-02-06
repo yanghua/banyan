@@ -19,8 +19,8 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
         super(MessageCarryType.SUBSCRIBE);
     }
 
-    public ISubscribeManager subscribe(@NotNull List<String> subQueueNames,
-                                       @NotNull IMessageReceiveListener receiveListener) throws IOException {
+    public ISubscribeManager subscribe( List<String> subQueueNames,
+                                        IMessageReceiveListener receiveListener) throws IOException {
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
         ctx.setAppId(this.context.getAppId());
@@ -62,7 +62,7 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
         };
     }
 
-    private void preProcessSubQueueNames(@NotNull List<String> subQueueNames) {
+    private void preProcessSubQueueNames( List<String> subQueueNames) {
         for (int i = 0; i < subQueueNames.size(); i++) {
             String subQueueName = subQueueNames.get(i);
             if (subQueueName.endsWith(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX))

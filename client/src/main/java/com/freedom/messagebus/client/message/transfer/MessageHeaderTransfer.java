@@ -31,7 +31,7 @@ public class MessageHeaderTransfer {
                       .build();
     }
 
-    public static IMessageHeader unbox(@NotNull AMQP.BasicProperties properties,
+    public static IMessageHeader unbox( AMQP.BasicProperties properties,
                                        MessageType msgType,
                                        IMessageHeader msgHeader) {
         //common properties

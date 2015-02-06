@@ -32,8 +32,8 @@ public class MessageProcessor extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
-                       @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,
+                        IHandlerChain chain) {
         if (!context.isSync() && context.getConsumedMsg() != null) {
             this.context = context;
             IMessageReceiveListener receiveListener = context.getListener();

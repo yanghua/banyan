@@ -12,7 +12,7 @@ public class ShellHelper {
 
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
-    public static ExecResult exec(@NotNull String cmdStr) throws IOException, InterruptedException {
+    public static ExecResult exec( String cmdStr) throws IOException, InterruptedException {
         String[] cmd = {"/bin/sh", "-c", cmdStr};
         Process process = Runtime.getRuntime().exec(cmd);
         process.waitFor();

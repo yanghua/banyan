@@ -14,7 +14,7 @@ public abstract class AbstractHandler {
      *
      * @param handlerModel the model of handler element
      */
-    public void init(@NotNull HandlerModel handlerModel) {
+    public void init( HandlerModel handlerModel) {
     }
 
     /**
@@ -23,8 +23,8 @@ public abstract class AbstractHandler {
      * @param context the message context
      * @param chain   the instance of IHandlerChain
      */
-    public abstract void handle(@NotNull MessageContext context,
-                                @NotNull IHandlerChain chain);
+    public abstract void handle( MessageContext context,
+                                 IHandlerChain chain);
 
     /**
      * resource clear after the handler would not be used

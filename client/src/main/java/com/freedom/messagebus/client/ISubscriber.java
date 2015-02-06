@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ISubscriber extends IBasicOperator {
 
-    public ISubscribeManager subscribe(@NotNull List<String> subQueueNames,
-                                       @NotNull IMessageReceiveListener receiveListener) throws IOException;
+    public ISubscribeManager subscribe( List<String> subQueueNames,
+                                        IMessageReceiveListener receiveListener) throws IOException;
 
 }

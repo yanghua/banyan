@@ -12,7 +12,7 @@ import java.util.List;
 public class MessageFilter extends AbstractHandler {
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         List<String> subQueueNames = context.getSubQueueNames();
         Message msg = context.getConsumedMsg();
 
@@ -32,7 +32,7 @@ public class MessageFilter extends AbstractHandler {
 
     }
 
-    private boolean filterMessage(@NotNull String replyTo, @NotNull List<String> subQueueNames) {
+    private boolean filterMessage( String replyTo,  List<String> subQueueNames) {
         for (String queueName : subQueueNames) {
             if (queueName.equals(replyTo))
                 return true;

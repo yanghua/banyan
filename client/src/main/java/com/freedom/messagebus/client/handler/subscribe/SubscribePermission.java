@@ -13,7 +13,7 @@ import java.util.List;
 public class SubscribePermission extends PermissionChecker {
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         List<String> subQueueNames = context.getSubQueueNames();
         Message msg = context.getConsumedMsg();
 

@@ -137,7 +137,7 @@
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
-        
+
         <action name="/node/*" class="com.freedom.managesystem.action.maintain.NodeAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>

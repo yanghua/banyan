@@ -41,48 +41,48 @@ public class ConfigManager implements IExchangerListener {
     private volatile String serverState = CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
-    @NotNull
+
     private List<HandlerModel> produceHandlerModels;
-    @NotNull
+
     private List<HandlerModel> consumerHandlerModels;
-    @NotNull
+
     private List<HandlerModel> requestHandlerModels;
-    @NotNull
+
     private List<HandlerModel> responseHandlerModels;
-    @NotNull
+
     private List<HandlerModel> publishHandlerModels;
-    @NotNull
+
     private List<HandlerModel> subscribeHandlerModels;
-    @NotNull
+
     private List<HandlerModel> broadcastHandlerModels;
     //endregion
 
     //region handler instance
-    @NotNull
+
     private List<AbstractHandler> produceHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> consumerHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> requestHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> responseHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> publishHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> subscribeHandlerChain;
-    @NotNull
+
     private List<AbstractHandler> broadcastHandlerChain;
     //endregion
 
-    @NotNull
+
     private Map<String, Node>   exchangeNodeMap;
-    @NotNull
+
     private Map<String, Node>   queueNodeMap;
-    @NotNull
+
     private Map<String, Node>   pubsubNodeMap;
-    @NotNull
+
     private Map<String, Node>   appIdQueueMap;
-    @NotNull
+
     private Map<String, Config> clientConfigMap;
 
     private ExchangerManager ZKExchangeManager;
@@ -97,7 +97,7 @@ public class ConfigManager implements IExchangerListener {
         this.inited = this.init();
     }
 
-    @NotNull
+
     public static ConfigManager getInstance() {
         if (instance == null) {
             synchronized (ConfigManager.class) {
@@ -148,96 +148,96 @@ public class ConfigManager implements IExchangerListener {
     }
 
     //region handler model
-    @NotNull
+
     public List<HandlerModel> getProduceHandlerModels() {
         return produceHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getConsumerHandlerModels() {
         return consumerHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getRequestHandlerModels() {
         return requestHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getResponseHandlerModels() {
         return responseHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getPublishHandlerModels() {
         return publishHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getSubscribeHandlerModels() {
         return subscribeHandlerModels;
     }
 
-    @NotNull
+
     public List<HandlerModel> getBroadcastHandlerModels() {
         return broadcastHandlerModels;
     }
     //endregion
 
     //region handler chain list
-    @NotNull
+
     public List<AbstractHandler> getProduceHandlerChain() {
         return produceHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getConsumerHandlerChain() {
         return consumerHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getRequestHandlerChain() {
         return requestHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getResponseHandlerChain() {
         return responseHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getPublishHandlerChain() {
         return publishHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getSubscribeHandlerChain() {
         return subscribeHandlerChain;
     }
 
-    @NotNull
+
     public List<AbstractHandler> getBroadcastHandlerChain() {
         return broadcastHandlerChain;
     }
     //endregion
 
     //region node map
-    @NotNull
+
     public Map<String, Node> getExchangeNodeMap() {
         return exchangeNodeMap;
     }
 
-    @NotNull
+
     public Map<String, Node> getQueueNodeMap() {
         return queueNodeMap;
     }
 
-    @NotNull
+
     public Map<String, Node> getPubsubNodeMap() {
         return pubsubNodeMap;
     }
 
-    @NotNull
+
     public Map<String, Node> getAppIdQueueMap() {
         return appIdQueueMap;
     }
@@ -261,7 +261,7 @@ public class ConfigManager implements IExchangerListener {
     }
     //endregion
 
-    @NotNull
+
     public Map<String, Config> getClientConfigMap() {
         return clientConfigMap;
     }
@@ -304,7 +304,7 @@ public class ConfigManager implements IExchangerListener {
         this.serverState = serverState;
     }
 
-    @NotNull
+
     private List<HandlerModel> parseHandlers(String pOrcIdentifier) {
         SAXReader reader = new SAXReader();
         URL url = ConfigManager.class.getClassLoader().getResource("handler.xml");
@@ -346,7 +346,7 @@ public class ConfigManager implements IExchangerListener {
         return result;
     }
 
-    @NotNull
+
     private List<AbstractHandler> initHandlers(MessageCarryType pcEnum) {
         List<AbstractHandler> handlerChain = new ArrayList<AbstractHandler>();
         List<HandlerModel> models = null;

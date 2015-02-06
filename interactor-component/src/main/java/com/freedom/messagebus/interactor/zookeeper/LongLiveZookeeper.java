@@ -157,8 +157,8 @@ public class LongLiveZookeeper {
 
     }
 
-    @NotNull
-    public byte[] getConfig(@NotNull String path) {
+
+    public byte[] getConfig( String path) {
         try {
             Stat stat = this.zooKeeper.exists(path, false);
             if (stat == null)
@@ -174,7 +174,7 @@ public class LongLiveZookeeper {
         return new byte[0];
     }
 
-    public void setConfig(@NotNull String path, @NotNull byte[] newData, boolean ifNotThenCreate) {
+    public void setConfig( String path,  byte[] newData, boolean ifNotThenCreate) {
         try {
             logger.info("[setConfig] path is : " + path);
             Stat stat = this.zooKeeper.exists(path, false);
@@ -194,7 +194,7 @@ public class LongLiveZookeeper {
         }
     }
 
-    public void createNode(@NotNull String path) throws Exception {
+    public void createNode( String path) throws Exception {
         Stat stat = this.zooKeeper.exists(path, false);
         if (stat == null)
             this.zooKeeper.create(path, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);

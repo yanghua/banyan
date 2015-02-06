@@ -13,7 +13,7 @@ public interface TextMessage extends Message {
      *
      * @return real message
      */
-    @NotNull
+
     public String getMessageBody();
 
     /**
@@ -21,6 +21,6 @@ public interface TextMessage extends Message {
      *
      * @param body the real message
      */
-    public void setMessageBody(@NotNull String body);
+    public void setMessageBody( String body);
 
 }

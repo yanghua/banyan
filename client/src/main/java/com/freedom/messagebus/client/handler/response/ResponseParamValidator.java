@@ -14,7 +14,7 @@ public class ResponseParamValidator extends AbstractParamValidator {
     private static Log logger = LogFactory.getLog(ResponseParamValidator.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.RESPONSE)) {

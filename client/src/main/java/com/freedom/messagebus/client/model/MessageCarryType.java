@@ -32,8 +32,8 @@ public enum MessageCarryType {
         lookups.put("broadcast", BROADCAST);
     }
 
-    @NotNull
-    public static MessageCarryType lookup(@NotNull String strType) {
+
+    public static MessageCarryType lookup( String strType) {
         MessageCarryType result = lookups.get(strType);
 
         if (result == null)
@@ -43,7 +43,7 @@ public enum MessageCarryType {
         return result;
     }
 
-    @NotNull
+
     public String stringOf() {
         for (Map.Entry<String, MessageCarryType> entry : lookups.entrySet()) {
             if (entry.getValue().equals(this))

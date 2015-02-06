@@ -19,7 +19,7 @@ public class DBAccessor {
     private Properties properties;
     private String     jdbcUrlStr;
 
-    public DBAccessor(@NotNull Properties config) {
+    public DBAccessor( Properties config) {
         this.properties = config;
         this.jdbcUrlStr = String.format(jdbcUrlFormatStr,
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),

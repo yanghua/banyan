@@ -14,6 +14,6 @@ public interface IChannelDestroyer {
      *
      * @param channel the channel between the client and the rabbitmq-server
      */
-    public void destroy(@NotNull Channel channel);
+    public void destroy( Channel channel);
 
 }

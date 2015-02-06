@@ -14,7 +14,7 @@ public interface IRequester extends IBasicOperator {
      * @return Message the response message
      * @throws MessageResponseTimeoutException
      */
-    public Message request(@NotNull Message msg, @NotNull String to, long timeout)
+    public Message request( Message msg,  String to, long timeout)
         throws MessageResponseTimeoutException;
 
 }

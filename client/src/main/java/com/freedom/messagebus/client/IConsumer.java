@@ -21,9 +21,9 @@ public interface IConsumer extends IBasicOperator {
      * (actually, the message receiver is needed to be controlled)
      * @throws IOException
      */
-    @NotNull
-    public IReceiverCloser consume(@NotNull String queueName,
-                                   @NotNull IMessageReceiveListener receiveListener) throws IOException;
+
+    public IReceiverCloser consume( String queueName,
+                                    IMessageReceiveListener receiveListener) throws IOException;
 
     /**
      * consume with sync-mode, when received messages' num equal the given num
@@ -33,7 +33,7 @@ public interface IConsumer extends IBasicOperator {
      * @param num       the num which the client expected (the result's num may not be equals to the given num)
      * @return received message
      */
-    @NotNull
-    public List<Message> consume(@NotNull String queueName, int num);
+
+    public List<Message> consume( String queueName, int num);
 
 }

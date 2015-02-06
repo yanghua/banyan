@@ -23,8 +23,8 @@ public class HttpHelper {
 
     private static final Log logger = LogFactory.getLog(HttpHelper.class);
 
-    @NotNull
-    public static String syncHTTPGet(@NotNull Map<String, Object> requestParamDic, @NotNull AuthInfo authInfo) {
+
+    public static String syncHTTPGet( Map<String, Object> requestParamDic,  AuthInfo authInfo) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         CloseableHttpResponse response = null;
@@ -66,31 +66,31 @@ public class HttpHelper {
         return "";
     }
 
-    public static void asyncHTTPGet(String urlStr, @NotNull AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPGet(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPPut(String urlStr, @NotNull AuthInfo authInfo) {
+    public static void syncHTTPPut(String urlStr,  AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPPut(String urlStr, @NotNull AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPPut(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPPost(String urlStr, @NotNull AuthInfo authInfo) {
+    public static void syncHTTPPost(String urlStr,  AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPPost(String urlStr, @NotNull AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPPost(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 
-    public static void syncHTTPDelete(String urlStr, @NotNull AuthInfo authInfo) {
+    public static void syncHTTPDelete(String urlStr,  AuthInfo authInfo) {
 
     }
 
-    public static void asyncHTTPDelete(String urlStr, @NotNull AuthInfo authInfo, IAsyncCallback callback) {
+    public static void asyncHTTPDelete(String urlStr,  AuthInfo authInfo, IAsyncCallback callback) {
 
     }
 

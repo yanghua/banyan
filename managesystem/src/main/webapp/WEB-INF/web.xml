@@ -41,7 +41,7 @@
     <listener>
         <listener-class>com.freedom.managesystem.action.other.MBServerSentinelListener</listener-class>
     </listener>
-    
+
     <welcome-file-list>
         <welcome-file>/goIndex.jsp</welcome-file>
     </welcome-file-list>

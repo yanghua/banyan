@@ -26,7 +26,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
         super(host);
     }
 
-    public static RabbitmqInitializer getInstance(@NotNull Properties config) {
+    public static RabbitmqInitializer getInstance( Properties config) {
         if (instance == null) {
             synchronized (RabbitmqInitializer.class) {
                 if (instance == null) {
@@ -120,7 +120,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
         return queueSet;
     }
 
-    private boolean exchangeExists(@NotNull String exchangeName) throws IOException {
+    private boolean exchangeExists( String exchangeName) throws IOException {
         boolean result = true;
         try {
             channel.exchangeDeclarePassive(exchangeName);

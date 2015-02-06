@@ -12,12 +12,12 @@ public class ConsumerTagGenerator extends AbstractHandler {
     private static final String CONSUMER_TAG_PREFIX = "consumer.tag.";
 
     @Override
-    public void init(@NotNull HandlerModel handlerModel) {
+    public void init( HandlerModel handlerModel) {
 
     }
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         String tag = CONSUMER_TAG_PREFIX + RandomHelper.randomNumberAndCharacter(6);
         context.setConsumerTag(tag);
         chain.handle(context);

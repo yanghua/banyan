@@ -18,7 +18,7 @@ public class RequestParamValidator extends AbstractParamValidator {
     private static Log logger = LogFactory.getLog(RequestParamValidator.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.REQUEST)) {
@@ -53,7 +53,7 @@ public class RequestParamValidator extends AbstractParamValidator {
         chain.handle(context);
     }
 
-    private void validateMessagesProperties(@NotNull MessageContext context) {
+    private void validateMessagesProperties( MessageContext context) {
         Date currentDate = new Date();
         for (Message msg : context.getMessages()) {
             //app id

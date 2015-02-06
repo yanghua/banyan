@@ -19,12 +19,12 @@ public class MessageIdGenerator extends AbstractHandler {
     private static final Random random = new Random();
 
     @Override
-    public void init(@NotNull HandlerModel handlerModel) {
+    public void init( HandlerModel handlerModel) {
         super.init(handlerModel);
     }
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         Message[] msgs = context.getMessages();
         for (Message msg : msgs) {
             UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);

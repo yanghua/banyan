@@ -21,7 +21,7 @@ public class RealBroadcaster extends AbstractHandler {
     private static final Log logger = LogFactory.getLog(RealBroadcaster.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         try {
             for (Message msg : context.getMessages()) {
                 IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());

@@ -22,12 +22,12 @@ public class RealPublisher extends AbstractHandler {
     private static final Log logger = LogFactory.getLog(RealPublisher.class);
 
     @Override
-    public void init(@NotNull HandlerModel handlerModel) {
+    public void init( HandlerModel handlerModel) {
         super.init(handlerModel);
     }
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         try {
             for (Message msg : context.getMessages()) {
                 IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());

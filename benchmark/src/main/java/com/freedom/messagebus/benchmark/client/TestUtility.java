@@ -16,7 +16,7 @@ public class TestUtility {
 
     private final static Log logger = LogFactory.getLog(TestUtility.class);
 
-    public static void writeFile(@NotNull String fileName, @NotNull long[] xArr, @NotNull long[] yArr) {
+    public static void writeFile( String fileName,  long[] xArr,  long[] yArr) {
         String filePath = String.format(TestConfigConstant.OUTPUT_FILE_PATH_FORMAT, fileName);
 
         PrintWriter out = null;

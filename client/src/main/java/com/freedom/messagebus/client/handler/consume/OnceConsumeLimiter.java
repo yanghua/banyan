@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class OnceConsumeLimiter extends AbstractHandler {
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         if (!context.isSync()) {
 //            int limit = ConfigManager.getInstance().getClientConfigMap().get("")
 //            context.getChannel().basicQos();

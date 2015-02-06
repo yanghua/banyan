@@ -13,6 +13,6 @@ public interface IQueueService {
 //
 //    public void disable(String appId, Map<String, Object> params);
 
-    @NotNull
+
     public Queue[] list();
 }

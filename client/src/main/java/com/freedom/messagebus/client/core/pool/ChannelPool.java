@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ChannelPool extends AbstractPool<Channel> {
 
-    public ChannelPool(@NotNull GenericObjectPoolConfig poolConfig,
-                       @NotNull PooledObjectFactory<Channel> factory) {
+    public ChannelPool( GenericObjectPoolConfig poolConfig,
+                        PooledObjectFactory<Channel> factory) {
         super(poolConfig, factory);
     }
 
@@ -21,12 +21,12 @@ public class ChannelPool extends AbstractPool<Channel> {
     }
 
     @Override
-    public void returnResource(@NotNull Channel resource) {
+    public void returnResource( Channel resource) {
         super.returnResource(resource);
     }
 
     @Override
-    public void returnBrokenResource(@NotNull Channel resource) {
+    public void returnBrokenResource( Channel resource) {
         super.returnBrokenResource(resource);
     }
 }

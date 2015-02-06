@@ -27,7 +27,7 @@ public class RealRequester extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         Message reqMsg = context.getMessages()[0];
         IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(reqMsg.getMessageType());
         byte[] msgBody = msgBodyProcessor.box(reqMsg.getMessageBody());

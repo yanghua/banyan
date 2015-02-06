@@ -23,8 +23,8 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
      * @throws com.freedom.messagebus.client.MessageResponseTimeoutException
      */
     @Override
-    public Message request(@NotNull Message msg,
-                           @NotNull String to,
+    public Message request( Message msg,
+                            String to,
                            long timeout) throws MessageResponseTimeoutException {
         final MessageContext cxt = new MessageContext();
         cxt.setCarryType(MessageCarryType.REQUEST);

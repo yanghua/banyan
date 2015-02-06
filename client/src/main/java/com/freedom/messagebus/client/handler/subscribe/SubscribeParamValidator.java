@@ -14,7 +14,7 @@ public class SubscribeParamValidator extends AbstractParamValidator {
     private static final Log logger = LogFactory.getLog(SubscribeParamValidator.class);
 
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         super.handle(context, chain);
 
         if (context.getCarryType().equals(MessageCarryType.SUBSCRIBE)) {

@@ -14,14 +14,14 @@ public class TextMessagePOJO implements TextMessage {
      */
     private String body;
 
-    @NotNull
+
     @Override
     public String getMessageBody() {
         return body;
     }
 
     @Override
-    public void setMessageBody(@NotNull String body) {
+    public void setMessageBody( String body) {
         this.body = body;
     }
 }

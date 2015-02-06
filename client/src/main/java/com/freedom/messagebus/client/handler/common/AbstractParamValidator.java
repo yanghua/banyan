@@ -23,8 +23,8 @@ public abstract class AbstractParamValidator extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context,
-                       @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,
+                        IHandlerChain chain) {
         if (context.getAppId().length() == 0)
             throw new ParamValidateFailedException(" the field : appId of MessageContext can not be empty");
 

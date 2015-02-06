@@ -12,15 +12,15 @@ public class MessageJSONSerializer {
     private static final Log  logger = LogFactory.getLog(MessageJSONSerializer.class);
     private static final Gson gson   = new GsonBuilder().serializeNulls().create();
 
-    @NotNull
-    public static String serialize(@NotNull Message msg) {
+
+    public static String serialize( Message msg) {
         checkMessageType(msg.getMessageType());
 
         return gson.toJson(msg);
     }
 
-    @NotNull
-    public static Message deSerialize(@NotNull String msgStr, @NotNull MessageType type) {
+
+    public static Message deSerialize( String msgStr,  MessageType type) {
         checkMessageType(type);
 
         JsonParser parser = new JsonParser();
@@ -39,7 +39,7 @@ public class MessageJSONSerializer {
         return msg;
     }
 
-    public static Message deSerialize(@NotNull JsonElement msgElement, @NotNull MessageType type) {
+    public static Message deSerialize( JsonElement msgElement,  MessageType type) {
         checkMessageType(type);
 
         JsonObject obj = msgElement.getAsJsonObject();
@@ -55,8 +55,8 @@ public class MessageJSONSerializer {
         return msg;
     }
 
-    @NotNull
-    public static String serializeMessages(@NotNull Collection<Message> msgs) {
+
+    public static String serializeMessages( Collection<Message> msgs) {
         for (Message msg : msgs) {
             checkMessageType(msg.getMessageType());
         }
@@ -64,8 +64,8 @@ public class MessageJSONSerializer {
         return gson.toJson(msgs);
     }
 
-    @NotNull
-    public static Message[] deSerializeMessages(@NotNull String msgArrStr, @NotNull MessageType type) {
+
+    public static Message[] deSerializeMessages( String msgArrStr,  MessageType type) {
         checkMessageType(type);
 
         int i = 0;
@@ -97,7 +97,7 @@ public class MessageJSONSerializer {
         return msgs;
     }
 
-    private static void checkMessageType(@NotNull MessageType type) {
+    private static void checkMessageType( MessageType type) {
         if (!type.equals(MessageType.QueueMessage)) {
             logger.error("[serialize] unsupport message type : " + type.toString() +
                              ", now just support QueueMessage");

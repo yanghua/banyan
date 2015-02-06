@@ -31,7 +31,7 @@ public class SyncConsumer extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         if (context.isSync()) {
             List<Message> consumeMsgs = new ArrayList<>(context.getConsumeMsgNum());
             context.setConsumeMsgs(consumeMsgs);

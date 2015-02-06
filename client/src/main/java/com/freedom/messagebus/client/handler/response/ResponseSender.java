@@ -26,7 +26,7 @@ public class ResponseSender extends AbstractHandler {
      * @param chain   the instance of IHandlerChain
      */
     @Override
-    public void handle(@NotNull MessageContext context, @NotNull IHandlerChain chain) {
+    public void handle( MessageContext context,  IHandlerChain chain) {
         Message responseMsg = context.getMessages()[0];
         IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(responseMsg.getMessageType());
         byte[] msgBody = msgBodyProcessor.box(responseMsg.getMessageBody());

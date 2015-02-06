@@ -13,34 +13,34 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GenericContext {
 
-    @NotNull
+
     private LongLiveZookeeper     zooKeeper;
-    @NotNull
+
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
-    @NotNull
+
     private Connection            connection;
-    @NotNull
+
     private String                appId;
 
     public GenericContext() {
     }
 
-    @NotNull
+
     public LongLiveZookeeper getZooKeeper() {
         return zooKeeper;
     }
 
-    public void setZooKeeper(@NotNull LongLiveZookeeper zooKeeper) {
+    public void setZooKeeper( LongLiveZookeeper zooKeeper) {
         this.zooKeeper = zooKeeper;
     }
 
-    @NotNull
+
     public ConfigManager getConfigManager() {
         return configManager;
     }
 
-    public void setConfigManager(@NotNull ConfigManager configManager) {
+    public void setConfigManager( ConfigManager configManager) {
         this.configManager = configManager;
     }
 
@@ -52,21 +52,21 @@ public class GenericContext {
         this.pool = pool;
     }
 
-    @NotNull
+
     public Connection getConnection() {
         return connection;
     }
 
-    public void setConnection(@NotNull Connection connection) {
+    public void setConnection( Connection connection) {
         this.connection = connection;
     }
 
-    @NotNull
+
     public String getAppId() {
         return appId;
     }
 
-    public void setAppId(@NotNull String appId) {
+    public void setAppId( String appId) {
         this.appId = appId;
     }
 
