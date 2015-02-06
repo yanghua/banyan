@@ -22,57 +22,30 @@ public class MessageContext {
 
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
-
-    public Connection connection;
-
-    private String  host;
-    private boolean isAuthorized;
-    private boolean enableTransaction;
-
-    private String appId;
-
-    /**
-     * for produce
-     */
-
-    private Message[] messages;
-
-    /**
-     * for consume
-     */
-    private Message consumedMsg;
-    private String  consumerTag;
-
-
-    private MessageCarryType carryType;                 //produce or consume
-
-    private Node sourceNode;                //store represent self
-
-    private Node targetNode;                 //store represent current carry node
-
-
-    private Channel channel;
-
+    public  Connection                        connection;
+    private String                            host;
+    private boolean                           isAuthorized;
+    private boolean                           enableTransaction;
+    private String                            appId;
+    private Message[]                         messages;
+    private Message                           consumedMsg;
+    private String                            consumerTag;
+    private MessageCarryType                  carryType;                 //produce or consume
+    private Node                              sourceNode;                //store represent self
+    private Node                              targetNode;                 //store represent current carry node
+    private Channel                           channel;
     private OriginalReceiver.ReceiveEventLoop receiveEventLoop;
-
-    private IChannelDestroyer destroyer;
-
-    private IMessageReceiveListener listener;
-
+    private IChannelDestroyer                 destroyer;
+    private IMessageReceiveListener           listener;
+    private AbstractPool<Channel>             pool;
+    private long                              timeout;
+    private boolean                           hasTimeout;
+    private int                               consumeMsgNum;
+    private List<Message>                     consumeMsgs;
+    private String                            tempQueueName;                       //for response
+    private List<String>                      subQueueNames;
     private Map<String, Object> otherParams = new HashMap<String, Object>();
-
-    private AbstractPool<Channel> pool;
-    private long                  timeout;
-    private boolean               hasTimeout;
-
-    private int           consumeMsgNum;
-    private List<Message> consumeMsgs;
-    private boolean isSync = false;
-
-
-    private String tempQueueName;                       //for response
-
-    private List<String> subQueueNames;
+    private boolean             isSync      = false;
 
     public MessageContext() {
     }

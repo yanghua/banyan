@@ -11,16 +11,12 @@ import com.rabbitmq.client.Connection;
  * and those object that it owns resource that must be destroyed
  */
 public class GenericContext {
-
-
-    private LongLiveZookeeper zooKeeper;
-
+    
+    private LongLiveZookeeper     zooKeeper;
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
-
-    private Connection connection;
-
-    private String appId;
+    private Connection            connection;
+    private String                appId;
 
     public GenericContext() {
     }
