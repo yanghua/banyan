@@ -6,7 +6,7 @@
 ```
 banyan is a tree has thick branches which grows in the East Asia. 
 ```
-Thanks for [@ok95](https://github.com/ok95) given the good idea & guidance.
+Thanks for [@ok95](https://github.com/ok95) & [@Joy-Zhang](https://github.com/Joy-Zhang) given the good idea & guidance.
 
 it can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
 
