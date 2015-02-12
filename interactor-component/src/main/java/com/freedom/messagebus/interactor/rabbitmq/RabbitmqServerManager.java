@@ -5,32 +5,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 public class RabbitmqServerManager {
 
     private static final    Log                   logger   = LogFactory.getLog(RabbitmqServerManager.class);
-    private static volatile RabbitmqServerManager instance = null;
 
-    private Properties properties;
-
-    private RabbitmqServerManager(Properties config) {
-        this.properties = config;
-    }
-
-    public static RabbitmqServerManager defaultManager(Properties config) {
-        if (instance == null) {
-            synchronized (RabbitmqServerManager.class) {
-                if (instance == null) {
-                    instance = new RabbitmqServerManager(config);
-                }
-            }
+    public static void start(String mqHost) {
+        if (!comeFromSameHost(mqHost)) {
+            throw new RuntimeException("the message bus server's host and the mq server's host" +
+                                           " are not the same");
         }
 
-        return instance;
-    }
-
-    public void start() {
         logger.info("starting mq server...");
         String mqServerStartupCmdStr = "rabbitmq-server start";
         try {
@@ -40,47 +28,68 @@ public class RabbitmqServerManager {
         }
     }
 
-    public void stop() {
+    public static void stop(String mqHost) {
+        if (!comeFromSameHost(mqHost)) {
+            throw new RuntimeException("the message bus server's host and the mq server's host" +
+                                           " are not the same");
+        }
+
         logger.info("stopping mq server...");
         String mqServerStopCmdStr = "rabbitmq-server stop";
         try {
             ShellHelper.exec("/usr/sbin/service " + mqServerStopCmdStr);
         } catch (IOException | InterruptedException e) {
-            logger.error("[start] occurs an IOException : " + e.getMessage());
+            logger.error("occurs an IOException : " + e.getMessage());
+            throw new RuntimeException("occurs an IOException : " + e.getMessage());
         }
     }
 
-    public void reset() {
-        String mqServerResetCmdStr = "rabbitmqctl reset";
-        String mqAppStartCmdStr = "rabbitmqctl start_app";
-        String mqAppStopCmdStr = "rabbitmqctl stop_app";
-        String defaultCmdInvoker = "/bin/sh ";
+//    public void reset() {
+//        String mqServerResetCmdStr = "rabbitmqctl reset";
+//        String mqAppStartCmdStr = "rabbitmqctl start_app";
+//        String mqAppStopCmdStr = "rabbitmqctl stop_app";
+//        String defaultCmdInvoker = "/bin/sh ";
+//
+//        try {
+//            if (!this.isAlive()) {
+//                this.start();
+//                ShellHelper.exec(defaultCmdInvoker + mqAppStopCmdStr);
+//                ShellHelper.exec(defaultCmdInvoker + mqServerResetCmdStr);
+//                ShellHelper.exec(defaultCmdInvoker + mqAppStartCmdStr);
+//            } else {
+//                ShellHelper.exec(defaultCmdInvoker + mqAppStopCmdStr);
+//                ShellHelper.exec(defaultCmdInvoker + mqServerResetCmdStr);
+//                ShellHelper.exec(defaultCmdInvoker + mqAppStartCmdStr);
+//            }
+//        } catch (IOException | InterruptedException e) {
+//            logger.error("[start] occurs an IOException : " + e.getMessage());
+//        }
+//    }
 
-        try {
-            if (!this.isAlive()) {
-                this.start();
-                ShellHelper.exec(defaultCmdInvoker + mqAppStopCmdStr);
-                ShellHelper.exec(defaultCmdInvoker + mqServerResetCmdStr);
-                ShellHelper.exec(defaultCmdInvoker + mqAppStartCmdStr);
-            } else {
-                ShellHelper.exec(defaultCmdInvoker + mqAppStopCmdStr);
-                ShellHelper.exec(defaultCmdInvoker + mqServerResetCmdStr);
-                ShellHelper.exec(defaultCmdInvoker + mqAppStartCmdStr);
-            }
-        } catch (IOException | InterruptedException e) {
-            logger.error("[start] occurs an IOException : " + e.getMessage());
+    public static boolean isAlive(String mqHost) {
+        if (!comeFromSameHost(mqHost)) {
+            throw new RuntimeException("the message bus server's host and the mq server's host" +
+                                           " are not the same");
         }
-    }
 
-    public synchronized boolean isAlive() {
         try {
-            ShellHelper.ExecResult result = ShellHelper.exec("/bin/sh rabbitmqctl status | grep 'pid'");
+            ShellHelper.ExecResult result = ShellHelper.exec("rabbitmqctl status | grep 'pid'");
             return result.getInfo().contains("pid");
         } catch (IOException e) {
             logger.error("[isAlive] occurs IOException : " + e.getMessage());
             return false;
         } catch (InterruptedException e) {
             return false;
+        }
+    }
+
+    private static boolean comeFromSameHost(String host) {
+        try {
+            String ipStr = Inet4Address.getLocalHost().getHostAddress();
+            return ipStr.equals(host);
+        } catch (UnknownHostException e) {
+            logger.error("unknown host exception : " + e.toString());
+            throw new RuntimeException("unknown host exception : " + e.toString());
         }
     }
 

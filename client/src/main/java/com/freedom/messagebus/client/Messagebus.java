@@ -243,8 +243,9 @@ public class Messagebus {
     }
 
     public int getPubsuberPort() {
-        if (this.pubsuberPort == 0)
-            this.pubsuberPort = 2181;
+        if (this.pubsuberPort == 0) {
+            throw new RuntimeException("pubsuber port error!");
+        }
 
         return pubsuberPort;
     }

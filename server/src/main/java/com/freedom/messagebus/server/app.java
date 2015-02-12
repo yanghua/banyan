@@ -90,46 +90,31 @@ public class App {
             System.exit(1);
         }
 
-        boolean mqIsAlive = RabbitmqServerManager.defaultManager(config).isAlive();
 
-        //TODO: should be remove , just for test
-//        boolean mqIsAlive = true;
+        App app = new App();
+        broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
 
-        logger.debug("** MQ is alive : " + mqIsAlive);
-        if (mqIsAlive) {
-            App app = new App();
-            broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
+        //load and start daemon service
+        logger.debug("** daemon service : ServiceLoader **");
+        ServiceLoader serviceLoader = ServiceLoader.getInstance(context);
+        serviceLoader.launch();
 
-            //load and start daemon service
-            logger.debug("** daemon service : ServiceLoader **");
-            ServiceLoader serviceLoader = ServiceLoader.getInstance(context);
-            serviceLoader.launch();
-
-            synchronized (app) {
-                try {
-                    //block
-                    app.wait(0);
-                } catch (InterruptedException e) {
-                    logger.info("[main] occurs a InterruptedException . the server has be quited!");
-                } finally {
-                    destroy(context);
-                }
+        synchronized (app) {
+            try {
+                //block
+                app.wait(0);
+            } catch (InterruptedException e) {
+                logger.info("[main] occurs a InterruptedException . the server has be quited!");
+            } finally {
+                destroy(context);
             }
-        } else {
-            logger.error("there is something wrong when startup messagebus server. " +
-                             "more detail see the log file.");
-            System.exit(1);
         }
     }
 
     public static void stop() {
-        RabbitmqServerManager serverManager = RabbitmqServerManager.defaultManager(config);
-        if (serverManager.isAlive()) {
-            App app = new App();
-            broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
-            serverManager.stop();
-            destroy(null);
-        }
+        App app = new App();
+        broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
+        destroy(null);
     }
 
     private static void debugArgs(String[] args) {

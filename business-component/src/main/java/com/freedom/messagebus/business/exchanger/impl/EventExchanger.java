@@ -15,6 +15,9 @@ public class EventExchanger extends AbstractExchanger {
 
     @Override
     public void upload() throws IOException {
+        //it will be call when message bus initialization,
+        //so here just init with "stoped"
+        this.upload(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED.getBytes());
     }
 
     @Override

@@ -17,11 +17,15 @@ public abstract class AbstractInitializer {
         this.host = host;
     }
 
-    protected void init() throws IOException {
-        this.connectionFactory = new ConnectionFactory();
-        this.connectionFactory.setHost(this.host);
-        this.connection = this.connectionFactory.newConnection();
-        this.channel = this.connection.createChannel();
+    protected void init() {
+        try {
+            this.connectionFactory = new ConnectionFactory();
+            this.connectionFactory.setHost(this.host);
+            this.connection = this.connectionFactory.newConnection();
+            this.channel = this.connection.createChannel();
+        } catch (IOException e) {
+            throw new RuntimeException("mq client inited failed :  " + e.toString());
+        }
     }
 
     protected void close() throws IOException {

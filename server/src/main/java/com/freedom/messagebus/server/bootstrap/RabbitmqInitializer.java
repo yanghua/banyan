@@ -45,11 +45,6 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     public synchronized void launch() throws IOException {
-        RabbitmqServerManager serverManager = RabbitmqServerManager.defaultManager(properties);
-        logger.info("server current status : " + (serverManager.isAlive() ? "alive" : "dead"));
-        if (!serverManager.isAlive())
-            serverManager.start();
-
         this.initTopologyComponent();
     }
 
