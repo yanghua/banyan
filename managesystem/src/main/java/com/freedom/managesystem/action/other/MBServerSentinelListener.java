@@ -29,8 +29,8 @@ public class MBServerSentinelListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 //        Messagebus messagebus = Messagebus.createClient("5hW0M5wl9H0wO35Eva1tgM9D0p3OL2N8");
 //        //TODO:
-//        messagebus.setZkHost(Constants.ZK_HOST);
-//        messagebus.setZkPort(Constants.ZK_PORT);
+//        messagebus.setPubsuberHost(Constants.ZK_HOST);
+//        messagebus.setPubsuberPort(Constants.ZK_PORT);
 //        try {
 //            messagebus.open();
 //            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGEBUS_KEY, messagebus);

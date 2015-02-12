@@ -84,7 +84,7 @@ public class ConfigManager implements IExchangerListener {
 
     private Map<String, Config> clientConfigMap;
 
-    private ExchangerManager ZKExchangeManager;
+    private ExchangerManager exchangeManager;
 
     private Map<String, String> sendPermissionMap;
     private Map<String, String> receivePermissionMap;
@@ -265,12 +265,12 @@ public class ConfigManager implements IExchangerListener {
         return clientConfigMap;
     }
 
-    public ExchangerManager getZKExchangeManager() {
-        return ZKExchangeManager;
+    public ExchangerManager getExchangeManager() {
+        return exchangeManager;
     }
 
-    public void setZKExchangeManager(ExchangerManager ZKExchangeManager) {
-        this.ZKExchangeManager = ZKExchangeManager;
+    public void setExchangeManager(ExchangerManager exchangeManager) {
+        this.exchangeManager = exchangeManager;
     }
 
     @Deprecated
@@ -464,31 +464,32 @@ public class ConfigManager implements IExchangerListener {
     }
 
     @Override
-    public void onZKPathChanged(String path, Object obj) {
-        logger.debug("** [onZKPathChanged] ** received change from path : " + path);
+    public void onChannelDataChanged(String path, Object obj) {
+        logger.debug("** [onChannelDataChanged] ** received change from path : " + path);
         switch (path) {
-            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER: {
-                this.extractDifferentNodes((List<Node>) obj);
+            case CONSTS.PUBSUB_ROUTER_CHANNEL: {
+                this.extractDifferentNodes((Node[]) obj);
             }
             break;
 
-            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG: {
-                this.extractClientConfigs((List<Config>) obj);
+            case CONSTS.PUBSUB_CONFIG_CHANNEL: {
+                this.extractClientConfigs((Config[]) obj);
             }
             break;
 
-            case CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT: {
+            case CONSTS.PUBSUB_EVENT_CHANNEL: {
+                logger.debug("received event value : " + obj.toString());
                 this.setServerState(obj.toString());
             }
             break;
 
-            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION: {
-                this.processSendPermission((List<SendPermission>) obj);
+            case CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL: {
+                this.processSendPermission((SendPermission[]) obj);
             }
             break;
 
-            case CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION: {
-                this.processReceivePermission((List<ReceivePermission>) obj);
+            case CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL: {
+                this.processReceivePermission((ReceivePermission[]) obj);
             }
             break;
         }
@@ -506,62 +507,29 @@ public class ConfigManager implements IExchangerListener {
                 handler.destroy();
             }
         }
-
     }
 
-    public synchronized void parseZKData() throws IOException {
+    public synchronized void parseRealTimeData() throws IOException {
         this.parseRouterInfo();
         this.parseConfigInfo();
         this.parseSendPermission();
         this.parseReceivePermission();
         //parse event
-        String serverState = this.getZKExchangeManager().
-            downloadWithPath(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT).toString();
-        this.setServerState(serverState);
+        Object tmp = this.getExchangeManager().downloadWithChannel(CONSTS.PUBSUB_EVENT_CHANNEL);
+        if (tmp != null) {
+            String serverState = tmp.toString();
+            this.setServerState(serverState);
+        }
     }
 
     public synchronized void parseRouterInfo() {
-//        SAXReader reader = new SAXReader();
-//        File routerFile = new File(CONSTS.EXPORTED_NODE_FILE_PATH);
-//        URL url = routerFile.toURI().toURL();
-//        Document doc = null;
-//
-//        try {
-//            doc = reader.read(url);
-//        } catch (DocumentException e) {
-//            logger.error("[parseRouterInfo] occurs a DocumentException exception : " + e.getMessage());
-//        }
-//
-//        Element rootElement = doc.getRootElement();
-//        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
-//
-//        List<Element> rowElements = databaseNode.selectNodes("//row");
-//        List<Node> nodes = new ArrayList<>(rowElements.size());
-//        for (Element row : rowElements) {
-//            Node anode = new Node();
-//
-//            anode.setNodeId(Integer.valueOf(row.selectSingleNode("field[@name='nodeId']").getStringValue()));
-//            anode.setName(row.selectSingleNode("field[@name='name']").getStringValue());
-//            anode.setValue(row.selectSingleNode("field[@name='value']").getStringValue());
-//            anode.setParentId(Integer.valueOf(row.selectSingleNode("field[@name='parentId']").getStringValue()));
-//            anode.setType(Short.valueOf(row.selectSingleNode("field[@name='type']").getStringValue()));
-//            anode.setLevel(Short.valueOf(row.selectSingleNode("field[@name='level']").getStringValue()));
-//            anode.setRouterType(row.selectSingleNode("field[@name='routerType']").getStringValue());
-//            anode.setRoutingKey(row.selectSingleNode("field[@name='routingKey']").getStringValue());
-//            anode.setAppId(row.selectSingleNode("field[@name='appId']").getStringValue());
-//            anode.setAvailable(row.selectSingleNode("field[@name='available']").getStringValue().equals("1"));
-//            anode.setInner(row.selectSingleNode("field[@name='inner']").getStringValue().equals("1"));
-//
-//            nodes.add(anode);
-//        }
-
-        if (this.getZKExchangeManager() == null) {
+        if (this.getExchangeManager() == null) {
             throw new NullPointerException(" the field exchangeManager can not be null.");
         }
 
         try {
-            List<Node> nodes = (List<Node>) this.getZKExchangeManager().
-                downloadWithPath(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER);
+            Node[] nodes = (Node[]) this.getExchangeManager().
+                downloadWithChannel(CONSTS.PUBSUB_ROUTER_CHANNEL);
             this.extractDifferentNodes(nodes);
         } catch (IOException e) {
             logger.error("[parseRouterInfo] occurs a IOException : " + e.getMessage());
@@ -569,38 +537,13 @@ public class ConfigManager implements IExchangerListener {
     }
 
     public synchronized void parseConfigInfo() throws MalformedURLException {
-//        SAXReader reader = new SAXReader();
-//        File routerFile = new File(CONSTS.EXPORTED_CONFIG_FILE_PATH);
-//        URL url = routerFile.toURI().toURL();
-//        Document doc = null;
-//
-//        try {
-//            doc = reader.read(url);
-//        } catch (DocumentException e) {
-//            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
-//        }
-//
-//        Element rootElement = doc.getRootElement();
-//        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
-//
-//        List<Element> rowElements = databaseNode.selectNodes("//row");
-//        List<Config> configItems = new ArrayList<>(rowElements.size());
-//        for (Element row : rowElements) {
-//            Config config = new Config();
-//
-//            config.setKey(row.selectSingleNode("field[@name='key']").getStringValue());
-//            config.setValue(row.selectSingleNode("field[@name='value']").getStringValue());
-//
-//            configItems.add(config);
-//        }
-
-        if (this.getZKExchangeManager() == null) {
+        if (this.getExchangeManager() == null) {
             throw new NullPointerException(" the field exchangeManager can not be null.");
         }
 
         try {
-            List<Config> configs = (List<Config>) this.getZKExchangeManager()
-                                                      .downloadWithPath(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG);
+            Config[] configs = (Config[]) this.getExchangeManager()
+                                              .downloadWithChannel(CONSTS.PUBSUB_CONFIG_CHANNEL);
             this.extractClientConfigs(configs);
         } catch (IOException e) {
             logger.error("[parseConfigInfo] occurs a IOException : " + e.getMessage());
@@ -609,51 +552,9 @@ public class ConfigManager implements IExchangerListener {
     }
 
     public synchronized void parseSendPermission() throws MalformedURLException {
-//        SAXReader reader = new SAXReader();
-//        File routerFile = new File(CONSTS.EXPORTED_SEND_PERMISSION_FILE_PATH);
-//        URL url = routerFile.toURI().toURL();
-//        Document doc = null;
-//
-//        try {
-//            doc = reader.read(url);
-//        } catch (DocumentException e) {
-//            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
-//        }
-//
-//        Element rootElement = doc.getRootElement();
-//        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
-//
-//        List<Element> rowElements = databaseNode.selectNodes("//row");
-//        sendPermissionMap = new ConcurrentHashMap<>(rowElements.size());
-//
-//        int maxSendPermGrantId = 0;
-//
-//        for (Element row : rowElements) {
-//            String targetId = row.selectSingleNode("field[@name='targetId']").getStringValue();
-//            if (!sendPermissionMap.containsKey(targetId)) {
-//                sendPermissionMap.put(targetId, "");
-//            }
-//
-//            String joinedGrantIds = sendPermissionMap.get(targetId);
-//            String grantId = row.selectSingleNode("field[@name='grantId']").getStringValue();
-//            sendPermissionMap.put(targetId, joinedGrantIds + grantId + ",");
-//
-//            //get max send-permission grant id
-//            maxSendPermGrantId = Math.max(maxSendPermGrantId, Integer.valueOf(grantId));
-//        }
-//
-//        sendPermByteQueryArrMap = new ConcurrentHashMap<>(sendPermissionMap.size());
-//        for (Map.Entry<String, String> sendPermItem : this.sendPermissionMap.entrySet()) {
-//            sendPermByteQueryArrMap.put(sendPermItem.getKey(),
-//                                        this.buildQueryArray(maxSendPermGrantId,
-//                                                             sendPermItem.getKey(),
-//                                                             this.sendPermissionMap)
-//                                       );
-//        }
-
         try {
-            List<SendPermission> sendPermissions = (List<SendPermission>) this.getZKExchangeManager().downloadWithPath(
-                CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION);
+            SendPermission[] sendPermissions = (SendPermission[]) this.getExchangeManager().downloadWithChannel(
+                CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL);
             this.processSendPermission(sendPermissions);
         } catch (IOException e) {
             logger.error("[parseSendPermission] occurs a IOException : " + e.getMessage());
@@ -661,51 +562,9 @@ public class ConfigManager implements IExchangerListener {
     }
 
     public synchronized void parseReceivePermission() throws MalformedURLException {
-//        SAXReader reader = new SAXReader();
-//        File routerFile = new File(CONSTS.EXPORTED_RECEIVE_PERMISSION_FILE_PATH);
-//        URL url = routerFile.toURI().toURL();
-//        Document doc = null;
-//
-//        try {
-//            doc = reader.read(url);
-//        } catch (DocumentException e) {
-//            logger.error("[parseConfigInfo] occurs a DocumentException exception : " + e.getMessage());
-//        }
-//
-//        Element rootElement = doc.getRootElement();
-//        org.dom4j.Node databaseNode = rootElement.selectSingleNode("./database");
-//
-//        List<Element> rowElements = databaseNode.selectNodes("//row");
-//        receivePermissionMap = new ConcurrentHashMap<>(rowElements.size());
-//
-//        int maxReceivePermGrantId = 0;
-//
-//        for (Element row : rowElements) {
-//            String targetId = row.selectSingleNode("field[@name='targetId']").getStringValue();
-//            if (!receivePermissionMap.containsKey(targetId)) {
-//                receivePermissionMap.put(targetId, "");
-//            }
-//
-//            String joinedGrantIds = receivePermissionMap.get(targetId);
-//            String grantId = row.selectSingleNode("field[@name='grantId']").getStringValue();
-//            receivePermissionMap.put(targetId, joinedGrantIds + grantId + ",");
-//
-//            //get max receive-permission grant id
-//            maxReceivePermGrantId = Math.max(maxReceivePermGrantId, Integer.valueOf(grantId));
-//        }
-//
-//        receivePermByteQueryArrMap = new ConcurrentHashMap<>(receivePermissionMap.size());
-//        for (Map.Entry<String, String> receivePermItem : receivePermissionMap.entrySet()) {
-//            receivePermByteQueryArrMap.put(receivePermItem.getKey(),
-//                                           this.buildQueryArray(maxReceivePermGrantId,
-//                                                                receivePermItem.getKey(),
-//                                                                this.receivePermissionMap)
-//                                          );
-//        }
-
         try {
-            List<ReceivePermission> receivePermissions = (List<ReceivePermission>) this.getZKExchangeManager().
-                downloadWithPath(CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION);
+            ReceivePermission[] receivePermissions = (ReceivePermission[]) this.getExchangeManager().
+                downloadWithChannel(CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL);
 
             this.processReceivePermission(receivePermissions);
         } catch (IOException e) {
@@ -714,7 +573,7 @@ public class ConfigManager implements IExchangerListener {
 
     }
 
-    private void extractDifferentNodes(List<Node> nodes) {
+    private void extractDifferentNodes(Node[] nodes) {
         this.exchangeNodeMap = new ConcurrentHashMap<>();
         this.queueNodeMap = new ConcurrentHashMap<>();
         this.pubsubNodeMap = new ConcurrentHashMap<>();
@@ -734,7 +593,7 @@ public class ConfigManager implements IExchangerListener {
         }
     }
 
-    private void extractClientConfigs(List<Config> configs) {
+    private void extractClientConfigs(Config[] configs) {
         this.clientConfigMap = new ConcurrentHashMap<>();
 
         for (Config config : configs) {
@@ -743,8 +602,8 @@ public class ConfigManager implements IExchangerListener {
         }
     }
 
-    private void processSendPermission(List<SendPermission> sendPermissions) {
-        sendPermissionMap = new ConcurrentHashMap<>(sendPermissions.size());
+    private void processSendPermission(SendPermission[] sendPermissions) {
+        sendPermissionMap = new ConcurrentHashMap<>(sendPermissions.length);
 
         int maxSendPermGrantId = 0;
 
@@ -772,8 +631,8 @@ public class ConfigManager implements IExchangerListener {
         }
     }
 
-    private void processReceivePermission(List<ReceivePermission> receivePermissions) {
-        receivePermissionMap = new ConcurrentHashMap<>(receivePermissions.size());
+    private void processReceivePermission(ReceivePermission[] receivePermissions) {
+        receivePermissionMap = new ConcurrentHashMap<>(receivePermissions.length);
 
         int maxReceivePermGrantId = 0;
 

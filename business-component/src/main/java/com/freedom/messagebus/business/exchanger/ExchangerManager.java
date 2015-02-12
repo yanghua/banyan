@@ -1,16 +1,16 @@
 package com.freedom.messagebus.business.exchanger;
 
 import com.freedom.messagebus.common.CONSTS;
-import com.freedom.messagebus.interactor.zookeeper.IConfigChangedListener;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
-import com.freedom.messagebus.interactor.zookeeper.ZKEventType;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
+import com.freedom.messagebus.interactor.pubsub.IPubSubListener;
+import com.freedom.messagebus.interactor.pubsub.IPubSuber;
+import com.freedom.messagebus.interactor.pubsub.PubSuberFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -28,62 +28,51 @@ public class ExchangerManager {
 
     private static final Log logger = LogFactory.getLog(ExchangerManager.class);
 
-    private List<String>                paths;
-    private List<IDataExchanger>        exchangers;
-    private Map<String, IDataExchanger> pathExchangeMap;
-    private Map<String, String>         tablePathMap;
-    private Map<String, IDataFetcher>   tableDataFetcherMap;
-
+    private List<String>                      channels;
+    private List<IDataExchanger>              exchangers;
+    private Map<String, IDataExchanger>       channelExchangeMap;
+    private Map<String, String>               tableChannelMap;
+    private Map<String, IDataFetcher>         tableDataFetcherMap;
+    private Map<String, ChannelListenerEntry> registry;
+    private IPubSuber                         pubsuber;
     private boolean dataFetcherInited = false;
-    private Map<String, List<IExchangerListener>> registry;
-    private LongLiveZookeeper                     zookeeper;
 
-    private static volatile ExchangerManager instance = null;
+    public ExchangerManager(String pubsuberHost, int pubsuberPort) {
+        this.pubsuber = PubSuberFactory.createPubSuber();
+        this.pubsuber.setHost(pubsuberHost);
+        this.pubsuber.setPort(pubsuberPort);
+        this.pubsuber.open();
 
-    private ExchangerManager(String zkHost, int zkPort) {
-        this.zookeeper = new LongLiveZookeeper(zkHost, zkPort);
-        this.zookeeper.open();
-
-        boolean isZKAlive = this.zookeeper.isAlive();
-        if (!isZKAlive)
+        boolean isAlive = this.pubsuber.isAlive();
+        if (!isAlive)
             return;
 
         scan();
 
-        //add external path
-        this.paths.add(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH);
-
         registry = new ConcurrentHashMap<>();
 
-        watchZookeeper();
+        //add external path
+        this.channels.add(CONSTS.PUBSUB_AUTH_CHANNEL);
+
+        watchPubSuber();
     }
 
     public boolean isZKAlive() {
-        return this.zookeeper.isAlive();
+        return this.pubsuber.isAlive();
     }
 
-    public void retryConnect(String zkHost, int zkPort) {
-        if (this.zookeeper != null && this.zookeeper.isAlive())
+    public void retryConnect(String pubsuberHost, int pubsuberPort) {
+        if (this.pubsuber != null && this.pubsuber.isAlive())
             this.destroy();
 
-        this.zookeeper = null;
-        this.zookeeper = new LongLiveZookeeper(zkHost, zkPort);
-        this.zookeeper.open();
+        this.pubsuber = null;
+        this.pubsuber = PubSuberFactory.createPubSuber();
+        this.pubsuber.setHost(pubsuberHost);
+        this.pubsuber.setPort(pubsuberPort);
+        this.pubsuber.open();
     }
 
-    public static ExchangerManager defaultExchangerManager(String zkHost, int zkPort) {
-        if (instance == null) {
-            synchronized (ExchangerManager.class) {
-                if (instance == null) {
-                    instance = new ExchangerManager(zkHost, zkPort);
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    public synchronized void uploadAll() {
+    public void uploadAll() {
         this.beforeUploadThroughFetcher();
 
         try {
@@ -95,108 +84,99 @@ public class ExchangerManager {
         }
     }
 
-    public synchronized void uploadWithPath(String path) throws IOException {
+    public void uploadWithChannel(String channel) throws IOException {
         this.beforeUploadThroughFetcher();
 
-        if (!this.pathExchangeMap.containsKey(path)) {
-            throw new RuntimeException("[uploadWithPath] the path : " + path);
+        if (!this.channelExchangeMap.containsKey(channel)) {
+            throw new RuntimeException("[uploadWithChannel] the path : " + channel);
         }
 
-        IDataExchanger exchanger = this.pathExchangeMap.get(path);
+        IDataExchanger exchanger = this.channelExchangeMap.get(channel);
         exchanger.upload();
     }
 
-    public synchronized void uploadWithTable(String tbName) throws IOException {
+    public void uploadWithTable(String tbName) throws IOException {
         this.beforeUploadThroughFetcher();
 
-        if (!this.tablePathMap.containsKey(tbName))
+        if (!this.tableChannelMap.containsKey(tbName))
             throw new RuntimeException("[uploadWithTable] the table name : " + tbName);
 
-        String path = this.tablePathMap.get(tbName);
-        this.uploadWithPath(path);
+        String path = this.tableChannelMap.get(tbName);
+        this.uploadWithChannel(path);
     }
 
-    public synchronized void uploadWithPath(String path, Serializable data) throws IOException {
-        if (!pathExchangeMap.containsKey(path)) {
-            logger.error("[uploadWithPath] illegal path : " + path);
-            throw new RuntimeException("illegal path : " + path);
+    public void uploadWithChannel(String channel, byte[] data) throws IOException {
+        if (!channelExchangeMap.containsKey(channel)) {
+            logger.error("[uploadWithChannel] illegal path : " + channel);
+            throw new RuntimeException("illegal path : " + channel);
         }
 
-        IDataExchanger exchanger = pathExchangeMap.get(path);
+        IDataExchanger exchanger = channelExchangeMap.get(channel);
         exchanger.upload(data);
     }
 
-    public synchronized void uploadWithTable(String tbName, Serializable data) throws IOException {
-        if (!tablePathMap.containsKey(tbName)) {
+    public void uploadWithTable(String tbName, byte[] data) throws IOException {
+        if (!tableChannelMap.containsKey(tbName)) {
             logger.error("[uploadWithTable] illegal table name : " + tbName);
             throw new RuntimeException("illegal table name : " + tbName);
         }
 
-        String path = tablePathMap.get(tbName);
+        String path = tableChannelMap.get(tbName);
 
-        pathExchangeMap.get(path).upload(data);
+        channelExchangeMap.get(path).upload(data);
     }
 
-    public synchronized Object downloadWithPath(String path) throws IOException {
-        if (!pathExchangeMap.containsKey(path)) {
-            logger.error("[downloadWithPath] illegal path : " + path);
-            throw new RuntimeException("illegal path : " + path);
+    public Object downloadWithChannel(String channel) throws IOException {
+        if (!channelExchangeMap.containsKey(channel)) {
+            logger.error("[downloadWithChannel] illegal channel : " + channel);
+            throw new RuntimeException("illegal channel : " + channel);
         }
 
-        return pathExchangeMap.get(path).download();
+        return channelExchangeMap.get(channel).download();
     }
 
-    public synchronized Object downloadWithTable(String tbName) throws IOException {
-        if (!tablePathMap.containsKey(tbName)) {
+    public Object downloadWithTable(String tbName) throws IOException {
+        if (!tableChannelMap.containsKey(tbName)) {
             logger.error("[downloadWithTable] illegal table name : " + tbName);
             throw new RuntimeException("illegal table name : " + tbName);
         }
 
-        String path = tablePathMap.get(tbName);
+        String path = tableChannelMap.get(tbName);
 
-        return this.downloadWithPath(path);
+        return this.downloadWithChannel(path);
     }
 
-    public synchronized void registerWithPath(String path, IExchangerListener onChanged) {
-        List<IExchangerListener> listenersOfPath = null;
-        if (!registry.containsKey(path)) {
-            listenersOfPath = new CopyOnWriteArrayList<>();
-            registry.put(path, listenersOfPath);
+    public void registerWithChannel(String appId, IExchangerListener onChanged, String channel) {
+        if (!registry.containsKey(appId)) {
+            ChannelListenerEntry entry = new ChannelListenerEntry();
+            entry.setOnChanged(onChanged);
+            List<String> channels = new ArrayList<>();
+            channels.add(channel);
+            entry.setChannels(channels);
+
+            registry.put(appId, entry);
         } else {
-            listenersOfPath = registry.get(path);
-        }
-
-        listenersOfPath.add(onChanged);
-    }
-
-    public synchronized void registerWithMultiPaths(String[] paths, IExchangerListener onChanged) {
-        for (String path : paths) {
-            this.registerWithPath(path, onChanged);
+            ChannelListenerEntry entry = registry.get(appId);
+            entry.getChannels().add(channel);
         }
     }
 
-    public synchronized void registerWithTable(String table, IExchangerListener onChanged) {
-        if (!tablePathMap.containsKey(table)) {
-            logger.error("[registerWithTable] illegal table name : " + table);
-            throw new RuntimeException("illegal table name : " + table);
-        }
-
-        String path = tablePathMap.get(table);
-        this.registerWithPath(path, onChanged);
-    }
-
-    public synchronized void removeRegister(IExchangerListener subscriber) {
-        for (Map.Entry<String, List<IExchangerListener>> listenersOfPath : registry.entrySet()) {
-            for (IExchangerListener listener : listenersOfPath.getValue()) {
-                if (listener == subscriber)
-                    listenersOfPath.getValue().remove(listener);
-            }
+    public void registerWithMultiChannels(String appId, IExchangerListener onChanged, String[] channels) {
+        for (String channel : channels) {
+            this.registerWithChannel(appId, onChanged, channel);
         }
     }
 
-    public synchronized void destroy() {
-        if (this.zookeeper != null && this.zookeeper.isAlive())
-            this.zookeeper.close();
+    public void removeRegister(String appId) {
+        this.registry.remove(appId);
+        if (this.registry.size() == 0) {
+            this.pubsuber.close();
+        }
+    }
+
+    public void destroy() {
+        if (this.pubsuber != null && this.pubsuber.isAlive())
+            this.pubsuber.close();
     }
 
     public Map<String, IDataFetcher> getTableDataFetcherMap() {
@@ -207,7 +187,7 @@ public class ExchangerManager {
         this.tableDataFetcherMap = tableDataFetcherMap;
     }
 
-    private synchronized void beforeUploadThroughFetcher() {
+    private void beforeUploadThroughFetcher() {
         if (tableDataFetcherMap == null || tableDataFetcherMap.size() == 0) {
             throw new IllegalStateException(" must set property : tableDataFetcherMap");
         }
@@ -221,9 +201,10 @@ public class ExchangerManager {
 
         exchangers = new CopyOnWriteArrayList<>();
 
-        pathExchangeMap = new ConcurrentHashMap<>(classes.size());
-        tablePathMap = new ConcurrentHashMap<>(classes.size());
-        paths = new CopyOnWriteArrayList<>();
+        channelExchangeMap = new ConcurrentHashMap<>(classes.size());
+        tableChannelMap = new ConcurrentHashMap<>(classes.size());
+        channels = new CopyOnWriteArrayList<>();
+        IDataConverter converter = PubSuberFactory.createConverter();
 
         try {
             for (Class<IDataExchanger> clazz : classes) {
@@ -233,19 +214,25 @@ public class ExchangerManager {
                         Exchanger metaData = (Exchanger) annotation;
                         if (metaData != null) {
                             IDataExchanger exchanger = null;
-                            Constructor ctor = clazz.getConstructor(LongLiveZookeeper.class,
+                            Constructor ctor = clazz.getConstructor(IPubSuber.class,
                                                                     String.class);
-                            exchanger = (IDataExchanger) ctor.newInstance(zookeeper, metaData.path());
+                            exchanger = (IDataExchanger) ctor.newInstance(pubsuber, metaData.path());
+                            Class<? extends IDataExchanger> clazzOfExchanger = exchanger.getClass();
 
-                            paths.add(metaData.path());
+                            //set dataConverter
+                            Field converterField = clazzOfExchanger.getField("dataConverter");
+                            converterField.setAccessible(true);
+                            converterField.set(exchanger, converter);
+
+                            channels.add(metaData.path());
                             exchangers.add(exchanger);
 
-                            if (!pathExchangeMap.containsKey(metaData.path())) {
-                                pathExchangeMap.put(metaData.path(), exchanger);
+                            if (!channelExchangeMap.containsKey(metaData.path())) {
+                                channelExchangeMap.put(metaData.path(), exchanger);
                             }
 
-                            if (!tablePathMap.containsKey(metaData.path())) {
-                                tablePathMap.put(metaData.table(), metaData.path());
+                            if (!tableChannelMap.containsKey(metaData.path())) {
+                                tableChannelMap.put(metaData.table(), metaData.path());
                             }
                         }
                     }
@@ -257,33 +244,33 @@ public class ExchangerManager {
 
         if (logger.isDebugEnabled()) {
             logger.debug(" ******exchangers size : " + exchangers.size());
-            logger.debug(" ******pathExchangeMap size : " + pathExchangeMap.size());
-            logger.debug(" ******tableExchangeMap size : " + tablePathMap.size());
+            logger.debug(" ******channelExchangeMap size : " + channelExchangeMap.size());
+            logger.debug(" ******tableExchangeMap size : " + tableChannelMap.size());
         }
     }
 
-    private void watchZookeeper() {
-        this.zookeeper.watchPaths(this.paths.toArray(new String[this.paths.size()]), new IConfigChangedListener() {
+    private void watchPubSuber() {
+        this.pubsuber.watch(this.channels.toArray(new String[this.channels.size()]), new IPubSubListener() {
+
             @Override
-            public void onChanged(String path, byte[] newData, ZKEventType eventType) {
+            public void onChange(String channel, byte[] data, Map<String, Object> params) {
                 Object deserializedObj = null;
-                if (path == null || !pathExchangeMap.containsKey(path)) {
-                    logger.error("[onChanged] path is null or pathExchangeMap don't contain path : " + path);
+                if (channel == null || !channelExchangeMap.containsKey(channel)) {
+                    logger.error("[onChanged] channel is null or channelExchangeMap don't contain path : " + channel);
                     return;
                 }
 
-                IDataExchanger exchanger = pathExchangeMap.get(path);
+                IDataExchanger exchanger = channelExchangeMap.get(channel);
 
                 try {
-                    deserializedObj = exchanger.download(newData);
+                    deserializedObj = exchanger.download(data);
                 } catch (IOException e) {
-                    logger.error("[watchZookeeper] occurs a IOException : " + e.getMessage());
+                    logger.error("[watchPubSuber] occurs a IOException : " + e.getMessage());
                 }
 
-                if (registry.containsKey(path)) {
-                    List<IExchangerListener> listeners = registry.get(path);
-                    for (IExchangerListener listener : listeners) {
-                        listener.onZKPathChanged(path, deserializedObj);
+                for (ChannelListenerEntry entry : registry.values()) {
+                    if (entry.getChannels().contains(channel)) {
+                        entry.getOnChanged().onChannelDataChanged(channel, deserializedObj);
                     }
                 }
             }
@@ -410,13 +397,15 @@ public class ExchangerManager {
         try {
             for (Map.Entry<String, IDataFetcher> item : tableDataFetcherMap.entrySet()) {
                 String tbName = item.getKey();
-                if (!tablePathMap.containsKey(tbName))
+                if (!tableChannelMap.containsKey(tbName))
                     continue;
 
-                String path = tablePathMap.get(tbName);
-                IDataExchanger exchanger = pathExchangeMap.get(path);
+                String path = tableChannelMap.get(tbName);
+                IDataExchanger exchanger = channelExchangeMap.get(path);
 
                 Class<? extends IDataExchanger> clazz = exchanger.getClass();
+
+                //set dataFetcher
                 Field fetcherField = clazz.getField("dataFetcher");
                 fetcherField.setAccessible(true);
                 fetcherField.set(exchanger, item.getValue());
@@ -429,4 +418,30 @@ public class ExchangerManager {
             logger.error("[lazyInit] occurs a IllegalAccessException : " + e.getMessage());
         }
     }
+
+    private static final class ChannelListenerEntry {
+        private List<String>       channels;
+        private IExchangerListener onChanged;
+
+        public ChannelListenerEntry() {
+        }
+
+        public List<String> getChannels() {
+            return channels;
+        }
+
+        public void setChannels(List<String> channels) {
+            this.channels = channels;
+        }
+
+        public IExchangerListener getOnChanged() {
+            return onChanged;
+        }
+
+        public void setOnChanged(IExchangerListener onChanged) {
+            this.onChanged = onChanged;
+        }
+
+    }
+
 }

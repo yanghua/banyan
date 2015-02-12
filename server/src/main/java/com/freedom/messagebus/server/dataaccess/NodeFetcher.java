@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +23,7 @@ public class NodeFetcher implements IDataFetcher {
     }
 
     @Override
-    public ArrayList fetchData() {
+    public byte[] fetchData(IDataConverter converter) {
         ArrayList<Node> nodes = new ArrayList<>();
 
         Connection connection = null;
@@ -57,6 +58,13 @@ public class NodeFetcher implements IDataFetcher {
                 this.dbAccessor.closeConnection(connection);
         }
 
-        return nodes;
+        if (nodes.isEmpty()) {
+            logger.error("nodes is empty");
+            throw new RuntimeException("nodes is empty");
+        }
+
+        Node[] nodeArr = nodes.toArray(new Node[nodes.size()]);
+
+        return converter.serialize(nodeArr);
     }
 }

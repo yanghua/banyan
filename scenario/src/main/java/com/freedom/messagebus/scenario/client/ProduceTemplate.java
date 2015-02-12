@@ -12,7 +12,7 @@ public class ProduceTemplate {
 
     private static final String appId = "6vifQNkw225U6dS8cI92rS2eS1o7ZehQ";     //ucp
     private static final String host  = "172.16.206.30";
-    private static final int    port  = 2181;
+    private static final int    port  = 6379;
 
     /**
      * produce的常见场景有如下几个特点：
@@ -21,7 +21,7 @@ public class ProduceTemplate {
      * (3)如果发生的消息量大，可使用多线程发送
      */
     public static void produce() {
-        String queueName = "crm";
+        String queueName = "erp";
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setReplyTo(queueName);
@@ -34,8 +34,8 @@ public class ProduceTemplate {
         msg.setMessageBody(body);
 
         Messagebus client = Messagebus.createClient(appId);
-        client.setZkHost(host);
-        client.setZkPort(port);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
         try {
             client.open();

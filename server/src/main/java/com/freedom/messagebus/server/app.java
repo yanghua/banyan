@@ -8,8 +8,8 @@ import com.freedom.messagebus.common.CONSTS;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
+import com.freedom.messagebus.server.bootstrap.PubSuberInitializer;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
-import com.freedom.messagebus.server.bootstrap.ZookeeperInitializer;
 import com.freedom.messagebus.server.daemon.ServiceLoader;
 import com.freedom.messagebus.server.dataaccess.*;
 import org.apache.commons.logging.Log;
@@ -29,7 +29,7 @@ public class App {
     private static final Log    logger                             = LogFactory.getLog(App.class);
     private static final String DEFAULT_SERVER_LOG4J_PROPERTY_PATH = "/usr/local/messagebus-server/conf/log4j.properties";
 
-    private static ExchangerManager globalZKExchangeManager;
+    private static ExchangerManager globalExchangeManager;
     private static Properties       config;
 
     public static void main(String[] args) {
@@ -70,11 +70,11 @@ public class App {
         Map<String, Object> context = null;
         context = buildContext(config);
 
-        //zookeeper
-        logger.info("** bootstrap service : ZookeeperInitializer **");
-        ZookeeperInitializer zookeeperInitializer = ZookeeperInitializer.getInstance(context);
+        //pubsuber
+        logger.info("** bootstrap service : PubSuberInitializer **");
+        PubSuberInitializer pubSuberInitializer = PubSuberInitializer.getInstance(context);
         try {
-            zookeeperInitializer.launch();
+            pubSuberInitializer.launch();
         } catch (IOException e) {
             logger.error("[main] occurs a IOException : " + e.getMessage());
             return;
@@ -91,6 +91,9 @@ public class App {
         }
 
         boolean mqIsAlive = RabbitmqServerManager.defaultManager(config).isAlive();
+
+        //TODO: should be remove , just for test
+//        boolean mqIsAlive = true;
 
         logger.debug("** MQ is alive : " + mqIsAlive);
         if (mqIsAlive) {
@@ -168,11 +171,11 @@ public class App {
 
         config = configurationLoader.getConfigProperties();
 
-        //init zookeeper
-        String zkHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
-        int zkPort = Integer.parseInt(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+        //init pubsuber
+        String pubsuberHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
+        int pubsuberPort = Integer.parseInt(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
-        globalZKExchangeManager = ExchangerManager.defaultExchangerManager(zkHost, zkPort);
+        globalExchangeManager = new ExchangerManager(pubsuberHost, pubsuberPort);
     }
 
     private static void invokeCommand(String cmd, Map<String, String> argMap) {
@@ -204,7 +207,6 @@ public class App {
     private static Map<String, Object> buildContext(Properties serverConfig) {
         Map<String, Object> context = new ConcurrentHashMap<>();
         context.put(Constants.KEY_SERVER_CONFIG, serverConfig);
-//        context.put(Constants.GLOBAL_ZOOKEEPER_OBJECT, globalZookeeper);
 
         DBAccessor dbAccessor = new DBAccessor(serverConfig);
         Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<>();
@@ -213,9 +215,9 @@ public class App {
         tableDataFetcherMap.put("SEND_PERMISSION", new SendPermissionFetcher(dbAccessor));
         tableDataFetcherMap.put("RECEIVE_PERMISSION", new ReceivePermissionFetcher(dbAccessor));
 
-        globalZKExchangeManager.setTableDataFetcherMap(tableDataFetcherMap);
+        globalExchangeManager.setTableDataFetcherMap(tableDataFetcherMap);
 
-        context.put(Constants.GLOBAL_ZKEXCHANGE_MANAGER, globalZKExchangeManager);
+        context.put(Constants.GLOBAL_EXCHANGE_MANAGER, globalExchangeManager);
 
         return context;
     }
@@ -226,11 +228,11 @@ public class App {
         String appId = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_APP_ID);
         Messagebus commonClient = Messagebus.createClient(appId);
 
-        String zkHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_HOST);
-        int zkPort = Integer.parseInt(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_ZK_PORT));
+        String pubsuberHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
+        int pubsuberPort = Integer.parseInt(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
-        commonClient.setZkHost(zkHost);
-        commonClient.setZkPort(zkPort);
+        commonClient.setPubsuberHost(pubsuberHost);
+        commonClient.setPubsuberPort(pubsuberPort);
         commonClient.open();
 
         context.put(Constants.GLOBAL_CLIENT_OBJECT, commonClient);
@@ -243,16 +245,13 @@ public class App {
             if (client.isOpen())
                 client.close();
         }
-
-//        if (globalZookeeper != null && globalZookeeper.isAlive())
-//            globalZookeeper.close();
     }
 
     private static void broadcastEvent(final String eventTypeStr, final App lockObj) {
         try {
             synchronized (lockObj) {
                 logger.debug("broadcast event : " + eventTypeStr);
-                globalZKExchangeManager.uploadWithPath(CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT, eventTypeStr);
+                globalExchangeManager.uploadWithChannel(CONSTS.PUBSUB_EVENT_CHANNEL, eventTypeStr.getBytes());
             }
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "[broadcastEvent]");

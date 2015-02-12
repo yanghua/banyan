@@ -27,36 +27,24 @@ public class Messagebus {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-
-    private String appId;
-
-    private IProducer producer;
-
-    private IConsumer consumer;
-
-    private IRequester requester;
-
-    private IResponser responser;
-
-    private IPublisher publisher;
-
-    private ISubscriber subscriber;
-
-    private IBroadcaster broadcaster;
-
-    private ExchangerManager zkExchangeManager;
-
+    private String                appId;
+    private IProducer             producer;
+    private IConsumer             consumer;
+    private IRequester            requester;
+    private IResponser            responser;
+    private IPublisher            publisher;
+    private ISubscriber           subscriber;
+    private IBroadcaster          broadcaster;
+    private ExchangerManager      exchangeManager;
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
-
-    private Connection connection;
+    private Connection            connection;
+    private String                pubsuberHost;
+    private int                   pubsuberPort;
 
     private AtomicBoolean isOpen         = new AtomicBoolean(false);
     private boolean       useChannelPool = false;
 
-
-    private String zkHost;
-    private int    zkPort;
 
     private Messagebus(String appId) {
         this.appId = appId;
@@ -80,24 +68,24 @@ public class Messagebus {
         if (this.isOpen())
             return;
 
-        this.zkExchangeManager = ExchangerManager.defaultExchangerManager(this.getZkHost(), this.getZkPort());
+        this.exchangeManager = new ExchangerManager(this.getPubsuberHost(), this.getPubsuberPort());
 
-        if (!this.zkExchangeManager.isZKAlive())
+        if (!this.exchangeManager.isZKAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
 
         this.configManager = ConfigManager.getInstance();
-        this.configManager.setZKExchangeManager(this.zkExchangeManager);
-        this.zkExchangeManager.registerWithMultiPaths(new String[]{
-            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_ROUTER,
-            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_CONFIG,
-            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_EVENT,
-            CONSTS.ZOOKEEPER_ROOT_PATH_FOR_AUTH,
-            CONSTS.ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION,
-            CONSTS.ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION
-        }, this.configManager);
+        this.configManager.setExchangeManager(this.exchangeManager);
+        this.exchangeManager.registerWithMultiChannels(this.appId, this.configManager, new String[]{
+            CONSTS.PUBSUB_ROUTER_CHANNEL,
+            CONSTS.PUBSUB_CONFIG_CHANNEL,
+            CONSTS.PUBSUB_EVENT_CHANNEL,
+            CONSTS.PUBSUB_AUTH_CHANNEL,
+            CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL,
+            CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL
+        });
 
         try {
-            this.configManager.parseZKData();
+            this.configManager.parseRealTimeData();
         } catch (IOException e) {
             throw new MessagebusConnectedFailedException(e);
         }
@@ -163,8 +151,8 @@ public class Messagebus {
     public synchronized void close() {
         //release all resource
         try {
-            if (this.zkExchangeManager != null)
-                this.zkExchangeManager.removeRegister(this.configManager);
+            if (this.exchangeManager != null)
+                this.exchangeManager.removeRegister(this.appId);
 
             if (this.configManager != null)
                 this.configManager.destroy();
@@ -189,7 +177,6 @@ public class Messagebus {
 
         return producer;
     }
-
 
     public synchronized IConsumer getConsumer() throws MessagebusUnOpenException {
         if (!this.isOpen())
@@ -244,26 +231,26 @@ public class Messagebus {
     }
 
 
-    public String getZkHost() {
-        if (this.zkHost == null || this.zkHost.isEmpty())
-            this.zkHost = "localhost";
+    public String getPubsuberHost() {
+        if (this.pubsuberHost == null || this.pubsuberHost.isEmpty())
+            this.pubsuberHost = "localhost";
 
-        return zkHost;
+        return pubsuberHost;
     }
 
-    public void setZkHost(String zkHost) {
-        this.zkHost = zkHost;
+    public void setPubsuberHost(String pubsuberHost) {
+        this.pubsuberHost = pubsuberHost;
     }
 
-    public int getZkPort() {
-        if (this.zkPort == 0)
-            this.zkPort = 2181;
+    public int getPubsuberPort() {
+        if (this.pubsuberPort == 0)
+            this.pubsuberPort = 2181;
 
-        return zkPort;
+        return pubsuberPort;
     }
 
-    public void setZkPort(int zkPort) {
-        this.zkPort = zkPort;
+    public void setPubsuberPort(int pubsuberPort) {
+        this.pubsuberPort = pubsuberPort;
     }
 
     private void initConnection() throws MessagebusConnectedFailedException {

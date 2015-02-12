@@ -9,20 +9,20 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-public class ZookeeperInitializer {
+public class PubSuberInitializer {
 
-    private static          Log                  logger   = LogFactory.getLog(ZookeeperInitializer.class);
-    private static volatile ZookeeperInitializer instance = null;
+    private static          Log                 logger   = LogFactory.getLog(PubSuberInitializer.class);
+    private static volatile PubSuberInitializer instance = null;
 
     private Properties          config;
     private Map<String, Object> context;
-    private ExchangerManager    zkExchangeManager;
+    private ExchangerManager    exchangeManager;
 
-    public static ZookeeperInitializer getInstance(Map<String, Object> context) {
+    public static PubSuberInitializer getInstance(Map<String, Object> context) {
         if (instance == null) {
-            synchronized (ZookeeperInitializer.class) {
+            synchronized (PubSuberInitializer.class) {
                 if (instance == null) {
-                    instance = new ZookeeperInitializer(context);
+                    instance = new PubSuberInitializer(context);
                 }
             }
         }
@@ -30,14 +30,14 @@ public class ZookeeperInitializer {
         return instance;
     }
 
-    private ZookeeperInitializer(Map<String, Object> context) {
+    private PubSuberInitializer(Map<String, Object> context) {
         this.context = context;
         this.config = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
-        this.zkExchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_ZKEXCHANGE_MANAGER);
+        this.exchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_EXCHANGE_MANAGER);
     }
 
     public void launch() throws IOException, InterruptedException {
-        this.zkExchangeManager.uploadAll();
+        this.exchangeManager.uploadAll();
     }
 
 

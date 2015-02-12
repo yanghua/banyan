@@ -69,8 +69,8 @@ public class TestUtility {
         Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
         Messagebus client = Messagebus.createClient(TestConfigConstant.APP_KEY);
-        client.setZkHost(TestConfigConstant.HOST);
-        client.setZkPort(TestConfigConstant.PORT);
+        client.setPubsuberHost(TestConfigConstant.HOST);
+        client.setPubsuberPort(TestConfigConstant.PORT);
         try {
             client.open();
             IProducer producer = client.getProducer();

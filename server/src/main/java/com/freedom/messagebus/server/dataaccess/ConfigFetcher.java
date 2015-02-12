@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.Config;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +23,7 @@ public class ConfigFetcher implements IDataFetcher {
     }
 
     @Override
-    public ArrayList fetchData() {
+    public byte[] fetchData(IDataConverter converter) {
         ArrayList<Config> configs = new ArrayList<>();
         Connection connection = null;
 
@@ -47,6 +48,13 @@ public class ConfigFetcher implements IDataFetcher {
                 this.dbAccessor.closeConnection(connection);
         }
 
-        return configs;
+        if (configs.isEmpty()) {
+            logger.error("configs is empty");
+            throw new RuntimeException("configs is empty");
+        }
+
+        Config[] configArr = configs.toArray(new Config[configs.size()]);
+
+        return converter.serialize(configArr);
     }
 }

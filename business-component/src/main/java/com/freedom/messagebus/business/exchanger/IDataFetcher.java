@@ -1,9 +1,10 @@
 package com.freedom.messagebus.business.exchanger;
 
-import java.util.ArrayList;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
+
 
 public interface IDataFetcher {
 
-    public ArrayList fetchData();
+    public byte[] fetchData(IDataConverter converter);
 
 }

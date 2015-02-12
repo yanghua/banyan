@@ -28,14 +28,13 @@ public class CommandService extends AbstractService {
     private Messagebus       client;
     private QueueMessage     responseMsg;
     private Properties       serverConfig;
-    private ExchangerManager zkExchangeManager;
+    private ExchangerManager exchangeManager;
 
     public CommandService(Map<String, Object> context) {
         super(context);
 
         serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
 
-        //set zookeeper info
         client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
 
         responseMsg = (QueueMessage) MessageFactory.createMessage(MessageType.QueueMessage);
@@ -49,7 +48,7 @@ public class CommandService extends AbstractService {
         body.setContent(new byte[0]);
         responseMsg.setMessageBody(body);
 
-        this.zkExchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_ZKEXCHANGE_MANAGER);
+        this.exchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_EXCHANGE_MANAGER);
     }
 
 
@@ -121,7 +120,7 @@ public class CommandService extends AbstractService {
 
     private void process(String tableName) {
         try {
-            this.zkExchangeManager.uploadWithTable(tableName);
+            this.exchangeManager.uploadWithTable(tableName);
         } catch (IOException e) {
             logger.error("[process] occurs a IOException : " + e.getMessage());
         }

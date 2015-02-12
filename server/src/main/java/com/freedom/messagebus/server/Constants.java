@@ -4,9 +4,9 @@ public class Constants {
 
     public static final String KEY_MESSAGEBUS_SERVER_MQ_HOST = "messagebus.server.mq.host";
 
-    public static final String KEY_MESSAGEBUS_SERVER_ZK_HOST = "messagebus.server.zk.host";
+    public static final String KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST = "messagebus.server.pubsuber.host";
 
-    public static final String KEY_MESSAGEBUS_SERVER_ZK_PORT = "messagebus.server.zk.port";
+    public static final String KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT = "messagebus.server.pubsuber.port";
 
     public static final String KEY_MESSAGEBUS_SERVER_DB_HOST = "messagebus.server.db.host";
 
@@ -34,6 +34,6 @@ public class Constants {
 
     public static final String GLOBAL_ZOOKEEPER_OBJECT = "zookeeper";
 
-    public static final String GLOBAL_ZKEXCHANGE_MANAGER = "zkExchangeManager";
+    public static final String GLOBAL_EXCHANGE_MANAGER = "exchangeManager";
 
 }

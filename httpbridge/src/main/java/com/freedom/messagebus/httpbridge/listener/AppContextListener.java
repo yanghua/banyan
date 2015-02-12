@@ -17,8 +17,8 @@ public class AppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         Messagebus messagebus = Messagebus.createClient(Constants.HTTP_BRIDGE_APP_KEY);
         //TODO:
-        messagebus.setZkHost("115.29.96.85");
-        messagebus.setZkPort(2181);
+        messagebus.setPubsuberHost("115.29.96.85");
+        messagebus.setPubsuberPort(2181);
         try {
             messagebus.open();
             servletContextEvent.getServletContext().setAttribute(Constants.MESSAGE_BUS_KEY, messagebus);

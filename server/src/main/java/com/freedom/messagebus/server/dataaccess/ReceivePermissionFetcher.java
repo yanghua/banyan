@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.ReceivePermission;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +23,7 @@ public class ReceivePermissionFetcher implements IDataFetcher {
     }
 
     @Override
-    public ArrayList fetchData() {
+    public byte[] fetchData(IDataConverter converter) {
         ArrayList<ReceivePermission> receivePermissions = new ArrayList<>();
 
         Connection connection = null;
@@ -47,6 +48,8 @@ public class ReceivePermissionFetcher implements IDataFetcher {
                 this.dbAccessor.closeConnection(connection);
         }
 
-        return receivePermissions;
+        ReceivePermission[] receivePermissionArr = receivePermissions.toArray(new ReceivePermission[receivePermissions.size()]);
+
+        return converter.serialize(receivePermissionArr);
     }
 }

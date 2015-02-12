@@ -2,66 +2,36 @@ package com.freedom.messagebus.business.exchanger.impl;
 
 import com.freedom.messagebus.business.exchanger.IDataExchanger;
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
+import com.freedom.messagebus.interactor.pubsub.IPubSuber;
+import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.*;
+import java.io.IOException;
 
 public abstract class AbstractExchanger implements IDataExchanger {
 
     private static final Log logger = LogFactory.getLog(AbstractExchanger.class);
 
-    protected byte[] serializedBytes;
+    public static final Gson gson = new Gson();
 
-    protected LongLiveZookeeper zookeeper;
-    protected String            zkPath;
+    protected IPubSuber pubsuber;
+    protected String    channel;
 
-    public IDataFetcher dataFetcher;
+    public IDataFetcher   dataFetcher;
+    public IDataConverter dataConverter;
 
-    public AbstractExchanger(LongLiveZookeeper zookeeper, String zkPath) {
-        this.zookeeper = zookeeper;
-        this.zkPath = zkPath;
-
-        try {
-            this.zookeeper.createNode(this.zkPath);
-        } catch (Exception e) {
-            logger.error("[constructor] occurs a Exception : " + e.getMessage());
-        }
-    }
-
-    protected byte[] serialize(Serializable obj) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(obj);
-        oos.flush();
-
-        byte[] bytes = baos.toByteArray();
-        baos.close();
-        oos.close();
-
-        return bytes;
-    }
-
-    protected Object deSerialize(byte[] originalData) throws IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(originalData);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Object obj = null;
-        try {
-            obj = ois.readObject();
-        } catch (ClassNotFoundException e) {
-            logger.error("[download] occurs a ClassNotFoundException : " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-        bais.close();
-        ois.close();
-
-        return obj;
+    public AbstractExchanger(IPubSuber pubsuber, String channel) {
+        this.pubsuber = pubsuber;
+        this.channel = channel;
     }
 
     @Override
-    public void upload(Serializable obj) throws IOException {
-        this.serializedBytes = this.serialize(obj);
+    public void upload() throws IOException {
+        byte[] datas = this.dataFetcher.fetchData(dataConverter);
+        this.pubsuber.publish(this.channel, datas);
     }
+
 
 }

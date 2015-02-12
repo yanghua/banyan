@@ -26,8 +26,8 @@ public class BroadcastTemplate {
         msg.setMessageBody(body);
 
         Messagebus client = Messagebus.createClient(appId);
-        client.setZkHost(host);
-        client.setZkPort(port);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
         try {
             client.open();

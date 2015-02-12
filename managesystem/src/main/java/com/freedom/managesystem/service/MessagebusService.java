@@ -21,8 +21,8 @@ public class MessagebusService {
 
     public MessagebusService() {
         client = Messagebus.createClient(Constants.MESSAGEBUS_WEB_APP_ID);
-        client.setZkHost(Constants.ZK_HOST);
-        client.setZkPort(Constants.ZK_PORT);
+        client.setPubsuberHost(Constants.ZK_HOST);
+        client.setPubsuberPort(Constants.ZK_PORT);
     }
 
     public void produceMessage(String queueName, Message msg) {

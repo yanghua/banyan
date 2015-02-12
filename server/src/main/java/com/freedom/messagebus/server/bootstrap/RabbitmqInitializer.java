@@ -2,6 +2,8 @@ package com.freedom.messagebus.server.bootstrap;
 
 
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.interactor.pubsub.IDataConverter;
+import com.freedom.messagebus.interactor.pubsub.PubSuberFactory;
 import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.Constants;
@@ -12,7 +14,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeSet;
 
 public class RabbitmqInitializer extends AbstractInitializer {
 
@@ -51,7 +56,9 @@ public class RabbitmqInitializer extends AbstractInitializer {
     private void initTopologyComponent() throws IOException {
         DBAccessor dbAccessor = new DBAccessor(this.properties);
         NodeFetcher nodeFetcher = new NodeFetcher(dbAccessor);
-        List<Node> sortedNodes = nodeFetcher.fetchData();
+        IDataConverter dataConverter = PubSuberFactory.createConverter();
+        Node[] sortedNodes = dataConverter.deSerializeArray(
+            nodeFetcher.fetchData(dataConverter), Node[].class);
         Map<Integer, Node> nodeMap = this.buildNodeMap(sortedNodes);
         TreeSet<Node> sortedExchangeNodes = this.extractExchangeNodes(sortedNodes);
         TreeSet<Node> sortedQueueNodes = this.extractQueueNodes(sortedNodes);
@@ -90,8 +97,8 @@ public class RabbitmqInitializer extends AbstractInitializer {
         //call reset-app
     }
 
-    private Map<Integer, Node> buildNodeMap(List<Node> nodes) {
-        Map<Integer, Node> nodeMap = new HashMap<>(nodes.size());
+    private Map<Integer, Node> buildNodeMap(Node[] nodes) {
+        Map<Integer, Node> nodeMap = new HashMap<>(nodes.length);
         for (Node node : nodes) {
             nodeMap.put(node.getNodeId(), node);
         }
@@ -99,7 +106,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
         return nodeMap;
     }
 
-    private TreeSet<Node> extractExchangeNodes(List<Node> nodes) {
+    private TreeSet<Node> extractExchangeNodes(Node[] nodes) {
         TreeSet<Node> exchangeSet = new TreeSet<>();
         for (Node node : nodes) {
             if (node.getType() == 0)
@@ -109,7 +116,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
         return exchangeSet;
     }
 
-    private TreeSet<Node> extractQueueNodes(List<Node> nodes) {
+    private TreeSet<Node> extractQueueNodes(Node[] nodes) {
         TreeSet<Node> queueSet = new TreeSet<>();
         for (Node node : nodes) {
             if (node.getType() == 1)

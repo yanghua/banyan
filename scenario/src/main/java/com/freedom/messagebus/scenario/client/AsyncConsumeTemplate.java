@@ -52,8 +52,8 @@ public class AsyncConsumeTemplate {
             try {
                 synchronized (lockObj) {
                     //set zookeeper info
-                    client.setZkHost(host);
-                    client.setZkPort(port);
+                    client.setPubsuberHost(host);
+                    client.setPubsuberPort(port);
 
                     client.open();
                     IConsumer consumer = client.getConsumer();

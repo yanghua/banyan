@@ -12,14 +12,14 @@ public class CONSTS {
 
     public static final byte[] EMPTY_PRIMITIVE_BYTE_ARRAY = new byte[0];
 
-    public static final String ZOOKEEPER_ROOT_PATH_FOR_ROUTER = "/router";
-    public static final String ZOOKEEPER_ROOT_PATH_FOR_CONFIG = "/config";
-    public static final String ZOOKEEPER_ROOT_PATH_FOR_EVENT  = "/event";
-    public static final String ZOOKEEPER_ROOT_PATH_FOR_AUTH   = "/auth";
+    public static final String PUBSUB_ROUTER_CHANNEL = "/router";
+    public static final String PUBSUB_CONFIG_CHANNEL = "/config";
+    public static final String PUBSUB_EVENT_CHANNEL  = "/event";
+    public static final String PUBSUB_AUTH_CHANNEL   = "/auth";
 
     //second path
-    public static final String ZOOKEEPER_PATH_FOR_AUTH_SEND_PERMISSION    = "/auth/sendpermission";
-    public static final String ZOOKEEPER_PATH_FOR_AUTH_RECEIVE_PERMISSION = "/auth/receivepermission";
+    public static final String PUBSUB_AUTH_SEND_PERMISSION_CHANNEL    = "/auth/sendpermission";
+    public static final String PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL = "/auth/receivepermission";
 
     public static final String MESSAGEBUS_SERVER_EVENT_STARTED = "started";
     public static final String MESSAGEBUS_SERVER_EVENT_STOPPED = "stopped";

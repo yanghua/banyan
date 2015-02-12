@@ -1,5 +1,7 @@
-package com.freedom.messagebus.interactor.zookeeper;
+package com.freedom.messagebus.interactor.pubsub.impl.zookeeper;
 
+import com.freedom.messagebus.interactor.pubsub.IPubSubListener;
+import com.freedom.messagebus.interactor.pubsub.IPubSuber;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.*;
@@ -7,7 +9,9 @@ import org.apache.zookeeper.data.Stat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * warped the zookeeper and make it has long-life cycle
  * used session timeout-check and reconnect
  */
-public class LongLiveZookeeper {
+public class LongLiveZookeeper implements IPubSuber {
 
     private static final Log logger = LogFactory.getLog(LongLiveZookeeper.class);
 
@@ -27,9 +31,7 @@ public class LongLiveZookeeper {
 
     private List<String> watchedPaths;
 
-    public LongLiveZookeeper(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public LongLiveZookeeper() {
     }
 
     private void init() {
@@ -66,7 +68,7 @@ public class LongLiveZookeeper {
         }
     }
 
-    public void watchPaths(String[] paths, IConfigChangedListener listener) {
+    public void watch(String[] paths, IPubSubListener listener) {
         try {
             PathWatcher watcher = new PathWatcher(zooKeeper, listener);
             logger.debug("paths :" + paths);
@@ -115,10 +117,10 @@ public class LongLiveZookeeper {
      */
     private static class PathWatcher implements Watcher {
 
-        private ZooKeeper              zooKeeper;
-        private IConfigChangedListener listener;
+        private ZooKeeper       zooKeeper;
+        private IPubSubListener listener;
 
-        public PathWatcher(ZooKeeper zooKeeper, IConfigChangedListener listener) {
+        public PathWatcher(ZooKeeper zooKeeper, IPubSubListener listener) {
             this.zooKeeper = zooKeeper;
             this.listener = listener;
         }
@@ -137,7 +139,10 @@ public class LongLiveZookeeper {
                     case NodeCreated:
                     case NodeDeleted:
                         byte[] data = this.zooKeeper.getData(path, false, null);
-                        this.listener.onChanged(path, data, new ZKEventType(watchedEvent.getType()));
+                        ZKEventType eventType = new ZKEventType(watchedEvent.getType());
+                        Map<String, Object> params = new HashMap<>(1);
+                        params.put("eventType", eventType);
+                        this.listener.onChange(path, data, params);
                         break;
 
                 }
@@ -157,7 +162,7 @@ public class LongLiveZookeeper {
     }
 
 
-    public byte[] getConfig(String path) {
+    public byte[] get(String path) {
         try {
             Stat stat = this.zooKeeper.exists(path, false);
             if (stat == null)
@@ -173,15 +178,12 @@ public class LongLiveZookeeper {
         return new byte[0];
     }
 
-    public void setConfig(String path, byte[] newData, boolean ifNotThenCreate) {
+    public void publish(String path, byte[] newData) {
         try {
             logger.info("[setConfig] path is : " + path);
             Stat stat = this.zooKeeper.exists(path, false);
             if (stat == null) {
-                if (ifNotThenCreate)
-                    this.zooKeeper.create(path, newData, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-                else
-                    throw new IllegalStateException(" the path : " + path + "is not exists!");
+                this.zooKeeper.create(path, newData, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             } else {
                 int version = stat.getVersion();
                 this.zooKeeper.setData(path, newData, version);
@@ -197,6 +199,22 @@ public class LongLiveZookeeper {
         Stat stat = this.zooKeeper.exists(path, false);
         if (stat == null)
             this.zooKeeper.create(path, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
 }

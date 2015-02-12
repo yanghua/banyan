@@ -24,8 +24,8 @@ public class SyncConsumeTemplate {
 
     public static void main(String[] args) {
         Messagebus client = Messagebus.createClient(appId);
-        client.setZkHost(host);
-        client.setZkPort(port);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
         IConsumer consumer = null;
         try {

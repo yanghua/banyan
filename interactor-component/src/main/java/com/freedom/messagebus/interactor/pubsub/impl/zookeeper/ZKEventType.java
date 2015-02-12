@@ -1,4 +1,4 @@
-package com.freedom.messagebus.interactor.zookeeper;
+package com.freedom.messagebus.interactor.pubsub.impl.zookeeper;
 
 import org.apache.zookeeper.Watcher;
 

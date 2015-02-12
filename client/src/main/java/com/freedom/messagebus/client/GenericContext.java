@@ -2,7 +2,6 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
-import com.freedom.messagebus.interactor.zookeeper.LongLiveZookeeper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -11,8 +10,7 @@ import com.rabbitmq.client.Connection;
  * and those object that it owns resource that must be destroyed
  */
 public class GenericContext {
-    
-    private LongLiveZookeeper     zooKeeper;
+
     private ConfigManager         configManager;
     private AbstractPool<Channel> pool;
     private Connection            connection;
@@ -20,16 +18,6 @@ public class GenericContext {
 
     public GenericContext() {
     }
-
-
-    public LongLiveZookeeper getZooKeeper() {
-        return zooKeeper;
-    }
-
-    public void setZooKeeper(LongLiveZookeeper zooKeeper) {
-        this.zooKeeper = zooKeeper;
-    }
-
 
     public ConfigManager getConfigManager() {
         return configManager;

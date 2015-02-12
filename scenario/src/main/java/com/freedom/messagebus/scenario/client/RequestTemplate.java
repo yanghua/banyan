@@ -17,8 +17,8 @@ public class RequestTemplate {
 
     public static void main(String[] args) {
         Messagebus messagebus = Messagebus.createClient(appId);
-        messagebus.setZkHost(host);
-        messagebus.setZkPort(port);
+        messagebus.setPubsuberHost(host);
+        messagebus.setPubsuberPort(port);
 
         String queueName = "crm";
 

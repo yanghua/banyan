@@ -24,8 +24,8 @@ public class ConsumeTestCase extends Benchmark {
 
         private BasicConsume() {
             client = Messagebus.createClient(TestConfigConstant.APP_KEY);
-            client.setZkHost(TestConfigConstant.HOST);
-            client.setZkPort(TestConfigConstant.PORT);
+            client.setPubsuberHost(TestConfigConstant.HOST);
+            client.setPubsuberPort(TestConfigConstant.PORT);
         }
 
         @Override
