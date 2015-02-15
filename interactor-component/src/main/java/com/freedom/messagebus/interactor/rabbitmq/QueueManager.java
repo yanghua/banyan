@@ -110,7 +110,7 @@ public class QueueManager extends AbstractInitializer {
         super.init();
         boolean result = true;
         try {
-            AMQP.Queue.DeclareOk declareOk = this.channel.queueDeclarePassive(queueName);
+            this.channel.queueDeclarePassive(queueName);
         } catch (IOException e) {
             result = false;
         }
@@ -129,7 +129,7 @@ public class QueueManager extends AbstractInitializer {
     private boolean innerExists(String queueName, Channel outerChannel) {
         boolean result = true;
         try {
-            AMQP.Queue.DeclareOk declareOk = outerChannel.queueDeclarePassive(queueName);
+            outerChannel.queueDeclarePassive(queueName);
         } catch (IOException e) {
             result = false;
         }

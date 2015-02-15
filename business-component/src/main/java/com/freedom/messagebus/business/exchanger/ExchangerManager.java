@@ -1,6 +1,6 @@
 package com.freedom.messagebus.business.exchanger;
 
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import com.freedom.messagebus.interactor.pubsub.IPubSubListener;
 import com.freedom.messagebus.interactor.pubsub.IPubSuber;
@@ -52,7 +52,7 @@ public class ExchangerManager {
         registry = new ConcurrentHashMap<>();
 
         //add external path
-        this.channels.add(CONSTS.PUBSUB_AUTH_CHANNEL);
+        this.channels.add(Constants.PUBSUB_AUTH_CHANNEL);
 
         watchPubSuber();
     }

@@ -6,11 +6,10 @@ import com.freedom.messagebus.business.model.Config;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.business.model.ReceivePermission;
 import com.freedom.messagebus.business.model.SendPermission;
-import com.freedom.messagebus.client.core.classLoader.RemoteClassLoader;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -37,7 +36,7 @@ public class ConfigManager implements IExchangerListener {
 
     private boolean inited = false;
     private static volatile ConfigManager instance;
-    private volatile String serverState = CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED;
+    private volatile String serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
 
@@ -273,28 +272,6 @@ public class ConfigManager implements IExchangerListener {
         this.exchangeManager = exchangeManager;
     }
 
-    @Deprecated
-    public void updateHandlerChain(String path, byte[] data) {
-        //TODO:test
-        String binaryname = "com.freedom.messagebus.client.handler.produce.MessageSizeValidator";
-        RemoteClassLoader rcl = new RemoteClassLoader(data);
-        AbstractHandler remoteHandler = null;
-        try {
-            Class clazz = rcl.loadClass(binaryname);
-            remoteHandler = (AbstractHandler) clazz.newInstance();
-
-            //add new handler
-            this.produceHandlerChain.add(2, remoteHandler);
-        } catch (ClassNotFoundException e) {
-            logger.error("[updateHandlerChain] occurs a ClassNotFoundException : " + e.getMessage());
-        } catch (InstantiationException e) {
-            logger.error("[updateHandlerChain] occurs a InstantiationException : " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            logger.error("[updateHandlerChain] occurs a IllegalAccessException : " + e.getMessage());
-        }
-
-    }
-
     public synchronized String getServerState() {
         return serverState;
     }
@@ -467,28 +444,28 @@ public class ConfigManager implements IExchangerListener {
     public void onChannelDataChanged(String path, Object obj) {
         logger.debug("** [onChannelDataChanged] ** received change from path : " + path);
         switch (path) {
-            case CONSTS.PUBSUB_ROUTER_CHANNEL: {
+            case Constants.PUBSUB_ROUTER_CHANNEL: {
                 this.extractDifferentNodes((Node[]) obj);
             }
             break;
 
-            case CONSTS.PUBSUB_CONFIG_CHANNEL: {
+            case Constants.PUBSUB_CONFIG_CHANNEL: {
                 this.extractClientConfigs((Config[]) obj);
             }
             break;
 
-            case CONSTS.PUBSUB_EVENT_CHANNEL: {
+            case Constants.PUBSUB_EVENT_CHANNEL: {
                 logger.debug("received event value : " + obj.toString());
                 this.setServerState(obj.toString());
             }
             break;
 
-            case CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL: {
+            case Constants.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL: {
                 this.processSendPermission((SendPermission[]) obj);
             }
             break;
 
-            case CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL: {
+            case Constants.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL: {
                 this.processReceivePermission((ReceivePermission[]) obj);
             }
             break;
@@ -515,7 +492,7 @@ public class ConfigManager implements IExchangerListener {
         this.parseSendPermission();
         this.parseReceivePermission();
         //parse event
-        Object tmp = this.getExchangeManager().downloadWithChannel(CONSTS.PUBSUB_EVENT_CHANNEL);
+        Object tmp = this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_EVENT_CHANNEL);
         if (tmp != null) {
             String serverState = tmp.toString();
             this.setServerState(serverState);
@@ -529,7 +506,7 @@ public class ConfigManager implements IExchangerListener {
 
         try {
             Node[] nodes = (Node[]) this.getExchangeManager().
-                downloadWithChannel(CONSTS.PUBSUB_ROUTER_CHANNEL);
+                downloadWithChannel(Constants.PUBSUB_ROUTER_CHANNEL);
             this.extractDifferentNodes(nodes);
         } catch (IOException e) {
             logger.error("[parseRouterInfo] occurs a IOException : " + e.getMessage());
@@ -543,7 +520,7 @@ public class ConfigManager implements IExchangerListener {
 
         try {
             Config[] configs = (Config[]) this.getExchangeManager()
-                                              .downloadWithChannel(CONSTS.PUBSUB_CONFIG_CHANNEL);
+                                              .downloadWithChannel(Constants.PUBSUB_CONFIG_CHANNEL);
             this.extractClientConfigs(configs);
         } catch (IOException e) {
             logger.error("[parseConfigInfo] occurs a IOException : " + e.getMessage());
@@ -554,7 +531,7 @@ public class ConfigManager implements IExchangerListener {
     public synchronized void parseSendPermission() throws MalformedURLException {
         try {
             SendPermission[] sendPermissions = (SendPermission[]) this.getExchangeManager().downloadWithChannel(
-                CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL);
+                Constants.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL);
             this.processSendPermission(sendPermissions);
         } catch (IOException e) {
             logger.error("[parseSendPermission] occurs a IOException : " + e.getMessage());
@@ -564,7 +541,7 @@ public class ConfigManager implements IExchangerListener {
     public synchronized void parseReceivePermission() throws MalformedURLException {
         try {
             ReceivePermission[] receivePermissions = (ReceivePermission[]) this.getExchangeManager().
-                downloadWithChannel(CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL);
+                downloadWithChannel(Constants.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL);
 
             this.processReceivePermission(receivePermissions);
         } catch (IOException e) {

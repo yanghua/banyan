@@ -23,7 +23,7 @@ public class LongLiveZookeeper implements IPubSuber {
 
     private static final Log logger = LogFactory.getLog(LongLiveZookeeper.class);
 
-    private static CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch latch = new CountDownLatch(1);
 
     private ZooKeeper zooKeeper;
     private String    host;
@@ -71,7 +71,6 @@ public class LongLiveZookeeper implements IPubSuber {
     public void watch(String[] paths, IPubSubListener listener) {
         try {
             PathWatcher watcher = new PathWatcher(zooKeeper, listener);
-            logger.debug("paths :" + paths);
             logger.debug("zooKeeper : " + zooKeeper);
 
             for (String path : paths) {
@@ -100,7 +99,7 @@ public class LongLiveZookeeper implements IPubSuber {
     private class SessionWatcher implements Watcher {
 
         @Override
-        public void process(WatchedEvent watchedEvent) {
+        public synchronized void process(WatchedEvent watchedEvent) {
             if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
                 if (latch != null) {
                     latch.countDown();
@@ -143,6 +142,9 @@ public class LongLiveZookeeper implements IPubSuber {
                         Map<String, Object> params = new HashMap<>(1);
                         params.put("eventType", eventType);
                         this.listener.onChange(path, data, params);
+                        break;
+
+                    default:
                         break;
 
                 }

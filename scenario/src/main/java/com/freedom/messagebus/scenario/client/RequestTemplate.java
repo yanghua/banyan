@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.model.QueueMessage;
+import com.freedom.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,7 +29,7 @@ public class RequestTemplate {
         msg.getMessageHeader().setContentEncoding("utf-8");
 
         QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-        body.setContent("test".getBytes());
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
         msg.setMessageBody(body);
 
         Message respMsg = null;

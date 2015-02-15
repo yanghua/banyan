@@ -1,12 +1,14 @@
 package com.freedom.messagebus.common;
 
+import java.nio.charset.Charset;
+
 /**
  * User: yanghua
  * Date: 6/29/14
  * Time: 9:11 PM
  * Copyright (c) 2013 yanghua. All rights reserved.
  */
-public class CONSTS {
+public class Constants {
 
     public static final Byte[] EMPTY_BYTE_ARRAY = new Byte[0];
 
@@ -26,10 +28,12 @@ public class CONSTS {
 
 
     public static final String PROXY_EXCHANGE_NAME      = "exchange.proxy";
-    public static       String DEFAULT_FILE_QUEUE_NAME  = "queue.proxy.log.file";
-    public static       String PUBSUB_ROUTING_KEY       = "routingkey.proxy.message.pubsub.#";
-    public static       String PUBSUB_QUEUE_NAME_SUFFIX = "-pubsub";
+    public static final String DEFAULT_FILE_QUEUE_NAME  = "queue.proxy.log.file";
+    public static final String PUBSUB_ROUTING_KEY       = "routingkey.proxy.message.pubsub.#";
+    public static final String PUBSUB_QUEUE_NAME_SUFFIX = "-pubsub";
 
-    public static long DEFAULT_DATACENTER_ID_FOR_UUID = 00001L;
+    public static final Charset CHARSET_OF_UTF8 = Charset.forName("UTF-8");
+
+    public static final long DEFAULT_DATACENTER_ID_FOR_UUID = 00001L;
 
 }

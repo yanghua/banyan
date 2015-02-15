@@ -4,7 +4,7 @@ import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 
 /**
  * abstract class of message carryer
@@ -31,7 +31,7 @@ public abstract class AbstractMessageCarryer {
      */
     public void carry(MessageContext context) {
         //check server state
-        if (ConfigManager.getInstance().getServerState().equals(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED)) {
+        if (ConfigManager.getInstance().getServerState().equals(Constants.MESSAGEBUS_SERVER_EVENT_STARTED)) {
             IHandlerChain handlerChain = new MessageCarryHandlerChain(carryType, this.getContext());
             handlerChain.handle(context);
         } else {

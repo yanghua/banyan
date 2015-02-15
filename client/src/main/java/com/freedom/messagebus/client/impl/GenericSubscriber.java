@@ -3,7 +3,7 @@ package com.freedom.messagebus.client.impl;
 import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,8 +64,8 @@ public class GenericSubscriber extends AbstractMessageCarryer implements ISubscr
     private void preProcessSubQueueNames(List<String> subQueueNames) {
         for (int i = 0; i < subQueueNames.size(); i++) {
             String subQueueName = subQueueNames.get(i);
-            if (subQueueName.endsWith(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX))
-                subQueueNames.set(i, subQueueName.replaceAll(CONSTS.PUBSUB_QUEUE_NAME_SUFFIX, ""));
+            if (subQueueName.endsWith(Constants.PUBSUB_QUEUE_NAME_SUFFIX))
+                subQueueNames.set(i, subQueueName.replaceAll(Constants.PUBSUB_QUEUE_NAME_SUFFIX, ""));
         }
     }
 

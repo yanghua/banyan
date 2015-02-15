@@ -7,6 +7,7 @@ import com.freedom.messagebus.client.message.model.BroadcastMessage;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.common.Constants;
 
 public class BroadcastTemplate {
 
@@ -22,7 +23,7 @@ public class BroadcastTemplate {
         msg.getMessageHeader().setContentEncoding("utf-8");
 
         BroadcastMessage.BroadcastMessageBody body = new BroadcastMessage.BroadcastMessageBody();
-        body.setContent("test".getBytes());
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
         msg.setMessageBody(body);
 
         Messagebus client = Messagebus.createClient(appId);

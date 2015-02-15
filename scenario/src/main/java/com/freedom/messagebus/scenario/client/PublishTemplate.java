@@ -7,6 +7,7 @@ import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.model.PubSubMessage;
+import com.freedom.messagebus.common.Constants;
 
 public class PublishTemplate {
 
@@ -21,7 +22,7 @@ public class PublishTemplate {
         msg.getMessageHeader().setContentEncoding("utf-8");
 
         PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
-        body.setContent("test".getBytes());
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
         msg.setMessageBody(body);
 
         Messagebus client = Messagebus.createClient(appId);

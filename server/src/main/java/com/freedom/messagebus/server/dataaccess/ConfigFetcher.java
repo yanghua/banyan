@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.Config;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,14 +26,12 @@ public class ConfigFetcher implements IDataFetcher {
     @Override
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<Config> configs = new ArrayList<>();
-        Connection connection = null;
 
-        try {
-            connection = this.dbAccessor.getConnection();
+        String sql = "SELECT * FROM CONFIG ";
 
-            String sql = "SELECT * FROM CONFIG ";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet rs = statement.executeQuery();
+        try (Connection connection = this.dbAccessor.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
                 Config config = new Config();
@@ -42,10 +41,8 @@ public class ConfigFetcher implements IDataFetcher {
                 configs.add(config);
             }
         } catch (SQLException e) {
-            logger.error("[getAllConfigs] occurs a SQLException : " + e.getMessage());
-        } finally {
-            if (connection != null)
-                this.dbAccessor.closeConnection(connection);
+            ExceptionHelper.logException(logger, e, "fetchData");
+            throw new RuntimeException(e);
         }
 
         if (configs.isEmpty()) {

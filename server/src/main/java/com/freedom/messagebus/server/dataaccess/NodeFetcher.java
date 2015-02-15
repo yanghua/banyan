@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.Node;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,14 +27,11 @@ public class NodeFetcher implements IDataFetcher {
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<Node> nodes = new ArrayList<>();
 
-        Connection connection = null;
+        String sql = "SELECT * FROM NODE ORDER BY parentId ASC ";
 
-        try {
-            connection = this.dbAccessor.getConnection();
-
-            String sql = "SELECT * FROM NODE ORDER BY parentId ASC ";
+        try (Connection connection = this.dbAccessor.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet rs = statement.executeQuery();
+             ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
                 Node node = new Node();
@@ -52,10 +50,8 @@ public class NodeFetcher implements IDataFetcher {
                 nodes.add(node);
             }
         } catch (SQLException e) {
-            logger.error("[getAllSortedNodes] occurs SQLException : " + e.getMessage());
-        } finally {
-            if (connection != null)
-                this.dbAccessor.closeConnection(connection);
+            ExceptionHelper.logException(logger, e, "fetchData");
+            throw new RuntimeException(e);
         }
 
         if (nodes.isEmpty()) {

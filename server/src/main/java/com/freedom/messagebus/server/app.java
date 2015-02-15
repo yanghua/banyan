@@ -4,9 +4,8 @@ import com.freedom.messagebus.business.exchanger.ExchangerManager;
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.common.ExceptionHelper;
-import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.bootstrap.ConfigurationLoader;
 import com.freedom.messagebus.server.bootstrap.PubSuberInitializer;
 import com.freedom.messagebus.server.bootstrap.RabbitmqInitializer;
@@ -40,14 +39,17 @@ public class App {
 
         Map<String, String> argMap = extractRunArgs(args);
 
-        if (argMap.containsKey(Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH))
-            PropertyConfigurator.configure(argMap.get(Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH));
-        else if (Files.exists(Paths.get(DEFAULT_SERVER_LOG4J_PROPERTY_PATH)))
+        if (argMap.containsKey(
+            com.freedom.messagebus.server.Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH)) {
+            PropertyConfigurator.configure(
+                argMap.get(com.freedom.messagebus.server.Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH));
+        } else if (Files.exists(Paths.get(DEFAULT_SERVER_LOG4J_PROPERTY_PATH))) {
             PropertyConfigurator.configure(DEFAULT_SERVER_LOG4J_PROPERTY_PATH);
+        }
 
-        prepareEnv(argMap.get(Constants.KEY_ARG_CONFIG_FILE_PATH));
+        prepareEnv(argMap.get(com.freedom.messagebus.server.Constants.KEY_ARG_CONFIG_FILE_PATH));
 
-        String cmd = argMap.get(Constants.KEY_ARG_COMMAND);
+        String cmd = argMap.get(com.freedom.messagebus.server.Constants.KEY_ARG_COMMAND);
         invokeCommand(cmd, argMap);
     }
 
@@ -92,7 +94,7 @@ public class App {
 
 
         App app = new App();
-        broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STARTED, app);
+        broadcastEvent(Constants.MESSAGEBUS_SERVER_EVENT_STARTED, app);
 
         //load and start daemon service
         logger.debug("** daemon service : ServiceLoader **");
@@ -113,7 +115,7 @@ public class App {
 
     public static void stop() {
         App app = new App();
-        broadcastEvent(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
+        broadcastEvent(Constants.MESSAGEBUS_SERVER_EVENT_STOPPED, app);
         destroy(null);
     }
 
@@ -157,8 +159,8 @@ public class App {
         config = configurationLoader.getConfigProperties();
 
         //init pubsuber
-        String pubsuberHost = config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
-        int pubsuberPort = Integer.parseInt(config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
+        String pubsuberHost = config.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
+        int pubsuberPort = Integer.parseInt(config.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
         globalExchangeManager = new ExchangerManager(pubsuberHost, pubsuberPort);
     }
@@ -191,7 +193,7 @@ public class App {
 
     private static Map<String, Object> buildContext(Properties serverConfig) {
         Map<String, Object> context = new ConcurrentHashMap<>();
-        context.put(Constants.KEY_SERVER_CONFIG, serverConfig);
+        context.put(com.freedom.messagebus.server.Constants.KEY_SERVER_CONFIG, serverConfig);
 
         DBAccessor dbAccessor = new DBAccessor(serverConfig);
         Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<>();
@@ -202,31 +204,31 @@ public class App {
 
         globalExchangeManager.setTableDataFetcherMap(tableDataFetcherMap);
 
-        context.put(Constants.GLOBAL_EXCHANGE_MANAGER, globalExchangeManager);
+        context.put(com.freedom.messagebus.server.Constants.GLOBAL_EXCHANGE_MANAGER, globalExchangeManager);
 
         return context;
     }
 
     private static void buildCommonClient(Map<String, Object> context) throws MessagebusConnectedFailedException {
-        Properties serverConfig = (Properties) context.get(Constants.KEY_SERVER_CONFIG);
+        Properties serverConfig = (Properties) context.get(com.freedom.messagebus.server.Constants.KEY_SERVER_CONFIG);
         //message bus client
-        String appId = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_APP_ID);
+        String appId = serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_APP_ID);
         Messagebus commonClient = Messagebus.createClient(appId);
 
-        String pubsuberHost = serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
-        int pubsuberPort = Integer.parseInt(serverConfig.getProperty(Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
+        String pubsuberHost = serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
+        int pubsuberPort = Integer.parseInt(serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
         commonClient.setPubsuberHost(pubsuberHost);
         commonClient.setPubsuberPort(pubsuberPort);
         commonClient.open();
 
-        context.put(Constants.GLOBAL_CLIENT_OBJECT, commonClient);
+        context.put(com.freedom.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT, commonClient);
     }
 
     private static void destroy(Map<String, Object> context) {
-        if (context != null && context.containsKey(Constants.GLOBAL_CLIENT_OBJECT)
-            && context.get(Constants.GLOBAL_CLIENT_OBJECT) != null) {
-            Messagebus client = (Messagebus) context.get(Constants.GLOBAL_CLIENT_OBJECT);
+        if (context != null && context.containsKey(com.freedom.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT)
+            && context.get(com.freedom.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT) != null) {
+            Messagebus client = (Messagebus) context.get(com.freedom.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT);
             if (client.isOpen())
                 client.close();
         }
@@ -236,7 +238,7 @@ public class App {
         try {
             synchronized (lockObj) {
                 logger.debug("broadcast event : " + eventTypeStr);
-                globalExchangeManager.uploadWithChannel(CONSTS.PUBSUB_EVENT_CHANNEL, eventTypeStr.getBytes());
+                globalExchangeManager.uploadWithChannel(Constants.PUBSUB_EVENT_CHANNEL, eventTypeStr.getBytes());
             }
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "[broadcastEvent]");

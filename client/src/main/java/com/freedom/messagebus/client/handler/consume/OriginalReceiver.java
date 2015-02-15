@@ -11,6 +11,7 @@ import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
@@ -26,7 +27,6 @@ import java.io.IOException;
 public class OriginalReceiver extends AbstractHandler {
 
     private static final Log logger = LogFactory.getLog(OriginalReceiver.class);
-
 
     /**
      * the main process method all sub class must implement
@@ -46,9 +46,13 @@ public class OriginalReceiver extends AbstractHandler {
             context.setReceiveEventLoop(eventLoop);
 
             //repeat current handler
-            ((MessageCarryHandlerChain) chain).setEnableRepeatBeforeNextHandler(true);
-
-            eventLoop.startEventLoop();
+            if (chain instanceof MessageCarryHandlerChain) {
+                MessageCarryHandlerChain realChain = (MessageCarryHandlerChain) chain;
+                realChain.setEnableRepeatBeforeNextHandler(true);
+                eventLoop.startEventLoop();
+            } else {
+                throw new RuntimeException("the type of chain's instance is not MessageCarryHandlerChain");
+            }
         } else {
             chain.handle(context);
         }
@@ -56,17 +60,11 @@ public class OriginalReceiver extends AbstractHandler {
 
     public static class ReceiveEventLoop implements Runnable {
 
-
-        private QueueingConsumer currentConsumer;
-
-
+        private QueueingConsumer  currentConsumer;
         private IChannelDestroyer channelDestroyer;
-
-        private MessageContext context;
-
-        private IHandlerChain chain;
-
-        private Thread currentThread;
+        private MessageContext    context;
+        private IHandlerChain     chain;
+        private Thread            currentThread;
 
         private ReceiveEventLoop() {
             this.currentThread = new Thread(this);
@@ -104,14 +102,11 @@ public class OriginalReceiver extends AbstractHandler {
                 }
             } catch (InterruptedException e) {
                 logger.info("[run] close the consumer's message handler!");
-            } catch (IOException e) {
-                logger.error("[run] occurs a IOException : " + e.getMessage());
-                this.shutdown();
-            } catch (ConsumerCancelledException e) {
-                logger.info("[run] the consumer has been canceled ");
+            } catch (IOException | ConsumerCancelledException e) {
+                ExceptionHelper.logException(logger, e, "run");
                 this.shutdown();
             } catch (Exception e) {
-                logger.error("[run] occurs a Exception : " + e.getMessage());
+                ExceptionHelper.logException(logger, e, "run");
                 this.shutdown();
             }
 
@@ -171,7 +166,6 @@ public class OriginalReceiver extends AbstractHandler {
         public void setContext(MessageContext context) {
             this.context = context;
         }
-
 
         public IHandlerChain getChain() {
             return chain;

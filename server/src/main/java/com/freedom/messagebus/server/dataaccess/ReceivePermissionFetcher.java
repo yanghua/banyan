@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.ReceivePermission;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,15 +27,11 @@ public class ReceivePermissionFetcher implements IDataFetcher {
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<ReceivePermission> receivePermissions = new ArrayList<>();
 
-        Connection connection = null;
+        String sql = "SELECT * FROM RECEIVE_PERMISSION ";
 
-        try {
-            connection = this.dbAccessor.getConnection();
-
-            String sql = "SELECT * FROM RECEIVE_PERMISSION ";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet rs = statement.executeQuery();
-
+        try (Connection connection = this.dbAccessor.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 ReceivePermission receivePermission = new ReceivePermission();
                 receivePermission.setTargetId(rs.getInt("targetId"));
@@ -42,10 +39,9 @@ public class ReceivePermissionFetcher implements IDataFetcher {
 
                 receivePermissions.add(receivePermission);
             }
-
         } catch (SQLException e) {
-            if (connection != null)
-                this.dbAccessor.closeConnection(connection);
+            ExceptionHelper.logException(logger, e, "fetchData");
+            throw new RuntimeException(e);
         }
 
         ReceivePermission[] receivePermissionArr = receivePermissions.toArray(new ReceivePermission[receivePermissions.size()]);

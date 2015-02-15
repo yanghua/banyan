@@ -6,7 +6,7 @@ import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
@@ -45,7 +45,7 @@ public class OriginalProduceTestCase extends Benchmark {
                 byte[] msgBodyOfBytes = msgBodyProcessor.box(msg.getMessageBody());
                 AMQP.BasicProperties header = MessageHeaderTransfer.box(msg.getMessageHeader());
                 while (flag) {
-                    ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
+                    ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                           this.channel,
                                           this.getRoutingkey(),
                                           msgBodyOfBytes,

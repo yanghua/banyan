@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class ReceivePermission implements Serializable {
 
+    private static final long serialVersionUID = 6665895459121648194L;
+
     private int targetId;
     private int grantId;
 

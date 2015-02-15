@@ -1,10 +1,12 @@
 package com.freedom.messagebus.interactor.pubsub.impl.zookeeper;
 
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Created by yanghua on 2/11/15.
@@ -15,26 +17,16 @@ public class ZookeeperDataConverter implements IDataConverter {
 
     @Override
     public <T> byte[] serialize(Serializable obj) {
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
-        byte[] bytes = new byte[0];
-        try {
-            baos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(baos);
+        byte[] bytes;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)){
             oos.writeObject(obj);
             oos.flush();
 
             bytes = baos.toByteArray();
         } catch (IOException e) {
-            logger.error("occurs a IOException : " + e.toString());
-            throw new RuntimeException(e.toString());
-        } finally {
-            try {
-                if (baos != null) baos.close();
-                if (oos != null) oos.close();
-            } catch (IOException e) {
-                logger.error("occurs a IOException : " + e.toString());
-            }
+            ExceptionHelper.logException(logger, e, "serialize");
+            throw new RuntimeException(e);
         }
 
         return bytes;
@@ -50,7 +42,7 @@ public class ZookeeperDataConverter implements IDataConverter {
     @Override
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
         if (clazz.equals(String.class)) {
-            String tmp = new String(originalData);
+            String tmp = new String(originalData, Charset.defaultCharset());
             return (T) tmp;
         }
 

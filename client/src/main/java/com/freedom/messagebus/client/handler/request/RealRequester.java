@@ -7,7 +7,7 @@ import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -32,7 +32,7 @@ public class RealRequester extends AbstractHandler {
         byte[] msgBody = msgBodyProcessor.box(reqMsg.getMessageBody());
         AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg.getMessageHeader());
         try {
-            ProxyProducer.produceWithTX(CONSTS.PROXY_EXCHANGE_NAME,
+            ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                         context.getChannel(),
                                         context.getTargetNode().getRoutingKey(),
                                         msgBody,

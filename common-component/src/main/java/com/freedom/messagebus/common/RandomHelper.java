@@ -32,6 +32,9 @@ public class RandomHelper {
                     data = randdata.nextInt(26) + 97;
                     sb.append((char) data);
                     break;
+
+                default:
+                    break;
             }
         }
 

@@ -6,6 +6,8 @@ import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,30 +20,27 @@ public class TestUtility {
     public static void writeFile(String fileName, long[] xArr, long[] yArr) {
         String filePath = String.format(TestConfigConstant.OUTPUT_FILE_PATH_FORMAT, fileName);
 
-        PrintWriter out = null;
-
+        File dataFile = new File(filePath);
         try {
-            logger.info(filePath);
-            File dataFile = new File(filePath);
-            if (!dataFile.exists()) {
-                dataFile.createNewFile();
+            if (!dataFile.exists() && (!dataFile.createNewFile())) {
+                throw new RuntimeException("create new file at : " + filePath + " , failure.");
             }
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "writeFile");
+            throw new RuntimeException(e);
+        }
 
-            out = new PrintWriter(new FileWriter(filePath));
+        try (FileWriter fileWriter = new FileWriter(filePath);
+             PrintWriter out = new PrintWriter(fileWriter)) {
             out.println("#x y");
 
             for (int i = 0; i < xArr.length; i++) {
                 out.println(xArr[i] + " " + yArr[i]);
             }
-
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (null != out) {
-                out.close();
-            }
+            ExceptionHelper.logException(logger, e, "writeFile");
+            throw new RuntimeException(e);
         }
-
     }
 
     public static void exec(String[] cmds, boolean hasOutput) {
@@ -49,20 +48,25 @@ public class TestUtility {
             return;
         }
 
-        try {
-            Process process = Runtime.getRuntime().exec(cmds);
-            if (hasOutput) {
-                InputStreamReader ir = new InputStreamReader(process.getInputStream());
-                LineNumberReader input = new LineNumberReader(ir);
+        if (hasOutput) {
+            Process process = null;
+            try {
+                process = Runtime.getRuntime().exec(cmds);
+            } catch (IOException e) {
+                ExceptionHelper.logException(logger, e, "exec");
+                throw new RuntimeException(e.toString());
+            }
+
+            try (InputStreamReader ir = new InputStreamReader(process.getInputStream());
+                 LineNumberReader input = new LineNumberReader(ir)) {
                 String line;
                 while ((line = input.readLine()) != null)
                     System.out.println(line);
+            } catch (IOException e) {
+                ExceptionHelper.logException(logger, e, "exec");
+                throw new RuntimeException(e.toString());
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
     }
 
     public static void produce(long total) {

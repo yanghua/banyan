@@ -35,7 +35,7 @@ public class QueueAction extends BaseAction {
         List<Node> nodeList = null;
 
         try {
-            offset = Integer.valueOf(req.getParameter("jtStartIndex"));
+            offset = Integer.parseInt(req.getParameter("jtStartIndex"));
             pageSize = Integer.parseInt(req.getParameter("jtPageSize"));
 
             nodeList = nodeService.getWithType(Constants.QUEUE_TYPE, offset, pageSize);

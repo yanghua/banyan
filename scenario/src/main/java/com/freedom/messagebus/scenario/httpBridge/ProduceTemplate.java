@@ -1,6 +1,7 @@
 package com.freedom.messagebus.scenario.httpBridge;
 
 import com.freedom.messagebus.client.message.model.*;
+import com.freedom.messagebus.common.Constants;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +42,7 @@ public class ProduceTemplate {
         msg.getMessageHeader().setReplyTo(testQueue);
 
         QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-        body.setContent("test".getBytes());
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
         msg.setMessageBody(body);
 
         List<Message> msgs = new ArrayList<>(1);

@@ -138,7 +138,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
     private boolean queueExists(String queueName) throws IOException {
         boolean result = true;
         try {
-            AMQP.Queue.DeclareOk declareOk = channel.queueDeclarePassive(queueName);
+            channel.queueDeclarePassive(queueName);
         } catch (IOException e) {
             result = false;
             if (!channel.isOpen()) {

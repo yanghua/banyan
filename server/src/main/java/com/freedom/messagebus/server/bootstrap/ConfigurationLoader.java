@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigurationLoader {
@@ -38,7 +39,9 @@ public class ConfigurationLoader {
             filePathStr = DEFAULT_CONFIG_FILE_PATH;
 
         this.configProperties = new Properties();
-        this.configProperties.load(new FileInputStream(filePathStr));
+        try(InputStream fileIS = new FileInputStream(filePathStr)) {
+            this.configProperties.load(fileIS);
+        }
     }
 
     public String getConfigFilePathStr() {

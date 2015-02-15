@@ -5,7 +5,7 @@ import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.HandlerModel;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.common.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +26,7 @@ public class MessageIdGenerator extends AbstractHandler {
     public void handle(MessageContext context, IHandlerChain chain) {
         Message[] msgs = context.getMessages();
         for (Message msg : msgs) {
-            UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), CONSTS.DEFAULT_DATACENTER_ID_FOR_UUID);
+            UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), Constants.DEFAULT_DATACENTER_ID_FOR_UUID);
             logger.debug("message id is : " + generator.nextId());
             msg.getMessageHeader().setMessageId(generator.nextId());
         }

@@ -7,7 +7,7 @@ import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -37,7 +37,7 @@ public class RealProducer extends AbstractHandler {
                     IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());
                     byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
                     AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
-                    ProxyProducer.produceWithTX(CONSTS.PROXY_EXCHANGE_NAME,
+                    ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                                 context.getChannel(),
                                                 context.getTargetNode().getRoutingKey(),
                                                 msgBody,
@@ -49,7 +49,7 @@ public class RealProducer extends AbstractHandler {
                     byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
                     AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
 
-                    ProxyProducer.produce(CONSTS.PROXY_EXCHANGE_NAME,
+                    ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                           context.getChannel(),
                                           context.getTargetNode().getRoutingKey(),
                                           msgBody,

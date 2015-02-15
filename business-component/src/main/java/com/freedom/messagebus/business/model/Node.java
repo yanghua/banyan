@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * representation a node of the topology
  */
-public class Node implements Serializable, Comparable<Node> {
+public class Node implements Serializable {
 
     private int     nodeId;
     private String  name;
@@ -108,16 +108,6 @@ public class Node implements Serializable, Comparable<Node> {
 
     public void setInner(boolean inner) {
         this.inner = inner;
-    }
-
-    @Override
-    public int compareTo(Node o) {
-        if (this.nodeId == o.getNodeId())
-            return 0;
-        else if (this.nodeId < o.getNodeId())
-            return -1;
-        else
-            return 1;
     }
 
     @Override

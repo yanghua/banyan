@@ -255,6 +255,8 @@ public class NodeServiceImpl extends MessagebusService implements INodeService {
                     data = randdata.nextInt(26) + 97;
                     sb.append((char) data);
                     break;
+                default:break;
+
             }
         }
 

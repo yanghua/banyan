@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -28,18 +29,18 @@ public class RedisDataConverter implements IDataConverter {
             tmp = gson.toJson(obj);
         }
 
-        return tmp.getBytes();
+        return tmp.getBytes(Charset.defaultCharset());
     }
 
     @Override
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
-        String jsonStr = new String(originalData);
+        String jsonStr = new String(originalData, Charset.defaultCharset());
         return gson.fromJson(jsonStr, clazz);
     }
 
     @Override
     public <T> T[] deSerializeArray(byte[] originalData, Class<T[]> clazz) {
-        String jsonStr = new String(originalData);
+        String jsonStr = new String(originalData, Charset.defaultCharset());
         return gson.fromJson(jsonStr, clazz);
     }
 }

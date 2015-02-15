@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class SendPermission implements Serializable {
 
+    private static final long serialVersionUID = -557146967365693606L;
+
     private int targetId;
     private int grantId;
 
@@ -12,7 +14,6 @@ public class SendPermission implements Serializable {
 
     public SendPermission() {
     }
-
 
     public int getTargetId() {
         return targetId;

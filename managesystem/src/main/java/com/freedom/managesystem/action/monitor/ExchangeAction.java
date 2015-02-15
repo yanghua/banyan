@@ -39,15 +39,11 @@ public class ExchangeAction extends BaseAction {
 
     public void test() {
         HttpServletResponse response = ServletActionContext.getResponse();
-        PrintWriter writer = null;
-        try {
-            writer = response.getWriter();
+        try (PrintWriter writer = response.getWriter();) {
             writer.print(exchangeService.list());
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            writer.flush();
-            writer.close();
         }
     }
 

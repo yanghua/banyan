@@ -7,7 +7,7 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -76,12 +76,12 @@ public class Messagebus {
         this.configManager = ConfigManager.getInstance();
         this.configManager.setExchangeManager(this.exchangeManager);
         this.exchangeManager.registerWithMultiChannels(this.appId, this.configManager, new String[]{
-            CONSTS.PUBSUB_ROUTER_CHANNEL,
-            CONSTS.PUBSUB_CONFIG_CHANNEL,
-            CONSTS.PUBSUB_EVENT_CHANNEL,
-            CONSTS.PUBSUB_AUTH_CHANNEL,
-            CONSTS.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL,
-            CONSTS.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL
+            Constants.PUBSUB_ROUTER_CHANNEL,
+            Constants.PUBSUB_CONFIG_CHANNEL,
+            Constants.PUBSUB_EVENT_CHANNEL,
+            Constants.PUBSUB_AUTH_CHANNEL,
+            Constants.PUBSUB_AUTH_SEND_PERMISSION_CHANNEL,
+            Constants.PUBSUB_AUTH_RECEIVE_PERMISSION_CHANNEL
         });
 
         try {

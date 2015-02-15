@@ -7,11 +7,12 @@ import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.model.QueueMessage;
+import com.freedom.messagebus.common.Constants;
 
 public class ProduceTemplate {
 
     private static final String appId = "6vifQNkw225U6dS8cI92rS2eS1o7ZehQ";     //ucp
-    private static final String host  = "172.16.206.30";
+    private static final String host  = "127.0.0.1";
     private static final int    port  = 6379;
 
     /**
@@ -29,7 +30,7 @@ public class ProduceTemplate {
         msg.getMessageHeader().setContentEncoding("utf-8");
 
         QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-        body.setContent("test".getBytes());
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         msg.setMessageBody(body);
 

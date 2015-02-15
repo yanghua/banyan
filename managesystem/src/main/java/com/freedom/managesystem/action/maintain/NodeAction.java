@@ -30,7 +30,6 @@ public class NodeAction extends BaseAction {
     public String index() {
         super.index();
         ServletActionContext.getRequest().setAttribute("pageName", "maintain/node/node");
-//        nodeList = nodeService.getAll();
         return "index";
     }
 
@@ -141,7 +140,6 @@ public class NodeAction extends BaseAction {
     }
 
     public void parentNodeInfo() throws IOException {
-        HttpServletRequest req = ServletActionContext.getRequest();
         HttpServletResponse resp = ServletActionContext.getResponse();
         List<Node> parentNodes = nodeService.getAll();
         DropdownlistModel[] parentNodeList = new DropdownlistModel[parentNodes.size()];

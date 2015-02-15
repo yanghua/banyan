@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+import java.nio.charset.Charset;
+
 /**
  * long live redis
  */
@@ -66,12 +68,12 @@ public class LongLiveRedis implements IPubSuber {
     public void publish(String channel, byte[] data) {
         //because redis do not store data when publishing
         //so we should store the data and use the channel name as the key
-        jedis.set(channel.getBytes(), data);
-        jedis.publish(channel.getBytes(), data);
+        jedis.set(channel.getBytes(Charset.defaultCharset()), data);
+        jedis.publish(channel.getBytes(Charset.defaultCharset()), data);
     }
 
     public byte[] get(String channel) {
-        return jedis.get(channel.getBytes());
+        return jedis.get(channel.getBytes(Charset.defaultCharset()));
     }
 
     public void open() {
@@ -106,7 +108,7 @@ public class LongLiveRedis implements IPubSuber {
                 realPubSuber = new JedisPubSub() {
                     @Override
                     public void onMessage(String channel, String message) {
-                        getListener().onChange(channel, message.getBytes(), null);
+                        getListener().onChange(channel, message.getBytes(Charset.defaultCharset()), null);
                     }
                 };
 

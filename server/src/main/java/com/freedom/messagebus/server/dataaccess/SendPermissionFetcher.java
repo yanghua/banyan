@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.dataaccess;
 
 import com.freedom.messagebus.business.exchanger.IDataFetcher;
 import com.freedom.messagebus.business.model.SendPermission;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,14 +27,11 @@ public class SendPermissionFetcher implements IDataFetcher {
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<SendPermission> sendPermissions = new ArrayList<>();
 
-        Connection connection = null;
+        String sql = "SELECT * FROM SEND_PERMISSION ";
 
-        try {
-            connection = this.dbAccessor.getConnection();
-            String sql = "SELECT * FROM SEND_PERMISSION ";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet rs = statement.executeQuery();
-
+        try (Connection connection = this.dbAccessor.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()){
             while (rs.next()) {
                 SendPermission sendPermission = new SendPermission();
                 sendPermission.setTargetId(rs.getInt("targetId"));
@@ -42,10 +40,8 @@ public class SendPermissionFetcher implements IDataFetcher {
                 sendPermissions.add(sendPermission);
             }
         } catch (SQLException e) {
-            logger.error("[fetchData] occurs a SQLException : " + e.getMessage());
-        } finally {
-            if (connection != null)
-                dbAccessor.closeConnection(connection);
+            ExceptionHelper.logException(logger, e, "fetchData");
+            throw new RuntimeException(e);
         }
 
         SendPermission[] sendPermissionArr = sendPermissions.toArray(new SendPermission[sendPermissions.size()]);

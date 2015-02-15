@@ -1,12 +1,12 @@
 package com.freedom.messagebus.business.exchanger.impl;
 
 import com.freedom.messagebus.business.exchanger.Exchanger;
-import com.freedom.messagebus.common.CONSTS;
+import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.pubsub.IPubSuber;
 
 import java.io.IOException;
 
-@Exchanger(table = "EVENT", path = CONSTS.PUBSUB_EVENT_CHANNEL)
+@Exchanger(table = "EVENT", path = Constants.PUBSUB_EVENT_CHANNEL)
 public class EventExchanger extends AbstractExchanger {
 
     public EventExchanger(IPubSuber pubsuber, String channel) {
@@ -17,7 +17,7 @@ public class EventExchanger extends AbstractExchanger {
     public void upload() throws IOException {
         //it will be call when message bus initialization,
         //so here just init with "stoped"
-        this.upload(CONSTS.MESSAGEBUS_SERVER_EVENT_STOPPED.getBytes());
+        this.upload(Constants.MESSAGEBUS_SERVER_EVENT_STOPPED.getBytes(Constants.CHARSET_OF_UTF8));
     }
 
     @Override

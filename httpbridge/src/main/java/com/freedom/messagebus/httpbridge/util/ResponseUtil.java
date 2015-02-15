@@ -3,6 +3,7 @@ package com.freedom.messagebus.httpbridge.util;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 
 public class ResponseUtil {
 
@@ -18,7 +19,7 @@ public class ResponseUtil {
             " \"msg\" : \"" + msg + "\", " +
             " \"data\" : " + data +
             "}";
-        response.setContentLength(responseStr.getBytes().length);
+        response.setContentLength(responseStr.getBytes(Charset.defaultCharset()).length);
         PrintWriter writer = response.getWriter();
         writer.write(responseStr);
         writer.flush();
