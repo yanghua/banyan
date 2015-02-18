@@ -17,8 +17,8 @@ public class ConsumeTestCase extends Benchmark {
 
     private static class BasicConsume implements Runnable, ITerminater, IFetcher {
 
-        private Messagebus client;
-        private IConsumer  consumer;
+        private Messagebus    client;
+        private AsyncConsumer asyncConsumer;
         private final Object lockObj = new Object();
         private       long   counter = 0;
 
@@ -36,34 +36,31 @@ public class ConsumeTestCase extends Benchmark {
         @Override
         public void terminate() {
             logger.info("closing test task ....");
-            synchronized (lockObj) {
-                lockObj.notifyAll();
+            if (asyncConsumer != null) {
+                asyncConsumer.shutdown();
             }
         }
 
         @Override
         public void run() {
-            IReceiverCloser closer = null;
             try {
                 client.open();
-                consumer = client.getConsumer();
 
                 synchronized (lockObj) {
-                    closer = consumer.consume(TestConfigConstant.QUEUE_NAME, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                            ++counter;
-                        }
-                    });
+                    asyncConsumer = client.getAsyncConsumer(
+                        TestConfigConstant.QUEUE_NAME,
+                        new IMessageReceiveListener() {
+                            @Override
+                            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                                ++counter;
+                            }
+                        });
 
                     lockObj.wait(0);
                 }
-            } catch (MessagebusConnectedFailedException | MessagebusUnOpenException |
-                IOException | InterruptedException e) {
+            } catch (MessagebusConnectedFailedException | MessagebusUnOpenException | InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                if (closer != null)
-                    closer.close();
                 if (client != null)
                     client.close();
             }

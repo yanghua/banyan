@@ -178,14 +178,21 @@ public class Messagebus {
         return producer;
     }
 
-    public synchronized IConsumer getConsumer() throws MessagebusUnOpenException {
+    public AsyncConsumer getAsyncConsumer(String appName, IMessageReceiveListener onMessage) {
         if (!this.isOpen())
             throw new MessagebusUnOpenException
                 ("Illegal State: please call Messagebus#open() first!");
 
-        return consumer;
+        return new AsyncConsumer(appName, onMessage, consumer);
     }
 
+    public SyncConsumer getSyncConsumer() {
+        if (!this.isOpen())
+            throw new MessagebusUnOpenException
+                ("Illegal State: please call Messagebus#open() first!");
+
+        return new SyncConsumer(consumer);
+    }
 
     public synchronized IRequester getRequester() throws MessagebusUnOpenException {
         if (!this.isOpen())

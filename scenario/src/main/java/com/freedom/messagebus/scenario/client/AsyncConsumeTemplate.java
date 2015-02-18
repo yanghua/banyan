@@ -1,11 +1,11 @@
 package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.*;
+import com.freedom.messagebus.client.AsyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,78 +17,46 @@ import java.util.concurrent.TimeUnit;
 public class AsyncConsumeTemplate {
 
     private static final Log    logger = LogFactory.getLog(AsyncConsumeTemplate.class);
-    private static final String appid  = "LAJFOWFALSKDJFALLKAJSDFLKSDFJLWKJ";
+    private static final String appid  = "djB5l1n7PbFsszF5817JOon2895El1KP";
 
-    private static final String host = "172.16.206.30";
-    private static final int    port = 2181;
+    private static final String host = "127.0.0.1";
+    private static final int    port = 6379;
 
     public static void main(String[] args) {
-        ConsumerService service = new ConsumerService();
+        asyncConsume();
+    }
 
-        //launch!!!
-        service.start();
+    private static void asyncConsume() {
+        Messagebus client = Messagebus.createClient(appid);
+        //set zookeeper info
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
-        //blocking main-thread for seeing effect
         try {
-            TimeUnit.SECONDS.sleep(60);
+            client.open();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        }
+
+        String appName = "erp";
+        AsyncConsumer asyncConsumer = client.getAsyncConsumer(appName, new IMessageReceiveListener() {
+            @Override
+            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                logger.info("[" + message.getMessageHeader().getMessageId() +
+                                "]-[" + message.getMessageHeader().getType() + "]");
+            }
+        });
+
+        asyncConsumer.startup();
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        //stop the daemon server
-        service.stopService();
-    }
-
-    public static class ConsumerService extends Thread {
-
-        Messagebus client = Messagebus.createClient(appid);
-
-        String          appName        = "file";
-        IReceiverCloser consumerCloser = null;
-        private final Object lockObj = new Object();
-
-        @Override
-        public void run() {
-            try {
-                synchronized (lockObj) {
-                    //set zookeeper info
-                    client.setPubsuberHost(host);
-                    client.setPubsuberPort(port);
-
-                    client.open();
-                    IConsumer consumer = client.getConsumer();
-                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                            logger.info("[" + message.getMessageHeader().getMessageId() +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
-                        }
-                    });
-
-                    logger.info("blocked for receiving message!");
-                    lockObj.wait(0);
-                    logger.info("released object lock!");
-                }
-            } catch (IOException | MessagebusUnOpenException |
-                MessagebusConnectedFailedException | InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                logger.info("close client");
-                if (consumerCloser != null)
-                    consumerCloser.close();
-                client.close();
-            }
-        }
-
-        public void stopService() {
-            //style 1 : use lock released
-            synchronized (lockObj) {
-                lockObj.notifyAll();
-            }
-
-            //style 2 : use interrupt
-//            this.interrupt();
-        }
+        asyncConsumer.shutdown();
+        client.close();
     }
 
 }

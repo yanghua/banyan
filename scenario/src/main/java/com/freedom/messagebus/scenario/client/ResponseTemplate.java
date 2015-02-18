@@ -18,78 +18,45 @@ public class ResponseTemplate {
     private static final int    port = 2181;
 
     public static void main(String[] args) {
-        ResponseService service = new ResponseService();
-
-        //launch!!!
-        service.start();
-
-        //blocking main-thread for seeing effect
-        try {
-            TimeUnit.SECONDS.sleep(60);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        //stop the daemon server
-        service.stopService();
+        responseUsage();
     }
 
-    public static class ResponseService extends Thread {
-
+    private static void responseUsage() {
         Messagebus client = Messagebus.createClient(appid);
 
-        String          appName        = "server";
-        IReceiverCloser consumerCloser = null;
-        private final Object lockObj = new Object();
+        String appName = "server";
 
-        @Override
-        public void run() {
-            try {
-                synchronized (lockObj) {
-                    //set zookeeper info
-                    client.setPubsuberHost(host);
-                    client.setPubsuberPort(port);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
-                    client.open();
-                    IConsumer consumer = client.getConsumer();
-                    final IResponser responser = client.getResponser();
-                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                            //handle message
-                            String msgId = String.valueOf(message.getMessageHeader().getMessageId());
-                            logger.info("[" + msgId +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
+        try {
+            client.open();
+            final IResponser responser = client.getResponser();
 
-                            //send response
-                            responser.responseTmpMessage(message, msgId);
-                        }
-                    });
+            AsyncConsumer asyncConsumer = client.getAsyncConsumer(
+                appName,
+                new IMessageReceiveListener() {
+                    @Override
+                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                        //handle message
+                        String msgId = String.valueOf(message.getMessageHeader().getMessageId());
+                        logger.info("[" + msgId +
+                                        "]-[" + message.getMessageHeader().getType() + "]");
 
-                    logger.info("blocked for receiving message!");
-                    lockObj.wait(0);
-                    logger.info("released object lock!");
-                }
-            } catch (IOException | MessagebusUnOpenException |
-                MessagebusConnectedFailedException | InterruptedException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                logger.info("close client");
-                consumerCloser.close();
-                client.close();
-            }
-        }
+                        //send response
+                        responser.responseTmpMessage(message, msgId);
+                    }
+                });
 
-        public void stopService() {
-            //style 1 : use lock released
-            synchronized (lockObj) {
-                lockObj.notifyAll();
-            }
+            asyncConsumer.startup();
 
-            //style 2 : use interrupt
-//            this.interrupt();
+            TimeUnit.SECONDS.sleep(30);
+
+            asyncConsumer.shutdown();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

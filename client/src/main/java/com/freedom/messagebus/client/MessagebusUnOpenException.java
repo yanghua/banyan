@@ -3,7 +3,7 @@ package com.freedom.messagebus.client;
 /**
  * the exception about messagebus unopened, mostly for semantic
  */
-public class MessagebusUnOpenException extends Exception {
+public class MessagebusUnOpenException extends RuntimeException {
 
     public MessagebusUnOpenException() {
         super();

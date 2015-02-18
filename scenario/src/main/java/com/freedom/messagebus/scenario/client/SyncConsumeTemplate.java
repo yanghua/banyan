@@ -1,9 +1,6 @@
 package com.freedom.messagebus.scenario.client;
 
-import com.freedom.messagebus.client.IConsumer;
-import com.freedom.messagebus.client.Messagebus;
-import com.freedom.messagebus.client.MessagebusConnectedFailedException;
-import com.freedom.messagebus.client.MessagebusUnOpenException;
+import com.freedom.messagebus.client.*;
 import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,24 +24,21 @@ public class SyncConsumeTemplate {
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
-        IConsumer consumer = null;
         try {
             client.open();
-            consumer = client.getConsumer();
+            SyncConsumer syncConsumer = client.getSyncConsumer();
+            List<Message> msgs = syncConsumer.consume(appName, 2);
+
+            client.close();
+
+            for (Message msg : msgs) {
+                logger.info("message id : " + msg.getMessageHeader().getMessageId());
+            }
         } catch (MessagebusConnectedFailedException e) {
             e.printStackTrace();
         } catch (MessagebusUnOpenException e) {
             e.printStackTrace();
         }
-
-        //consume
-        List<Message> msgs = consumer.consume(appName, 2);
-        client.close();
-
-        for (Message msg : msgs) {
-            logger.info("message id : " + msg.getMessageHeader().getMessageId());
-        }
-
     }
 
 }

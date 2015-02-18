@@ -32,7 +32,6 @@ public class GenericConsumer extends AbstractMessageCarryer implements IConsumer
      * (actually, the message receiver is needed to be controlled)
      * @throws IOException
      */
-
     @Override
     public IReceiverCloser consume(String queueName,
                                    IMessageReceiveListener receiveListener) throws IOException {

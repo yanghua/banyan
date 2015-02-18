@@ -8,6 +8,10 @@ import java.io.StringWriter;
 public class ExceptionHelper {
 
     public static String extractStackTrace(Throwable t) {
+        if (t == null) {
+            return "";
+        }
+
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 

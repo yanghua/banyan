@@ -29,6 +29,7 @@ public class CommandService extends AbstractService {
     private QueueMessage     responseMsg;
     private Properties       serverConfig;
     private ExchangerManager exchangeManager;
+    private AsyncConsumer    asyncConsumer;
 
     public CommandService(Map<String, Object> context) {
         super(context);
@@ -54,11 +55,11 @@ public class CommandService extends AbstractService {
 
     @Override
     public void run() {
-        try {
-            synchronized (lockObj) {
-                IConsumer consumer = client.getConsumer();
-                final IResponser responser = client.getResponser();
-                consumerCloser = consumer.consume(Constants.SERVER_QUEUE_NAME, new IMessageReceiveListener() {
+        synchronized (lockObj) {
+            final IResponser responser = client.getResponser();
+            asyncConsumer = client.getAsyncConsumer(
+                Constants.SERVER_QUEUE_NAME,
+                new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message, IReceiverCloser consumerCloser) {
                         String msgId = String.valueOf(message.getMessageHeader().getMessageId());
@@ -103,18 +104,12 @@ public class CommandService extends AbstractService {
                     }
                 });
 
-                logger.debug("blocked for receiving message!");
+            asyncConsumer.startup();
+            try {
                 lockObj.wait(0);
-                logger.debug("released object lock!");
+            } catch (InterruptedException e) {
+                asyncConsumer.shutdown();
             }
-
-        } catch (MessagebusUnOpenException | InterruptedException e) {
-            logger.error("[run] occurs a Exception : " + e.getMessage());
-        } catch (Exception e) {
-            logger.error("[run] occurs a Exception : " + e.getMessage());
-        } finally {
-            logger.info("close sentinel");
-            consumerCloser.close();
         }
     }
 

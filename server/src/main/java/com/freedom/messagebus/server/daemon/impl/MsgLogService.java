@@ -16,8 +16,9 @@ import java.util.Map;
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
 public class MsgLogService extends AbstractService {
 
-    private static final Log logger = LogFactory.getLog("msgLog");
+    private static final Log logger = LogFactory.getLog(MsgLogService.class);
     private Messagebus client;
+    private AsyncConsumer asyncConsumer;
 
     public MsgLogService(Map<String, Object> context) {
         super(context);
@@ -27,29 +28,23 @@ public class MsgLogService extends AbstractService {
 
     @Override
     public void run() {
-        IReceiverCloser closer = null;
         try {
             synchronized (this) {
-                IConsumer consumer = client.getConsumer();
-                closer = consumer.consume(Constants.LOG_OF_FILE_QUEUE_NAME, new IMessageReceiveListener() {
-                    @Override
-                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                        logger.info(formatLog(message.getMessageHeader()));
-                    }
-                });
+                asyncConsumer = client.getAsyncConsumer(
+                    Constants.LOG_OF_FILE_QUEUE_NAME,
+                    new IMessageReceiveListener() {
+                        @Override
+                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                            logger.info(formatLog(message.getMessageHeader()));
 
-                //block all time
-                this.wait(0);
+                        }
+                    });
+
+                asyncConsumer.startup();
+                this.wait();
             }
-        } catch (MessagebusUnOpenException e) {
-            ExceptionHelper.logException(logger, e, "[run]");
-        } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "[run]");
         } catch (InterruptedException e) {
-            logger.info(" consumer closed! ");
-        } finally {
-            if (closer != null)
-                closer.close();
+            asyncConsumer.shutdown();
         }
     }
 

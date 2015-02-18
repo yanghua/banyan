@@ -68,7 +68,7 @@ public class OriginalReceiver extends AbstractHandler {
 
         private ReceiveEventLoop() {
             this.currentThread = new Thread(this);
-            this.currentThread.setDaemon(false);
+            this.currentThread.setDaemon(true);
         }
 
         @Override
@@ -102,9 +102,6 @@ public class OriginalReceiver extends AbstractHandler {
                 }
             } catch (InterruptedException e) {
                 logger.info("[run] close the consumer's message handler!");
-            } catch (IOException | ConsumerCancelledException e) {
-                ExceptionHelper.logException(logger, e, "run");
-                this.shutdown();
             } catch (Exception e) {
                 ExceptionHelper.logException(logger, e, "run");
                 this.shutdown();

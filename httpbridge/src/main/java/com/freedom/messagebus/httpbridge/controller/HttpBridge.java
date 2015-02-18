@@ -215,7 +215,7 @@ public class HttpBridge extends HttpServlet {
                 throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than " +
                                                         Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM);
 
-            IConsumer consumer = messagebus.getConsumer();
+            SyncConsumer consumer = messagebus.getSyncConsumer();
             messages = consumer.consume(queueName, num);
             if (messages == null) {
                 ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
@@ -254,34 +254,32 @@ public class HttpBridge extends HttpServlet {
             @Override
             public void onTimeout(Continuation continuation) {
                 logger.info("[onTimeout] : continuation timeout.");
-                IReceiverCloser closer = (IReceiverCloser) continuation.getAttribute("consumerCloser");
+                AsyncConsumer closer = (AsyncConsumer) continuation.getAttribute("consumerCloser");
                 if (closer != null) {
-                    closer.close();
+                    closer.shutdown();
                 }
             }
         });
 
         try {
-            IConsumer consumer = messagebus.getConsumer();
-            IReceiverCloser consumerCloser = consumer.consume(queueName, new IMessageReceiveListener() {
-                @Override
-                public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                    String msgStr = MessageJSONSerializer.serialize(message);
-                    logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
-                    try {
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
-                    } catch (IOException e) {
-                        logger.error("[consume] occurs a IOException : " + e.getMessage());
-                    } finally {
-                        continuation.complete();
-                        //close consumer
-                        consumerCloser.close();
+            final AsyncConsumer asyncConsumer = messagebus.getAsyncConsumer(
+                queueName, new IMessageReceiveListener() {
+                    @Override
+                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                        String msgStr = MessageJSONSerializer.serialize(message);
+                        logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
+                        try {
+                            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                        } catch (IOException e) {
+                            logger.error("[consume] occurs a IOException : " + e.getMessage());
+                        } finally {
+                            continuation.complete();
+                        }
                     }
-                }
-            });
+                });
 
-            continuation.setAttribute("consumerCloser", consumerCloser);
-        } catch (MessagebusUnOpenException | IOException e) {
+            continuation.setAttribute("consumerCloser", asyncConsumer);
+        } catch (MessagebusUnOpenException e) {
             logger.error("[consume] occurs a Exception : " + e.getMessage());
             continuation.undispatch();
             ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
