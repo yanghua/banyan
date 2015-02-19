@@ -21,8 +21,10 @@ public class AsyncConsumer implements Runnable {
     private IMessageReceiveListener onMessage;
     private String                  appName;
     private IReceiverCloser         consumerCloser;
-    private final Lock      locker  = new ReentrantLock();
-    private final Condition blocker = locker.newCondition();
+
+    private       long      consumeNanosTimeout = 0;
+    private final Lock      locker              = new ReentrantLock();
+    private final Condition blocker             = locker.newCondition();
 
     public AsyncConsumer(String appName,
                          IMessageReceiveListener onMessage,
@@ -34,12 +36,20 @@ public class AsyncConsumer implements Runnable {
         this.consumer = consumer;
     }
 
+    public AsyncConsumer(IConsumer consumer,
+                         IMessageReceiveListener onMessage,
+                         String appName,
+                         long consumeNanosTimeout) {
+        this(appName, onMessage, consumer);
+        this.consumeNanosTimeout = consumeNanosTimeout;
+    }
+
     @Override
     public void run() {
         locker.lock();
         try {
             consumerCloser = this.consumer.consume(this.appName, this.onMessage);
-            blocker.await();
+            blocker.awaitNanos(this.consumeNanosTimeout);
         } catch (InterruptedException e) {
 
         } catch (IOException e) {

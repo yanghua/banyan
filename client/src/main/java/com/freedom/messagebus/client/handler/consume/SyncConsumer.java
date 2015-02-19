@@ -9,6 +9,7 @@ import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
@@ -65,7 +66,7 @@ public class SyncConsumer extends AbstractHandler {
                     consumeMsgs.add(msg);
                 }
             } catch (IOException | RuntimeException e) {
-                logger.error("[handle] occurs a Exception " + e.getMessage());
+                ExceptionHelper.logException(logger, e, "handle");
             } finally {
                 //destroy channel
                 context.getDestroyer().destroy(context.getChannel());
