@@ -12,6 +12,10 @@ public interface IHandlerChain {
      *
      * @param context the message context
      */
-    public abstract void handle(MessageContext context);
+    public void handle(MessageContext context);
+
+    public void startPre();
+
+    public void startPost();
 
 }

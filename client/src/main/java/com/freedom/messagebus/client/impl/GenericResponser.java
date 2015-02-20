@@ -4,14 +4,24 @@ import com.freedom.messagebus.client.AbstractMessageCarryer;
 import com.freedom.messagebus.client.IResponser;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.model.MessageCarryType;
+import com.freedom.messagebus.common.ExceptionHelper;
+import com.freedom.messagebus.interactor.proxy.ProxyProducer;
+import com.rabbitmq.client.AMQP;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
 
 public class GenericResponser extends AbstractMessageCarryer implements IResponser {
 
-    public GenericResponser() {
-        super(MessageCarryType.RESPONSE);
-    }
+    private static final Log logger = LogFactory.getLog(GenericResponser.class);
 
     /**
      * response a temp message to a named queue
@@ -24,15 +34,50 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
         final MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.RESPONSE);
 
-        ctx.setAppId(super.context.getAppId());
+        ctx.setAppId(this.getContext().getAppId());
 
-        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(super.context.getAppId()));
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.getContext().getAppId()));
         ctx.setMessages(new Message[]{msg});
         ctx.setTempQueueName(queueName);
 
-        ctx.setPool(super.context.getPool());
-        ctx.setConnection(super.context.getConnection());
+        ctx.setPool(this.getContext().getPool());
+        ctx.setConnection(this.getContext().getConnection());
 
-        carry(ctx);
+        checkState();
+
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RESPONSE,
+                                                         this.getContext());
+        //launch pre pipeline
+        this.handlerChain.startPre();
+        this.handlerChain.handle(ctx);
+
+        //consume
+        this.genericResponse(ctx, handlerChain);
+
+        //launch post pipeline
+        this.handlerChain.startPost();
+        handlerChain.handle(ctx);
     }
+
+    private void genericResponse(MessageContext context, IHandlerChain chain) {
+        Message responseMsg = context.getMessages()[0];
+        IMessageBodyTransfer msgBodyProcessor =
+            MessageBodyTransferFactory.createMsgBodyProcessor(responseMsg.getMessageType());
+        byte[] msgBody = msgBodyProcessor.box(responseMsg.getMessageBody());
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(responseMsg.getMessageHeader());
+        try {
+            ProxyProducer.produce("",
+                                  context.getChannel(),
+                                  context.getTempQueueName(),
+                                  msgBody,
+                                  properties);
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "genericResponse");
+            throw new RuntimeException(e);
+        } finally {
+            context.getDestroyer().destroy(context.getChannel());
+        }
+
+    }
+
 }

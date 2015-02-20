@@ -3,7 +3,7 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
-import com.freedom.messagebus.client.handler.consume.OriginalReceiver;
+import com.freedom.messagebus.client.handler.common.ReceiveEventLoop;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
@@ -22,28 +22,28 @@ public class MessageContext {
 
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
-    public  Connection                        connection;
-    private String                            host;
-    private boolean                           isAuthorized;
-    private boolean                           enableTransaction;
-    private String                            appId;
-    private Message[]                         messages;
-    private Message                           consumedMsg;
-    private String                            consumerTag;
-    private MessageCarryType                  carryType;                 //produce or consume
-    private Node                              sourceNode;                //store represent self
-    private Node                              targetNode;                 //store represent current carry node
-    private Channel                           channel;
-    private OriginalReceiver.ReceiveEventLoop receiveEventLoop;
-    private IChannelDestroyer                 destroyer;
-    private IMessageReceiveListener           listener;
-    private AbstractPool<Channel>             pool;
-    private long                              timeout;
-    private boolean                           hasTimeout;
-    private int                               consumeMsgNum;
-    private List<Message>                     consumeMsgs;
-    private String                            tempQueueName;                       //for response
-    private List<String>                      subQueueNames;
+    public  Connection              connection;
+    private String                  host;
+    private boolean                 isAuthorized;
+    private boolean                 enableTransaction;
+    private String                  appId;
+    private Message[]               messages;
+    private Message                 consumedMsg;
+    private String                  consumerTag;
+    private MessageCarryType        carryType;                 //produce or consume
+    private Node                    sourceNode;                //store represent self
+    private Node                    targetNode;                 //store represent current carry node
+    private Channel                 channel;
+    private ReceiveEventLoop        receiveEventLoop;
+    private IChannelDestroyer       destroyer;
+    private IMessageReceiveListener listener;
+    private AbstractPool<Channel>   pool;
+    private long                    timeout;
+    private boolean                 hasTimeout;
+    private int                     consumeMsgNum;
+    private List<Message>           consumeMsgs;
+    private String                  tempQueueName;                       //for response
+    private List<String>            subQueueNames;
     private Map<String, Object> otherParams = new HashMap<String, Object>();
     private boolean             isSync      = false;
 
@@ -103,11 +103,11 @@ public class MessageContext {
     }
 
 
-    public OriginalReceiver.ReceiveEventLoop getReceiveEventLoop() {
+    public ReceiveEventLoop getReceiveEventLoop() {
         return receiveEventLoop;
     }
 
-    public void setReceiveEventLoop(OriginalReceiver.ReceiveEventLoop receiveEventLoop) {
+    public void setReceiveEventLoop(ReceiveEventLoop receiveEventLoop) {
         this.receiveEventLoop = receiveEventLoop;
     }
 

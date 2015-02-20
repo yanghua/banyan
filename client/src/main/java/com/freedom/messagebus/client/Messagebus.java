@@ -7,6 +7,8 @@ import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.core.pool.ChannelFactory;
 import com.freedom.messagebus.client.core.pool.ChannelPool;
 import com.freedom.messagebus.client.core.pool.ChannelPoolConfig;
+import com.freedom.messagebus.client.impl.AsyncConsumer;
+import com.freedom.messagebus.client.impl.SyncConsumer;
 import com.freedom.messagebus.common.Constants;
 import com.google.common.base.Strings;
 import com.rabbitmq.client.Channel;
@@ -29,7 +31,9 @@ public class Messagebus {
 
     private String                appId;
     private IProducer             producer;
-    private IConsumer             consumer;
+    //    private IConsumer             consumer;
+    private AsyncConsumer         asyncConsumer;
+    private SyncConsumer          syncConsumer;
     private IRequester            requester;
     private IResponser            responser;
     private IPublisher            publisher;
@@ -113,9 +117,14 @@ public class Messagebus {
         producer = producerLoader.iterator().next();
         producer.setContext(context);
 
-        ServiceLoader<IConsumer> consumerLoader = ServiceLoader.load(IConsumer.class);
-        consumer = consumerLoader.iterator().next();
-        consumer.setContext(context);
+//        ServiceLoader<IConsumer> consumerLoader = ServiceLoader.load(IConsumer.class);
+//        consumer = consumerLoader.iterator().next();
+//        consumer.setContext(context);
+        asyncConsumer = new AsyncConsumer();
+        asyncConsumer.setContext(context);
+
+        syncConsumer = new SyncConsumer();
+        syncConsumer.setContext(context);
 
         ServiceLoader<IRequester> requestLoader = ServiceLoader.load(IRequester.class);
         requester = requestLoader.iterator().next();
@@ -183,7 +192,10 @@ public class Messagebus {
             throw new MessagebusUnOpenException
                 ("Illegal State: please call Messagebus#open() first!");
 
-        return new AsyncConsumer(appName, onMessage, consumer);
+        asyncConsumer.setAppName(appName);
+        asyncConsumer.setOnMessage(onMessage);
+
+        return asyncConsumer;
     }
 
     public SyncConsumer getSyncConsumer() {
@@ -191,7 +203,7 @@ public class Messagebus {
             throw new MessagebusUnOpenException
                 ("Illegal State: please call Messagebus#open() first!");
 
-        return new SyncConsumer(consumer);
+        return syncConsumer;
     }
 
     public synchronized IRequester getRequester() throws MessagebusUnOpenException {
@@ -201,14 +213,12 @@ public class Messagebus {
         return requester;
     }
 
-
     public synchronized IResponser getResponser() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
         return responser;
     }
-
 
     public synchronized IPublisher getPublisher() throws MessagebusUnOpenException {
         if (!this.isOpen())
@@ -217,14 +227,12 @@ public class Messagebus {
         return publisher;
     }
 
-
     public synchronized ISubscriber getSubscriber() throws MessagebusUnOpenException {
         if (!this.isOpen())
             throw new MessagebusUnOpenException("Illegal State : please call Messagebus#open() first!");
 
         return subscriber;
     }
-
 
     public synchronized IBroadcaster getBroadcaster() throws MessagebusUnOpenException {
         if (!this.isOpen())
@@ -236,7 +244,6 @@ public class Messagebus {
     public boolean isOpen() {
         return this.isOpen.get();
     }
-
 
     public String getPubsuberHost() {
         if (this.pubsuberHost == null || this.pubsuberHost.isEmpty())

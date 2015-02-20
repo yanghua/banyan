@@ -6,14 +6,25 @@ import com.freedom.messagebus.client.IRequester;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
+import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.model.MessageCarryType;
+import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
+import com.freedom.messagebus.interactor.proxy.ProxyProducer;
+import com.rabbitmq.client.AMQP;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
 
 public class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
-    public GenericRequester() {
-        super(MessageCarryType.REQUEST);
-    }
+    private static final Log logger = LogFactory.getLog(GenericRequester.class);
 
     /**
      * send a request and got a response
@@ -28,25 +39,57 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
     public Message request(Message msg,
                            String to,
                            long timeout) throws MessageResponseTimeoutException {
-        final MessageContext cxt = new MessageContext();
-        cxt.setCarryType(MessageCarryType.REQUEST);
-        cxt.setAppId(super.context.getAppId());
+        MessageContext ctx = new MessageContext();
+        ctx.setCarryType(MessageCarryType.REQUEST);
+        ctx.setAppId(this.getContext().getAppId());
 
-        cxt.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.context.getAppId()));
+        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.getContext().getAppId()));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
-        cxt.setTargetNode(node);
-        cxt.setTimeout(timeout);
-        cxt.setMessages(new Message[]{msg});
+        ctx.setTargetNode(node);
+        ctx.setTimeout(timeout);
+        ctx.setMessages(new Message[]{msg});
 
-        cxt.setPool(this.context.getPool());
-        cxt.setConnection(this.context.getConnection());
+        ctx.setPool(this.getContext().getPool());
+        ctx.setConnection(this.getContext().getConnection());
 
-        carry(cxt);
+        checkState();
 
-        if (cxt.isTimeout() || cxt.getConsumedMsg() == null)
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.REQUEST,
+                                                         this.getContext());
+        //launch pre pipeline
+        this.handlerChain.startPre();
+        this.handlerChain.handle(ctx);
+
+        //consume
+        this.genericRequest(ctx, handlerChain);
+
+        //launch post pipeline
+        this.handlerChain.startPost();
+        handlerChain.handle(ctx);
+
+        if (ctx.isTimeout() || ctx.getConsumedMsg() == null)
             throw new MessageResponseTimeoutException("message request time out.");
 
-        return cxt.getConsumedMsg();
+        return ctx.getConsumedMsg();
+    }
+
+    private void genericRequest(MessageContext context, IHandlerChain chain) {
+        Message reqMsg = context.getMessages()[0];
+        IMessageBodyTransfer msgBodyProcessor =
+            MessageBodyTransferFactory.createMsgBodyProcessor(reqMsg.getMessageType());
+        byte[] msgBody = msgBodyProcessor.box(reqMsg.getMessageBody());
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg.getMessageHeader());
+        try {
+            ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
+                                        context.getChannel(),
+                                        context.getTargetNode().getRoutingKey(),
+                                        msgBody,
+                                        properties);
+            chain.handle(context);
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "genericRequest");
+            throw new RuntimeException(e);
+        }
     }
 
 }

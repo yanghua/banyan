@@ -1,7 +1,7 @@
 package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.AsyncConsumer;
+import com.freedom.messagebus.client.impl.AsyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +23,8 @@ public class AsyncConsumeTemplate {
     private static final int    port = 6379;
 
     public static void main(String[] args) {
-        asyncConsume();
+//        asyncConsume();
+        asyncConsumeWithTimeout(10);
     }
 
     private static void asyncConsume() {
@@ -50,7 +51,7 @@ public class AsyncConsumeTemplate {
         asyncConsumer.startup();
 
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -59,4 +60,32 @@ public class AsyncConsumeTemplate {
         client.close();
     }
 
+    private static void asyncConsumeWithTimeout(long seconds) {
+        Messagebus client = Messagebus.createClient(appid);
+        //set zookeeper info
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
+
+        try {
+            client.open();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        }
+
+        String appName = "erp";
+        AsyncConsumer asyncConsumer = client.getAsyncConsumer(appName, new IMessageReceiveListener() {
+            @Override
+            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                logger.info("[" + message.getMessageHeader().getMessageId() +
+                                "]-[" + message.getMessageHeader().getType() + "]");
+            }
+        });
+
+        asyncConsumer.setTimeout(seconds);
+        asyncConsumer.setTimeUnit(TimeUnit.SECONDS);
+
+        asyncConsumer.startup();
+
+        client.close();
+    }
 }

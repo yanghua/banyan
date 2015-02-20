@@ -2,11 +2,11 @@ package com.freedom.messagebus.scenario.client;
 
 
 import com.freedom.messagebus.client.*;
+import com.freedom.messagebus.client.impl.AsyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class ResponseTemplate {

@@ -2,6 +2,7 @@ package com.freedom.messagebus.server.daemon.impl;
 
 import com.freedom.messagebus.business.exchanger.ExchangerManager;
 import com.freedom.messagebus.client.*;
+import com.freedom.messagebus.client.impl.AsyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;

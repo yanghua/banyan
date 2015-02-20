@@ -10,6 +10,7 @@ import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -39,37 +40,50 @@ public class ConfigManager implements IExchangerListener {
     private volatile String serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
+    private List<HandlerModel> preProduceHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postProduceHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> produceHandlerModels;
+    private List<HandlerModel> preConsumeHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postConsumeHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> consumerHandlerModels;
+    private List<HandlerModel> preRequestHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postRequestHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> requestHandlerModels;
+    private List<HandlerModel> preResponseHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postResponseHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> responseHandlerModels;
+    private List<HandlerModel> prePublishHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postPublishHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> publishHandlerModels;
+    private List<HandlerModel> preSubscribeHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postSubscribeHandlerModels = new ArrayList<>();
 
-    private List<HandlerModel> subscribeHandlerModels;
-
-    private List<HandlerModel> broadcastHandlerModels;
+    private List<HandlerModel> preBroadcastHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> postBroadcastHandlerModels = new ArrayList<>();
     //endregion
 
     //region handler instance
 
-    private List<AbstractHandler> produceHandlerChain;
+    private List<AbstractHandler> preProduceHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postProduceHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> consumerHandlerChain;
+    private List<AbstractHandler> preConsumeHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postConsumeHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> requestHandlerChain;
+    private List<AbstractHandler> preRequestHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postRequestHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> responseHandlerChain;
+    private List<AbstractHandler> preResponseHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postResponseHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> publishHandlerChain;
+    private List<AbstractHandler> prePublishHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postPublishHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> subscribeHandlerChain;
+    private List<AbstractHandler> preSubscribeHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postSubscribeHandlerChain = new ArrayList<>();
 
-    private List<AbstractHandler> broadcastHandlerChain;
+    private List<AbstractHandler> preBroadcastHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> postBroadcastHandlerChain = new ArrayList<>();
     //endregion
 
 
@@ -111,31 +125,73 @@ public class ConfigManager implements IExchangerListener {
     private boolean init() {
         try {
             //parse
-            produceHandlerModels = parseHandlers("produce");
-            consumerHandlerModels = parseHandlers("consumer");
-            requestHandlerModels = parseHandlers("request");
-            responseHandlerModels = parseHandlers("response");
-            publishHandlerModels = parseHandlers("publish");
-            subscribeHandlerModels = parseHandlers("subscribe");
-            broadcastHandlerModels = parseHandlers("broadcast");
+            parseHandlers("produce", this.preProduceHandlerModels,
+                          this.postProduceHandlerModels);
+            parseHandlers("consumer", this.preConsumeHandlerModels,
+                          this.postConsumeHandlerModels);
+            parseHandlers("request", this.preRequestHandlerModels,
+                          this.postRequestHandlerModels);
+            parseHandlers("response", this.preResponseHandlerModels,
+                          this.postResponseHandlerModels);
+            parseHandlers("publish", this.prePublishHandlerModels,
+                          this.postPublishHandlerModels);
+            parseHandlers("subscribe", this.preSubscribeHandlerModels,
+                          this.postSubscribeHandlerModels);
+            parseHandlers("broadcast", this.preBroadcastHandlerModels,
+                          this.postBroadcastHandlerModels);
 
             //box
-            produceHandlerChain = initHandlers(MessageCarryType.PRODUCE);
-            consumerHandlerChain = initHandlers(MessageCarryType.CONSUME);
-            requestHandlerChain = initHandlers(MessageCarryType.REQUEST);
-            responseHandlerChain = initHandlers(MessageCarryType.RESPONSE);
-            publishHandlerChain = initHandlers(MessageCarryType.PUBLISH);
-            subscribeHandlerChain = initHandlers(MessageCarryType.SUBSCRIBE);
-            broadcastHandlerChain = initHandlers(MessageCarryType.BROADCAST);
+            initHandlers(this.preProduceHandlerModels,
+                         this.postProduceHandlerModels,
+                         this.preProduceHandlerChain,
+                         this.postProduceHandlerChain);
+            initHandlers(this.preConsumeHandlerModels,
+                         this.postConsumeHandlerModels,
+                         this.preConsumeHandlerChain,
+                         this.postConsumeHandlerChain);
+            initHandlers(this.preRequestHandlerModels,
+                         this.postRequestHandlerModels,
+                         this.preRequestHandlerChain,
+                         this.postRequestHandlerChain);
+            initHandlers(this.preResponseHandlerModels,
+                         this.postResponseHandlerModels,
+                         this.preResponseHandlerChain,
+                         this.postResponseHandlerChain);
+            initHandlers(this.prePublishHandlerModels,
+                         this.postPublishHandlerModels,
+                         this.prePublishHandlerChain,
+                         this.postPublishHandlerChain);
+            initHandlers(this.preSubscribeHandlerModels,
+                         this.postSubscribeHandlerModels,
+                         this.preSubscribeHandlerChain,
+                         this.postSubscribeHandlerChain);
+            initHandlers(this.preBroadcastHandlerModels,
+                         this.postBroadcastHandlerModels,
+                         this.preBroadcastHandlerChain,
+                         this.postBroadcastHandlerChain);
 
             if (logger.isDebugEnabled()) {
-                printHandlerChain(MessageCarryType.PRODUCE);
-                printHandlerChain(MessageCarryType.CONSUME);
-                printHandlerChain(MessageCarryType.REQUEST);
-                printHandlerChain(MessageCarryType.RESPONSE);
-                printHandlerChain(MessageCarryType.PUBLISH);
-                printHandlerChain(MessageCarryType.SUBSCRIBE);
-                printHandlerChain(MessageCarryType.BROADCAST);
+                printHandlerChain(MessageCarryType.PRODUCE,
+                                  this.preProduceHandlerModels,
+                                  this.postProduceHandlerModels);
+                printHandlerChain(MessageCarryType.CONSUME,
+                                  this.preConsumeHandlerModels,
+                                  this.postConsumeHandlerModels);
+                printHandlerChain(MessageCarryType.REQUEST,
+                                  this.preRequestHandlerModels,
+                                  this.postRequestHandlerModels);
+                printHandlerChain(MessageCarryType.RESPONSE,
+                                  this.preResponseHandlerModels,
+                                  this.postResponseHandlerModels);
+                printHandlerChain(MessageCarryType.PUBLISH,
+                                  this.prePublishHandlerModels,
+                                  this.postPublishHandlerModels);
+                printHandlerChain(MessageCarryType.SUBSCRIBE,
+                                  this.preSubscribeHandlerModels,
+                                  this.postSubscribeHandlerModels);
+                printHandlerChain(MessageCarryType.BROADCAST,
+                                  this.preBroadcastHandlerModels,
+                                  this.postBroadcastHandlerModels);
             }
 
             return true;
@@ -147,76 +203,122 @@ public class ConfigManager implements IExchangerListener {
 
     //region handler model
 
-    public List<HandlerModel> getProduceHandlerModels() {
-        return produceHandlerModels;
+    public List<HandlerModel> getPreProduceHandlerModels() {
+        return preProduceHandlerModels;
     }
 
-
-    public List<HandlerModel> getConsumerHandlerModels() {
-        return consumerHandlerModels;
+    public List<HandlerModel> getPreConsumeHandlerModels() {
+        return preConsumeHandlerModels;
     }
 
-
-    public List<HandlerModel> getRequestHandlerModels() {
-        return requestHandlerModels;
+    public List<HandlerModel> getPreRequestHandlerModels() {
+        return preRequestHandlerModels;
     }
 
-
-    public List<HandlerModel> getResponseHandlerModels() {
-        return responseHandlerModels;
+    public List<HandlerModel> getPreResponseHandlerModels() {
+        return preResponseHandlerModels;
     }
 
-
-    public List<HandlerModel> getPublishHandlerModels() {
-        return publishHandlerModels;
+    public List<HandlerModel> getPrePublishHandlerModels() {
+        return prePublishHandlerModels;
     }
 
-
-    public List<HandlerModel> getSubscribeHandlerModels() {
-        return subscribeHandlerModels;
+    public List<HandlerModel> getPreSubscribeHandlerModels() {
+        return preSubscribeHandlerModels;
     }
 
-
-    public List<HandlerModel> getBroadcastHandlerModels() {
-        return broadcastHandlerModels;
+    public List<HandlerModel> getPreBroadcastHandlerModels() {
+        return preBroadcastHandlerModels;
     }
+
+    public List<HandlerModel> getPostProduceHandlerModels() {
+        return postProduceHandlerModels;
+    }
+
+    public List<HandlerModel> getPostConsumeHandlerModels() {
+        return postConsumeHandlerModels;
+    }
+
+    public List<HandlerModel> getPostRequestHandlerModels() {
+        return postRequestHandlerModels;
+    }
+
+    public List<HandlerModel> getPostResponseHandlerModels() {
+        return postResponseHandlerModels;
+    }
+
+    public List<HandlerModel> getPostPublishHandlerModels() {
+        return postPublishHandlerModels;
+    }
+
+    public List<HandlerModel> getPostSubscribeHandlerModels() {
+        return postSubscribeHandlerModels;
+    }
+
+    public List<HandlerModel> getPostBroadcastHandlerModels() {
+        return postBroadcastHandlerModels;
+    }
+
     //endregion
 
     //region handler chain list
 
-    public List<AbstractHandler> getProduceHandlerChain() {
-        return produceHandlerChain;
+    public List<AbstractHandler> getPreProduceHandlerChain() {
+        return preProduceHandlerChain;
     }
 
-
-    public List<AbstractHandler> getConsumerHandlerChain() {
-        return consumerHandlerChain;
+    public List<AbstractHandler> getPreConsumeHandlerChain() {
+        return preConsumeHandlerChain;
     }
 
-
-    public List<AbstractHandler> getRequestHandlerChain() {
-        return requestHandlerChain;
+    public List<AbstractHandler> getPreRequestHandlerChain() {
+        return preRequestHandlerChain;
     }
 
-
-    public List<AbstractHandler> getResponseHandlerChain() {
-        return responseHandlerChain;
+    public List<AbstractHandler> getPreResponseHandlerChain() {
+        return preResponseHandlerChain;
     }
 
-
-    public List<AbstractHandler> getPublishHandlerChain() {
-        return publishHandlerChain;
+    public List<AbstractHandler> getPrePublishHandlerChain() {
+        return prePublishHandlerChain;
     }
 
-
-    public List<AbstractHandler> getSubscribeHandlerChain() {
-        return subscribeHandlerChain;
+    public List<AbstractHandler> getPreSubscribeHandlerChain() {
+        return preSubscribeHandlerChain;
     }
 
-
-    public List<AbstractHandler> getBroadcastHandlerChain() {
-        return broadcastHandlerChain;
+    public List<AbstractHandler> getPreBroadcastHandlerChain() {
+        return preBroadcastHandlerChain;
     }
+
+    public List<AbstractHandler> getPostProduceHandlerChain() {
+        return postProduceHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostConsumeHandlerChain() {
+        return postConsumeHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostRequestHandlerChain() {
+        return postRequestHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostResponseHandlerChain() {
+        return postResponseHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostPublishHandlerChain() {
+        return postPublishHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostSubscribeHandlerChain() {
+        return postSubscribeHandlerChain;
+    }
+
+    public List<AbstractHandler> getPostBroadcastHandlerChain() {
+        return postBroadcastHandlerChain;
+    }
+
     //endregion
 
     //region node map
@@ -281,26 +383,29 @@ public class ConfigManager implements IExchangerListener {
     }
 
 
-    private List<HandlerModel> parseHandlers(String pOrcIdentifier) {
+    private void parseHandlers(String messageCarryTypeStr,
+                               List<HandlerModel> preHandlerModels,
+                               List<HandlerModel> postHandlerModels) {
         SAXReader reader = new SAXReader();
         URL url = ConfigManager.class.getClassLoader().getResource("handler.xml");
         Document doc = null;
-        List<HandlerModel> result = new ArrayList<HandlerModel>();
 
         try {
             doc = reader.read(url);
         } catch (DocumentException e) {
-            logger.error("[parseHandlers] occurs a DocumentException exception");
+            ExceptionHelper.logException(logger, e, "parseHandlers");
+            throw new RuntimeException(e);
         }
         Map<String, String> map = new HashMap<String, String>();
         map.put("ns", "http://com.freedom.messagebus");
-        XPath xPath = doc.createXPath("//ns:handler-plugins/ns:" + pOrcIdentifier + "/ns:handler");
+        XPath xPath = doc.createXPath("//ns:handler-plugins/ns:" + messageCarryTypeStr
+                                          + "/ns:prehandlers" + "/ns:handler");
         xPath.setNamespaceURIs(map);
 
-        List<Element> handlerElements = xPath.selectNodes(doc);
+        List<Element> preHandlerElements = xPath.selectNodes(doc);
 
         //iterate each element
-        for (Element element : handlerElements) {
+        for (Element element : preHandlerElements) {
             xPath = element.createXPath("ns:handler-name");
             xPath.setNamespaceURIs(map);
 
@@ -316,124 +421,75 @@ public class ConfigManager implements IExchangerListener {
             HandlerModel model = new HandlerModel();
             model.setHandlerName(handlerName);
             model.setHandlerPath(handlerPath);
-            result.add(model);
+            preHandlerModels.add(model);
         }
 
-        return result;
+        map.put("ns", "http://com.freedom.messagebus");
+        xPath = doc.createXPath("//ns:handler-plugins/ns:" + messageCarryTypeStr
+                                    + "/ns:posthandlers" + "/ns:handler");
+        xPath.setNamespaceURIs(map);
+
+        List<Element> postHandlerElements = xPath.selectNodes(doc);
+
+        //iterate each element
+        for (Element element : postHandlerElements) {
+            xPath = element.createXPath("ns:handler-name");
+            xPath.setNamespaceURIs(map);
+
+            org.dom4j.Node handlerNameNode = xPath.selectSingleNode(element);
+            String handlerName = handlerNameNode.getStringValue();
+
+            xPath = element.createXPath("ns:handler-path");
+            xPath.setNamespaceURIs(map);
+
+            org.dom4j.Node handlerPathNode = xPath.selectSingleNode(element);
+            String handlerPath = handlerPathNode.getStringValue();
+
+            HandlerModel model = new HandlerModel();
+            model.setHandlerName(handlerName);
+            model.setHandlerPath(handlerPath);
+            postHandlerModels.add(model);
+        }
+
     }
 
 
-    private List<AbstractHandler> initHandlers(MessageCarryType pcEnum) {
-        List<AbstractHandler> handlerChain = new ArrayList<AbstractHandler>();
-        List<HandlerModel> models = null;
-
-        switch (pcEnum) {
-            case PRODUCE:
-                models = produceHandlerModels;
-                break;
-
-            case CONSUME:
-                models = consumerHandlerModels;
-                break;
-
-            case REQUEST:
-                models = requestHandlerModels;
-                break;
-
-            case RESPONSE:
-                models = responseHandlerModels;
-                break;
-
-            case PUBLISH:
-                models = publishHandlerModels;
-                break;
-
-            case SUBSCRIBE:
-                models = subscribeHandlerModels;
-                break;
-
-            case BROADCAST:
-                models = broadcastHandlerModels;
-                break;
-
-            default: {
-                logger.error("[initHandlers] : unknow message handle type");
-                models = new ArrayList<HandlerModel>(0);
-            }
-        }
-
+    private void initHandlers(List<HandlerModel> preHandlerModels,
+                              List<HandlerModel> postHandlerModels,
+                              List<AbstractHandler> preHandlerChain,
+                              List<AbstractHandler> postHandlerChain) {
         try {
-            for (HandlerModel model : models) {
+            for (HandlerModel model : preHandlerModels) {
                 AbstractHandler handler = (AbstractHandler) Class.forName(model.getHandlerPath()).newInstance();
                 handler.init(model);
-                handlerChain.add(handler);
+                preHandlerChain.add(handler);
             }
-        } catch (InstantiationException e) {
-            logger.error("[initHandlers] : occurs a InstantiationException. message : " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            logger.error("[initHandlers] : occurs a IllegalAccessException. message : " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            logger.error("[initHandlers] : occurs a ClassNotFoundException. message : " + e.getMessage());
-        }
 
-        return handlerChain;
+            for (HandlerModel model : postHandlerModels) {
+                AbstractHandler handler = (AbstractHandler) Class.forName(model.getHandlerPath()).newInstance();
+                handler.init(model);
+                postHandlerChain.add(handler);
+            }
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            ExceptionHelper.logException(logger, e, "initHandlers");
+            throw new RuntimeException(e);
+        }
     }
 
-    private void printHandlerChain(MessageCarryType pcEnum) {
-        List<HandlerModel> handlerModels = null;
-        String title = "";
+    private void printHandlerChain(MessageCarryType carryType,
+                                   List<HandlerModel> preHandlerModels,
+                                   List<HandlerModel> postHandlerModels) {
 
-        switch (pcEnum) {
-            case PRODUCE: {
-                handlerModels = produceHandlerModels;
-                title = "produce";
-            }
-            break;
-
-            case CONSUME: {
-                handlerModels = consumerHandlerModels;
-                title = "consume";
-            }
-            break;
-
-            case REQUEST: {
-                handlerModels = requestHandlerModels;
-                title = "request";
-            }
-            break;
-
-            case RESPONSE: {
-                handlerModels = responseHandlerModels;
-                title = "response";
-            }
-            break;
-
-            case PUBLISH: {
-                handlerModels = publishHandlerModels;
-                title = "publish";
-            }
-            break;
-
-            case SUBSCRIBE: {
-                handlerModels = subscribeHandlerModels;
-                title = "subscribe";
-            }
-            break;
-
-            case BROADCAST: {
-                handlerModels = broadcastHandlerModels;
-                title = "broadcast";
-            }
-            break;
-
-            default: {
-                logger.error("unknown message handle type");
-                handlerModels = new ArrayList<HandlerModel>(0);
-            }
+        logger.debug("==============" + carryType.toString() + "=============");
+        logger.debug("==============prehandlers=============");
+        for (HandlerModel model : preHandlerModels) {
+            logger.debug("              " + model.getHandlerName() + "              ");
+            logger.debug("                     ||                     ");
+            logger.debug("                     \\/                     ");
         }
 
-        logger.debug("==============" + title + "=============");
-        for (HandlerModel model : handlerModels) {
+        logger.debug("==============posthandlers=============");
+        for (HandlerModel model : postHandlerModels) {
             logger.debug("              " + model.getHandlerName() + "              ");
             logger.debug("                     ||                     ");
             logger.debug("                     \\/                     ");
@@ -441,9 +497,9 @@ public class ConfigManager implements IExchangerListener {
     }
 
     @Override
-    public void onChannelDataChanged(String path, Object obj) {
-        logger.debug("** [onChannelDataChanged] ** received change from path : " + path);
-        switch (path) {
+    public void onChannelDataChanged(String channel, Object obj) {
+        logger.debug("** [onChannelDataChanged] ** received change from path : " + channel);
+        switch (channel) {
             case Constants.PUBSUB_ROUTER_CHANNEL: {
                 this.extractDifferentNodes((Node[]) obj);
             }
@@ -473,14 +529,86 @@ public class ConfigManager implements IExchangerListener {
     }
 
     public synchronized void destroy() {
-        if (produceHandlerChain != null) {
-            for (AbstractHandler handler : produceHandlerChain) {
+        if (preProduceHandlerChain != null) {
+            for (AbstractHandler handler : preProduceHandlerChain) {
                 handler.destroy();
             }
         }
 
-        if (consumerHandlerChain != null) {
-            for (AbstractHandler handler : consumerHandlerChain) {
+        if (postProduceHandlerChain != null) {
+            for (AbstractHandler handler : postProduceHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (preConsumeHandlerChain != null) {
+            for (AbstractHandler handler : preConsumeHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postConsumeHandlerChain != null) {
+            for (AbstractHandler handler : postConsumeHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (preRequestHandlerChain != null) {
+            for (AbstractHandler handler : preRequestHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postRequestHandlerChain != null) {
+            for (AbstractHandler handler : postRequestHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (preResponseHandlerChain != null) {
+            for (AbstractHandler handler : preResponseHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postResponseHandlerChain != null) {
+            for (AbstractHandler handler : postResponseHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (prePublishHandlerChain != null) {
+            for (AbstractHandler handler : prePublishHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postPublishHandlerChain != null) {
+            for (AbstractHandler handler : postPublishHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (preSubscribeHandlerChain != null) {
+            for (AbstractHandler handler : preSubscribeHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postSubscribeHandlerChain != null) {
+            for (AbstractHandler handler : postSubscribeHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (preBroadcastHandlerChain != null) {
+            for (AbstractHandler handler : preBroadcastHandlerChain) {
+                handler.destroy();
+            }
+        }
+
+        if (postBroadcastHandlerChain != null) {
+            for (AbstractHandler handler : postBroadcastHandlerChain) {
                 handler.destroy();
             }
         }

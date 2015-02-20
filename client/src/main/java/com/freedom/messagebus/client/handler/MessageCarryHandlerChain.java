@@ -13,39 +13,50 @@ import java.util.List;
  */
 public class MessageCarryHandlerChain implements IHandlerChain {
 
-    private List<AbstractHandler> handlerChain;
-    private int     pos          = 0;
-    private boolean enableRepeat = false;
-    private int     repeatPos    = -1;
+    private List<AbstractHandler> preHandlerChain;
+    private List<AbstractHandler> postHandlerChain;
+
+    private int prePos  = 0;
+    private int postPos = 0;
+
+    private boolean preing  = false;
+    private boolean posting = false;
 
     public MessageCarryHandlerChain(MessageCarryType type, GenericContext context) {
         switch (type) {
             case PRODUCE:
-                handlerChain = context.getConfigManager().getProduceHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreProduceHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostProduceHandlerChain();
                 break;
 
             case CONSUME:
-                handlerChain = context.getConfigManager().getConsumerHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreConsumeHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostConsumeHandlerChain();
                 break;
 
             case REQUEST:
-                handlerChain = context.getConfigManager().getRequestHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreRequestHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostRequestHandlerChain();
                 break;
 
             case RESPONSE:
-                handlerChain = context.getConfigManager().getResponseHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreResponseHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostResponseHandlerChain();
                 break;
 
             case PUBLISH:
-                handlerChain = context.getConfigManager().getPublishHandlerChain();
+                preHandlerChain = context.getConfigManager().getPrePublishHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostPublishHandlerChain();
                 break;
 
             case SUBSCRIBE:
-                handlerChain = context.getConfigManager().getSubscribeHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreSubscribeHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostSubscribeHandlerChain();
                 break;
 
             case BROADCAST:
-                handlerChain = context.getConfigManager().getBroadcastHandlerChain();
+                preHandlerChain = context.getConfigManager().getPreBroadcastHandlerChain();
+                postHandlerChain = context.getConfigManager().getPostBroadcastHandlerChain();
                 break;
 
             default:
@@ -60,22 +71,29 @@ public class MessageCarryHandlerChain implements IHandlerChain {
      */
     @Override
     public void handle(MessageContext context) {
-        if (this.repeatPos != Integer.MIN_VALUE) {
-            if (this.pos < handlerChain.size()) {
-                AbstractHandler currentHandler = handlerChain.get(pos++);
+        if (this.preing) {
+            if (this.prePos < this.preHandlerChain.size()) {
+                AbstractHandler currentHandler = preHandlerChain.get(prePos++);
                 currentHandler.handle(context, this);
-            } else if (this.enableRepeat) {
-                this.pos = this.repeatPos;
+            }
+        }
+
+        if (this.posting) {
+            if (this.postPos < this.postHandlerChain.size()) {
+                AbstractHandler currentHandler = postHandlerChain.get(postPos++);
+                currentHandler.handle(context, this);
             }
         }
     }
 
-    public void setEnableRepeatBeforeNextHandler(boolean enableRepeat) {
-        this.enableRepeat = enableRepeat;
-        if (this.enableRepeat) {
-            this.repeatPos = this.pos;
-        } else {
-            this.repeatPos = Integer.MIN_VALUE;
-        }
+    public void startPre() {
+        this.preing = true;
+        this.posting = false;
     }
+
+    public void startPost() {
+        this.preing = false;
+        this.posting = true;
+    }
+
 }

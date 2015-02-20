@@ -11,7 +11,7 @@ import com.freedom.messagebus.common.Constants;
 
 public class ProduceTemplate {
 
-    private static final String appId = "6vifQNkw225U6dS8cI92rS2eS1o7ZehQ";     //ucp
+    private static final String appId = "djB5l1n7PbFsszF5817JOon2895El1KP";     //ucp
     private static final String host  = "127.0.0.1";
     private static final int    port  = 6379;
 
