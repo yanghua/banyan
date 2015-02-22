@@ -84,9 +84,6 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
                 }
             } catch (IOException e) {
                 logger.error("[handle] finally block occurs a IOException : " + e.getMessage());
-            } finally {
-                //destroy channel
-                context.getDestroyer().destroy(context.getChannel());
             }
         }
     }

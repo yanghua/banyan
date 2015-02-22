@@ -50,7 +50,7 @@ public class ConsumeTestCase extends Benchmark {
                         TestConfigConstant.QUEUE_NAME,
                         new IMessageReceiveListener() {
                             @Override
-                            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                            public void onMessage(Message message) {
                                 ++counter;
                             }
                         });

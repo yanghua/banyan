@@ -33,7 +33,7 @@ public class MsgLogService extends AbstractService {
                     Constants.LOG_OF_FILE_QUEUE_NAME,
                     new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                        public void onMessage(Message message) {
                             logger.info(formatLog(message.getMessageHeader()));
 
                         }

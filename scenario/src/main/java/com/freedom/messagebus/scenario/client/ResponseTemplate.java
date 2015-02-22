@@ -37,7 +37,7 @@ public class ResponseTemplate {
                 appName,
                 new IMessageReceiveListener() {
                     @Override
-                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                    public void onMessage(Message message) {
                         //handle message
                         String msgId = String.valueOf(message.getMessageHeader().getMessageId());
                         logger.info("[" + msgId +

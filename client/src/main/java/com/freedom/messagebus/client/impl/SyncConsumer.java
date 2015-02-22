@@ -53,16 +53,11 @@ public class SyncConsumer extends AbstractMessageCarryer {
 
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME,
                                                          this.getContext());
-        //launch pre pipeline
-        this.handlerChain.startPre();
+        //launch pipeline
         this.handlerChain.handle(ctx);
 
         //sync consume
         this.syncConsume(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
 
         return ctx.getConsumeMsgs();
     }
@@ -100,11 +95,9 @@ public class SyncConsumer extends AbstractMessageCarryer {
                 initMessage(msg, msgType, properties, msgBody);
                 consumeMsgs.add(msg);
             }
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "handle");
-        } finally {
-            //destroy channel
-            context.getDestroyer().destroy(context.getChannel());
+            throw new RuntimeException(e);
         }
     }
 

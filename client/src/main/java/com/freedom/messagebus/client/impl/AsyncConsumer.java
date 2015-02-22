@@ -7,9 +7,8 @@ import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
-import com.freedom.messagebus.client.handler.common.ReceiveEventLoop;
+import com.freedom.messagebus.client.handler.common.AsyncEventLoop;
 import com.freedom.messagebus.client.model.MessageCarryType;
-import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,10 +62,6 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
 
             this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME,
                                                              this.getContext());
-            //launch pre pipeline
-            this.handlerChain.startPre();
-            this.handlerChain.handle(ctx);
-
             //async consume
             this.asyncConsume(ctx, handlerChain);
 
@@ -78,8 +73,8 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
             }
         } catch (InterruptedException e) {
         } finally {
-            if (ctx.getReceiveEventLoop().isAlive()) {
-                ctx.getReceiveEventLoop().shutdown();
+            if (ctx.getAsyncEventLoop().isAlive()) {
+                ctx.getAsyncEventLoop().shutdown();
             }
 
             eventLocker.unlock();
@@ -144,12 +139,10 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
 
     private void asyncConsume(MessageContext context,
                               IHandlerChain chain) {
-        ReceiveEventLoop eventLoop = new ReceiveEventLoop();
+        AsyncEventLoop eventLoop = new AsyncEventLoop();
         eventLoop.setChain(chain);
         eventLoop.setContext(context);
-        eventLoop.setChannelDestroyer(context.getDestroyer());
-        eventLoop.setCurrentConsumer((QueueingConsumer) context.getOtherParams().get("consumer"));
-        context.setReceiveEventLoop(eventLoop);
+        context.setAsyncEventLoop(eventLoop);
 
         //repeat current handler
         if (chain instanceof MessageCarryHandlerChain) {

@@ -62,7 +62,7 @@ public class CommandService extends AbstractService {
                 Constants.SERVER_QUEUE_NAME,
                 new IMessageReceiveListener() {
                     @Override
-                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                    public void onMessage(Message message) {
                         String msgId = String.valueOf(message.getMessageHeader().getMessageId());
 
                         //check command is ping...

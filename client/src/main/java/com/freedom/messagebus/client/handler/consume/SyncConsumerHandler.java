@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SyncConsumer extends AbstractHandler {
+class SyncConsumerHandler extends AbstractHandler {
 
-    private static final Log logger = LogFactory.getLog(SyncConsumer.class);
+    private static final Log logger = LogFactory.getLog(SyncConsumerHandler.class);
 
     /**
      * the main process method all sub class must implement
@@ -67,9 +67,6 @@ public class SyncConsumer extends AbstractHandler {
                 }
             } catch (IOException | RuntimeException e) {
                 ExceptionHelper.logException(logger, e, "handle");
-            } finally {
-                //destroy channel
-                context.getDestroyer().destroy(context.getChannel());
             }
         }
 

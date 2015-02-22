@@ -1,6 +1,5 @@
 package com.freedom.messagebus.client.handler.common;
 
-import com.freedom.messagebus.client.IChannelDestroyer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.AbstractHandler;
@@ -33,34 +32,31 @@ public class PooledChannelAccessor extends AbstractHandler {
 
         context.setChannel(pool.getResource());
 
-        //set channel destroyer , just return here
-        context.setDestroyer(new IChannelDestroyer() {
-            @Override
-            public void destroy(Channel channel) {
-                //if carry is consume or request then release current consumer
-                if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
-                    if (context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()) {
-                        try {
-                            if (channel.isOpen() && channel.getConnection().isOpen())
-                                channel.basicCancel(context.getConsumerTag());
-                        } catch (IOException e) {
-                            logger.error("[destroy] occurs a IOException : " + e.getMessage());
-                        }
+        try {
+            if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
+                try {
+                    context.getChannel().basicRecover();
+                } catch (IOException e) {
+                    logger.error("[handle] occurs a IOException : " + e.getMessage());
+                }
+            }
+
+            chain.handle(context);
+
+            //return resource
+            //if carry is consume or request then release current consumer
+            if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
+                if (context.getConsumerTag() != null && !context.getConsumerTag().isEmpty()) {
+                    try {
+                        if (context.getChannel().isOpen() && context.getChannel().getConnection().isOpen())
+                            context.getChannel().basicCancel(context.getConsumerTag());
+                    } catch (IOException e) {
+                        logger.error("[destroy] occurs a IOException : " + e.getMessage());
                     }
                 }
-
-                pool.returnResource(channel);
             }
-        });
-
-        if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
-            try {
-                context.getChannel().basicRecover();
-            } catch (IOException e) {
-                logger.error("[handle] occurs a IOException : " + e.getMessage());
-            }
+        } finally {
+            pool.returnResource(context.getChannel());
         }
-
-        chain.handle(context);
     }
 }

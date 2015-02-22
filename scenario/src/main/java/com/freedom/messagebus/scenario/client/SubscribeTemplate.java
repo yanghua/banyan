@@ -54,7 +54,7 @@ public class SubscribeTemplate {
                     ISubscriber subscriber = client.getSubscriber();
                     subscribeManager = subscriber.subscribe(subQueueNames, new IMessageReceiveListener() {
                         @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                        public void onMessage(Message message) {
                             logger.info("[" + message.getMessageHeader().getMessageId() +
                                             "]-[" + message.getMessageHeader().getType() + "]");
                         }

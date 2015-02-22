@@ -36,8 +36,6 @@ public class RealBroadcaster extends AbstractHandler {
             chain.handle(context);
         } catch (IOException e) {
             logger.error("[handle] occurs a IOException : " + e.getMessage());
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
     }
 }

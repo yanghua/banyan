@@ -42,7 +42,7 @@ public class AsyncConsumeTemplate {
         String appName = "erp";
         AsyncConsumer asyncConsumer = client.getAsyncConsumer(appName, new IMessageReceiveListener() {
             @Override
-            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+            public void onMessage(Message message) {
                 logger.info("[" + message.getMessageHeader().getMessageId() +
                                 "]-[" + message.getMessageHeader().getType() + "]");
             }
@@ -75,7 +75,7 @@ public class AsyncConsumeTemplate {
         String appName = "erp";
         AsyncConsumer asyncConsumer = client.getAsyncConsumer(appName, new IMessageReceiveListener() {
             @Override
-            public void onMessage(Message message, IReceiverCloser consumerCloser) {
+            public void onMessage(Message message) {
                 logger.info("[" + message.getMessageHeader().getMessageId() +
                                 "]-[" + message.getMessageHeader().getType() + "]");
             }

@@ -13,50 +13,38 @@ import java.util.List;
  */
 public class MessageCarryHandlerChain implements IHandlerChain {
 
-    private List<AbstractHandler> preHandlerChain;
-    private List<AbstractHandler> postHandlerChain;
+    private List<AbstractHandler> handlerChain;
 
-    private int prePos  = 0;
-    private int postPos = 0;
-
-    private boolean preing  = false;
-    private boolean posting = false;
+    private int pos = 0;
 
     public MessageCarryHandlerChain(MessageCarryType type, GenericContext context) {
         switch (type) {
             case PRODUCE:
-                preHandlerChain = context.getConfigManager().getPreProduceHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostProduceHandlerChain();
+                handlerChain = context.getConfigManager().getProduceHandlerChain();
                 break;
 
             case CONSUME:
-                preHandlerChain = context.getConfigManager().getPreConsumeHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostConsumeHandlerChain();
+                handlerChain = context.getConfigManager().getConsumeHandlerChain();
                 break;
 
             case REQUEST:
-                preHandlerChain = context.getConfigManager().getPreRequestHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostRequestHandlerChain();
+                handlerChain = context.getConfigManager().getRequestHandlerChain();
                 break;
 
             case RESPONSE:
-                preHandlerChain = context.getConfigManager().getPreResponseHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostResponseHandlerChain();
+                handlerChain = context.getConfigManager().getResponseHandlerChain();
                 break;
 
             case PUBLISH:
-                preHandlerChain = context.getConfigManager().getPrePublishHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostPublishHandlerChain();
+                handlerChain = context.getConfigManager().getPublishHandlerChain();
                 break;
 
             case SUBSCRIBE:
-                preHandlerChain = context.getConfigManager().getPreSubscribeHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostSubscribeHandlerChain();
+                handlerChain = context.getConfigManager().getSubscribeHandlerChain();
                 break;
 
             case BROADCAST:
-                preHandlerChain = context.getConfigManager().getPreBroadcastHandlerChain();
-                postHandlerChain = context.getConfigManager().getPostBroadcastHandlerChain();
+                handlerChain = context.getConfigManager().getBroadcastHandlerChain();
                 break;
 
             default:
@@ -71,29 +59,10 @@ public class MessageCarryHandlerChain implements IHandlerChain {
      */
     @Override
     public void handle(MessageContext context) {
-        if (this.preing) {
-            if (this.prePos < this.preHandlerChain.size()) {
-                AbstractHandler currentHandler = preHandlerChain.get(prePos++);
-                currentHandler.handle(context, this);
-            }
+        if (this.pos < this.handlerChain.size()) {
+            AbstractHandler currentHandler = handlerChain.get(pos++);
+            currentHandler.handle(context, this);
         }
-
-        if (this.posting) {
-            if (this.postPos < this.postHandlerChain.size()) {
-                AbstractHandler currentHandler = postHandlerChain.get(postPos++);
-                currentHandler.handle(context, this);
-            }
-        }
-    }
-
-    public void startPre() {
-        this.preing = true;
-        this.posting = false;
-    }
-
-    public void startPost() {
-        this.preing = false;
-        this.posting = true;
     }
 
 }

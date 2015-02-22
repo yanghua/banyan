@@ -267,7 +267,7 @@ public class HttpBridge extends HttpServlet {
             final AsyncConsumer asyncConsumer = messagebus.getAsyncConsumer(
                 queueName, new IMessageReceiveListener() {
                     @Override
-                    public void onMessage(Message message, IReceiverCloser consumerCloser) {
+                    public void onMessage(Message message) {
                         String msgStr = MessageJSONSerializer.serialize(message);
                         logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
                         try {

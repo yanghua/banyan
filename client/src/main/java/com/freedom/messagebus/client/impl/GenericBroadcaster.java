@@ -38,16 +38,11 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
 
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.BROADCAST,
                                                          this.getContext());
-        //launch pre pipeline
-        this.handlerChain.startPre();
+        //launch pipeline
         this.handlerChain.handle(ctx);
 
         //consume
         this.genericBroadcast(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
     }
 
     private void genericBroadcast(MessageContext context, IHandlerChain chain) {
@@ -66,8 +61,6 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
             chain.handle(context);
         } catch (IOException e) {
             logger.error("[handle] occurs a IOException : " + e.getMessage());
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
     }
 

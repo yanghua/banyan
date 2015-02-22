@@ -9,6 +9,7 @@ import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.model.HandlerModel;
 import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -41,9 +42,8 @@ public class RealPublisher extends AbstractHandler {
 
             chain.handle(context);
         } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
+            ExceptionHelper.logException(logger, e, "handle");
+            throw new RuntimeException(e);
         }
     }
 

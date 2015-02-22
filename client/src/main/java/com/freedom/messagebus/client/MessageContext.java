@@ -3,7 +3,7 @@ package com.freedom.messagebus.client;
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.core.pool.AbstractPool;
-import com.freedom.messagebus.client.handler.common.ReceiveEventLoop;
+import com.freedom.messagebus.client.handler.common.AsyncEventLoop;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
@@ -34,8 +34,8 @@ public class MessageContext {
     private Node                    sourceNode;                //store represent self
     private Node                    targetNode;                 //store represent current carry node
     private Channel                 channel;
-    private ReceiveEventLoop        receiveEventLoop;
-    private IChannelDestroyer       destroyer;
+    private AsyncEventLoop          asyncEventLoop;
+    //    private IChannelDestroyer       destroyer;
     private IMessageReceiveListener listener;
     private AbstractPool<Channel>   pool;
     private long                    timeout;
@@ -103,12 +103,12 @@ public class MessageContext {
     }
 
 
-    public ReceiveEventLoop getReceiveEventLoop() {
-        return receiveEventLoop;
+    public AsyncEventLoop getAsyncEventLoop() {
+        return asyncEventLoop;
     }
 
-    public void setReceiveEventLoop(ReceiveEventLoop receiveEventLoop) {
-        this.receiveEventLoop = receiveEventLoop;
+    public void setAsyncEventLoop(AsyncEventLoop asyncEventLoop) {
+        this.asyncEventLoop = asyncEventLoop;
     }
 
 
@@ -143,22 +143,12 @@ public class MessageContext {
         return otherParams;
     }
 
-
     public String getAppId() {
         return appId;
     }
 
     public void setAppId(String appId) {
         this.appId = appId;
-    }
-
-
-    public IChannelDestroyer getDestroyer() {
-        return destroyer;
-    }
-
-    public void setDestroyer(IChannelDestroyer destroyer) {
-        this.destroyer = destroyer;
     }
 
     public Message getConsumedMsg() {

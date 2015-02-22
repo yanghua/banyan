@@ -1,10 +1,8 @@
 package com.freedom.messagebus.client.handler.common;
 
-import com.freedom.messagebus.client.IChannelDestroyer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,32 +41,32 @@ public class SingleChannelAccessor extends AbstractHandler {
     @Override
     public void handle(MessageContext context,
                        IHandlerChain chain) {
-        this.init(context);
-        if (!this.isInited) {
-            logger.error("[handle]: the [init] method invoked failed.");
-        }
-
-        context.setChannel(this.channel);
-        context.setDestroyer(new IChannelDestroyer() {
-            @Override
-            public void destroy(Channel channel) {
-                try {
-                    if (channel.isOpen())
-                        channel.close();
-                } catch (IOException e) {
-                    logger.error("[destroy] occurs a IOException : " + e.getMessage());
-                }
-            }
-        });
-
-        if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
-            try {
-                context.getChannel().basicRecover();
-            } catch (IOException e) {
-                logger.error("[handle] occurs a IOException : " + e.getMessage());
-            }
-        }
-
-        chain.handle(context);
+//        this.init(context);
+//        if (!this.isInited) {
+//            logger.error("[handle]: the [init] method invoked failed.");
+//        }
+//
+//        context.setChannel(this.channel);
+//        context.setDestroyer(new IChannelDestroyer() {
+//            @Override
+//            public void destroy(Channel channel) {
+//                try {
+//                    if (channel.isOpen())
+//                        channel.close();
+//                } catch (IOException e) {
+//                    logger.error("[destroy] occurs a IOException : " + e.getMessage());
+//                }
+//            }
+//        });
+//
+//        if (context.getCarryType().equals(MessageCarryType.CONSUME) && !context.isSync()) {
+//            try {
+//                context.getChannel().basicRecover();
+//            } catch (IOException e) {
+//                logger.error("[handle] occurs a IOException : " + e.getMessage());
+//            }
+//        }
+//
+//        chain.handle(context);
     }
 }

@@ -108,16 +108,11 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
 
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PRODUCE,
                                                          this.getContext());
-        //launch pre pipeline
-        this.handlerChain.startPre();
+        //launch pipeline
         this.handlerChain.handle(ctx);
 
         //consume
         this.genericProduce(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
     }
 
     private void genericProduce(MessageContext context,
@@ -151,8 +146,6 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
             chain.handle(context);
         } catch (IOException e) {
             logger.error("[handle] occurs a IOException : " + e.getMessage());
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
     }
 

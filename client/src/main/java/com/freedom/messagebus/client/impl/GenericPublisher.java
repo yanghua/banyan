@@ -39,16 +39,11 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
 
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PUBLISH,
                                                          this.getContext());
-        //launch pre pipeline
-        this.handlerChain.startPre();
+
         this.handlerChain.handle(ctx);
 
         //consume
         this.genericPublish(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
     }
 
     public void genericPublish(MessageContext context, IHandlerChain chain) {
@@ -69,8 +64,6 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "genericPublish");
             throw new RuntimeException(e);
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
     }
 

@@ -47,16 +47,11 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
 
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RESPONSE,
                                                          this.getContext());
-        //launch pre pipeline
-        this.handlerChain.startPre();
+        //launch pipeline
         this.handlerChain.handle(ctx);
 
         //consume
         this.genericResponse(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
     }
 
     private void genericResponse(MessageContext context, IHandlerChain chain) {
@@ -74,10 +69,7 @@ public class GenericResponser extends AbstractMessageCarryer implements IRespons
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "genericResponse");
             throw new RuntimeException(e);
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
-
     }
 
 }

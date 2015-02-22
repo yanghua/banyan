@@ -57,15 +57,10 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.REQUEST,
                                                          this.getContext());
         //launch pre pipeline
-        this.handlerChain.startPre();
         this.handlerChain.handle(ctx);
 
         //consume
         this.genericRequest(ctx, handlerChain);
-
-        //launch post pipeline
-        this.handlerChain.startPost();
-        handlerChain.handle(ctx);
 
         if (ctx.isTimeout() || ctx.getConsumedMsg() == null)
             throw new MessageResponseTimeoutException("message request time out.");

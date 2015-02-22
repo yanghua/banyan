@@ -7,6 +7,6 @@ import com.freedom.messagebus.client.message.model.Message;
  */
 public interface IMessageReceiveListener {
 
-    public void onMessage(Message message, IReceiverCloser consumerCloser);
+    public void onMessage(Message message);
 
 }

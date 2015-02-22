@@ -14,8 +14,4 @@ public interface IHandlerChain {
      */
     public void handle(MessageContext context);
 
-    public void startPre();
-
-    public void startPost();
-
 }

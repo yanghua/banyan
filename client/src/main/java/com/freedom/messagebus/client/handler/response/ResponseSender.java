@@ -38,8 +38,6 @@ public class ResponseSender extends AbstractHandler {
                                   properties);
         } catch (IOException e) {
             logger.error("[handle] occurs a IOException : " + e.getMessage());
-        } finally {
-            context.getDestroyer().destroy(context.getChannel());
         }
 
     }
