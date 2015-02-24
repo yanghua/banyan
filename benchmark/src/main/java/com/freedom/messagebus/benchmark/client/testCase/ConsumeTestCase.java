@@ -47,7 +47,6 @@ public class ConsumeTestCase extends Benchmark {
 
                 synchronized (lockObj) {
                     asyncConsumer = client.getAsyncConsumer(
-                        TestConfigConstant.QUEUE_NAME,
                         new IMessageReceiveListener() {
                             @Override
                             public void onMessage(Message message) {

@@ -35,7 +35,6 @@ public class MessageContext {
     private Node                    targetNode;                 //store represent current carry node
     private Channel                 channel;
     private AsyncEventLoop          asyncEventLoop;
-    //    private IChannelDestroyer       destroyer;
     private IMessageReceiveListener listener;
     private AbstractPool<Channel>   pool;
     private long                    timeout;

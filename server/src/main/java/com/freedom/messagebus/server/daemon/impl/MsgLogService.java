@@ -30,7 +30,6 @@ public class MsgLogService extends AbstractService {
         try {
             synchronized (this) {
                 asyncConsumer = client.getAsyncConsumer(
-                    Constants.LOG_OF_FILE_QUEUE_NAME,
                     new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message) {

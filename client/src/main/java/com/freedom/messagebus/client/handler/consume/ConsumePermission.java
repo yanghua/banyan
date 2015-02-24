@@ -14,17 +14,6 @@ public class ConsumePermission extends PermissionChecker {
 
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        Node sourceNode = context.getSourceNode();
-        Node targetNode = context.getTargetNode();
-
-        boolean hasPermission = this.commonCheck(sourceNode, targetNode, false);
-        if (!hasPermission) {
-            logger.error("[handle] can not consume message from queue : " + targetNode.getName() +
-                             " with queue : " + sourceNode.getName());
-            throw new PermissionException("can not consume message from queue : " + targetNode.getName() +
-                                              " with queue : " + sourceNode.getName());
-        }
-
         chain.handle(context);
     }
 }

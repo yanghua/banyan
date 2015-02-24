@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.AbstractMessageCarryer;
 import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
@@ -15,10 +16,12 @@ import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.ServiceLoader;
 
 /**
  * a generic producer implements the IProducer interface
@@ -26,6 +29,24 @@ import java.io.IOException;
 public class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
+    private static volatile IProducer instance;
+    private Channel channel;
+
+    private GenericProducer(AbstractPool<Channel> pool) {
+        this.channel = pool.getResource();
+    }
+
+    public static IProducer defaultProducer(AbstractPool<Channel> pool) {
+        synchronized (GenericProducer.class) {
+            if (instance == null) {
+                synchronized (GenericProducer.class) {
+                    instance = new GenericProducer(pool);
+                }
+            }
+        }
+
+        return instance;
+    }
 
     /**
      * simple producer just produces a message
@@ -38,6 +59,7 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
                         String to) {
         MessageContext ctx = this.innerProduce(this.getContext().getAppId(), to);
         ctx.setMessages(new Message[]{msg});
+        ctx.setChannel(this.channel);
         commonCarry(ctx);
     }
 

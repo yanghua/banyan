@@ -3,6 +3,7 @@ package com.freedom.messagebus.client.handler.request;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.rabbitmq.QueueManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +28,8 @@ public class TempQueueInitializer extends AbstractHandler {
             queueManager.create(String.valueOf(msgId));
             chain.handle(context);
         } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "[TempQueueInitializer]");
+            throw new RuntimeException(e);
         }
     }
 }

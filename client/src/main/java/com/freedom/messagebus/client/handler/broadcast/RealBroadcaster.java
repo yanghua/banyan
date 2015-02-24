@@ -8,6 +8,7 @@ import com.freedom.messagebus.client.message.transfer.IMessageBodyTransfer;
 import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -35,7 +36,8 @@ public class RealBroadcaster extends AbstractHandler {
 
             chain.handle(context);
         } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "RealBroadcaster");
+            throw new RuntimeException(e);
         }
     }
 }

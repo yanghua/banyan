@@ -6,6 +6,7 @@ import com.freedom.messagebus.client.IRequester;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
@@ -17,6 +18,7 @@ import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,6 +27,25 @@ import java.io.IOException;
 public class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
     private static final Log logger = LogFactory.getLog(GenericRequester.class);
+
+    private static volatile GenericRequester instance;
+    private Channel channel;
+
+    private GenericRequester(AbstractPool<Channel> pool) {
+        this.channel = pool.getResource();
+    }
+
+    public static GenericRequester defaultRequester(AbstractPool<Channel> pool) {
+        synchronized (GenericRequester.class) {
+            if (instance == null) {
+                synchronized (GenericRequester.class) {
+                    instance = new GenericRequester(pool);
+                }
+            }
+        }
+
+        return instance;
+    }
 
     /**
      * send a request and got a response
@@ -42,6 +63,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         MessageContext ctx = new MessageContext();
         ctx.setCarryType(MessageCarryType.REQUEST);
         ctx.setAppId(this.getContext().getAppId());
+        ctx.setChannel(this.channel);
 
         ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.getContext().getAppId()));
         Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
@@ -59,32 +81,11 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         //launch pre pipeline
         this.handlerChain.handle(ctx);
 
-        //consume
-        this.genericRequest(ctx, handlerChain);
-
         if (ctx.isTimeout() || ctx.getConsumedMsg() == null)
             throw new MessageResponseTimeoutException("message request time out.");
 
         return ctx.getConsumedMsg();
     }
 
-    private void genericRequest(MessageContext context, IHandlerChain chain) {
-        Message reqMsg = context.getMessages()[0];
-        IMessageBodyTransfer msgBodyProcessor =
-            MessageBodyTransferFactory.createMsgBodyProcessor(reqMsg.getMessageType());
-        byte[] msgBody = msgBodyProcessor.box(reqMsg.getMessageBody());
-        AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg.getMessageHeader());
-        try {
-            ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
-                                        context.getChannel(),
-                                        context.getTargetNode().getRoutingKey(),
-                                        msgBody,
-                                        properties);
-            chain.handle(context);
-        } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "genericRequest");
-            throw new RuntimeException(e);
-        }
-    }
 
 }

@@ -59,7 +59,6 @@ public class CommandService extends AbstractService {
         synchronized (lockObj) {
             final IResponser responser = client.getResponser();
             asyncConsumer = client.getAsyncConsumer(
-                Constants.SERVER_QUEUE_NAME,
                 new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {

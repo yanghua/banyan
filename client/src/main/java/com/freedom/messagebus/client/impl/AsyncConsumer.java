@@ -5,10 +5,12 @@ import com.freedom.messagebus.client.AbstractMessageCarryer;
 import com.freedom.messagebus.client.IMessageReceiveListener;
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.core.config.ConfigManager;
+import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.handler.common.AsyncEventLoop;
 import com.freedom.messagebus.client.model.MessageCarryType;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,18 +28,32 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
 
     private Thread                  currentThread;
     private IMessageReceiveListener onMessage;
-    private String                  appName;
+    private TimeUnit                timeUnit;
+    private Channel                 channel;
+    private static volatile AsyncConsumer instance;
 
-    private TimeUnit timeUnit;
     private       long      timeout      = 0;
     private final Lock      eventLocker  = new ReentrantLock();
     private final Condition eventBlocker = eventLocker.newCondition();
     private final Lock      mainLock     = new ReentrantLock();
     private final Condition mainBlocker  = mainLock.newCondition();
 
-    public AsyncConsumer() {
+    private AsyncConsumer(AbstractPool<Channel> pool) {
         this.currentThread = new Thread(this);
         this.currentThread.setDaemon(true);
+        this.channel = pool.getResource();
+    }
+
+    public static AsyncConsumer defaultAsyncConsumer(AbstractPool<Channel> pool) {
+        synchronized (AsyncConsumer.class) {
+            if (instance == null) {
+                synchronized (AsyncConsumer.class) {
+                    instance = new AsyncConsumer(pool);
+                }
+            }
+        }
+
+        return instance;
     }
 
     @Override
@@ -45,13 +61,11 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
         eventLocker.lock();
         final MessageContext ctx = new MessageContext();
         try {
+            ctx.setChannel(this.channel);
             ctx.setCarryType(MessageCarryType.CONSUME);
             ctx.setAppId(this.getContext().getAppId());
-
-            ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.getContext().getAppId()));
-            Node node = ConfigManager.getInstance().getQueueNodeMap().get(appName);
-            ctx.setTargetNode(node);
-
+            ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap()
+                                           .get(this.getContext().getAppId()));
             ctx.setPool(this.getContext().getPool());
             ctx.setConnection(this.getContext().getConnection());
             ctx.setListener(onMessage);
@@ -98,7 +112,6 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
         } else {
             this.currentThread.start();
         }
-
     }
 
     public void shutdown() {
@@ -112,15 +125,7 @@ public class AsyncConsumer extends AbstractMessageCarryer implements Runnable {
     public void setOnMessage(IMessageReceiveListener onMessage) {
         this.onMessage = onMessage;
     }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
+    
     public TimeUnit getTimeUnit() {
         return timeUnit;
     }

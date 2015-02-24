@@ -5,6 +5,7 @@ import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageType;
+import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,15 +28,21 @@ public class PublishParamValidator extends AbstractParamValidator {
         Date currentDate = new Date();
         for (Message msg : context.getMessages()) {
             //app id
-            if (msg.getMessageHeader().getAppId() == null || msg.getMessageHeader().getAppId().isEmpty())
+            if (Strings.isNullOrEmpty(msg.getMessageHeader().getAppId())) {
                 msg.getMessageHeader().setAppId(context.getAppId());
+            }
+
+            if (Strings.isNullOrEmpty(msg.getMessageHeader().getReplyTo())) {
+                msg.getMessageHeader().setReplyTo(context.getSourceNode().getName());
+            }
 
             //timestamp
             if (msg.getMessageHeader().getTimestamp() == null)
                 msg.getMessageHeader().setTimestamp(currentDate);
 
             if (!MessageType.PubSubMessage.getType().equals(msg.getMessageHeader().getType())) {
-                logger.error("[validateMessagesProperites] there is a message is not  `PubSubMessage`. ");
+                logger.error("[validateMessagesProperites] the message is not a  PubSubMessage. ");
+                throw new RuntimeException("the message is not a  PubSubMessage");
             }
         }
     }

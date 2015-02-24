@@ -18,10 +18,10 @@ public class SubscribePermission extends PermissionChecker {
 
         ConfigManager configManager = ConfigManager.getInstance();
         for (String queueName : subQueueNames) {
-            Node targetNode = configManager.getPubsubNodeMap().get(queueName);
+            Node subNode = configManager.getPubsubNodeMap().get(queueName);
 
             //has receive permission
-            if (commonCheck(context.getSourceNode(), targetNode, false))
+            if (commonCheck(context.getSourceNode(), subNode, false))
                 context.setConsumedMsg(msg);
             else
                 context.setConsumedMsg(null);

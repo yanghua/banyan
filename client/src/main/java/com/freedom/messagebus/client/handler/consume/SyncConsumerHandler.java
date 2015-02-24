@@ -39,7 +39,7 @@ class SyncConsumerHandler extends AbstractHandler {
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
-                                                                              context.getTargetNode().getValue());
+                                                                              context.getSourceNode().getValue());
 
                     if (response == null)
                         continue;

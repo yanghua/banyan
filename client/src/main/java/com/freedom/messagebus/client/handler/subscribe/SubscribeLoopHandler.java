@@ -26,6 +26,11 @@ public class SubscribeLoopHandler extends CommonLoopHandler {
             IMessageReceiveListener receiveListener = msgContext.getListener();
             receiveListener.onMessage(msgContext.getConsumedMsg());
         }
+
+        if (msg.getMessageType().equals(MessageType.BroadcastMessage)) {
+            IMessageReceiveListener receiveListener = msgContext.getListener();
+            receiveListener.onMessage(msgContext.getConsumedMsg());
+        }
     }
 
     private boolean filterMessage(String replyTo, List<String> subQueueNames) {

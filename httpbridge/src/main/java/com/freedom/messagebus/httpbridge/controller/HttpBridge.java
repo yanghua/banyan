@@ -218,7 +218,7 @@ public class HttpBridge extends HttpServlet {
                                                         Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM);
 
             SyncConsumer consumer = messagebus.getSyncConsumer();
-            messages = consumer.consume(queueName, num);
+            messages = consumer.consume(num);
             if (messages == null) {
                 ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
             } else {
@@ -265,7 +265,7 @@ public class HttpBridge extends HttpServlet {
 
         try {
             final AsyncConsumer asyncConsumer = messagebus.getAsyncConsumer(
-                queueName, new IMessageReceiveListener() {
+                 new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {
                         String msgStr = MessageJSONSerializer.serialize(message);
