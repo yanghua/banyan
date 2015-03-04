@@ -297,84 +297,142 @@ scenario is used to show:
 * test message bus's function
 * test message bus's client api
 
-###produce
+###produce & consume
 
 ```java
-public static void produce() {
-        Message msg = MessageFactory.createMessage(MessageType.AppMessage);
-        String queueName = "crm";
-
-        AppMessageBody appMessageBody = (AppMessageBody) msg.getMessageBody();
-        appMessageBody.setMessageBody("test".getBytes());
-
-        Messagebus client = Messagebus.getInstance(appkey);
-        client.setZkHost(host);
-        client.setZkPort(port);
+private static void produce() {
+        //crm
+        String appid = "djB5l1n7PbFsszF5817JOon2895El1KP";
+        Messagebus client = new Messagebus(appid);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
         try {
             client.open();
-            client.getProducer().produce(msg, queueName);
-        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
+        } catch (MessagebusConnectedFailedException e) {
             e.printStackTrace();
-        } finally {
-            client.close();
+        }
+
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.getMessageHeader().setContentType("text/plain");
+        msg.getMessageHeader().setContentEncoding("utf-8");
+
+        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+
+        msg.setMessageBody(body);
+
+        client.produce(msg, "erp");
+
+        client.close();
+    }
+```
+
+
+```java
+private static void consumeWithPullStyle() {
+        //erp
+        String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
+        Messagebus client = new Messagebus(appid);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
+
+        try {
+            client.open();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        }
+
+        List<Message> msgs = client.consume(1);
+
+        client.close();
+
+        for (Message msg : msgs) {
+            logger.info(msg.getMessageHeader().getMessageId());
         }
     }
 ```
 
-###consume
+```java
+private static void ConsumeWithPushStyle() {
+        //erp
+        String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
+        Messagebus client = new Messagebus(appid);
+        client.setPubsuberHost(host);
+        client.setPubsuberPort(port);
 
-####async mode
+        try {
+            client.open();
+        } catch (MessagebusConnectedFailedException e) {
+            e.printStackTrace();
+        }
+
+        client.consume(new IMessageReceiveListener() {
+            @Override
+            public void onMessage(Message message) {
+                logger.info(message.getMessageHeader().getMessageId());
+            }
+        }, 5, TimeUnit.SECONDS);
+
+        client.close();
+    }
+```
 
 ```java
-public static class ConsumerService extends Thread {
+private static void asyncConsume() {
+        AsyncConsumeThread asyncConsumeThread = new AsyncConsumeThread();
+        asyncConsumeThread.startup();
 
-        Messagebus client = Messagebus.getInstance(appkey);
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        String          appName        = "crm";
-        IConsumerCloser consumerCloser = null;
-        private final Object lockObj = new Object();
+        asyncConsumeThread.shutdown();
+    }
+
+    private static class AsyncConsumeThread implements Runnable {
+
+        private Thread currentThread;
+
+        public AsyncConsumeThread() {
+            this.currentThread = new Thread(this);
+            this.currentThread.setName("AsyncConsumeThread");
+            this.currentThread.setDaemon(true);
+        }
 
         @Override
         public void run() {
+            //erp
+            String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
+            Messagebus client = new Messagebus(appid);
+            client.setPubsuberHost(host);
+            client.setPubsuberPort(port);
+
             try {
-                synchronized (lockObj) {
-                    //set zookeeper info
-                    client.setZkHost(host);
-                    client.setZkPort(port);
+                client.open();
 
-                    client.open();
-                    IConsumer consumer = client.getConsumer();
-                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message) {
-                            logger.info("[" + message.getMessageHeader().getMessageId() +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
-                        }
-                    });
-
-                    logger.info("blocked for receiving message!");
-                    lockObj.wait(0);
-                    logger.info("released object lock!");
-                }
-            } catch (IOException | MessagebusUnOpenException |
-                MessagebusConnectedFailedException | InterruptedException e) {
+                //long long time
+                client.consume(new IMessageReceiveListener() {
+                    @Override
+                    public void onMessage(Message message) {
+                        logger.info(message.getMessageHeader().getMessageId());
+                    }
+                }, Integer.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (MessagebusConnectedFailedException e) {
                 e.printStackTrace();
             } finally {
-                logger.info("close client");
-                consumerCloser.closeConsumer();
                 client.close();
             }
         }
 
-        public void stopService() {
-            //style 1 : use lock released
-            synchronized (lockObj) {
-                lockObj.notifyAll();
-            }
+        public void startup() {
+            this.currentThread.start();
+        }
 
-            //style 2 : use interrupt
-//            this.interrupt();
+        public void shutdown() {
+            this.currentThread.interrupt();
         }
     }
 ```
