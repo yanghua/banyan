@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,10 +35,13 @@ public class ProduceConsume {
             e.printStackTrace();
         }
 
-//        asyncConsume();
+//        ConsumeWithPushStyle();
 
         //or
-        syncConsume();
+//        consumeWithPullStyle();
+
+        //or async consume
+        asyncConsume();
     }
 
     private static void produce() {
@@ -67,7 +71,7 @@ public class ProduceConsume {
         client.close();
     }
 
-    private static void syncConsume() {
+    private static void consumeWithPullStyle() {
         //erp
         String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
         Messagebus client = new Messagebus(appid);
@@ -89,11 +93,10 @@ public class ProduceConsume {
         }
     }
 
-    private static void asyncConsume() {
+    private static void ConsumeWithPushStyle() {
         //erp
         String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
         Messagebus client = new Messagebus(appid);
-        //set zookeeper info
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -111,6 +114,63 @@ public class ProduceConsume {
         }, 5, TimeUnit.SECONDS);
 
         client.close();
+    }
+
+    private static void asyncConsume() {
+        AsyncConsumeThread asyncConsumeThread = new AsyncConsumeThread();
+        asyncConsumeThread.startup();
+
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        asyncConsumeThread.shutdown();
+    }
+
+    private static class AsyncConsumeThread implements Runnable {
+
+        private Thread currentThread;
+
+        public AsyncConsumeThread() {
+            this.currentThread = new Thread(this);
+            this.currentThread.setName("AsyncConsumeThread");
+            this.currentThread.setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            //erp
+            String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
+            Messagebus client = new Messagebus(appid);
+            client.setPubsuberHost(host);
+            client.setPubsuberPort(port);
+
+            try {
+                client.open();
+
+                //long long time
+                client.asyncConsume(new IMessageReceiveListener() {
+                    @Override
+                    public void onMessage(Message message) {
+                        logger.info(message.getMessageHeader().getMessageId());
+                    }
+                }, Integer.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (MessagebusConnectedFailedException e) {
+                e.printStackTrace();
+            } finally {
+                client.close();
+            }
+        }
+
+        public void startup() {
+            this.currentThread.start();
+        }
+
+        public void shutdown() {
+            this.currentThread.interrupt();
+        }
     }
 
 }

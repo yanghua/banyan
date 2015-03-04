@@ -77,7 +77,7 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
     public void asyncConsume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
         this.onMessage = onMessage;
         this.timeout = timeout;
-        this.timeUnit = timeUnit;
+        this.timeUnit = unit;
 
         this.startup();
     }
@@ -111,16 +111,12 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
             } catch (InterruptedException e) {
 
             } finally {
-                this.shutdown();
+                this.currentThread.interrupt();
                 mainLock.unlock();
             }
         } else {
             this.currentThread.start();
         }
-    }
-
-    public void shutdown() {
-        this.currentThread.interrupt();
     }
 
     private void asyncConsume(MessageContext context,
