@@ -1,11 +1,8 @@
 package com.freedom.messagebus.scenario.client;
 
 import com.freedom.messagebus.client.IMessageReceiveListener;
-import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
-import com.freedom.messagebus.client.impl.SyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
@@ -37,17 +34,16 @@ public class ProduceConsume {
             e.printStackTrace();
         }
 
-        asyncConsume();
+//        asyncConsume();
 
         //or
-//        syncConsume();
+        syncConsume();
     }
 
     private static void produce() {
         //crm
         String appid = "djB5l1n7PbFsszF5817JOon2895El1KP";
-        Messagebus client = Messagebus.createClient(appid);
-        //set zookeeper info
+        Messagebus client = new Messagebus(appid);
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -66,8 +62,7 @@ public class ProduceConsume {
 
         msg.setMessageBody(body);
 
-        IProducer producer = client.getProducer();
-        producer.produce(msg, "erp");
+        client.produce(msg, "erp");
 
         client.close();
     }
@@ -75,8 +70,7 @@ public class ProduceConsume {
     private static void syncConsume() {
         //erp
         String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-        Messagebus client = Messagebus.createClient(appid);
-        //set zookeeper info
+        Messagebus client = new Messagebus(appid);
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -86,8 +80,7 @@ public class ProduceConsume {
             e.printStackTrace();
         }
 
-        SyncConsumer syncConsumer = client.getSyncConsumer();
-        List<Message> msgs = syncConsumer.consume(1);
+        List<Message> msgs = client.consume(1);
 
         client.close();
 
@@ -99,7 +92,7 @@ public class ProduceConsume {
     private static void asyncConsume() {
         //erp
         String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-        Messagebus client = Messagebus.createClient(appid);
+        Messagebus client = new Messagebus(appid);
         //set zookeeper info
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
@@ -110,15 +103,12 @@ public class ProduceConsume {
             e.printStackTrace();
         }
 
-        AsyncConsumer asyncConsumer = client.getAsyncConsumer(new IMessageReceiveListener() {
+        client.asyncConsume(new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
-        });
-
-        asyncConsumer.setTimeout(5);
-        asyncConsumer.startup();
+        }, 5, TimeUnit.SECONDS);
 
         client.close();
     }

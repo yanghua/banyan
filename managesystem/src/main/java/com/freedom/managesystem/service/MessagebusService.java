@@ -1,6 +1,5 @@
 package com.freedom.managesystem.service;
 
-import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
@@ -20,7 +19,7 @@ public class MessagebusService {
     private Messagebus client;
 
     public MessagebusService() {
-        client = Messagebus.createClient(Constants.MESSAGEBUS_WEB_APP_ID);
+        client = new Messagebus(Constants.MESSAGEBUS_WEB_APP_ID);
         client.setPubsuberHost(Constants.ZK_HOST);
         client.setPubsuberPort(Constants.ZK_PORT);
     }
@@ -28,9 +27,7 @@ public class MessagebusService {
     public void produceMessage(String queueName, Message msg) {
         try {
             client.open();
-
-            IProducer producer = client.getProducer();
-            producer.produce(msg, queueName);
+            client.produce(msg, queueName);
         } catch (MessagebusConnectedFailedException e) {
             logger.error("[produceMessage] occurs a MessagebusConnectedFailedException : " + e.getMessage());
         } catch (MessagebusUnOpenException e) {

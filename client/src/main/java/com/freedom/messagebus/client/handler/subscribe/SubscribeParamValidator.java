@@ -2,9 +2,7 @@ package com.freedom.messagebus.client.handler.subscribe;
 
 import com.freedom.messagebus.client.MessageContext;
 import com.freedom.messagebus.client.handler.IHandlerChain;
-import com.freedom.messagebus.client.handler.ParamValidateFailedException;
 import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
-import com.freedom.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

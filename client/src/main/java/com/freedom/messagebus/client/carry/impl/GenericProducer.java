@@ -1,11 +1,9 @@
-package com.freedom.messagebus.client.impl;
+package com.freedom.messagebus.client.carry.impl;
 
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.AbstractMessageCarryer;
-import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.pool.AbstractPool;
+import com.freedom.messagebus.client.carry.IProducer;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
@@ -14,14 +12,13 @@ import com.freedom.messagebus.client.message.transfer.MessageBodyTransferFactory
 import com.freedom.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.freedom.messagebus.common.Constants;
+import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.util.ServiceLoader;
 
 /**
  * a generic producer implements the IProducer interface
@@ -29,23 +26,8 @@ import java.util.ServiceLoader;
 public class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
-    private static volatile IProducer instance;
-    private Channel channel;
 
-    private GenericProducer(AbstractPool<Channel> pool) {
-        this.channel = pool.getResource();
-    }
-
-    public static IProducer defaultProducer(AbstractPool<Channel> pool) {
-        synchronized (GenericProducer.class) {
-            if (instance == null) {
-                synchronized (GenericProducer.class) {
-                    instance = new GenericProducer(pool);
-                }
-            }
-        }
-
-        return instance;
+    public GenericProducer() {
     }
 
     /**
@@ -59,7 +41,6 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
                         String to) {
         MessageContext ctx = this.innerProduce(this.getContext().getAppId(), to);
         ctx.setMessages(new Message[]{msg});
-        ctx.setChannel(this.channel);
         commonCarry(ctx);
     }
 
@@ -111,16 +92,12 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
 
     private MessageContext innerProduce(String appId,
                                         String to) {
-        MessageContext context = new MessageContext();
+        MessageContext context = initMessageContext();
         context.setCarryType(MessageCarryType.PRODUCE);
-        context.setAppId(appId);
-
-        context.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(appId));
-        Node node = ConfigManager.getInstance().getQueueNodeMap().get(to);
+        context.setSourceNode(this.getContext().getConfigManager()
+                                  .getAppIdQueueMap().get(appId));
+        Node node = this.getContext().getConfigManager().getQueueNodeMap().get(to);
         context.setTargetNode(node);
-
-        context.setPool(this.getContext().getPool());
-        context.setConnection(this.getContext().getConnection());
 
         return context;
     }
@@ -128,12 +105,10 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
     private void commonCarry(MessageContext ctx) {
         checkState();
 
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PRODUCE,
-                                                         this.getContext());
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PRODUCE, this.getContext());
         //launch pipeline
         this.handlerChain.handle(ctx);
 
-        //consume
         this.genericProduce(ctx, handlerChain);
     }
 
@@ -167,7 +142,8 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
 
             chain.handle(context);
         } catch (IOException e) {
-            logger.error("[handle] occurs a IOException : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "genericProduce");
+            throw new RuntimeException(e);
         }
     }
 

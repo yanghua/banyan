@@ -5,11 +5,9 @@ import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.interactor.pubsub.IDataConverter;
 import com.freedom.messagebus.interactor.pubsub.PubSuberFactory;
 import com.freedom.messagebus.interactor.rabbitmq.AbstractInitializer;
-import com.freedom.messagebus.interactor.rabbitmq.RabbitmqServerManager;
 import com.freedom.messagebus.server.Constants;
 import com.freedom.messagebus.server.dataaccess.DBAccessor;
 import com.freedom.messagebus.server.dataaccess.NodeFetcher;
-import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

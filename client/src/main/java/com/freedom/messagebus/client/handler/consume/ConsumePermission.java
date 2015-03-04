@@ -1,8 +1,6 @@
 package com.freedom.messagebus.client.handler.consume;
 
-import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.PermissionException;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.PermissionChecker;
 import org.apache.commons.logging.Log;

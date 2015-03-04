@@ -15,7 +15,7 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = Messagebus.createClient(Constants.HTTP_BRIDGE_APP_KEY);
+        Messagebus messagebus = new Messagebus(Constants.HTTP_BRIDGE_APP_KEY);
         //TODO:
         messagebus.setPubsuberHost("115.29.96.85");
         messagebus.setPubsuberPort(2181);

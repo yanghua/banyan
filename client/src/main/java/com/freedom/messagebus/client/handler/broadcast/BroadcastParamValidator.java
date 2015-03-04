@@ -5,7 +5,6 @@ import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.AbstractParamValidator;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageType;
-import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

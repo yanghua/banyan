@@ -1,12 +1,10 @@
 package com.freedom.messagebus.benchmark.client;
 
-import com.freedom.messagebus.client.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageType;
-import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,15 +70,14 @@ public class TestUtility {
     public static void produce(long total) {
         Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
-        Messagebus client = Messagebus.createClient(TestConfigConstant.APP_KEY);
+        Messagebus client = new Messagebus(TestConfigConstant.APP_KEY);
         client.setPubsuberHost(TestConfigConstant.HOST);
         client.setPubsuberPort(TestConfigConstant.PORT);
         try {
             client.open();
-            IProducer producer = client.getProducer();
 
             for (int i = 0; i < total; i++) {
-                producer.produce(msg, TestConfigConstant.QUEUE_NAME);
+                client.produce(msg, TestConfigConstant.QUEUE_NAME);
             }
         } catch (MessagebusConnectedFailedException e) {
             e.printStackTrace();

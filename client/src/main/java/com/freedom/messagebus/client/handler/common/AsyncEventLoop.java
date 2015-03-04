@@ -21,6 +21,7 @@ public class AsyncEventLoop implements Runnable {
     public AsyncEventLoop() {
         this.currentThread = new Thread(this);
         this.currentThread.setDaemon(true);
+        this.currentThread.setName("async-event-loop-thread");
     }
 
     @Override

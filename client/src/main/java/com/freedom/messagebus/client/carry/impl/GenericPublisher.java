@@ -1,10 +1,8 @@
-package com.freedom.messagebus.client.impl;
+package com.freedom.messagebus.client.carry.impl;
 
 import com.freedom.messagebus.client.AbstractMessageCarryer;
-import com.freedom.messagebus.client.IPublisher;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.pool.AbstractPool;
+import com.freedom.messagebus.client.carry.IPublisher;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.MessageCarryHandlerChain;
 import com.freedom.messagebus.client.message.model.Message;
@@ -16,7 +14,6 @@ import com.freedom.messagebus.common.Constants;
 import com.freedom.messagebus.common.ExceptionHelper;
 import com.freedom.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,42 +23,20 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
 
     private static final Log logger = LogFactory.getLog(GenericPublisher.class);
 
-    private static volatile GenericPublisher instance;
-    private Channel channel;
-
-    private GenericPublisher(AbstractPool<Channel> pool) {
-        this.channel = pool.getResource();
+    public GenericPublisher() {
     }
-
-    public static GenericPublisher defaultPublisher(AbstractPool<Channel> pool) {
-        synchronized (GenericPublisher.class) {
-            if (instance == null) {
-                synchronized (GenericPublisher.class) {
-                    instance = new GenericPublisher(pool);
-                }
-            }
-        }
-
-        return instance;
-    }
-
 
     @Override
     public void publish(Message[] msgs) {
-        MessageContext ctx = new MessageContext();
+        MessageContext ctx = initMessageContext();
         ctx.setCarryType(MessageCarryType.PUBLISH);
-        ctx.setAppId(this.getContext().getAppId());
-        ctx.setSourceNode(ConfigManager.getInstance().getAppIdQueueMap().get(this.getContext().getAppId()));
+        ctx.setSourceNode(this.getContext().getConfigManager()
+                              .getAppIdQueueMap().get(this.getContext().getAppId()));
         ctx.setMessages(msgs);
-        ctx.setChannel(this.channel);
-
-        ctx.setPool(this.getContext().getPool());
-        ctx.setConnection(this.getContext().getConnection());
 
         checkState();
 
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PUBLISH,
-                                                         this.getContext());
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PUBLISH, this.getContext());
 
         this.handlerChain.handle(ctx);
 

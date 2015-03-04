@@ -1,8 +1,8 @@
 package com.freedom.messagebus.server.daemon.impl;
 
 import com.freedom.messagebus.business.exchanger.ExchangerManager;
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
+import com.freedom.messagebus.client.IMessageReceiveListener;
+import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageFactory;
 import com.freedom.messagebus.client.message.model.MessageType;
@@ -17,20 +17,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @DaemonService(value = "sentinelService", policy = RunPolicy.ONCE)
 public class CommandService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(CommandService.class);
 
-    private       IReceiverCloser consumerCloser = null;
     private final Object          lockObj        = new Object();
 
     private Messagebus       client;
     private QueueMessage     responseMsg;
     private Properties       serverConfig;
     private ExchangerManager exchangeManager;
-    private AsyncConsumer    asyncConsumer;
 
     public CommandService(Map<String, Object> context) {
         super(context);
@@ -57,8 +56,7 @@ public class CommandService extends AbstractService {
     @Override
     public void run() {
         synchronized (lockObj) {
-            final IResponser responser = client.getResponser();
-            asyncConsumer = client.getAsyncConsumer(
+            client.asyncConsume(
                 new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {
@@ -83,7 +81,7 @@ public class CommandService extends AbstractService {
                             switch (cmd) {
                                 case "PING":
                                     //responseMsg pong
-                                    responser.responseTmpMessage(responseMsg, msgId);
+                                    client.responseTmpMessage(responseMsg, msgId);
                                     break;
 
                                 case "INSERT":
@@ -102,14 +100,7 @@ public class CommandService extends AbstractService {
                             }
                         }
                     }
-                });
-
-            asyncConsumer.startup();
-            try {
-                lockObj.wait(0);
-            } catch (InterruptedException e) {
-                asyncConsumer.shutdown();
-            }
+                }, Integer.MAX_VALUE, TimeUnit.SECONDS);
         }
     }
 

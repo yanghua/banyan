@@ -1,7 +1,7 @@
 package com.freedom.messagebus.benchmark.client.testCase;
 
 import com.freedom.messagebus.benchmark.client.*;
-import com.freedom.messagebus.client.IProducer;
+import com.freedom.messagebus.client.carry.IProducer;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusConnectedFailedException;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
@@ -25,7 +25,7 @@ public class ProduceTestCase extends Benchmark {
 
         private BasicProduce(double msgBodySize) {
             msg = TestMessageFactory.create(MessageType.QueueMessage, msgBodySize);
-            client = Messagebus.createClient(TestConfigConstant.APP_KEY);
+            client = new Messagebus(TestConfigConstant.APP_KEY);
             client.setPubsuberHost(TestConfigConstant.HOST);
             client.setPubsuberPort(TestConfigConstant.PORT);
         }
@@ -34,9 +34,8 @@ public class ProduceTestCase extends Benchmark {
         public void run() {
             try {
                 client.open();
-                producer = client.getProducer();
                 while (flag) {
-                    producer.produce(msg, TestConfigConstant.QUEUE_NAME);
+                    client.produce(msg, TestConfigConstant.QUEUE_NAME);
                     ++counter;
                 }
             } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {

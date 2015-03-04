@@ -1,8 +1,7 @@
 package com.freedom.messagebus.httpbridge.controller;
 
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
-import com.freedom.messagebus.client.impl.SyncConsumer;
+import com.freedom.messagebus.client.carry.IResponser;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.message.model.MessageJSONSerializer;
 import com.freedom.messagebus.client.message.model.MessageType;
@@ -22,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class HttpBridge extends HttpServlet {
 
@@ -84,8 +84,7 @@ public class HttpBridge extends HttpServlet {
                 Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
 
                 try {
-                    IProducer producer = messagebus.getProducer();
-                    producer.batchProduce(msgArr, queueName);
+                    messagebus.batchProduce(msgArr, queueName);
                     ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
                 } catch (MessagebusUnOpenException e) {
                     logger.error("[produce] occurs a MessagebusUnOpenException : " + e.getMessage());
@@ -155,8 +154,7 @@ public class HttpBridge extends HttpServlet {
 
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
 
-            IRequester requester = messagebus.getRequester();
-            Message responseMsg = requester.request(msg, queueName, timeout);
+            Message responseMsg = messagebus.request(msg, queueName, timeout);
 
             String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
             ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
@@ -185,8 +183,7 @@ public class HttpBridge extends HttpServlet {
 
             IResponser responser = null;
             try {
-                responser = messagebus.getResponser();
-                responser.responseTmpMessage(msg, queueName);
+                messagebus.responseTmpMessage(msg, queueName);
                 ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
             } catch (MessagebusUnOpenException e) {
                 ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
@@ -217,8 +214,7 @@ public class HttpBridge extends HttpServlet {
                 throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than " +
                                                         Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM);
 
-            SyncConsumer consumer = messagebus.getSyncConsumer();
-            messages = consumer.consume(num);
+            messages = messagebus.consume(num);
             if (messages == null) {
                 ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
             } else {
@@ -256,16 +252,12 @@ public class HttpBridge extends HttpServlet {
             @Override
             public void onTimeout(Continuation continuation) {
                 logger.info("[onTimeout] : continuation timeout.");
-                AsyncConsumer closer = (AsyncConsumer) continuation.getAttribute("consumerCloser");
-                if (closer != null) {
-                    closer.shutdown();
-                }
             }
         });
 
         try {
-            final AsyncConsumer asyncConsumer = messagebus.getAsyncConsumer(
-                 new IMessageReceiveListener() {
+            messagebus.asyncConsume(
+                new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {
                         String msgStr = MessageJSONSerializer.serialize(message);
@@ -278,9 +270,8 @@ public class HttpBridge extends HttpServlet {
                             continuation.complete();
                         }
                     }
-                });
+                }, Constants.MAX_CONSUME_CONTINUATION_TIMEOUT, TimeUnit.MILLISECONDS);
 
-            continuation.setAttribute("consumerCloser", asyncConsumer);
         } catch (MessagebusUnOpenException e) {
             logger.error("[consume] occurs a Exception : " + e.getMessage());
             continuation.undispatch();

@@ -1,7 +1,6 @@
 package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -11,10 +10,10 @@ import com.rabbitmq.client.Connection;
  */
 public class GenericContext {
 
-    private ConfigManager         configManager;
-    private AbstractPool<Channel> pool;
-    private Connection            connection;
-    private String                appId;
+    private ConfigManager configManager;
+    private Channel       channel;
+    private Connection    connection;
+    private String        appId;
 
     public GenericContext() {
     }
@@ -27,14 +26,13 @@ public class GenericContext {
         this.configManager = configManager;
     }
 
-    public AbstractPool<Channel> getPool() {
-        return pool;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setPool(AbstractPool<Channel> pool) {
-        this.pool = pool;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
-
 
     public Connection getConnection() {
         return connection;
@@ -43,7 +41,6 @@ public class GenericContext {
     public void setConnection(Connection connection) {
         this.connection = connection;
     }
-
 
     public String getAppId() {
         return appId;

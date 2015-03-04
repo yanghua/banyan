@@ -1,6 +1,5 @@
 package com.freedom.messagebus.client;
 
-import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.common.Constants;
 
@@ -11,16 +10,25 @@ import com.freedom.messagebus.common.Constants;
 public abstract class AbstractMessageCarryer {
 
     private   GenericContext context;
-    private   MessageContext msgContext;
     protected IHandlerChain  handlerChain;
 
-
-    public void checkState() {
+    protected void checkState() {
         //check server state
-        if (!ConfigManager.getInstance().getServerState().equals(
+        if (!context.getConfigManager().getServerState().equals(
             Constants.MESSAGEBUS_SERVER_EVENT_STARTED)) {
             throw new RuntimeException("the server is closed. Message can not be carried now!");
         }
+    }
+
+    protected MessageContext initMessageContext() {
+        MessageContext msgCtx = new MessageContext();
+        msgCtx.setAppId(this.context.getAppId());
+        msgCtx.setConfigManager(this.context.getConfigManager());
+        msgCtx.setChannel(this.context.getChannel());
+        msgCtx.setHost(this.context.getConfigManager()
+                                   .getClientConfigMap().get("messagebus.client.host").getValue());
+
+        return msgCtx;
     }
 
     public GenericContext getContext() {
@@ -31,11 +39,4 @@ public abstract class AbstractMessageCarryer {
         this.context = context;
     }
 
-    public MessageContext getMsgContext() {
-        return msgContext;
-    }
-
-    public void setMsgContext(MessageContext msgContext) {
-        this.msgContext = msgContext;
-    }
 }

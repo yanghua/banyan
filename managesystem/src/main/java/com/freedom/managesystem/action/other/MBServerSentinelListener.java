@@ -1,7 +1,6 @@
 package com.freedom.managesystem.action.other;
 
 import com.freedom.managesystem.service.Constants;
-import com.freedom.messagebus.client.IRequester;
 import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.Messagebus;
 import com.freedom.messagebus.client.MessagebusUnOpenException;
@@ -78,10 +77,9 @@ public class MBServerSentinelListener implements ServletContextListener {
         public void run() {
             ServletContext context = servletContextEvent.getServletContext();
             try {
-                IRequester requester = messagebus.getRequester();
                 while (true) {
                     try {
-                        QueueMessage responseMsg = (QueueMessage) requester.request(pingCmdMsg, Constants.SERVER_QUEUE_NAME,
+                        QueueMessage responseMsg = (QueueMessage) messagebus.request(pingCmdMsg, Constants.SERVER_QUEUE_NAME,
                                                                                     Constants.PING_SERVER_TIME_INTERVAL);
                         Map<String, Object> msgHeaders = responseMsg.getMessageHeader().getHeaders();
 

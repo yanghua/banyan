@@ -213,7 +213,7 @@ public class App {
         Properties serverConfig = (Properties) context.get(com.freedom.messagebus.server.Constants.KEY_SERVER_CONFIG);
         //message bus client
         String appId = serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_APP_ID);
-        Messagebus commonClient = Messagebus.createClient(appId);
+        Messagebus commonClient = new Messagebus(appId);
 
         String pubsuberHost = serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
         int pubsuberPort = Integer.parseInt(serverConfig.getProperty(com.freedom.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));

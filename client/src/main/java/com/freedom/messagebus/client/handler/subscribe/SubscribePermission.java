@@ -2,7 +2,6 @@ package com.freedom.messagebus.client.handler.subscribe;
 
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import com.freedom.messagebus.client.handler.common.PermissionChecker;
 import com.freedom.messagebus.client.message.model.Message;
@@ -16,12 +15,11 @@ public class SubscribePermission extends PermissionChecker {
         List<String> subQueueNames = context.getSubQueueNames();
         Message msg = context.getConsumedMsg();
 
-        ConfigManager configManager = ConfigManager.getInstance();
         for (String queueName : subQueueNames) {
-            Node subNode = configManager.getPubsubNodeMap().get(queueName);
+            Node subNode = context.getConfigManager().getPubsubNodeMap().get(queueName);
 
             //has receive permission
-            if (commonCheck(context.getSourceNode(), subNode, false))
+            if (commonCheck(context, subNode, false, context.getSourceNode()))
                 context.setConsumedMsg(msg);
             else
                 context.setConsumedMsg(null);

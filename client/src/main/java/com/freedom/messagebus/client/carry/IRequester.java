@@ -1,8 +1,9 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.carry;
 
+import com.freedom.messagebus.client.MessageResponseTimeoutException;
 import com.freedom.messagebus.client.message.model.Message;
 
-public interface IRequester extends IBasicOperator {
+public interface IRequester {
 
     /**
      * send a request and got a response
@@ -11,7 +12,7 @@ public interface IRequester extends IBasicOperator {
      * @param to      send to destination
      * @param timeout response wait timeout
      * @return Message the response message
-     * @throws MessageResponseTimeoutException
+     * @throws com.freedom.messagebus.client.MessageResponseTimeoutException
      */
     public Message request(Message msg, String to, long timeout)
         throws MessageResponseTimeoutException;

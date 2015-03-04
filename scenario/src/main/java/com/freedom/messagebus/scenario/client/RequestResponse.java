@@ -1,8 +1,13 @@
 package com.freedom.messagebus.scenario.client;
 
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
-import com.freedom.messagebus.client.message.model.*;
+import com.freedom.messagebus.client.IMessageReceiveListener;
+import com.freedom.messagebus.client.MessageResponseTimeoutException;
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.MessagebusConnectedFailedException;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
+import com.freedom.messagebus.client.message.model.QueueMessage;
 import com.freedom.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +39,7 @@ public class RequestResponse {
     private static void request() {
         //crm
         String appid = "djB5l1n7PbFsszF5817JOon2895El1KP";
-        Messagebus client = Messagebus.createClient(appid);
+        Messagebus client = new Messagebus(appid);
         //set zookeeper info
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
@@ -54,12 +59,10 @@ public class RequestResponse {
 
         msg.setMessageBody(body);
 
-        IRequester requester = client.getRequester();
-
         Message responseMsg = null;
 
         try {
-            responseMsg = requester.request(msg, "erp", 20);
+            responseMsg = client.request(msg, "erp", 20);
         } catch (MessageResponseTimeoutException e) {
             e.printStackTrace();
         }
@@ -78,16 +81,15 @@ public class RequestResponse {
             public void run() {
                 //erp
                 String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-                Messagebus client = Messagebus.createClient(appid);
+                final Messagebus client = new Messagebus(appid);
 
                 client.setPubsuberHost(host);
                 client.setPubsuberPort(port);
 
                 try {
                     client.open();
-                    final IResponser responser = client.getResponser();
 
-                    AsyncConsumer asyncConsumer = client.getAsyncConsumer(
+                    client.asyncConsume(
                         new IMessageReceiveListener() {
                             @Override
                             public void onMessage(Message message) {
@@ -97,12 +99,9 @@ public class RequestResponse {
                                                 "]-[" + message.getMessageHeader().getType() + "]");
 
                                 //send response
-                                responser.responseTmpMessage(message, msgId);
+                                client.responseTmpMessage(message, msgId);
                             }
-                        });
-
-                    asyncConsumer.setTimeout(30);
-                    asyncConsumer.startup();
+                        }, 30, TimeUnit.SECONDS);
 
                     client.close();
                 } catch (MessagebusConnectedFailedException e) {

@@ -5,10 +5,11 @@ import com.freedom.messagebus.benchmark.client.IFetcher;
 import com.freedom.messagebus.benchmark.client.ITerminater;
 import com.freedom.messagebus.benchmark.client.TestConfigConstant;
 import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
 import com.freedom.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.concurrent.TimeUnit;
 
 public class ConsumeTestCase extends Benchmark {
 
@@ -17,12 +18,10 @@ public class ConsumeTestCase extends Benchmark {
     private static class BasicConsume implements Runnable, ITerminater, IFetcher {
 
         private Messagebus    client;
-        private AsyncConsumer asyncConsumer;
-        private final Object lockObj = new Object();
         private       long   counter = 0;
 
         private BasicConsume() {
-            client = Messagebus.createClient(TestConfigConstant.APP_KEY);
+            client = new Messagebus(TestConfigConstant.APP_KEY);
             client.setPubsuberHost(TestConfigConstant.HOST);
             client.setPubsuberPort(TestConfigConstant.PORT);
         }
@@ -35,9 +34,6 @@ public class ConsumeTestCase extends Benchmark {
         @Override
         public void terminate() {
             logger.info("closing test task ....");
-            if (asyncConsumer != null) {
-                asyncConsumer.shutdown();
-            }
         }
 
         @Override
@@ -45,18 +41,14 @@ public class ConsumeTestCase extends Benchmark {
             try {
                 client.open();
 
-                synchronized (lockObj) {
-                    asyncConsumer = client.getAsyncConsumer(
-                        new IMessageReceiveListener() {
-                            @Override
-                            public void onMessage(Message message) {
-                                ++counter;
-                            }
-                        });
-
-                    lockObj.wait(0);
-                }
-            } catch (MessagebusConnectedFailedException | MessagebusUnOpenException | InterruptedException e) {
+                client.asyncConsume(
+                    new IMessageReceiveListener() {
+                        @Override
+                        public void onMessage(Message message) {
+                            ++counter;
+                        }
+                    }, Integer.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
                 e.printStackTrace();
             } finally {
                 if (client != null)

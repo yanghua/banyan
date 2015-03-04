@@ -35,9 +35,8 @@ public class ConfigManager implements IExchangerListener {
 
     private static final Log logger = LogFactory.getLog(ConfigManager.class);
 
-    private boolean inited = false;
-    private static volatile ConfigManager instance;
-    private volatile String serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
+    private          boolean inited      = false;
+    private volatile String  serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
     private List<HandlerModel> produceHandlerModels   = new ArrayList<>();
@@ -59,40 +58,19 @@ public class ConfigManager implements IExchangerListener {
     private List<AbstractHandler> broadcastHandlerChain = new ArrayList<>();
     //endregion
 
-
-    private Map<String, Node> exchangeNodeMap;
-
-    private Map<String, Node> queueNodeMap;
-
-    private Map<String, Node> pubsubNodeMap;
-
-    private Map<String, Node> appIdQueueMap;
-
+    private Map<String, Node>   exchangeNodeMap;
+    private Map<String, Node>   queueNodeMap;
+    private Map<String, Node>   pubsubNodeMap;
+    private Map<String, Node>   appIdQueueMap;
     private Map<String, Config> clientConfigMap;
-
-    private ExchangerManager exchangeManager;
-
+    private ExchangerManager    exchangeManager;
     private Map<String, String> sendPermissionMap;
     private Map<String, String> receivePermissionMap;
-
     private Map<String, byte[]> sendPermByteQueryArrMap;
     private Map<String, byte[]> receivePermByteQueryArrMap;
 
-    private ConfigManager() {
+    public ConfigManager() {
         this.inited = this.init();
-    }
-
-
-    public static ConfigManager getInstance() {
-        if (instance == null) {
-            synchronized (ConfigManager.class) {
-                if (instance == null) {
-                    instance = new ConfigManager();
-                }
-            }
-        }
-
-        return instance;
     }
 
     private boolean init() {
@@ -127,7 +105,7 @@ public class ConfigManager implements IExchangerListener {
 
             return true;
         } catch (Exception e) {
-            logger.error("[init] occurs a Exception : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "init");
             return false;
         }
     }

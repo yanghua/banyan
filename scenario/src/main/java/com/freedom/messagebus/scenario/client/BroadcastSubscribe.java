@@ -1,8 +1,12 @@
 package com.freedom.messagebus.scenario.client;
 
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.GenericSubscriber;
-import com.freedom.messagebus.client.message.model.*;
+import com.freedom.messagebus.client.IMessageReceiveListener;
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.MessagebusConnectedFailedException;
+import com.freedom.messagebus.client.message.model.BroadcastMessage;
+import com.freedom.messagebus.client.message.model.Message;
+import com.freedom.messagebus.client.message.model.MessageFactory;
+import com.freedom.messagebus.client.message.model.MessageType;
 import com.freedom.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,20 +34,18 @@ public class BroadcastSubscribe {
         subscribe1();
 
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         subscribe2();
-
     }
 
     private static void broadcast() {
         //crm
         String appid = "djB5l1n7PbFsszF5817JOon2895El1KP";
-        Messagebus client = Messagebus.createClient(appid);
-        //set zookeeper info
+        Messagebus client = new Messagebus(appid);
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -62,15 +64,16 @@ public class BroadcastSubscribe {
 
         msg.setMessageBody(body);
 
-        IBroadcaster broadcaster = client.getBroadcaster();
-        broadcaster.broadcast(new Message[] {msg});
+        client.broadcast(new Message[] {msg});
+
+        logger.info("crm broadcast!");
+        client.close();
     }
 
     private static void subscribe1() {
         //erp
         String appid = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-        Messagebus client = Messagebus.createClient(appid);
-        //set zookeeper info
+        Messagebus client = new Messagebus(appid);
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -80,21 +83,15 @@ public class BroadcastSubscribe {
             e.printStackTrace();
         }
 
-        GenericSubscriber subscriber = client.getSubscriber();
-        subscriber.setOnMessage(new IMessageReceiveListener() {
+        logger.info("erp is subscribing message from crm! ");
+        List<String> subscribeQueues = new ArrayList<>(1);
+        subscribeQueues.add("crm");
+        client.subscribe(new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
-        });
-
-        List<String> subscribeQueues = new ArrayList<>(1);
-        subscribeQueues.add("crm");
-
-        subscriber.setSubQueueNames(subscribeQueues);
-        subscriber.setTimeout(10);
-
-        subscriber.startup();
+        }, subscribeQueues, 10, TimeUnit.SECONDS);
 
         client.close();
     }
@@ -102,8 +99,7 @@ public class BroadcastSubscribe {
     private static void subscribe2() {
         //ucp
         String appid = "6vifQNkw225U6dS8cI92rS2eS1o7ZehQ";
-        Messagebus client = Messagebus.createClient(appid);
-        //set zookeeper info
+        Messagebus client = new Messagebus(appid);
         client.setPubsuberHost(host);
         client.setPubsuberPort(port);
 
@@ -113,21 +109,15 @@ public class BroadcastSubscribe {
             e.printStackTrace();
         }
 
-        GenericSubscriber subscriber = client.getSubscriber();
-        subscriber.setOnMessage(new IMessageReceiveListener() {
+        logger.info("ucp is subscribing message from crm! ");
+        List<String> subscribeQueues = new ArrayList<>(1);
+        subscribeQueues.add("crm");
+        client.subscribe(new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
-        });
-
-        List<String> subscribeQueues = new ArrayList<>(1);
-        subscribeQueues.add("crm");
-
-        subscriber.setSubQueueNames(subscribeQueues);
-        subscriber.setTimeout(10);
-
-        subscriber.startup();
+        }, subscribeQueues, 10, TimeUnit.SECONDS);
 
         client.close();
     }

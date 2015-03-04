@@ -1,7 +1,8 @@
 package com.freedom.messagebus.server.daemon.impl;
 
-import com.freedom.messagebus.client.*;
-import com.freedom.messagebus.client.impl.AsyncConsumer;
+import com.freedom.messagebus.client.IMessageReceiveListener;
+import com.freedom.messagebus.client.Messagebus;
+import com.freedom.messagebus.client.carry.impl.GenericConsumer;
 import com.freedom.messagebus.client.message.model.IMessageHeader;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.server.Constants;
@@ -11,13 +12,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @DaemonService(value = "msgLogService", policy = RunPolicy.ONCE)
 public class MsgLogService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(MsgLogService.class);
-    private Messagebus    client;
-    private AsyncConsumer asyncConsumer;
+    private Messagebus      client;
+    private GenericConsumer asyncConsumer;
 
     public MsgLogService(Map<String, Object> context) {
         super(context);
@@ -27,23 +29,13 @@ public class MsgLogService extends AbstractService {
 
     @Override
     public void run() {
-        try {
-            synchronized (this) {
-                asyncConsumer = client.getAsyncConsumer(
-                    new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message) {
-                            logger.info(formatLog(message.getMessageHeader()));
-
-                        }
-                    });
-
-                asyncConsumer.startup();
-                this.wait();
-            }
-        } catch (InterruptedException e) {
-            asyncConsumer.shutdown();
-        }
+        client.asyncConsume(
+            new IMessageReceiveListener() {
+                @Override
+                public void onMessage(Message message) {
+                    logger.info(formatLog(message.getMessageHeader()));
+                }
+            }, Integer.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     private String formatLog(IMessageHeader msgHeader) {

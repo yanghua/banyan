@@ -2,7 +2,6 @@ package com.freedom.messagebus.client.handler.common;
 
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.MessageContext;
-import com.freedom.messagebus.client.core.config.ConfigManager;
 import com.freedom.messagebus.client.handler.AbstractHandler;
 import com.freedom.messagebus.client.handler.IHandlerChain;
 import org.apache.commons.logging.Log;
@@ -18,7 +17,7 @@ public class PermissionChecker extends AbstractHandler {
     public void handle(MessageContext context, IHandlerChain chain) {
     }
 
-    protected boolean commonCheck(Node source, Node target, boolean isSend) {
+    protected boolean commonCheck(MessageContext context, Node target, boolean isSend, Node source) {
         //inner channel just let it go!
         if (source.isInner() || target.isInner())
             return true;
@@ -26,9 +25,9 @@ public class PermissionChecker extends AbstractHandler {
         Map<String, byte[]> permissionQueryArrMap = null;
 
         if (isSend) {
-            permissionQueryArrMap = ConfigManager.getInstance().getSendPermByteQueryArrMap();
+            permissionQueryArrMap = context.getConfigManager().getSendPermByteQueryArrMap();
         } else {
-            permissionQueryArrMap = ConfigManager.getInstance().getReceivePermByteQueryArrMap();
+            permissionQueryArrMap = context.getConfigManager().getReceivePermByteQueryArrMap();
         }
 
         byte[] grantIdSwitchArr = permissionQueryArrMap.get(String.valueOf(source.getNodeId()));

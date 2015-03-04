@@ -1,11 +1,11 @@
-package com.freedom.messagebus.client;
+package com.freedom.messagebus.client.carry;
 
 import com.freedom.messagebus.client.message.model.Message;
 
 /**
  * the interface of producer
  */
-public interface IProducer extends IBasicOperator {
+public interface IProducer {
 
     /**
      * simple producer just produces a message

@@ -17,7 +17,7 @@ public class ProducePermission extends PermissionChecker {
         Node sourceNode = context.getSourceNode();
         Node targetNode = context.getTargetNode();
 
-        boolean hasPermission = this.commonCheck(sourceNode, targetNode, true);
+        boolean hasPermission = this.commonCheck(context, targetNode, true, sourceNode);
         if (!hasPermission) {
             logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +
                              "] to queue [" + targetNode.getName() + "]");

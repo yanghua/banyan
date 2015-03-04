@@ -17,34 +17,34 @@ public class MessageCarryHandlerChain implements IHandlerChain {
 
     private int pos = 0;
 
-    public MessageCarryHandlerChain(MessageCarryType type, GenericContext context) {
+    public MessageCarryHandlerChain(MessageCarryType type, GenericContext genericContext) {
         switch (type) {
             case PRODUCE:
-                handlerChain = context.getConfigManager().getProduceHandlerChain();
+                handlerChain = genericContext.getConfigManager().getProduceHandlerChain();
                 break;
 
             case CONSUME:
-                handlerChain = context.getConfigManager().getConsumeHandlerChain();
+                handlerChain = genericContext.getConfigManager().getConsumeHandlerChain();
                 break;
 
             case REQUEST:
-                handlerChain = context.getConfigManager().getRequestHandlerChain();
+                handlerChain = genericContext.getConfigManager().getRequestHandlerChain();
                 break;
 
             case RESPONSE:
-                handlerChain = context.getConfigManager().getResponseHandlerChain();
+                handlerChain = genericContext.getConfigManager().getResponseHandlerChain();
                 break;
 
             case PUBLISH:
-                handlerChain = context.getConfigManager().getPublishHandlerChain();
+                handlerChain = genericContext.getConfigManager().getPublishHandlerChain();
                 break;
 
             case SUBSCRIBE:
-                handlerChain = context.getConfigManager().getSubscribeHandlerChain();
+                handlerChain = genericContext.getConfigManager().getSubscribeHandlerChain();
                 break;
 
             case BROADCAST:
-                handlerChain = context.getConfigManager().getBroadcastHandlerChain();
+                handlerChain = genericContext.getConfigManager().getBroadcastHandlerChain();
                 break;
 
             default:

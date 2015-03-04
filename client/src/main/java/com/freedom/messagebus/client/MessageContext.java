@@ -2,12 +2,10 @@ package com.freedom.messagebus.client;
 
 import com.freedom.messagebus.business.model.Node;
 import com.freedom.messagebus.client.core.config.ConfigManager;
-import com.freedom.messagebus.client.core.pool.AbstractPool;
 import com.freedom.messagebus.client.handler.common.AsyncEventLoop;
 import com.freedom.messagebus.client.message.model.Message;
 import com.freedom.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +20,6 @@ public class MessageContext {
 
     private static final Log logger = LogFactory.getLog(MessageContext.class);
 
-    public  Connection              connection;
     private String                  host;
     private boolean                 isAuthorized;
     private boolean                 enableTransaction;
@@ -30,41 +27,32 @@ public class MessageContext {
     private Message[]               messages;
     private Message                 consumedMsg;
     private String                  consumerTag;
-    private MessageCarryType        carryType;                 //produce or consume
-    private Node                    sourceNode;                //store represent self
-    private Node                    targetNode;                 //store represent current carry node
+    private MessageCarryType        carryType;
+    private Node                    sourceNode;
+    private Node                    targetNode;
     private Channel                 channel;
     private AsyncEventLoop          asyncEventLoop;
     private IMessageReceiveListener listener;
-    private AbstractPool<Channel>   pool;
     private long                    timeout;
     private boolean                 hasTimeout;
     private int                     consumeMsgNum;
     private List<Message>           consumeMsgs;
-    private String                  tempQueueName;                       //for response
+    private String                  tempQueueName;
     private List<String>            subQueueNames;
+    private ConfigManager           configManager;
+
     private Map<String, Object> otherParams = new HashMap<String, Object>();
     private boolean             isSync      = false;
 
     public MessageContext() {
     }
 
-
     public String getHost() {
-        if (this.host == null) {
-            this.host = ConfigManager.getInstance().getClientConfigMap().get("messagebus.client.host").getValue();
-            return this.host;
-        }
         return this.host;
     }
 
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public boolean isAuthorized() {
@@ -83,7 +71,6 @@ public class MessageContext {
         this.enableTransaction = enableTransaction;
     }
 
-
     public Message[] getMessages() {
         return messages;
     }
@@ -91,7 +78,6 @@ public class MessageContext {
     public void setMessages(Message[] messages) {
         this.messages = messages;
     }
-
 
     public Channel getChannel() {
         return channel;
@@ -101,7 +87,6 @@ public class MessageContext {
         this.channel = channel;
     }
 
-
     public AsyncEventLoop getAsyncEventLoop() {
         return asyncEventLoop;
     }
@@ -109,7 +94,6 @@ public class MessageContext {
     public void setAsyncEventLoop(AsyncEventLoop asyncEventLoop) {
         this.asyncEventLoop = asyncEventLoop;
     }
-
 
     public MessageCarryType getCarryType() {
         return carryType;
@@ -119,7 +103,6 @@ public class MessageContext {
         this.carryType = carryType;
     }
 
-
     public Node getTargetNode() {
         return targetNode;
     }
@@ -128,7 +111,6 @@ public class MessageContext {
         this.targetNode = targetNode;
     }
 
-
     public Node getSourceNode() {
         return sourceNode;
     }
@@ -136,7 +118,6 @@ public class MessageContext {
     public void setSourceNode(Node sourceNode) {
         this.sourceNode = sourceNode;
     }
-
 
     public Map<String, Object> getOtherParams() {
         return otherParams;
@@ -158,21 +139,12 @@ public class MessageContext {
         this.consumedMsg = consumedMsg;
     }
 
-
     public IMessageReceiveListener getListener() {
         return listener;
     }
 
     public void setListener(IMessageReceiveListener listener) {
         this.listener = listener;
-    }
-
-    public AbstractPool<Channel> getPool() {
-        return pool;
-    }
-
-    public void setPool(AbstractPool<Channel> pool) {
-        this.pool = pool;
     }
 
     public long getTimeout() {
@@ -190,7 +162,6 @@ public class MessageContext {
     public void setIsTimeout(boolean hasTimeout) {
         this.hasTimeout = hasTimeout;
     }
-
 
     public String getTempQueueName() {
         return tempQueueName;
@@ -238,6 +209,14 @@ public class MessageContext {
 
     public void setSubQueueNames(List<String> subQueueNames) {
         this.subQueueNames = subQueueNames;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public void setConfigManager(ConfigManager configManager) {
+        this.configManager = configManager;
     }
 
     @Override
