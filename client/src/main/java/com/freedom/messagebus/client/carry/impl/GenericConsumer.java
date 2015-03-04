@@ -74,7 +74,7 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
     }
 
     @Override
-    public void asyncConsume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
+    public void consume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
         this.onMessage = onMessage;
         this.timeout = timeout;
         this.timeUnit = unit;

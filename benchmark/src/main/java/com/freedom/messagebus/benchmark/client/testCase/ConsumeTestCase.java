@@ -41,7 +41,7 @@ public class ConsumeTestCase extends Benchmark {
             try {
                 client.open();
 
-                client.asyncConsume(
+                client.consume(
                     new IMessageReceiveListener() {
                         @Override
                         public void onMessage(Message message) {

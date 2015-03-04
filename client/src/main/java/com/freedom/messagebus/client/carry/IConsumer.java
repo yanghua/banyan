@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface IConsumer {
 
-    public void asyncConsume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit);
+    public void consume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit);
 
     public List<Message> consume(int expectedNum);
 

@@ -52,10 +52,10 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void asyncConsume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
+    public void consume(IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
         GenericConsumer consumer = new GenericConsumer();
         consumer.setContext(context);
-        consumer.asyncConsume(onMessage, timeout, unit);
+        consumer.consume(onMessage, timeout, unit);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class MsgLogService extends AbstractService {
 
     @Override
     public void run() {
-        client.asyncConsume(
+        client.consume(
             new IMessageReceiveListener() {
                 @Override
                 public void onMessage(Message message) {

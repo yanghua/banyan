@@ -12,7 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -106,7 +105,7 @@ public class ProduceConsume {
             e.printStackTrace();
         }
 
-        client.asyncConsume(new IMessageReceiveListener() {
+        client.consume(new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageHeader().getMessageId());
@@ -151,7 +150,7 @@ public class ProduceConsume {
                 client.open();
 
                 //long long time
-                client.asyncConsume(new IMessageReceiveListener() {
+                client.consume(new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {
                         logger.info(message.getMessageHeader().getMessageId());

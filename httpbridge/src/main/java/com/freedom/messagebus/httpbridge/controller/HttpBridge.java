@@ -256,7 +256,7 @@ public class HttpBridge extends HttpServlet {
         });
 
         try {
-            messagebus.asyncConsume(
+            messagebus.consume(
                 new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {

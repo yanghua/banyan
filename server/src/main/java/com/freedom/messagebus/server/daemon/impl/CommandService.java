@@ -56,7 +56,7 @@ public class CommandService extends AbstractService {
     @Override
     public void run() {
         synchronized (lockObj) {
-            client.asyncConsume(
+            client.consume(
                 new IMessageReceiveListener() {
                     @Override
                     public void onMessage(Message message) {
