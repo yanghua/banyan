@@ -57,7 +57,7 @@ public class ExchangerManager {
         watchPubSuber();
     }
 
-    public boolean isZKAlive() {
+    public boolean isPubsuberAlive() {
         return this.pubsuber.isAlive();
     }
 

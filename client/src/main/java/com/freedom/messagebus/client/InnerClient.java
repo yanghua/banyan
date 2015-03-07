@@ -41,7 +41,7 @@ abstract class InnerClient {
 
         this.exchangeManager = new ExchangerManager(this.getPubsuberHost(), this.getPubsuberPort());
 
-        if (!this.exchangeManager.isZKAlive())
+        if (!this.exchangeManager.isPubsuberAlive())
             throw new MessagebusConnectedFailedException("can not connect to zookeeper server.");
 
         this.configManager = new ConfigManager();
