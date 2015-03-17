@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.freedom.messagebus</groupId>
+    <groupId>com.messagebus</groupId>
     <artifactId>messagebus</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -103,7 +103,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.freedom.messagebus.server.App</mainClass>
+                            <mainClass>com.messagebus.server.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -130,7 +130,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.freedom.messagebus.server.App</mainClass>
+                            <mainClass>com.messagebus.server.App</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -11,7 +11,7 @@
 
     <servlet>
         <servlet-name>httpBridge</servlet-name>
-        <servlet-class>com.freedom.messagebus.httpbridge.controller.HttpBridge</servlet-class>
+        <servlet-class>com.messagebus.httpbridge.controller.HttpBridge</servlet-class>
         <async-supported>true</async-supported>
         <!--<load-on-startup>1</load-on-startup>-->
     </servlet>
@@ -24,7 +24,7 @@
 
     <filter>
         <filter-name>urlDispatcher</filter-name>
-        <filter-class>com.freedom.messagebus.httpbridge.filter.URLDispatcher</filter-class>
+        <filter-class>com.messagebus.httpbridge.filter.URLDispatcher</filter-class>
         <async-supported>true</async-supported>
     </filter>
 
@@ -33,8 +33,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <listener>
-        <listener-class>com.freedom.messagebus.httpbridge.listener.AppContextListener</listener-class>
-    </listener>
+    <receiveListener>
+        <receiveListener-class>com.messagebus.httpbridge.receiveListener.AppContextListener</receiveListener-class>
+    </receiveListener>
 
 </web-app>

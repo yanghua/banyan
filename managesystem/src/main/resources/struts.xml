@@ -32,7 +32,7 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="/dashboard/*" class="com.freedom.managesystem.action.home.DashboardAction" method="{1}">
+        <action name="/dashboard/*" class="com.messagebus.managesystem.action.home.DashboardAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
 
@@ -60,11 +60,11 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="/module/*" class="com.freedom.managesystem.action.permission.ModuleAction" method="{1}">
+        <action name="/module/*" class="com.messagebus.managesystem.action.permission.ModuleAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
 
-        <action name="/queue/*" class="com.freedom.managesystem.action.permission.QueueAction" method="{1}">
+        <action name="/queue/*" class="com.messagebus.managesystem.action.permission.QueueAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
         </action>
     </package>
@@ -91,19 +91,19 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="/channel/*" class="com.freedom.managesystem.action.monitor.ChannelAction" method="{1}">
+        <action name="/channel/*" class="com.messagebus.managesystem.action.monitor.ChannelAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
 
-        <action name="/queue/*" class="com.freedom.managesystem.action.monitor.QueueAction" method="{1}">
+        <action name="/queue/*" class="com.messagebus.managesystem.action.monitor.QueueAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
 
-        <action name="/exchange/*" class="com.freedom.managesystem.action.monitor.ExchangeAction" method="{1}">
+        <action name="/exchange/*" class="com.messagebus.managesystem.action.monitor.ExchangeAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
@@ -132,13 +132,13 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="/topology/*" class="com.freedom.managesystem.action.maintain.TopologyAction" method="{1}">
+        <action name="/topology/*" class="com.messagebus.managesystem.action.maintain.TopologyAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
         </action>
 
-        <action name="/node/*" class="com.freedom.managesystem.action.maintain.NodeAction" method="{1}">
+        <action name="/node/*" class="com.messagebus.managesystem.action.maintain.NodeAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>
@@ -167,7 +167,7 @@
                                result="error"/>
         </global-exception-mappings>
 
-        <action name="/queue/*" class="com.freedom.managesystem.action.alarm.QueueAction" method="{1}">
+        <action name="/queue/*" class="com.messagebus.managesystem.action.alarm.QueueAction" method="{1}">
             <result name="index" type="freemarker">/WEB-INF/widget/layout.ftl</result>
             <result name="success">/success.jsp</result>
             <result name="error">/error.jsp</result>

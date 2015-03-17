@@ -1,0 +1,16 @@
+package com.messagebus.client.core.pool;
+
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
+/**
+ * channel pool config
+ */
+public class ChannelPoolConfig extends GenericObjectPoolConfig {
+
+    public ChannelPoolConfig() {
+        setTestWhileIdle(false);
+        setMinEvictableIdleTimeMillis(60000);
+        setTimeBetweenEvictionRunsMillis(30000);
+        setNumTestsPerEvictionRun(-1);
+    }
+}

@@ -26,9 +26,9 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:applicationContext.xml</param-value>
     </context-param>
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+    <receiveListener>
+        <receiveListener-class>org.springframework.web.context.ContextLoaderListener</receiveListener-class>
+    </receiveListener>
 
     <!-- jsp tag for freemarker -->
     <servlet>
@@ -37,10 +37,10 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- messagebus server sentinel listener -->
-    <listener>
-        <listener-class>com.freedom.managesystem.action.other.MBServerSentinelListener</listener-class>
-    </listener>
+    <!-- messagebus server sentinel receiveListener -->
+    <receiveListener>
+        <receiveListener-class>com.messagebus.managesystem.action.other.MBServerSentinelListener</receiveListener-class>
+    </receiveListener>
 
     <welcome-file-list>
         <welcome-file>/goIndex.jsp</welcome-file>
