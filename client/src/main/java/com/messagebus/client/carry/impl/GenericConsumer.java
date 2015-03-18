@@ -7,7 +7,7 @@ import com.messagebus.client.carry.IConsumer;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.handler.common.AsyncEventLoop;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,7 +86,7 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
     }
 
     @Override
-    public List<Message> consume(String secret, int expectedNum) {
+    public List<IMessage> consume(String secret, int expectedNum) {
         final MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.CONSUME);

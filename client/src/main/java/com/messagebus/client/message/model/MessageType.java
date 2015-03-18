@@ -10,19 +10,13 @@ public enum MessageType {
 
 
     QueueMessage("queue", 0),
-    AuthreqMessage("authreq", 1),
-    AuthrespMessage("authresp", 2),
-    PubSubMessage("pubsub", 3),
-    BroadcastMessage("broadcast", 4);
+    BroadcastMessage("broadcast", 1);
 
     private static final Log                      logger     = LogFactory.getLog(MessageType.class);
-    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(5);
+    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(2);
 
     static {
         lookupList.put("queue", QueueMessage);
-        lookupList.put("authreq", AuthreqMessage);
-        lookupList.put("authresp", AuthrespMessage);
-        lookupList.put("pubsub", PubSubMessage);
         lookupList.put("broadcast", BroadcastMessage);
     }
 

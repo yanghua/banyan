@@ -12,14 +12,14 @@ public class MessageJSONSerializer {
     private static final Gson gson   = new GsonBuilder().serializeNulls().create();
 
 
-    public static String serialize(Message msg) {
+    public static String serialize(IMessage msg) {
         checkMessageType(msg.getMessageType());
 
         return gson.toJson(msg);
     }
 
 
-    public static Message deSerialize(String msgStr, MessageType type) {
+    public static IMessage deSerialize(String msgStr, MessageType type) {
         checkMessageType(type);
 
         JsonParser parser = new JsonParser();
@@ -27,27 +27,27 @@ public class MessageJSONSerializer {
 
         JsonObject obj = element.getAsJsonObject();
         JsonElement headerElement = obj.get("messageHeader");
-        QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
+        Message.MessageBody body = gson.fromJson(obj.get("messageBody"), Message.MessageBody.class);
         MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
         IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-        Message msg = MessageFactory.createMessage(msgType);
+        IMessage msg = MessageFactory.createMessage(msgType);
         adaptMsgHeader(header, msg.getMessageHeader());
         msg.setMessageBody(body);
 
         return msg;
     }
 
-    public static Message deSerialize(JsonElement msgElement, MessageType type) {
+    public static IMessage deSerialize(JsonElement msgElement, MessageType type) {
         checkMessageType(type);
 
         JsonObject obj = msgElement.getAsJsonObject();
         JsonElement headerElement = obj.get("messageHeader");
-        QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
+        Message.MessageBody body = gson.fromJson(obj.get("messageBody"), Message.MessageBody.class);
         MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
         IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-        Message msg = MessageFactory.createMessage(msgType);
+        IMessage msg = MessageFactory.createMessage(msgType);
         adaptMsgHeader(header, msg.getMessageHeader());
         msg.setMessageBody(body);
 
@@ -55,8 +55,8 @@ public class MessageJSONSerializer {
     }
 
 
-    public static String serializeMessages(Collection<Message> msgs) {
-        for (Message msg : msgs) {
+    public static String serializeMessages(Collection<IMessage> msgs) {
+        for (IMessage msg : msgs) {
             checkMessageType(msg.getMessageType());
         }
 
@@ -64,7 +64,7 @@ public class MessageJSONSerializer {
     }
 
 
-    public static Message[] deSerializeMessages(String msgArrStr, MessageType type) {
+    public static IMessage[] deSerializeMessages(String msgArrStr, MessageType type) {
         checkMessageType(type);
 
         int i = 0;
@@ -78,16 +78,16 @@ public class MessageJSONSerializer {
                                                         "it should be a string of json object array ");
         }
 
-        Message[] msgs = new Message[element.getAsJsonArray().size()];
+        IMessage[] msgs = new IMessage[element.getAsJsonArray().size()];
 
         for (JsonElement e : element.getAsJsonArray()) {
             JsonObject obj = e.getAsJsonObject();
             JsonElement headerElement = obj.get("messageHeader");
-            QueueMessage.QueueMessageBody body = gson.fromJson(obj.get("messageBody"), QueueMessage.QueueMessageBody.class);
+            Message.MessageBody body = gson.fromJson(obj.get("messageBody"), Message.MessageBody.class);
             MessageType msgType = gson.fromJson(obj.get("messageType"), MessageType.class);
             IMessageHeader header = gson.fromJson(headerElement, GenericMessageHeader.class);
 
-            Message msg = MessageFactory.createMessage(msgType);
+            IMessage msg = MessageFactory.createMessage(msgType);
             adaptMsgHeader(header, msg.getMessageHeader());
             msg.setMessageBody(body);
             msgs[i++] = msg;

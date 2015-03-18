@@ -1,10 +1,9 @@
 package com.messagebus.httpbridge.controller;
 
-import com.messagebus.client.*;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusUnOpenException;
 import com.messagebus.client.carry.IResponser;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageJSONSerializer;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
@@ -82,7 +81,7 @@ public class HttpBridge extends HttpServlet {
                 ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
                                       "param : messages can not be null or empty", "", "''");
             } else {
-                Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+                IMessage[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
 
                 try {
 //                    messagebus.batchProduce(, queueName, msgArr, );
@@ -178,7 +177,7 @@ public class HttpBridge extends HttpServlet {
             String queueName = request.getRequestURI().split("/")[3];
             String msgStr = request.getParameter("message");
 
-            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
+            IMessage msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
 
             Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
 
@@ -199,7 +198,7 @@ public class HttpBridge extends HttpServlet {
         String numStr = request.getParameter("num");
         int num = 0;
 
-        List<Message> messages = null;
+        List<IMessage> messages = null;
 
         try {
             if (numStr == null)

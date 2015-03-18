@@ -19,7 +19,7 @@ public class ZookeeperDataConverter implements IDataConverter {
     public <T> byte[] serialize(Serializable obj) {
         byte[] bytes;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(baos)){
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(obj);
             oos.flush();
 

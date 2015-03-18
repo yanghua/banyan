@@ -1,4 +1,4 @@
-package com.messagebus.client.core.pool;
+package com.messagebus.client;
 
 import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
@@ -12,7 +12,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
  *
  * @param <T> the Object that the pool want to cache
  */
-public abstract class AbstractPool<T> {
+abstract class AbstractPool<T> {
 
     private static final Log logger = LogFactory.getLog(AbstractPool.class);
 
@@ -37,7 +37,7 @@ public abstract class AbstractPool<T> {
             return internalPool.borrowObject();
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "[getResource]");
-            throw new ChannelConnectException("can not get a resource from the pool ", e);
+            throw new RuntimeException("can not get a resource from the pool ", e);
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class AbstractPool<T> {
         try {
             internalPool.invalidateObject(resource);
         } catch (Exception e) {
-            throw new ChannelException("Could not return the resource to the pool", e);
+            throw new RuntimeException("Could not return the resource to the pool", e);
         }
     }
 

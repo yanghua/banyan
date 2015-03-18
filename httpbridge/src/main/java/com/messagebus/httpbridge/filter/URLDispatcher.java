@@ -1,8 +1,8 @@
 package com.messagebus.httpbridge.filter;
 
+import com.google.gson.Gson;
 import com.messagebus.httpbridge.util.Constants;
 import com.messagebus.httpbridge.util.ResponseUtil;
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

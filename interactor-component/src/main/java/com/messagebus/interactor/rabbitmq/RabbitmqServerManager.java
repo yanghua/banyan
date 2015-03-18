@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 
 public class RabbitmqServerManager {
 
-    private static final    Log                   logger   = LogFactory.getLog(RabbitmqServerManager.class);
+    private static final Log logger = LogFactory.getLog(RabbitmqServerManager.class);
 
     public static void start(String mqHost) {
         if (!comeFromSameHost(mqHost)) {

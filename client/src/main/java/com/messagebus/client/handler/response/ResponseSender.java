@@ -3,10 +3,9 @@ package com.messagebus.client.handler.response;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
@@ -27,9 +26,8 @@ public class ResponseSender extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        Message responseMsg = context.getMessages()[0];
-        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(responseMsg.getMessageType());
-        byte[] msgBody = msgBodyProcessor.box(responseMsg.getMessageBody());
+        IMessage responseMsg = context.getMessages()[0];
+        byte[] msgBody = MsgBodyTransfer.box(responseMsg.getMessageBody());
         AMQP.BasicProperties properties = MessageHeaderTransfer.box(responseMsg.getMessageHeader());
         try {
             ProxyProducer.produce("",

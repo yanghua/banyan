@@ -1,6 +1,6 @@
 package com.messagebus.client;
 
-public class MessageResponseTimeoutException extends Exception {
+public class MessageResponseTimeoutException extends RuntimeException {
 
     public MessageResponseTimeoutException() {
         super();

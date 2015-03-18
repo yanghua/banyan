@@ -4,10 +4,9 @@ import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.client.model.HandlerModel;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
@@ -31,9 +30,8 @@ public class RealPublisher extends AbstractHandler {
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
         try {
-            for (Message msg : context.getMessages()) {
-                IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());
-                byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
+            for (IMessage msg : context.getMessages()) {
+                byte[] msgBody = MsgBodyTransfer.box(msg.getMessageBody());
                 AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
 
                 List<Node> publishNodes = (List<Node>) context.getOtherParams().get("publishList");

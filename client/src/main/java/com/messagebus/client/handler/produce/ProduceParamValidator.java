@@ -3,7 +3,7 @@ package com.messagebus.client.handler.produce;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.AbstractParamValidator;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
@@ -38,7 +38,7 @@ public class ProduceParamValidator extends AbstractParamValidator {
 
     private void validateMessagesProperties(MessageContext context) {
         Date currentDate = new Date();
-        for (Message msg : context.getMessages()) {
+        for (IMessage msg : context.getMessages()) {
             //app id
             if (msg.getMessageHeader().getAppId() == null || msg.getMessageHeader().getAppId().isEmpty())
                 msg.getMessageHeader().setAppId(context.getSourceNode().getAppId());

@@ -1,7 +1,7 @@
 package com.messagebus.interactor.pubsub.impl.redis;
 
-import com.messagebus.interactor.pubsub.IDataConverter;
 import com.google.gson.Gson;
+import com.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

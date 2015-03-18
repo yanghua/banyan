@@ -1,6 +1,6 @@
 package com.messagebus.client.message.model;
 
-abstract class AbstractMessage implements Message {
+abstract class AbstractMessage implements IMessage {
 
     protected MessageType          type;
     protected GenericMessageHeader genericMessageHeader;

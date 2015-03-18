@@ -3,12 +3,11 @@ package com.messagebus.client.handler.request;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.client.model.HandlerModel;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.messagebus.interactor.rabbitmq.QueueManager;
@@ -69,7 +68,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
             }
 
             MessageType msgType = MessageType.lookup(msgTypeStr);
-            Message msg = MessageFactory.createMessage(msgType);
+            IMessage msg = MessageFactory.createMessage(msgType);
             initMessage(msg, msgType, properties, msgBody);
             context.setConsumedMsg(msg);
         } catch (IOException | InterruptedException e) {
@@ -96,10 +95,8 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
 
     }
 
-    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
+    private void initMessage(IMessage msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
         MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
-
-        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msgType);
-        msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
+        msg.setMessageBody(MsgBodyTransfer.unbox(bodyData));
     }
 }

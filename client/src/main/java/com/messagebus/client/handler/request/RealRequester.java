@@ -3,10 +3,9 @@ package com.messagebus.client.handler.request;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -28,9 +27,8 @@ public class RealRequester extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        Message reqMsg = context.getMessages()[0];
-        IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(reqMsg.getMessageType());
-        byte[] msgBody = msgBodyProcessor.box(reqMsg.getMessageBody());
+        IMessage reqMsg = context.getMessages()[0];
+        byte[] msgBody = MsgBodyTransfer.box(reqMsg.getMessageBody());
         AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg.getMessageHeader());
         try {
             ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,

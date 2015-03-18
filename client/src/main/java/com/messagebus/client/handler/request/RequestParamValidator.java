@@ -4,7 +4,7 @@ import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.ParamValidateFailedException;
 import com.messagebus.client.handler.common.AbstractParamValidator;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
@@ -24,7 +24,7 @@ public class RequestParamValidator extends AbstractParamValidator {
             throw new RuntimeException("message carry type should be request");
         }
 
-        Message[] msgs = context.getMessages();
+        IMessage[] msgs = context.getMessages();
         if (msgs == null || msgs.length != 1) {
             throw new RuntimeException("illegal message array length : in request-response mode : " +
                                            "just send a request message once a time ");
@@ -47,7 +47,7 @@ public class RequestParamValidator extends AbstractParamValidator {
 
     private void validateMessagesProperties(MessageContext context) {
         Date currentDate = new Date();
-        for (Message msg : context.getMessages()) {
+        for (IMessage msg : context.getMessages()) {
             //app id
             if (msg.getMessageHeader().getAppId() == null || msg.getMessageHeader().getAppId().isEmpty())
                 msg.getMessageHeader().setAppId(context.getSourceNode().getAppId());

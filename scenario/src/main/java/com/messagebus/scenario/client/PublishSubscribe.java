@@ -2,11 +2,11 @@ package com.messagebus.scenario.client;
 
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.PubSubMessage;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,73 +34,55 @@ public class PublishSubscribe {
     private static void publish() {
         String secret = "oiqwenncuicnsdfuasdfnkajkwqowe";
         String token = "kjkjasdjfhkajsdfhksdjhfkasdf";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
-
-        Message msg = MessageFactory.createMessage(MessageType.PubSubMessage);
+        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setContentType("text/plain");
         msg.getMessageHeader().setContentEncoding("utf-8");
 
-        PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         msg.setMessageBody(body);
 
-        client.publish(secret, new Message[]{msg}, token);
+        client.publish(secret, new IMessage[]{msg}, token);
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
     private static void subscribe1() {
         String secret = "nckljsenlkjanefluiwnlanfmsdfas";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
-
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
         client.subscribe(secret, new IMessageReceiveListener() {
             @Override
-            public void onMessage(Message message) {
+            public void onMessage(IMessage message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
         }, 3, TimeUnit.SECONDS);
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
     private static void subscribe2() {
         String secret = "zxcnvblawelkusahdfqwiuhowefhnx";
 
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
-
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
         client.subscribe(secret, new IMessageReceiveListener() {
             @Override
-            public void onMessage(Message message) {
+            public void onMessage(IMessage message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
         }, 3, TimeUnit.SECONDS);
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
 }

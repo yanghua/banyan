@@ -4,6 +4,7 @@ import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.business.exchanger.IDataFetcher;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.server.bootstrap.ConfigurationLoader;
@@ -212,24 +213,22 @@ public class App {
     private static void buildCommonClient(Map<String, Object> context) throws MessagebusConnectedFailedException {
         Properties serverConfig = (Properties) context.get(com.messagebus.server.Constants.KEY_SERVER_CONFIG);
         //message bus client
-        Messagebus commonClient = new Messagebus();
-
         String pubsuberHost = serverConfig.getProperty(com.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
         int pubsuberPort = Integer.parseInt(serverConfig.getProperty(com.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
-        commonClient.setPubsuberHost(pubsuberHost);
-        commonClient.setPubsuberPort(pubsuberPort);
-        commonClient.open();
+        MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
+        Messagebus commonClient = pool.getResource();
 
+        context.put(com.messagebus.server.Constants.GLOBAL_CLIENT_POOL, pool);
         context.put(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT, commonClient);
     }
 
     private static void destroy(Map<String, Object> context) {
-        if (context != null && context.containsKey(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT)
-            && context.get(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT) != null) {
+        if (context != null) {
+            MessagebusSinglePool pool = (MessagebusSinglePool) context.get(com.messagebus.server.Constants.GLOBAL_CLIENT_POOL);
             Messagebus client = (Messagebus) context.get(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT);
-            if (client.isOpen())
-                client.close();
+            pool.returnResource(client);
+            pool.destroy();
         }
     }
 

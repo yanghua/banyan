@@ -3,7 +3,7 @@ package com.messagebus.client;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.client.handler.common.AsyncEventLoop;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
@@ -24,8 +24,8 @@ public class MessageContext {
     private String                  secret;
     private String                  token;
     private boolean                 enableTransaction;
-    private Message[]               messages;
-    private Message                 consumedMsg;
+    private IMessage[]              messages;
+    private IMessage                consumedMsg;
     private String                  consumerTag;
     private MessageCarryType        carryType;
     private Node                    sourceNode;
@@ -36,7 +36,7 @@ public class MessageContext {
     private long                    timeout;
     private boolean                 hasTimeout;
     private int                     consumeMsgNum;
-    private List<Message>           consumeMsgs;
+    private List<IMessage>          consumeMsgs;
     private String                  tempQueueName;
     private ConfigManager           configManager;
     private IMessageReceiveListener noticeListener;
@@ -80,11 +80,11 @@ public class MessageContext {
         this.enableTransaction = enableTransaction;
     }
 
-    public Message[] getMessages() {
+    public IMessage[] getMessages() {
         return messages;
     }
 
-    public void setMessages(Message[] messages) {
+    public void setMessages(IMessage[] messages) {
         this.messages = messages;
     }
 
@@ -132,11 +132,11 @@ public class MessageContext {
         return otherParams;
     }
 
-    public Message getConsumedMsg() {
+    public IMessage getConsumedMsg() {
         return consumedMsg;
     }
 
-    public void setConsumedMsg(Message consumedMsg) {
+    public void setConsumedMsg(IMessage consumedMsg) {
         this.consumedMsg = consumedMsg;
     }
 
@@ -180,11 +180,11 @@ public class MessageContext {
         this.consumeMsgNum = consumeMsgNum;
     }
 
-    public List<Message> getConsumeMsgs() {
+    public List<IMessage> getConsumeMsgs() {
         return consumeMsgs;
     }
 
-    public void setConsumeMsgs(List<Message> consumeMsgs) {
+    public void setConsumeMsgs(List<IMessage> consumeMsgs) {
         this.consumeMsgs = consumeMsgs;
     }
 

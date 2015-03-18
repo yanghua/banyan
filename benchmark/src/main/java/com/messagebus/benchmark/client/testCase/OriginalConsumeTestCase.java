@@ -4,12 +4,11 @@ import com.messagebus.benchmark.client.Benchmark;
 import com.messagebus.benchmark.client.IFetcher;
 import com.messagebus.benchmark.client.ITerminater;
 import com.messagebus.benchmark.client.TestConfigConstant;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
@@ -72,7 +71,7 @@ public class OriginalConsumeTestCase extends Benchmark {
                         throw new RuntimeException("unknown message type : " + msgTypeStr);
                     }
 
-                    Message msg = MessageFactory.createMessage(msgType);
+                    IMessage msg = MessageFactory.createMessage(msgType);
                     initMessage(msg, msgType, properties, msgBody);
 
                     ++counter;
@@ -91,11 +90,9 @@ public class OriginalConsumeTestCase extends Benchmark {
             }
         }
 
-        private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
+        private void initMessage(IMessage msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
             MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
-
-            IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msgType);
-            msg.setMessageBody(msgBodyProcessor.unbox(bodyData));
+            msg.setMessageBody(MsgBodyTransfer.unbox(bodyData));
         }
 
         public String getRealQueueName() {

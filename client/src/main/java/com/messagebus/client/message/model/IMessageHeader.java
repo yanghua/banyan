@@ -12,7 +12,7 @@ public interface IMessageHeader {
 
     public String getType();
 
-//    public void setType(String type);
+    public void setType(String type);
 
     public Date getTimestamp();
 

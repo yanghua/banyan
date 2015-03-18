@@ -1,13 +1,44 @@
 package com.messagebus.client.message.model;
 
-public interface Message {
+import java.security.InvalidParameterException;
 
-    public IMessageHeader getMessageHeader();
+public class Message extends AbstractMessage {
 
-    public IMessageBody getMessageBody();
+    private MessageBody body;
 
-    public void setMessageBody(IMessageBody messageBody);
+    public Message() {
+        this.type = MessageType.QueueMessage;
+        this.genericMessageHeader.setType(MessageType.QueueMessage.getType());
+    }
 
-    public MessageType getMessageType();
+    @Override
+    public IMessageBody getMessageBody() {
+        return this.body;
+    }
 
+    @Override
+    public void setMessageBody(IMessageBody messageBody) {
+        if (messageBody instanceof MessageBody)
+            this.body = (MessageBody) messageBody;
+        else {
+            throw new InvalidParameterException("messageBody should can be cast to : "
+                                                    + MessageBody.class.getName());
+        }
+    }
+
+    public static class MessageBody implements IMessageBody {
+
+        private byte[] content;
+
+        public MessageBody() {
+        }
+
+        public byte[] getContent() {
+            return content;
+        }
+
+        public void setContent(byte[] content) {
+            this.content = content;
+        }
+    }
 }

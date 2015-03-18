@@ -18,8 +18,8 @@ public class Constants {
 
     public static final String IS_SERVER_ONLINE = "isServerOnline";
 
-    public static final String ZK_HOST = "172.16.206.30";
-    public static final int    ZK_PORT = 2181;
+    public static final String PUBSUBER_HOST = "172.16.206.30";
+    public static final int    PUBSUBER_PORT = 2181;
 
     public static final String MESSAGEBUS_WEB_APP_ID = "5hW0M5wl9H0wO35Eva1tgM9D0p3OL2N8";
 }

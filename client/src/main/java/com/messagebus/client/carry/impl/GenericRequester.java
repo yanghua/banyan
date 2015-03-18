@@ -6,7 +6,7 @@ import com.messagebus.client.MessageContext;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.carry.IRequester;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,8 +29,8 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
      * @throws com.messagebus.client.MessageResponseTimeoutException
      */
     @Override
-    public Message request(String secret, String to, Message msg,
-                           String token, long timeout) throws MessageResponseTimeoutException {
+    public IMessage request(String secret, String to, IMessage msg,
+                            String token, long timeout) throws MessageResponseTimeoutException {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setToken(token);
@@ -39,7 +39,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
         Node node = this.getContext().getConfigManager().getReqrespNodeMap().get(to);
         ctx.setTargetNode(node);
         ctx.setTimeout(timeout);
-        ctx.setMessages(new Message[]{msg});
+        ctx.setMessages(new IMessage[]{msg});
 
         checkState();
 

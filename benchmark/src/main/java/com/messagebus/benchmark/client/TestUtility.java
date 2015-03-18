@@ -1,9 +1,9 @@
 package com.messagebus.benchmark.client;
 
 import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.MessagebusUnOpenException;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
@@ -68,23 +68,21 @@ public class TestUtility {
     }
 
     public static void produce(long total) {
-        Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
+        IMessage msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(TestConfigConstant.HOST);
-        client.setPubsuberPort(TestConfigConstant.PORT);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(TestConfigConstant.HOST,
+                                                                   TestConfigConstant.PORT);
+        Messagebus client = singlePool.getResource();
+
         try {
-            client.open();
-
             for (int i = 0; i < total; i++) {
 //                client.produce(, TestConfigConstant.QUEUE_NAME, msg, );
             }
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
         } catch (MessagebusUnOpenException e) {
             e.printStackTrace();
         } finally {
-            client.close();
+            singlePool.returnResource(client);
+            singlePool.destroy();
         }
     }
 

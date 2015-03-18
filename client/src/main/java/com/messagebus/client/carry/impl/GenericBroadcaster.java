@@ -4,7 +4,7 @@ import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.carry.IBroadcaster;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,7 +17,7 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
     }
 
     @Override
-    public void broadcast(String secret, Message[] msgs, String token) {
+    public void broadcast(String secret, IMessage[] msgs, String token) {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setToken(token);

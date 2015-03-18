@@ -1,12 +1,11 @@
 package com.messagebus.managesystem.action.other;
 
-import com.messagebus.managesystem.service.Constants;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusUnOpenException;
-import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.QueueMessage;
+import com.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,8 +25,8 @@ public class MBServerSentinelListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 //        Messagebus messagebus = Messagebus.createClient("5hW0M5wl9H0wO35Eva1tgM9D0p3OL2N8");
 //        //TODO:
-//        messagebus.setPubsuberHost(Constants.ZK_HOST);
-//        messagebus.setPubsuberPort(Constants.ZK_PORT);
+//        messagebus.setPubsuberHost(Constants.PUBSUBER_HOST);
+//        messagebus.setPubsuberPort(Constants.PUBSUBER_PORT);
 //        try {
 //            messagebus.open();
 //            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGEBUS_KEY, messagebus);
@@ -42,18 +41,18 @@ public class MBServerSentinelListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         sentinel.stopMonitor();
-        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().
-            getAttribute(Constants.MESSAGEBUS_KEY);
-        if (messagebus != null && messagebus.isOpen()) {
-            messagebus.close();
-        }
+//        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().
+//            getAttribute(Constants.MESSAGEBUS_KEY);
+//        if (messagebus != null && messagebus.isOpen()) {
+//            messagebus.close();
+//        }
     }
 
     private static class Sentinel extends Thread {
 
         private Thread              currentThread;
         private Messagebus          messagebus;
-        private Message             pingCmdMsg;
+        private IMessage            pingCmdMsg;
         private ServletContextEvent servletContextEvent;
 
         private Sentinel(Messagebus mb, ServletContextEvent contextEvent) {
@@ -66,7 +65,7 @@ public class MBServerSentinelListener implements ServletContextListener {
             pingCmdMsg = MessageFactory.createMessage(MessageType.QueueMessage);
             pingCmdMsg.getMessageHeader().setHeaders(header);
 
-            QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+            Message.MessageBody body = new Message.MessageBody();
             body.setContent(new byte[0]);
             pingCmdMsg.setMessageBody(body);
         }

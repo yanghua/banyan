@@ -2,9 +2,9 @@ package com.messagebus.server.daemon.impl;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.client.Messagebus;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.QueueMessage;
 import com.messagebus.server.Constants;
 import com.messagebus.server.daemon.DaemonService;
 import com.messagebus.server.daemon.RunPolicy;
@@ -24,7 +24,7 @@ public class CommandService extends AbstractService {
     private final Object lockObj = new Object();
 
     private Messagebus       client;
-    private QueueMessage     responseMsg;
+    private Message          responseMsg;
     private Properties       serverConfig;
     private ExchangerManager exchangeManager;
 
@@ -35,14 +35,14 @@ public class CommandService extends AbstractService {
 
         client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
 
-        responseMsg = (QueueMessage) MessageFactory.createMessage(MessageType.QueueMessage);
+        responseMsg = (Message) MessageFactory.createMessage(MessageType.QueueMessage);
         Map<String, Object> headers = new HashMap<>(1);
         headers.put("COMMAND", "PONG");
         responseMsg.getMessageHeader().setHeaders(headers);
         //TODO
 //        responseMsg.getMessageHeader().setAppId(appId);
 //        responseMsg.getMessageHeader().setReplyTo(appId);
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent(new byte[0]);
         responseMsg.setMessageBody(body);
 

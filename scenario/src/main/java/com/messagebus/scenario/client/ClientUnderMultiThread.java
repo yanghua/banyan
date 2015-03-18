@@ -1,10 +1,17 @@
 package com.messagebus.scenario.client;
 
-import com.messagebus.client.MessagebusPool;
+import com.messagebus.client.Messagebus;
+import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.MessageFactory;
+import com.messagebus.client.message.model.MessageType;
+import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +31,7 @@ public class ClientUnderMultiThread {
         produceClient.simulate();
 
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(4);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -42,8 +49,8 @@ public class ClientUnderMultiThread {
             logger.info("ProduceClient simulate start");
             GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
             poolConfig.setMaxTotal(2);
-            String appId = "djB5l1n7PbFsszF5817JOon2895El1KP";
-            MessagebusPool pool = new MessagebusPool(poolConfig, appId, pubsuberHost, pubsuberPort);
+
+            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
 
             Thread tmpThread;
             for (int i = 0; i < 2; i++) {
@@ -72,7 +79,7 @@ public class ClientUnderMultiThread {
             GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
             poolConfig.setMaxTotal(2);
             String appId = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-            MessagebusPool pool = new MessagebusPool(poolConfig, appId, pubsuberHost, pubsuberPort);
+            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
 
             Thread tmpThread;
             for (int i = 0; i < 2; i++) {
@@ -94,53 +101,57 @@ public class ClientUnderMultiThread {
 
     private static class ProduceThread implements Runnable {
 
-        private MessagebusPool pool;
-        private CountDownLatch counter;
+        private MessagebusSinglePool pool;
+        private CountDownLatch       counter;
 
-        public ProduceThread(MessagebusPool pool, CountDownLatch counter) {
+        public ProduceThread(MessagebusSinglePool pool, CountDownLatch counter) {
             this.pool = pool;
             this.counter = counter;
         }
 
         @Override
         public void run() {
-//            Messagebus client = pool.getResource();
-//            Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
-//            msg.getMessageHeader().setContentType("text/plain");
-//            msg.getMessageHeader().setContentEncoding("utf-8");
-//
-//            QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-//            body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
-//            msg.setMessageBody(body);
-//
-//            client.produce(, "erp", msg, );
-//            pool.returnResource(client);
-//
-//            counter.countDown();
+            Messagebus client = pool.getResource();
+            IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
+            msg.getMessageHeader().setContentType("text/plain");
+            msg.getMessageHeader().setContentEncoding("utf-8");
+
+            Message.MessageBody body = new Message.MessageBody();
+            body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+            msg.setMessageBody(body);
+
+            String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
+            String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
+
+            client.produce(secret, "emapDemoConsume", msg, token);
+            pool.returnResource(client);
+
+            counter.countDown();
         }
     }
 
     private static class ConsumeThread implements Runnable {
 
-        private MessagebusPool pool;
-        private CountDownLatch counter;
+        private MessagebusSinglePool pool;
+        private CountDownLatch       counter;
 
-        public ConsumeThread(MessagebusPool pool, CountDownLatch counter) {
+        public ConsumeThread(MessagebusSinglePool pool, CountDownLatch counter) {
             this.pool = pool;
             this.counter = counter;
         }
 
         @Override
         public void run() {
-//            Messagebus client = pool.getResource();
-//            List<Message> msgs = client.consume(, 10);
-//            pool.returnResource(client);
-//
-//            for (Message msg : msgs) {
-//                logger.info(msg.getMessageHeader().getMessageId());
-//            }
-//
-//            counter.countDown();
+            String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
+            Messagebus client = pool.getResource();
+            List<IMessage> msgs = client.consume(secret, 10);
+            pool.returnResource(client);
+
+            for (IMessage msg : msgs) {
+                logger.info(msg.getMessageHeader().getMessageId());
+            }
+
+            counter.countDown();
         }
     }
 

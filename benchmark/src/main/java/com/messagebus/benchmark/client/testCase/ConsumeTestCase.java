@@ -4,9 +4,8 @@ import com.messagebus.benchmark.client.Benchmark;
 import com.messagebus.benchmark.client.IFetcher;
 import com.messagebus.benchmark.client.ITerminater;
 import com.messagebus.benchmark.client.TestConfigConstant;
-import com.messagebus.client.*;
 import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.MessagebusUnOpenException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,13 +16,13 @@ public class ConsumeTestCase extends Benchmark {
 
     private static class BasicConsume implements Runnable, ITerminater, IFetcher {
 
-        private Messagebus client;
+        private MessagebusSinglePool singlePool;
+        private Messagebus           client;
         private long counter = 0;
 
         private BasicConsume() {
-            client = new Messagebus();
-            client.setPubsuberHost(TestConfigConstant.HOST);
-            client.setPubsuberPort(TestConfigConstant.PORT);
+            singlePool = new MessagebusSinglePool(TestConfigConstant.HOST, TestConfigConstant.PORT);
+            client = singlePool.getResource();
         }
 
         @Override
@@ -39,7 +38,6 @@ public class ConsumeTestCase extends Benchmark {
         @Override
         public void run() {
             try {
-                client.open();
 
 //                client.consume(,
 //                    Integer.MAX_VALUE, TimeUnit.SECONDS, new IMessageReceiveListener() {
@@ -48,11 +46,11 @@ public class ConsumeTestCase extends Benchmark {
 //                            ++counter;
 //                        }
 //                    });
-            } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
+            } catch (MessagebusUnOpenException e) {
                 e.printStackTrace();
             } finally {
-                if (client != null)
-                    client.close();
+                singlePool.returnResource(client);
+                singlePool.destroy();
             }
         }
     }

@@ -2,11 +2,11 @@ package com.messagebus.scenario.client;
 
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.QueueMessage;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,71 +39,53 @@ public class ProduceConsume {
     private static void produce() {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
         String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
-
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setContentType("text/plain");
         msg.getMessageHeader().setContentEncoding("utf-8");
 
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         msg.setMessageBody(body);
 
         client.produce(secret, "emapDemoConsume", msg, token);
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
     private static void consumeWithPullStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
+        List<IMessage> msgs = client.consume(secret, 1);
 
-        List<Message> msgs = client.consume(secret, 1);
-
-        client.close();
-
-        for (Message msg : msgs) {
+        for (IMessage msg : msgs) {
             logger.info(msg.getMessageHeader().getMessageId());
         }
+
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
     private static void ConsumeWithPushStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
-
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
         client.consume(secret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
-            public void onMessage(Message message) {
+            public void onMessage(IMessage message) {
                 logger.info(message.getMessageHeader().getMessageId());
             }
         });
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
     }
 
     private static void asyncConsume() {
@@ -121,7 +103,9 @@ public class ProduceConsume {
 
     private static class AsyncConsumeThread implements Runnable {
 
-        private Thread currentThread;
+        private Thread               currentThread;
+        private MessagebusSinglePool singlePool;
+        private Messagebus           client;
 
         public AsyncConsumeThread() {
             this.currentThread = new Thread(this);
@@ -132,33 +116,24 @@ public class ProduceConsume {
         @Override
         public void run() {
             String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-            Messagebus client = new Messagebus();
-            client.setPubsuberHost(host);
-            client.setPubsuberPort(port);
+            singlePool = new MessagebusSinglePool(host, port);
+            client = singlePool.getResource();
 
             //register notification listener
             client.setNotificationListener(new IMessageReceiveListener() {
                 @Override
-                public void onMessage(Message message) {
+                public void onMessage(IMessage message) {
                     logger.info("received notification : " + message.getMessageHeader().getAppId());
                 }
             });
 
-            try {
-                client.open();
-
-                //long long time
-                client.consume(secret, Integer.MAX_VALUE, TimeUnit.SECONDS, new IMessageReceiveListener() {
-                    @Override
-                    public void onMessage(Message message) {
-                        logger.info(message.getMessageHeader().getMessageId());
-                    }
-                });
-            } catch (MessagebusConnectedFailedException e) {
-                e.printStackTrace();
-            } finally {
-                client.close();
-            }
+            //long long time
+            client.consume(secret, Integer.MAX_VALUE, TimeUnit.SECONDS, new IMessageReceiveListener() {
+                @Override
+                public void onMessage(IMessage message) {
+                    logger.info(message.getMessageHeader().getMessageId());
+                }
+            });
         }
 
         public void startup() {
@@ -166,6 +141,8 @@ public class ProduceConsume {
         }
 
         public void shutdown() {
+            singlePool.returnResource(client);
+            singlePool.destroy();
             this.currentThread.interrupt();
         }
     }

@@ -3,10 +3,9 @@ package com.messagebus.client.handler.produce;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.transfer.IMessageBodyTransfer;
-import com.messagebus.client.message.transfer.MessageBodyTransferFactory;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -27,9 +26,8 @@ public class RealProduce extends AbstractHandler {
     public void handle(MessageContext context, IHandlerChain chain) {
         try {
             if (context.isEnableTransaction()) {
-                for (Message msg : context.getMessages()) {
-                    IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());
-                    byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
+                for (IMessage msg : context.getMessages()) {
+                    byte[] msgBody = MsgBodyTransfer.box(msg.getMessageBody());
                     AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
                     ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                                 context.getChannel(),
@@ -38,9 +36,8 @@ public class RealProduce extends AbstractHandler {
                                                 properties);
                 }
             } else {
-                for (Message msg : context.getMessages()) {
-                    IMessageBodyTransfer msgBodyProcessor = MessageBodyTransferFactory.createMsgBodyProcessor(msg.getMessageType());
-                    byte[] msgBody = msgBodyProcessor.box(msg.getMessageBody());
+                for (IMessage msg : context.getMessages()) {
+                    byte[] msgBody = MsgBodyTransfer.box(msg.getMessageBody());
                     AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
 
                     ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,

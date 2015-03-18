@@ -1,30 +1,81 @@
 package com.messagebus.client;
 
+import com.messagebus.business.exchanger.ExchangerManager;
+import com.messagebus.client.core.config.ConfigManager;
+import com.rabbitmq.client.Connection;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 /**
  * Created by yanghua on 3/5/15.
  */
-public class MessagebusFactory implements PooledObjectFactory<Messagebus> {
+class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
-    private String appId;
-    private String pubsuberHost;
-    private int    pubsuberPort;
+    private static final Log logger = LogFactory.getLog(MessagebusFactory.class.getName());
 
-    public MessagebusFactory(String appId, String pubsuberHost, int pubsuberPort) {
-        this.appId = appId;
+    private String           pubsuberHost;
+    private int              pubsuberPort;
+    private ExchangerManager exchangeManager;
+    private ConfigManager    configManager;
+    private Connection       connection;
+
+    private final Method openMethod;
+    private final Method closeMethod;
+
+    public MessagebusFactory(String pubsuberHost,
+                             int pubsuberPort,
+                             ExchangerManager exchangeManager,
+                             ConfigManager configManager,
+                             Connection connection) {
         this.pubsuberHost = pubsuberHost;
         this.pubsuberPort = pubsuberPort;
+        this.exchangeManager = exchangeManager;
+        this.configManager = configManager;
+        this.connection = connection;
+
+        try {
+            openMethod = Messagebus.class.getSuperclass().getDeclaredMethod("open");
+            openMethod.setAccessible(true);
+            closeMethod = Messagebus.class.getSuperclass().getDeclaredMethod("close");
+            closeMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public PooledObject<Messagebus> makeObject() throws Exception {
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(this.pubsuberHost);
-        client.setPubsuberPort(this.pubsuberPort);
-        client.open();
+        Constructor<Messagebus> privateCtor = Messagebus.class.getDeclaredConstructor();
+        privateCtor.setAccessible(true);
+        Messagebus client = privateCtor.newInstance();
+        privateCtor.setAccessible(false);
+
+        Class<?> superClient = Messagebus.class.getSuperclass();
+
+        //set private field
+        Field exchangeManagerField = superClient.getDeclaredField("exchangeManager");
+        exchangeManagerField.setAccessible(true);
+        exchangeManagerField.set(client, this.exchangeManager);
+        exchangeManagerField.setAccessible(false);
+
+        Field configManagerField = superClient.getDeclaredField("configManager");
+        configManagerField.setAccessible(true);
+        configManagerField.set(client, this.configManager);
+        configManagerField.setAccessible(false);
+
+        Field connectionField = superClient.getDeclaredField("connection");
+        connectionField.setAccessible(true);
+        connectionField.set(client, this.connection);
+        connectionField.setAccessible(false);
+
+        openMethod.invoke(client);
 
         return new DefaultPooledObject<>(client);
     }
@@ -34,7 +85,7 @@ public class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         Messagebus client = pooledObject.getObject();
         if (client != null) {
             if (client.isOpen()) {
-                client.close();
+                closeMethod.invoke(client);
             }
         }
     }
@@ -42,7 +93,7 @@ public class MessagebusFactory implements PooledObjectFactory<Messagebus> {
     @Override
     public boolean validateObject(PooledObject<Messagebus> pooledObject) {
         Messagebus client = pooledObject.getObject();
-        return client != null && client.isOpen();
+        return client != null;
     }
 
     @Override
@@ -50,13 +101,18 @@ public class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         Messagebus client = pooledObject.getObject();
         if (client != null) {
             if (!client.isOpen()) {
-                client.open();
+                openMethod.invoke(client);
             }
         }
     }
 
     @Override
     public void passivateObject(PooledObject<Messagebus> pooledObject) throws Exception {
-
+        Messagebus client = pooledObject.getObject();
+        if (client != null) {
+            if (client.isOpen()) {
+                closeMethod.invoke(client);
+            }
+        }
     }
 }

@@ -3,11 +3,11 @@ package com.messagebus.scenario.client;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.QueueMessage;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,26 +33,19 @@ public class RequestResponse {
     private static void request() {
         String secret = "iuoqiwejicaoisfaisfbsqewnfjnfa";
         String token = "cakjdhfjasdflqjoiajsdjflqkuwef";
-        Messagebus client = new Messagebus();
-        client.setPubsuberHost(host);
-        client.setPubsuberPort(port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        Messagebus client = singlePool.getResource();
 
-        try {
-            client.open();
-        } catch (MessagebusConnectedFailedException e) {
-            e.printStackTrace();
-        }
-
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setContentType("text/plain");
         msg.getMessageHeader().setContentEncoding("utf-8");
 
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         msg.setMessageBody(body);
 
-        Message responseMsg = null;
+        IMessage responseMsg = null;
 
         try {
             responseMsg = client.request(secret, "emapDemoResponse", msg, token, 10);
@@ -60,7 +53,8 @@ public class RequestResponse {
             e.printStackTrace();
         }
 
-        client.close();
+        singlePool.returnResource(client);
+        singlePool.destroy();
 
         if (responseMsg != null) {
             logger.info("received response message : " + responseMsg.getMessageHeader().getCorrelationId());
@@ -73,39 +67,32 @@ public class RequestResponse {
             @Override
             public void run() {
                 final String secret = "zxjhvclawenlkfhsladfnqpwenflak";
-                final Messagebus client = new Messagebus();
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                final Messagebus client = singlePool.getResource();
 
-                client.setPubsuberHost(host);
-                client.setPubsuberPort(port);
+                client.response(secret, new IRequestListener() {
 
-                try {
-                    client.open();
+                    @Override
+                    public IMessage onRequest(IMessage requestMsg) {
+                        logger.info("got requested message : " + requestMsg.getMessageHeader().getCorrelationId());
 
-                    client.response(secret, new IRequestListener() {
+                        IMessage respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        respMsg.getMessageHeader().setContentType("text/plain");
+                        respMsg.getMessageHeader().setContentEncoding("utf-8");
+                        respMsg.getMessageHeader().setCorrelationId(requestMsg.getMessageHeader().getCorrelationId());
 
-                        @Override
-                        public Message onRequest(Message requestMsg) {
-                            logger.info("got requested message : " + requestMsg.getMessageHeader().getCorrelationId());
+                        Message.MessageBody body = new Message.MessageBody();
+                        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-                            Message respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                            respMsg.getMessageHeader().setContentType("text/plain");
-                            respMsg.getMessageHeader().setContentEncoding("utf-8");
-                            respMsg.getMessageHeader().setCorrelationId(requestMsg.getMessageHeader().getCorrelationId());
+                        respMsg.setMessageBody(body);
 
-                            QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-                            body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+                        return respMsg;
+                    }
 
-                            respMsg.setMessageBody(body);
+                }, 10, TimeUnit.SECONDS);
 
-                            return respMsg;
-                        }
-
-                    }, 10, TimeUnit.SECONDS);
-
-                    client.close();
-                } catch (MessagebusConnectedFailedException e) {
-                    e.printStackTrace();
-                }
+                singlePool.returnResource(client);
+                singlePool.destroy();
             }
 
         }).start();

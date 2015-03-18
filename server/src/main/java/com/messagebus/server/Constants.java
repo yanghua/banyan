@@ -23,7 +23,7 @@ public class Constants {
     public static final String KEY_SERVER_CONFIG = "SERVER_CONFIG";
 
     public static final String GLOBAL_CLIENT_OBJECT    = "client";
-    public static final String GLOBAL_ZOOKEEPER_OBJECT = "zookeeper";
+    public static final String GLOBAL_CLIENT_POOL      = "clientPool";
     public static final String GLOBAL_EXCHANGE_MANAGER = "exchangeManager";
 
 }

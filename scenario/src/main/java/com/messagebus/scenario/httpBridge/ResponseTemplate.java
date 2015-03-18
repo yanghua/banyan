@@ -70,8 +70,8 @@ public class ResponseTemplate {
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
 
-                Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                IMessage testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                Message.MessageBody body = new Message.MessageBody();
                 body.setContent("test".getBytes());
                 testMsg.setMessageBody(body);
 
@@ -122,7 +122,7 @@ public class ResponseTemplate {
                         String responseData = EntityUtils.toString(entity);
                         logger.info("end point 2 : received response : " + responseData);
 
-                        Message msg = extractRequestMsg(responseData);
+                        IMessage msg = extractRequestMsg(responseData);
 
                         String tmpQueueName = String.valueOf(msg.getMessageHeader().getMessageId());
 
@@ -133,8 +133,8 @@ public class ResponseTemplate {
                         CloseableHttpClient responseHttpClient = HttpClients.createDefault();
 
 
-                        Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+                        IMessage testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        Message.MessageBody body = new Message.MessageBody();
                         body.setContent("test".getBytes());
                         testMsg.setMessageBody(body);
 
@@ -171,7 +171,7 @@ public class ResponseTemplate {
         }
     }
 
-    private static Message extractRequestMsg(String respData) {
+    private static IMessage extractRequestMsg(String respData) {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(respData);
         JsonObject object = element.getAsJsonObject();

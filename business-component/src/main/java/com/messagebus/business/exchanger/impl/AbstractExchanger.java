@@ -1,10 +1,10 @@
 package com.messagebus.business.exchanger.impl;
 
+import com.google.gson.Gson;
 import com.messagebus.business.exchanger.IDataExchanger;
 import com.messagebus.business.exchanger.IDataFetcher;
 import com.messagebus.interactor.pubsub.IDataConverter;
 import com.messagebus.interactor.pubsub.IPubSuber;
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -1,8 +1,5 @@
 package com.messagebus.httpbridge.listener;
 
-import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusConnectedFailedException;
-import com.messagebus.httpbridge.util.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,24 +12,25 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = new Messagebus();
-        //TODO:
-        messagebus.setPubsuberHost("115.29.96.85");
-        messagebus.setPubsuberPort(2181);
-        try {
-            messagebus.open();
-            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGE_BUS_KEY, messagebus);
-        } catch (MessagebusConnectedFailedException e) {
-            logger.error("[contextInitialized] occurs a MessagebusConnectedFailedException : " + e.getMessage());
-        }
+//        MessagebusSinglePool singlePool = new MessagebusSinglePool()
+//        Messagebus messagebus = new Messagebus();
+//        //TODO:
+//        messagebus.setPubsuberHost("115.29.96.85");
+//        messagebus.setPubsuberPort(2181);
+//        try {
+//            messagebus.open();
+//            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGE_BUS_KEY, messagebus);
+//        } catch (MessagebusConnectedFailedException e) {
+//            logger.error("[contextInitialized] occurs a MessagebusConnectedFailedException : " + e.getMessage());
+//        }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY);
-        if (messagebus != null && messagebus.isOpen()) {
-            messagebus.close();
-        }
+//        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY);
+//        if (messagebus != null && messagebus.isOpen()) {
+//            messagebus.close();
+//        }
     }
 
 }

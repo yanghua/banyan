@@ -1,9 +1,9 @@
 package com.messagebus.scenario.httpBridge;
 
+import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.QueueMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,10 +28,10 @@ public class RequestTemplate {
 
         CloseableHttpResponse response = null;
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setReplyTo(testQueue);
 
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent("test".getBytes());
         msg.setMessageBody(body);
 

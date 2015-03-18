@@ -1,8 +1,8 @@
 package com.messagebus.scenario.httpBridge;
 
+import com.google.gson.Gson;
 import com.messagebus.client.message.model.*;
 import com.messagebus.common.Constants;
-import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -38,14 +38,14 @@ public class ProduceTemplate {
 
         CloseableHttpResponse response = null;
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.getMessageHeader().setReplyTo(testQueue);
 
-        QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
+        Message.MessageBody body = new Message.MessageBody();
         body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
         msg.setMessageBody(body);
 
-        List<Message> msgs = new ArrayList<>(1);
+        List<IMessage> msgs = new ArrayList<>(1);
         msgs.add(msg);
         String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
 

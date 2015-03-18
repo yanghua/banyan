@@ -1,43 +1,27 @@
 package com.messagebus.benchmark.client;
 
-import com.messagebus.client.message.model.*;
+import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.MessageFactory;
+import com.messagebus.client.message.model.MessageType;
 
 public class TestMessageFactory {
 
-    public static Message create(MessageType type, double sizeOfKB) {
-        Message msg = MessageFactory.createMessage(type);
+    public static IMessage create(MessageType type, double sizeOfKB) {
+        IMessage msg = MessageFactory.createMessage(type);
 
         byte[] content = generate(sizeOfKB);
 
-        switch (type) {
-            case QueueMessage: {
-                QueueMessage.QueueMessageBody body = new QueueMessage.QueueMessageBody();
-                body.setContent(content);
-                msg.setMessageBody(body);
-            }
-            break;
-
-            case PubSubMessage: {
-                PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
-                body.setContent(content);
-                msg.setMessageBody(body);
-            }
-            break;
-
-            case BroadcastMessage: {
-                BroadcastMessage.BroadcastMessageBody body = new BroadcastMessage.BroadcastMessageBody();
-                body.setContent(content);
-                msg.setMessageBody(body);
-            }
-            break;
-        }
+        Message.MessageBody body = new Message.MessageBody();
+        body.setContent(content);
+        msg.setMessageBody(body);
 
         return msg;
     }
 
-    public static Message[] create(MessageType type, int sizeOfKB, int num) {
-        Message[] msgs = new Message[num];
-        Message msg = create(type, sizeOfKB);
+    public static IMessage[] create(MessageType type, int sizeOfKB, int num) {
+        IMessage[] msgs = new IMessage[num];
+        IMessage msg = create(type, sizeOfKB);
         for (int i = 0; i < num; i++) {
             msgs[i] = msg;
         }
