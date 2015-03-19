@@ -1,7 +1,7 @@
 package com.messagebus.client.carry;
 
 import com.messagebus.client.MessageResponseTimeoutException;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 
 public interface IRequester {
 
@@ -15,7 +15,7 @@ public interface IRequester {
      * @param timeout response wait timeout  @return Message the response message
      * @throws com.messagebus.client.MessageResponseTimeoutException
      */
-    public IMessage request(String secret, String to, IMessage msg, String token, long timeout)
+    public Message request(String secret, String to, Message msg, String token, long timeout)
         throws MessageResponseTimeoutException;
 
 }

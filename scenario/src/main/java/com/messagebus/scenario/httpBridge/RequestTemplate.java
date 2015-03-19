@@ -1,6 +1,5 @@
 package com.messagebus.scenario.httpBridge;
 
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -28,12 +27,10 @@ public class RequestTemplate {
 
         CloseableHttpResponse response = null;
 
-        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.getMessageHeader().setReplyTo(testQueue);
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.setReplyTo(testQueue);
 
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent("test".getBytes());
-        msg.setMessageBody(body);
+        msg.setContent("test".getBytes());
 
 //        String msg2json = MessageJSONSerializer.serialize(testMsg);
 //

@@ -211,7 +211,7 @@ public class ServiceLoader {
                         getContextClassLoader().loadClass(packageName + "." + className);
 
                     //fetch the class that implemented the interface `IService`
-                    Class[] ifClasses = clazz.getInterfaces();
+                    Class[] ifClasses = clazz.getSuperclass().getInterfaces();
                     if (ifClasses == null || ifClasses.length == 0)
                         continue;
 

@@ -1,6 +1,6 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 
 /**
  * the interface of producer
@@ -15,7 +15,7 @@ public interface IProducer {
      * @param msg    a general message
      * @param token
      */
-    public void produce(String secret, String to, IMessage msg, String token);
+    public void produce(String secret, String to, Message msg, String token);
 
 
     /**
@@ -27,7 +27,7 @@ public interface IProducer {
      * @param msg    a general message
      * @param token
      */
-    public void produceWithTX(String secret, String to, IMessage msg, String token);
+    public void produceWithTX(String secret, String to, Message msg, String token);
 
 
     /**
@@ -38,7 +38,7 @@ public interface IProducer {
      * @param msgs   a general message's array
      * @param token
      */
-    public void batchProduce(String secret, String to, IMessage[] msgs, String token);
+    public void batchProduce(String secret, String to, Message[] msgs, String token);
 
 
     /**
@@ -50,6 +50,6 @@ public interface IProducer {
      * @param msgs   a general message's array
      * @param token
      */
-    public void batchProduceWithTX(String secret, String to, IMessage[] msgs, String token);
+    public void batchProduceWithTX(String secret, String to, Message[] msgs, String token);
 
 }

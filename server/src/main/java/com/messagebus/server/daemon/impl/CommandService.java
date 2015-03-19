@@ -35,16 +35,11 @@ public class CommandService extends AbstractService {
 
         client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
 
-        responseMsg = (Message) MessageFactory.createMessage(MessageType.QueueMessage);
+        responseMsg = MessageFactory.createMessage(MessageType.QueueMessage);
         Map<String, Object> headers = new HashMap<>(1);
         headers.put("COMMAND", "PONG");
-        responseMsg.getMessageHeader().setHeaders(headers);
-        //TODO
-//        responseMsg.getMessageHeader().setAppId(appId);
-//        responseMsg.getMessageHeader().setReplyTo(appId);
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent(new byte[0]);
-        responseMsg.setMessageBody(body);
+        responseMsg.setHeaders(headers);
+        responseMsg.setContent(new byte[0]);
 
         this.exchangeManager = (ExchangerManager) this.context.get(Constants.GLOBAL_EXCHANGE_MANAGER);
     }

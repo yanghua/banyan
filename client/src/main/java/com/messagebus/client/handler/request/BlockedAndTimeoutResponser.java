@@ -3,11 +3,10 @@ package com.messagebus.client.handler.request;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.client.model.HandlerModel;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.messagebus.interactor.rabbitmq.QueueManager;
@@ -40,7 +39,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        long msgId = context.getMessages()[0].getMessageHeader().getMessageId();
+        long msgId = context.getMessages()[0].getMessageId();
 
         try {
             //just receive one
@@ -68,7 +67,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
             }
 
             MessageType msgType = MessageType.lookup(msgTypeStr);
-            IMessage msg = MessageFactory.createMessage(msgType);
+            Message msg = MessageFactory.createMessage(msgType);
             initMessage(msg, msgType, properties, msgBody);
             context.setConsumedMsg(msg);
         } catch (IOException | InterruptedException e) {
@@ -95,8 +94,8 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
 
     }
 
-    private void initMessage(IMessage msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderTransfer.unbox(properties, msgType, msg.getMessageHeader());
-        msg.setMessageBody(MsgBodyTransfer.unbox(bodyData));
+    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
+        MessageHeaderTransfer.unbox(properties, msg);
+        msg.setContent(bodyData);
     }
 }

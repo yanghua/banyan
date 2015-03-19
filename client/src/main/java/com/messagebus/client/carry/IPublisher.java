@@ -1,9 +1,9 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 
 public interface IPublisher {
 
-    public void publish(String secret, IMessage[] msgs, String token);
+    public void publish(String secret, Message[] msgs, String token);
 
 }

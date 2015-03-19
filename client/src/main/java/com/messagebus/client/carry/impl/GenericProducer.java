@@ -5,7 +5,7 @@ import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.carry.IProducer;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,9 +29,9 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param token
      */
     @Override
-    public void produce(String secret, String to, IMessage msg, String token) {
+    public void produce(String secret, String to, Message msg, String token) {
         MessageContext ctx = this.innerProduce(secret, to, token);
-        ctx.setMessages(new IMessage[]{msg});
+        ctx.setMessages(new Message[]{msg});
         commonCarry(ctx);
     }
 
@@ -45,9 +45,9 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param token
      */
     @Override
-    public void produceWithTX(String secret, String to, IMessage msg, String token) {
+    public void produceWithTX(String secret, String to, Message msg, String token) {
         MessageContext context = this.innerProduce(secret, to, token);
-        context.setMessages(new IMessage[]{msg});
+        context.setMessages(new Message[]{msg});
         context.setEnableTransaction(true);
         commonCarry(context);
     }
@@ -61,7 +61,7 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param token
      */
     @Override
-    public void batchProduce(String secret, String to, IMessage[] msgs, String token) {
+    public void batchProduce(String secret, String to, Message[] msgs, String token) {
         MessageContext context = this.innerProduce(secret, to, token);
         context.setMessages(msgs);
         commonCarry(context);
@@ -77,7 +77,7 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
      * @param token
      */
     @Override
-    public void batchProduceWithTX(String secret, String to, IMessage[] msgs, String token) {
+    public void batchProduceWithTX(String secret, String to, Message[] msgs, String token) {
         MessageContext context = this.innerProduce(secret, to, token);
         context.setMessages(msgs);
         context.setEnableTransaction(true);

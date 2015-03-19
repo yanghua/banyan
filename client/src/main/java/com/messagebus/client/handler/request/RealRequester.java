@@ -3,9 +3,8 @@ package com.messagebus.client.handler.request;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -27,14 +26,13 @@ public class RealRequester extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        IMessage reqMsg = context.getMessages()[0];
-        byte[] msgBody = MsgBodyTransfer.box(reqMsg.getMessageBody());
-        AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg.getMessageHeader());
+        Message reqMsg = context.getMessages()[0];
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(reqMsg);
         try {
             ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                         context.getChannel(),
                                         context.getTargetNode().getRoutingKey(),
-                                        msgBody,
+                                        reqMsg.getContent(),
                                         properties);
             chain.handle(context);
         } catch (IOException e) {

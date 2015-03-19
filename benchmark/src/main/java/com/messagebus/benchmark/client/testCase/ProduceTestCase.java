@@ -5,7 +5,7 @@ import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.MessagebusUnOpenException;
 import com.messagebus.client.carry.IProducer;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
@@ -19,7 +19,7 @@ public class ProduceTestCase extends Benchmark {
 
         private MessagebusSinglePool singlePool;
         private Messagebus           client;
-        private IMessage             msg;
+        private Message              msg;
         private IProducer            producer;
         private boolean flag    = true;
         private long    counter = 0;

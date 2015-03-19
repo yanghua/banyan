@@ -3,7 +3,6 @@ package com.messagebus.scenario.client;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -37,16 +36,13 @@ public class PublishSubscribe {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.setContentType("text/plain");
+        msg.setContentEncoding("utf-8");
 
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+        msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        msg.setMessageBody(body);
-
-        client.publish(secret, new IMessage[]{msg}, token);
+        client.publish(secret, new Message[]{msg}, token);
 
         singlePool.returnResource(client);
         singlePool.destroy();
@@ -59,8 +55,8 @@ public class PublishSubscribe {
 
         client.subscribe(secret, new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
-                logger.info(message.getMessageHeader().getMessageId());
+            public void onMessage(Message message) {
+                logger.info(message.getMessageId());
             }
         }, 3, TimeUnit.SECONDS);
 
@@ -76,8 +72,8 @@ public class PublishSubscribe {
 
         client.subscribe(secret, new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
-                logger.info(message.getMessageHeader().getMessageId());
+            public void onMessage(Message message) {
+                logger.info(message.getMessageId());
             }
         }, 3, TimeUnit.SECONDS);
 

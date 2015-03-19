@@ -3,9 +3,8 @@ package com.messagebus.client.handler.response;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.common.CommonLoopHandler;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
@@ -24,18 +23,17 @@ public class ResponseLoopHandler extends CommonLoopHandler {
     @Override
     public void process(MessageContext msgContext) {
         IRequestListener requestListener = msgContext.getRequestListener();
-        IMessage requestMsg = msgContext.getConsumedMsg();
-        String tempQueueName = requestMsg.getMessageHeader().getCorrelationId();
+        Message requestMsg = msgContext.getConsumedMsg();
+        String tempQueueName = requestMsg.getCorrelationId();
         msgContext.setTempQueueName(tempQueueName);
-        IMessage respMsg = requestListener.onRequest(msgContext.getConsumedMsg());
+        Message respMsg = requestListener.onRequest(msgContext.getConsumedMsg());
 
-        byte[] msgBody = MsgBodyTransfer.box(respMsg.getMessageBody());
-        AMQP.BasicProperties properties = MessageHeaderTransfer.box(respMsg.getMessageHeader());
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(respMsg);
         try {
             ProxyProducer.produce("",
                                   msgContext.getChannel(),
                                   tempQueueName,
-                                  msgBody,
+                                  respMsg.getContent(),
                                   properties);
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "response process");

@@ -2,7 +2,6 @@ package com.messagebus.scenario.client;
 
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -112,13 +111,11 @@ public class ClientUnderMultiThread {
         @Override
         public void run() {
             Messagebus client = pool.getResource();
-            IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
-            msg.getMessageHeader().setContentType("text/plain");
-            msg.getMessageHeader().setContentEncoding("utf-8");
+            Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+            msg.setContentType("text/plain");
+            msg.setContentEncoding("utf-8");
 
-            Message.MessageBody body = new Message.MessageBody();
-            body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
-            msg.setMessageBody(body);
+            msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
             String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
             String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
@@ -144,11 +141,11 @@ public class ClientUnderMultiThread {
         public void run() {
             String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
             Messagebus client = pool.getResource();
-            List<IMessage> msgs = client.consume(secret, 10);
+            List<Message> msgs = client.consume(secret, 10);
             pool.returnResource(client);
 
-            for (IMessage msg : msgs) {
-                logger.info(msg.getMessageHeader().getMessageId());
+            for (Message msg : msgs) {
+                logger.info(msg.getMessageId());
             }
 
             counter.countDown();

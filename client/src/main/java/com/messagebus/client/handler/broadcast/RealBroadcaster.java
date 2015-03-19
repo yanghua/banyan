@@ -3,9 +3,8 @@ package com.messagebus.client.handler.broadcast;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -22,13 +21,12 @@ public class RealBroadcaster extends AbstractHandler {
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
         try {
-            for (IMessage msg : context.getMessages()) {
-                byte[] msgBody = MsgBodyTransfer.box(msg.getMessageBody());
-                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
+            for (Message msg : context.getMessages()) {
+                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                       context.getChannel(),
                                       Constants.NOTIFICATION_ROUTING_KEY,
-                                      msgBody,
+                                      msg.getContent(),
                                       properties);
             }
 

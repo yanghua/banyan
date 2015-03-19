@@ -1,8 +1,13 @@
 package com.messagebus.httpbridge.listener;
 
+import com.messagebus.client.Messagebus;
+import com.messagebus.client.MessagebusPool;
+import com.messagebus.httpbridge.util.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -12,25 +17,22 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-//        MessagebusSinglePool singlePool = new MessagebusSinglePool()
-//        Messagebus messagebus = new Messagebus();
-//        //TODO:
-//        messagebus.setPubsuberHost("115.29.96.85");
-//        messagebus.setPubsuberPort(2181);
-//        try {
-//            messagebus.open();
-//            servletContextEvent.getServletContext().setAttribute(Constants.MESSAGE_BUS_KEY, messagebus);
-//        } catch (MessagebusConnectedFailedException e) {
-//            logger.error("[contextInitialized] occurs a MessagebusConnectedFailedException : " + e.getMessage());
-//        }
+        ServletContext servletContext = servletContextEvent.getServletContext();
+        String pubsuberHost = servletContext.getInitParameter("pubsuberHost");
+        int pubsuberPort = Integer.parseInt(servletContext.getInitParameter("pubsuberPort"));
+
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxTotal(Integer.parseInt(servletContext.getInitParameter("messagebuspool.maxtotal")));
+        MessagebusPool messagebusPool = new MessagebusPool(pubsuberHost, pubsuberPort, poolConfig);
+        servletContextEvent.getServletContext().setAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ, messagebusPool);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-//        Messagebus messagebus = (Messagebus) servletContextEvent.getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY);
-//        if (messagebus != null && messagebus.isOpen()) {
-//            messagebus.close();
-//        }
+        MessagebusPool messagebusPool = (MessagebusPool) servletContextEvent.getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ);
+        if (messagebusPool != null) {
+            messagebusPool.destroy();
+        }
     }
 
 }

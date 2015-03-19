@@ -2,10 +2,9 @@ package com.messagebus.managesystem.action.other;
 
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusUnOpenException;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,7 +51,7 @@ public class MBServerSentinelListener implements ServletContextListener {
 
         private Thread              currentThread;
         private Messagebus          messagebus;
-        private IMessage            pingCmdMsg;
+        private Message             pingCmdMsg;
         private ServletContextEvent servletContextEvent;
 
         private Sentinel(Messagebus mb, ServletContextEvent contextEvent) {
@@ -62,12 +61,12 @@ public class MBServerSentinelListener implements ServletContextListener {
 
             Map<String, Object> header = new HashMap<>(1);
             header.put("COMMAND", "PING");
-            pingCmdMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-            pingCmdMsg.getMessageHeader().setHeaders(header);
-
-            Message.MessageBody body = new Message.MessageBody();
-            body.setContent(new byte[0]);
-            pingCmdMsg.setMessageBody(body);
+//            pingCmdMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+//            pingCmdMsg.getMessageHeader().setHeaders(header);
+//
+//            Message.MessageBody body = new Message.MessageBody();
+//            body.setContent(new byte[0]);
+//            pingCmdMsg.setMessageBody(body);
         }
 
         @Override

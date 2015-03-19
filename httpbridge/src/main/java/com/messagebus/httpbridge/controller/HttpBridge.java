@@ -1,9 +1,9 @@
 package com.messagebus.httpbridge.controller;
 
-import com.messagebus.client.Messagebus;
-import com.messagebus.client.MessagebusUnOpenException;
-import com.messagebus.client.carry.IResponser;
-import com.messagebus.client.message.model.IMessage;
+import com.google.common.base.Strings;
+import com.messagebus.client.*;
+import com.messagebus.client.carry.impl.GenericConsumer;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageJSONSerializer;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
@@ -20,12 +20,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class HttpBridge extends HttpServlet {
 
     private static final Log logger = LogFactory.getLog(HttpBridge.class);
+
+    private static final String CONSUME_MODE_PULL = "pull";
+    private static final String CONSUME_MODE_PUSH = "push";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
@@ -33,203 +37,170 @@ public class HttpBridge extends HttpServlet {
         logger.info("[service] url is : " + req.getRequestURI());
         String apiType = req.getParameter("type");
 
-        if (apiType == null || apiType.isEmpty()) {
-            logger.error("the query string : type can not be null or empty");
+        if (Strings.isNullOrEmpty(apiType)) {
             ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
                                   "the query string : type can not be null or empty",
-                                  "", "\"\"");
-        } else {
-            MessageCarryType msgCarryType = MessageCarryType.lookup(apiType);
+                                  "", "''");
+            return;
+        }
 
-            switch (msgCarryType) {
-                case PRODUCE:
-                    this.produce(req, resp);
-                    break;
+        String secret = req.getParameter("secret");
+        if (Strings.isNullOrEmpty(secret)) {
+            ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
+                                  "param : secret can not be null or empty", "", "''");
+            return;
+        }
 
-                case CONSUME:
-                    this.consume(req, resp);
-                    break;
+        MessageCarryType msgCarryType = MessageCarryType.lookup(apiType);
 
-                case REQUEST:
-                    this.request(req, resp);
-                    break;
+        switch (msgCarryType) {
+            case PRODUCE:
+                this.produce(req, resp);
+                break;
 
-                case RESPONSE:
-                    this.response(req, resp);
-                    break;
+            case CONSUME:
+                this.consume(req, resp);
+                break;
 
-                default:
-                    ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
-                                          "invalidate type", "", "''");
-            }
+            case PUBLISH:
+                this.publish(req, resp);
+                break;
+
+            case SUBSCRIBE:
+                this.subscribe(req, resp);
+                break;
+
+            case REQUEST:
+                this.request(req, resp);
+                break;
+
+            case RESPONSE:
+                ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
+                                      "unsupported type : " + msgCarryType.toString(), "", "''");
+                break;
+
+            default:
+                ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
+                                      "invalidate type", "", "''");
         }
     }
 
     private void produce(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("post")) {
-            logger.error("[produce] error http request method");
             ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
                                   "error http request method", "", "");
-        } else {
-            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
-            String queueName = request.getRequestURI().split("/")[3];
-            String msgArrStr = request.getParameter("messages");
+            return;
+        }
 
-            if (msgArrStr == null || msgArrStr.isEmpty()) {
-                logger.error("[produce] param : messages can not be null or empty");
-                ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                      "param : messages can not be null or empty", "", "''");
-            } else {
-                IMessage[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+        String queueName = request.getRequestURI().split("/")[3];
+        String token = request.getParameter("token");
+        String msgArrStr = request.getParameter("messages");
 
-                try {
-//                    messagebus.batchProduce(, queueName, msgArr, );
-//                    ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
-                } catch (MessagebusUnOpenException e) {
-                    logger.error("[produce] occurs a MessagebusUnOpenException : " + e.getMessage());
-                    ResponseUtil.response(response,
-                                          Constants.HTTP_FAILED_CODE,
-                                          "[produce] occurs a MessagebusUnOpenException : " + e.getMessage(),
-                                          "",
-                                          "''");
-                }
-            }
+        if (Strings.isNullOrEmpty(queueName)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "param : qname can not be null or empty", "", "''");
+            return;
+        }
+
+        if (Strings.isNullOrEmpty(token)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "param : token can not be null or empty", "", "''");
+            return;
+        }
+
+        if (Strings.isNullOrEmpty(msgArrStr)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "param : messages can not be null or empty", "", "''");
+            return;
+        }
+
+        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+
+        MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        Messagebus messagebus = pool.getResource();
+
+        try {
+            messagebus.batchProduce(request.getParameter("secret"), queueName, msgArr, token);
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
+        } catch (Exception e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "[produce] occurs a exception : " + e.getMessage(), "", "''");
+        } finally {
+            pool.returnResource(messagebus);
         }
     }
 
     private void consume(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("get")) {
-            logger.error("[consume] error http request method");
             ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
                                   "error http request method", "", "''");
-        } else {
-            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
-            String mode = request.getParameter("mode");
+            return;
+        }
 
-            if (mode == null || mode.isEmpty()) {
-                logger.error("[consume] the param : mode can not be null or empty");
-                ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                      "the param : mode can not be null or empty", "", "''");
-            } else {
-                switch (mode.toLowerCase()) {
-                    case "sync":
-                        this.syncConsume(request, response, messagebus);
-                        break;
+        String mode = request.getParameter("mode");
+        if (Strings.isNullOrEmpty(mode)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "the param : mode can not be null or empty", "", "''");
+            return;
+        }
 
-                    case "async":
-                        this.asyncConsume(request, response, messagebus);
-                        break;
+        switch (mode.toLowerCase()) {
+            case CONSUME_MODE_PULL:
+                this.consumeWithPull(request, response);
+                break;
 
-                    default:
-                        logger.error("[consume] invalidate param : mode with value - " + mode);
-                }
-            }
+            case CONSUME_MODE_PUSH:
+                this.consumeWithPush(request, response);
+                break;
+
+            default:
+                logger.error("[consume] invalidate param : mode with value - " + mode);
         }
     }
 
-    private void request(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-//        try {
-//            if (!request.getMethod().toLowerCase().equals("post"))
-//                throw new InvalidParameterException("error http method : " + request.getMethod());
-//
-//            String timeoutStr = request.getParameter("timeout");
-//            if (timeoutStr == null || timeoutStr.isEmpty())
-//                throw new NullPointerException("param : timeout can not be null or empty");
-//
-//            long timeout;
-//            timeout = Long.parseLong(timeoutStr);
-//
-//            if (timeout < Constants.MIN_REQUEST_TIMEOUT || timeout > Constants.MAX_REQUEST_TIMEOUT)
-//                throw new InvalidParameterException("invalid param : timeout it should be greater than :" +
-//                                                        Constants.MIN_REQUEST_TIMEOUT +
-//                                                        "and less than : " + Constants.MAX_REQUEST_TIMEOUT);
-//
-//            String queueName = request.getRequestURI().split("/")[3];
-//            String msgStr = request.getParameter("message");
-//
-//            Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
-//
-//            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
-//
-////            Message responseMsg = messagebus.request(, queueName, msg, timeout);
-//
-////            String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
-////            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
-//        } catch (MessagebusUnOpenException e) {
-//            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "\"\"");
-//        } catch (MessageResponseTimeoutException e) {
-//            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "\"\"");
-//        } catch (Exception e) {
-//            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a exception : " + e.getMessage(), "", "\"\"");
-//        }
-    }
-
-    private void response(HttpServletRequest request, HttpServletResponse response)
+    private void publish(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("post")) {
-            logger.error("error http method : " + request.getMethod());
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "error http method : " + request.getMethod(),
-                                  "", "''");
-        } else {
-            String queueName = request.getRequestURI().split("/")[3];
-            String msgStr = request.getParameter("message");
-
-            IMessage msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
-
-            Messagebus messagebus = (Messagebus) (getServletContext().getAttribute(Constants.MESSAGE_BUS_KEY));
-
-            IResponser responser = null;
-            try {
-//                messagebus.responseTmpMessage(, queueName, msg);
-                ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
-            } catch (MessagebusUnOpenException e) {
-                ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                      "occurs a MessagebusUnOpenException exception : " + e.getMessage(), "", "''");
-            }
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "error http request method", "", "");
+            return;
         }
-    }
 
-    private void syncConsume(HttpServletRequest request, HttpServletResponse response, Messagebus messagebus)
-        throws ServletException, IOException {
-        String queueName = request.getRequestURI().split("/")[3];
-        String numStr = request.getParameter("num");
-        int num = 0;
+        String token = request.getParameter("token");
+        if (Strings.isNullOrEmpty(token)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "param : token can not be null or empty", "", "''");
+            return;
+        }
 
-        List<IMessage> messages = null;
+        String msgArrStr = request.getParameter("messages");
+
+        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+
+        MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        Messagebus messagebus = pool.getResource();
 
         try {
-            if (numStr == null)
-                throw new NullPointerException("[syncConsume] param : num can not be null or empty");
-
-            try {
-                num = Integer.parseInt(numStr);
-            } catch (NumberFormatException e) {
-                throw new InvalidParameterException("[syncConsume] invalidate param : num, it must be a integer!");
-            }
-
-            if (num < Constants.MIN_CONSUME_NUM || num > Constants.MAX_CONSUME_NUM)
-                throw new InvalidParameterException("[syncConsume] invalidate param : num , it should be less than " +
-                                                        Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM);
-
-//            messages = messagebus.consume(, num);
-            if (messages == null) {
-                ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
-            } else {
-                String msgsStr = MessageJSONSerializer.serializeMessages(messages);
-                ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgsStr);
-            }
+            messagebus.publish(request.getParameter("secret"), msgArr, token);
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, e.getMessage(), "", "\"\"");
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "[produce] occurs a exception : " + e.getMessage(), "", "''");
+        } finally {
+            pool.returnResource(messagebus);
         }
+
     }
 
-    private void asyncConsume(HttpServletRequest request, final HttpServletResponse response, Messagebus messagebus)
+    private void subscribe(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
-        String queueName = request.getRequestURI().split("/")[3];
+        if (!request.getMethod().toLowerCase().equals("get")) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "error http request method", "", "''");
+            return;
+        }
 
         final Continuation continuation = ContinuationSupport.getContinuation(request);
 
@@ -241,42 +212,242 @@ public class HttpBridge extends HttpServlet {
         }
 
         continuation.setTimeout(Constants.MAX_CONSUME_CONTINUATION_TIMEOUT);
-
         continuation.suspend(response);
+
+        final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        final Messagebus messagebus = pool.getResource();
+        final List<Message> receivedMsgs = new ArrayList<>();
+
         continuation.addContinuationListener(new ContinuationListener() {
             @Override
             public void onComplete(Continuation continuation) {
-                logger.info("[onComplete] : continuation complete.");
+                try {
+                    if (receivedMsgs.size() != 0) {
+                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                    }
+                } catch (IOException e) {
+                    logger.error("[onComplete] occurs a IOException : " + e.getMessage());
+                }
             }
 
             @Override
             public void onTimeout(Continuation continuation) {
-                logger.info("[onTimeout] : continuation timeout.");
+                try {
+                    if (receivedMsgs.size() == 0) {
+                        ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
+                    } else {
+                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                    }
+                } catch (IOException e) {
+                    logger.error("[onTimeout] occurs a IOException : " + e.getMessage());
+                }
             }
         });
 
         try {
-//            messagebus.consume(,
-//                Constants.MAX_CONSUME_CONTINUATION_TIMEOUT, TimeUnit.MILLISECONDS, new IMessageReceiveListener() {
-//                    @Override
-//                    public void onMessage(Message message) {
-//                        String msgStr = MessageJSONSerializer.serialize(message);
-//                        logger.info("[consume] received message id: " + message.getMessageHeader().getMessageId());
-//                        try {
-//                            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
-//                        } catch (IOException e) {
-//                            logger.error("[consume] occurs a IOException : " + e.getMessage());
-//                        } finally {
-//                            continuation.complete();
-//                        }
-//                    }
-//                });
+            messagebus.subscribe(request.getParameter("secret"), new IMessageReceiveListener() {
 
-        } catch (MessagebusUnOpenException e) {
-            logger.error("[consume] occurs a Exception : " + e.getMessage());
+                @Override
+                public void onMessage(Message message) {
+                    receivedMsgs.add(message);
+                }
+
+            }, Constants.MAX_CONSUME_CONTINUATION_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            logger.error("[consumeWithPush] occurs a Exception : " + e.getMessage());
             continuation.undispatch();
             ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "[consume] occurs a Exception : " + e.getMessage(), "", "''");
+                                  "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
+        } finally {
+            pool.returnResource(messagebus);
+            continuation.complete();
+        }
+    }
+
+    private void request(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+        if (!request.getMethod().toLowerCase().equals("post")) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "error request method !", "", "''");
+            return;
+        }
+
+
+        String timeoutStr = request.getParameter("timeout");
+        if (Strings.isNullOrEmpty(timeoutStr)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : timeout can not be null or empty", "", "''");
+            return;
+        }
+
+        long timeout;
+        try {
+            timeout = Long.parseLong(timeoutStr);
+        } catch (NumberFormatException e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "illegal param : timeout ", "", "''");
+            return;
+        }
+
+        if (timeout < Constants.MIN_REQUEST_TIMEOUT || timeout > Constants.MAX_REQUEST_TIMEOUT) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "invalid param : timeout it should be greater than :" + Constants.MIN_REQUEST_TIMEOUT +
+                                      "and less than : " + Constants.MAX_REQUEST_TIMEOUT, "", "''");
+            return;
+        }
+
+        String token = request.getParameter("token");
+        if (Strings.isNullOrEmpty(token)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : token can not be null or empty", "", "''");
+            return;
+        }
+
+        String queueName = request.getRequestURI().split("/")[3];
+        String msgStr = request.getParameter("message");
+
+        if (Strings.isNullOrEmpty(msgStr)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : msgStr can not be null or empty", "", "''");
+            return;
+        }
+
+        Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
+
+        MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        Messagebus messagebus = pool.getResource();
+        try {
+            Message responseMsg = messagebus.request(request.getParameter("secret"), queueName, msg, token, timeout);
+
+            String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
+        } catch (MessagebusUnOpenException e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "''");
+        } catch (MessageResponseTimeoutException e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "''");
+        } catch (Exception e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a exception : " + e.getMessage(), "", "''");
+        } finally {
+            pool.returnResource(messagebus);
+        }
+    }
+
+    @Deprecated
+    private void response(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        throw new UnsupportedOperationException("unsupported operation!");
+    }
+
+    private void consumeWithPull(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String numStr = request.getParameter("num");
+        if (Strings.isNullOrEmpty(numStr)) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "when consume with pull mode the param :  num can not be null or empty", "", "''");
+            return;
+        }
+        int num = 0;
+
+        try {
+            num = Integer.parseInt(numStr);
+        } catch (NumberFormatException e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "invalidate param : num, it must be a integer!", "", "''");
+            return;
+        }
+
+        if (num < Constants.MIN_CONSUME_NUM || num > Constants.MAX_CONSUME_NUM) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  " invalidate param : num , it should be less than "
+                                      + Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM, "", "''");
+            return;
+        }
+
+        MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        Messagebus messagebus = pool.getResource();
+
+        List<Message> messages = null;
+        try {
+            messages = messagebus.consume(request.getParameter("secret"), num);
+        } catch (Exception e) {
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "", "", "'[']");
+            return;
+        } finally {
+            pool.returnResource(messagebus);
+        }
+
+        if (messages == null) {
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
+        } else {
+            String msgsStr = MessageJSONSerializer.serializeMessages(messages);
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgsStr);
+        }
+    }
+
+    private void consumeWithPush(HttpServletRequest request, final HttpServletResponse response)
+        throws ServletException, IOException {
+
+        final Continuation continuation = ContinuationSupport.getContinuation(request);
+
+        if (continuation.isExpired()) {
+            ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "timeout",
+                                  "there is no message could be consumed in " +
+                                      Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "\"\"");
+            return;
+        }
+
+        continuation.setTimeout(Constants.MAX_CONSUME_CONTINUATION_TIMEOUT);
+        continuation.suspend(response);
+
+        final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
+        final Messagebus messagebus = pool.getResource();
+
+        final List<Message> receivedMsgs = new ArrayList<>();
+
+        continuation.addContinuationListener(new ContinuationListener() {
+            @Override
+            public void onComplete(Continuation continuation) {
+                try {
+                    if (receivedMsgs.size() != 0) {
+                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                    }
+                } catch (IOException e) {
+                    logger.error("[onComplete] occurs a IOException : " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onTimeout(Continuation continuation) {
+                try {
+                    if (receivedMsgs.size() == 0) {
+                        ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
+                    } else {
+                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                    }
+                } catch (IOException e) {
+                    logger.error("[onTimeout] occurs a IOException : " + e.getMessage());
+                }
+            }
+        });
+
+        try {
+            messagebus.consume(request.getParameter("secret"),
+                               Constants.MAX_CONSUME_CONTINUATION_TIMEOUT,
+                               TimeUnit.MILLISECONDS,
+                               new IMessageReceiveListener() {
+                                   @Override
+                                   public void onMessage(Message message) {
+                                       receivedMsgs.add(message);
+                                   }
+                               });
+        } catch (Exception e) {
+            logger.error("[consumeWithPush] occurs a Exception : " + e.getMessage());
+            continuation.undispatch();
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
+                                  "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
+        } finally {
+            pool.returnResource(messagebus);
+            continuation.complete();
         }
     }
 

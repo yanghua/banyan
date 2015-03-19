@@ -5,7 +5,7 @@ import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.AbstractParamValidator;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,19 +32,19 @@ public class PublishParamValidator extends AbstractParamValidator {
     private void validateMessageProperties(MessageContext context) {
         Date currentDate = new Date();
         Node sourceNode = context.getSourceNode();
-        for (IMessage msg : context.getMessages()) {
+        for (Message msg : context.getMessages()) {
             //app id
-            if (Strings.isNullOrEmpty(msg.getMessageHeader().getAppId())) {
-                msg.getMessageHeader().setAppId(sourceNode.getAppId());
+            if (Strings.isNullOrEmpty(msg.getAppId())) {
+                msg.setAppId(sourceNode.getAppId());
             }
 
-            if (Strings.isNullOrEmpty(msg.getMessageHeader().getReplyTo())) {
-                msg.getMessageHeader().setReplyTo(context.getSourceNode().getName());
+            if (Strings.isNullOrEmpty(msg.getReplyTo())) {
+                msg.setReplyTo(context.getSourceNode().getName());
             }
 
             //timestamp
-            if (msg.getMessageHeader().getTimestamp() == null)
-                msg.getMessageHeader().setTimestamp(currentDate);
+            if (msg.getTimestamp() == null)
+                msg.setTimestamp(currentDate);
         }
     }
 }

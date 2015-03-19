@@ -3,7 +3,6 @@ package com.messagebus.scenario.client;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -42,14 +41,10 @@ public class ProduceConsume {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
-
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
-
-        msg.setMessageBody(body);
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.setContentType("text/plain");
+        msg.setContentEncoding("utf-8");
+        msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         client.produce(secret, "emapDemoConsume", msg, token);
 
@@ -62,10 +57,10 @@ public class ProduceConsume {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        List<IMessage> msgs = client.consume(secret, 1);
+        List<Message> msgs = client.consume(secret, 1);
 
-        for (IMessage msg : msgs) {
-            logger.info(msg.getMessageHeader().getMessageId());
+        for (Message msg : msgs) {
+            logger.info(msg.getMessageId());
         }
 
         singlePool.returnResource(client);
@@ -79,8 +74,8 @@ public class ProduceConsume {
 
         client.consume(secret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
-                logger.info(message.getMessageHeader().getMessageId());
+            public void onMessage(Message message) {
+                logger.info(message.getMessageId());
             }
         });
 
@@ -122,16 +117,16 @@ public class ProduceConsume {
             //register notification listener
             client.setNotificationListener(new IMessageReceiveListener() {
                 @Override
-                public void onMessage(IMessage message) {
-                    logger.info("received notification : " + message.getMessageHeader().getAppId());
+                public void onMessage(Message message) {
+                    logger.info("received notification : " + message.getAppId());
                 }
             });
 
             //long long time
             client.consume(secret, Integer.MAX_VALUE, TimeUnit.SECONDS, new IMessageReceiveListener() {
                 @Override
-                public void onMessage(IMessage message) {
-                    logger.info(message.getMessageHeader().getMessageId());
+                public void onMessage(Message message) {
+                    logger.info(message.getMessageId());
                 }
             });
         }

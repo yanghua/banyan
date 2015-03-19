@@ -3,7 +3,7 @@ package com.messagebus.benchmark.client;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.MessagebusUnOpenException;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
@@ -68,7 +68,7 @@ public class TestUtility {
     }
 
     public static void produce(long total) {
-        IMessage msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
+        Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(TestConfigConstant.HOST,
                                                                    TestConfigConstant.PORT);

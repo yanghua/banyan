@@ -2,7 +2,7 @@ package com.messagebus.client;
 
 import com.messagebus.client.carry.*;
 import com.messagebus.client.carry.impl.*;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,25 +40,25 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void produce(String secret, String to, IMessage msg, String token) {
+    public void produce(String secret, String to, Message msg, String token) {
         producer.setContext(context);
         producer.produce(secret, to, msg, token);
     }
 
     @Override
-    public void produceWithTX(String secret, String to, IMessage msg, String token) {
+    public void produceWithTX(String secret, String to, Message msg, String token) {
         producer.setContext(context);
         producer.produceWithTX(secret, to, msg, token);
     }
 
     @Override
-    public void batchProduce(String secret, String to, IMessage[] msgs, String token) {
+    public void batchProduce(String secret, String to, Message[] msgs, String token) {
         producer.setContext(context);
         producer.batchProduce(secret, to, msgs, token);
     }
 
     @Override
-    public void batchProduceWithTX(String secret, String to, IMessage[] msgs, String token) {
+    public void batchProduceWithTX(String secret, String to, Message[] msgs, String token) {
         producer.setContext(context);
         producer.batchProduceWithTX(secret, to, msgs, token);
     }
@@ -70,13 +70,13 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public List<IMessage> consume(String secret, int expectedNum) {
+    public List<Message> consume(String secret, int expectedNum) {
         consumer.setContext(context);
         return consumer.consume(secret, expectedNum);
     }
 
     @Override
-    public IMessage request(String secret, String to, IMessage msg, String token, long timeout) throws MessageResponseTimeoutException {
+    public Message request(String secret, String to, Message msg, String token, long timeout) throws MessageResponseTimeoutException {
         requester.setContext(context);
         return requester.request(secret, to, msg, token, timeout);
     }
@@ -88,7 +88,7 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void publish(String secret, IMessage[] msgs, String token) {
+    public void publish(String secret, Message[] msgs, String token) {
         publisher.setContext(context);
         publisher.publish(secret, msgs, token);
     }
@@ -100,7 +100,7 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void broadcast(String secret, IMessage[] msgs, String token) {
+    public void broadcast(String secret, Message[] msgs, String token) {
         broadcaster.setContext(context);
         broadcaster.broadcast(secret, msgs, token);
     }

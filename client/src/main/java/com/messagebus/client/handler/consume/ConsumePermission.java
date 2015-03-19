@@ -1,5 +1,6 @@
 package com.messagebus.client.handler.consume;
 
+import com.google.common.base.Strings;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
@@ -20,8 +21,10 @@ public class ConsumePermission extends PermissionChecker {
         }
 
         Node sourceNode = context.getSourceNode();
-        boolean hasPermission = !sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE);
-        hasPermission = hasPermission && context.getConfigManager().getProconNodeMap().containsKey(sourceNode.getName());
+        boolean hasPermission = !Strings.isNullOrEmpty(sourceNode.getCommunicateType());
+        hasPermission = hasPermission && !sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE);
+        hasPermission = hasPermission && (context.getConfigManager().getProconNodeMap().containsKey(sourceNode.getName())
+            || sourceNode.isInner());
 
         if (!hasPermission) {
             logger.error("permission error : can not consume ");

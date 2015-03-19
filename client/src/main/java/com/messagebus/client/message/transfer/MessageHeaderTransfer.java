@@ -1,7 +1,6 @@
 package com.messagebus.client.message.transfer;
 
-import com.messagebus.client.message.model.IMessageHeader;
-import com.messagebus.client.message.model.MessageType;
+import com.messagebus.client.message.model.Message;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,45 +9,44 @@ public class MessageHeaderTransfer {
 
     private static final Log logger = LogFactory.getLog(MessageHeaderTransfer.class);
 
-    public static AMQP.BasicProperties box(IMessageHeader header) {
+    public static AMQP.BasicProperties box(Message msg) {
         AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
 
-        return builder.messageId(String.valueOf(header.getMessageId()))
-                      .appId(header.getAppId())
-                      .clusterId(header.getClusterId())
-                      .contentEncoding(header.getContentEncoding())
-                      .contentType(header.getContentType())
-                      .correlationId(header.getCorrelationId())
-                      .deliveryMode((int) header.getDeliveryMode())
-                      .expiration(header.getExpiration())
-                      .headers(header.getHeaders())
-                      .priority((int) header.getPriority())
-                      .replyTo(header.getReplyTo())
-                      .timestamp(header.getTimestamp())
-                      .type(header.getType())
-                      .userId(header.getUserId())
+        return builder.messageId(String.valueOf(msg.getMessageId()))
+                      .appId(msg.getAppId())
+                      .clusterId(msg.getClusterId())
+                      .contentEncoding(msg.getContentEncoding())
+                      .contentType(msg.getContentType())
+                      .correlationId(msg.getCorrelationId())
+                      .deliveryMode((int) msg.getDeliveryMode())
+                      .expiration(msg.getExpiration())
+                      .headers(msg.getHeaders())
+                      .priority((int) msg.getPriority())
+                      .replyTo(msg.getReplyTo())
+                      .timestamp(msg.getTimestamp())
+                      .type(msg.getType())
+                      .userId(msg.getUserId())
                       .build();
     }
 
-    public static IMessageHeader unbox(AMQP.BasicProperties properties,
-                                       MessageType msgType,
-                                       IMessageHeader msgHeader) {
+    public static Message unbox(AMQP.BasicProperties properties,
+                                Message msg) {
         //common properties
-        msgHeader.setCorrelationId(properties.getCorrelationId());
-        msgHeader.setHeaders(properties.getHeaders());
-        msgHeader.setTimestamp(properties.getTimestamp());
+        msg.setCorrelationId(properties.getCorrelationId());
+        msg.setHeaders(properties.getHeaders());
+        msg.setTimestamp(properties.getTimestamp());
         String msgIdStr = properties.getMessageId();
         if (msgIdStr != null && !msgIdStr.isEmpty())
-            msgHeader.setMessageId(Long.parseLong(msgIdStr));
+            msg.setMessageId(Long.parseLong(msgIdStr));
         else
             logger.error("[unbox] illegal message id (can not be null) ");
 
-        msgHeader.setContentEncoding(properties.getContentEncoding());
-        msgHeader.setContentType(properties.getContentType());
-        msgHeader.setAppId(properties.getAppId());
-        msgHeader.setReplyTo(properties.getReplyTo());
+        msg.setContentEncoding(properties.getContentEncoding());
+        msg.setContentType(properties.getContentType());
+        msg.setAppId(properties.getAppId());
+        msg.setReplyTo(properties.getReplyTo());
 
-        return msgHeader;
+        return msg;
     }
 
 }

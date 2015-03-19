@@ -1,7 +1,8 @@
 package com.messagebus.client.carry;
 
 import com.messagebus.client.IMessageReceiveListener;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.carry.impl.GenericConsumer;
+import com.messagebus.client.message.model.Message;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,6 @@ public interface IConsumer {
 
     public void consume(String secret, long timeout, TimeUnit unit, IMessageReceiveListener onMessage);
 
-    public List<IMessage> consume(String secret, int expectedNum);
+    public List<Message> consume(String secret, int expectedNum);
 
 }

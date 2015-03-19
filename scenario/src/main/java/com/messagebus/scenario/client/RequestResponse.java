@@ -1,10 +1,10 @@
 package com.messagebus.scenario.client;
 
+import com.google.common.base.Strings;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -36,16 +36,13 @@ public class RequestResponse {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        IMessage msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
+        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        msg.setContentType("text/plain");
+        msg.setContentEncoding("utf-8");
 
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+        msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        msg.setMessageBody(body);
-
-        IMessage responseMsg = null;
+        Message responseMsg = null;
 
         try {
             responseMsg = client.request(secret, "emapDemoResponse", msg, token, 10);
@@ -57,7 +54,7 @@ public class RequestResponse {
         singlePool.destroy();
 
         if (responseMsg != null) {
-            logger.info("received response message : " + responseMsg.getMessageHeader().getCorrelationId());
+            logger.info("received response message : " + responseMsg.getCorrelationId());
         }
     }
 
@@ -73,18 +70,17 @@ public class RequestResponse {
                 client.response(secret, new IRequestListener() {
 
                     @Override
-                    public IMessage onRequest(IMessage requestMsg) {
-                        logger.info("got requested message : " + requestMsg.getMessageHeader().getCorrelationId());
+                    public Message onRequest(Message requestMsg) {
+                        if (Strings.isNullOrEmpty(requestMsg.getCorrelationId())) {
+                            logger.info("got requested message : " + requestMsg.getCorrelationId());
+                        }
 
-                        IMessage respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                        respMsg.getMessageHeader().setContentType("text/plain");
-                        respMsg.getMessageHeader().setContentEncoding("utf-8");
-                        respMsg.getMessageHeader().setCorrelationId(requestMsg.getMessageHeader().getCorrelationId());
+                        Message respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        respMsg.setContentType("text/plain");
+                        respMsg.setContentEncoding("utf-8");
+                        respMsg.setCorrelationId(requestMsg.getCorrelationId());
 
-                        Message.MessageBody body = new Message.MessageBody();
-                        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
-
-                        respMsg.setMessageBody(body);
+                        respMsg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
                         return respMsg;
                     }

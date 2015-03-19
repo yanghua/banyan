@@ -1,10 +1,9 @@
 package com.messagebus.benchmark.client.testCase;
 
 import com.messagebus.benchmark.client.*;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;
@@ -20,8 +19,8 @@ public class OriginalProduceTestCase extends Benchmark {
 
     private static class BasicProduce extends AbstractInitializer implements Runnable, ITerminater, IFetcher {
 
-        private IMessage msg;
-        private String   routingkey;
+        private Message msg;
+        private String  routingkey;
         private boolean flag    = true;
         private long    counter = 0;
 
@@ -39,13 +38,12 @@ public class OriginalProduceTestCase extends Benchmark {
         public void run() {
             try {
                 this.init();
-                byte[] msgBodyOfBytes = MsgBodyTransfer.box(msg.getMessageBody());
-                AMQP.BasicProperties header = MessageHeaderTransfer.box(msg.getMessageHeader());
+                AMQP.BasicProperties header = MessageHeaderTransfer.box(msg);
                 while (flag) {
                     ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                           this.channel,
                                           this.getRoutingkey(),
-                                          msgBodyOfBytes,
+                                          msg.getContent(),
                                           header);
                     ++counter;
                 }

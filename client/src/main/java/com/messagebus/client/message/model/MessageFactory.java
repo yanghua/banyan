@@ -3,12 +3,11 @@ package com.messagebus.client.message.model;
 
 public class MessageFactory {
 
-    public static IMessage createMessage(MessageType messageType) {
-        IMessage aMsg;
+    public static Message createMessage(MessageType messageType) {
+        Message aMsg;
 
         aMsg = new Message();
-        aMsg.getMessageHeader().setType(messageType.getType());
-        aMsg.setMessageBody(new Message.MessageBody());
+        aMsg.setType(messageType.getType());
 
         return aMsg;
     }

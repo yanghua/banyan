@@ -70,10 +70,8 @@ public class ResponseTemplate {
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
 
-                IMessage testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                Message.MessageBody body = new Message.MessageBody();
-                body.setContent("test".getBytes());
-                testMsg.setMessageBody(body);
+                Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                testMsg.setContent("test".getBytes());
 
                 String msg2json = MessageJSONSerializer.serialize(testMsg);
 
@@ -122,9 +120,9 @@ public class ResponseTemplate {
                         String responseData = EntityUtils.toString(entity);
                         logger.info("end point 2 : received response : " + responseData);
 
-                        IMessage msg = extractRequestMsg(responseData);
+                        Message msg = extractRequestMsg(responseData);
 
-                        String tmpQueueName = String.valueOf(msg.getMessageHeader().getMessageId());
+                        String tmpQueueName = String.valueOf(msg.getMessageId());
 
                         String responseUrl = String.format(testUrlFormat, testHost, testPort,
                                                            tmpQueueName, appkey, "response", timeout);
@@ -133,10 +131,8 @@ public class ResponseTemplate {
                         CloseableHttpClient responseHttpClient = HttpClients.createDefault();
 
 
-                        IMessage testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
-                        Message.MessageBody body = new Message.MessageBody();
-                        body.setContent("test".getBytes());
-                        testMsg.setMessageBody(body);
+                        Message testMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        testMsg.setContent("test".getBytes());
 
                         String msg2json = MessageJSONSerializer.serialize(testMsg);
 
@@ -171,7 +167,7 @@ public class ResponseTemplate {
         }
     }
 
-    private static IMessage extractRequestMsg(String respData) {
+    private static Message extractRequestMsg(String respData) {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(respData);
         JsonObject object = element.getAsJsonObject();

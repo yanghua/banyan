@@ -3,7 +3,6 @@ package com.messagebus.scenario.client;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
-import com.messagebus.client.message.model.IMessage;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -34,16 +33,13 @@ public class BroadcastSubscribe {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        IMessage msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
+        Message msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
+        msg.setContentType("text/plain");
+        msg.setContentEncoding("utf-8");
 
-        Message.MessageBody body = new Message.MessageBody();
-        body.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+        msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        msg.setMessageBody(body);
-
-        client.broadcast(secret, new IMessage[]{msg}, token);
+        client.broadcast(secret, new Message[]{msg}, token);
 
         logger.info(" broadcast! ");
 
@@ -59,17 +55,17 @@ public class BroadcastSubscribe {
         //notification handler
         client.setNotificationListener(new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
+            public void onMessage(Message message) {
                 logger.info("received notification !");
-                logger.info(message.getMessageHeader().getMessageId());
+                logger.info(message.getMessageId());
             }
         });
 
         //business handler
         client.consume(secret, 3, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
-                logger.info(message.getMessageHeader().getMessageId());
+            public void onMessage(Message message) {
+                logger.info(message.getMessageId());
             }
         });
 
@@ -84,16 +80,16 @@ public class BroadcastSubscribe {
 
         client.setNotificationListener(new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
+            public void onMessage(Message message) {
                 logger.info("received notification !");
-                logger.info(message.getMessageHeader().getMessageId());
+                logger.info(message.getMessageId());
             }
         });
 
         client.consume(sercet, 3, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
-            public void onMessage(IMessage message) {
-                logger.info(message.getMessageHeader().getMessageId());
+            public void onMessage(Message message) {
+                logger.info(message.getMessageId());
             }
         });
 

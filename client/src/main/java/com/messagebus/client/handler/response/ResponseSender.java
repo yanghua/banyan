@@ -3,9 +3,8 @@ package com.messagebus.client.handler.response;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
@@ -26,14 +25,13 @@ public class ResponseSender extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        IMessage responseMsg = context.getMessages()[0];
-        byte[] msgBody = MsgBodyTransfer.box(responseMsg.getMessageBody());
-        AMQP.BasicProperties properties = MessageHeaderTransfer.box(responseMsg.getMessageHeader());
+        Message responseMsg = context.getMessages()[0];
+        AMQP.BasicProperties properties = MessageHeaderTransfer.box(responseMsg);
         try {
             ProxyProducer.produce("",
                                   context.getChannel(),
                                   context.getTempQueueName(),
-                                  msgBody,
+                                  responseMsg.getContent(),
                                   properties);
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "response sender");

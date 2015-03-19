@@ -413,7 +413,7 @@ public class ConfigManager implements IExchangerListener {
 
         for (Node node : nodes) {
             idNodeMap.put(node.getNodeId(), node);
-            if (node.getType().equals("1") && !node.isInner()) {
+            if (node.getType().equals("1") || !node.isInner()) {
                 this.secretNodeMap.put(node.getSecret(), node);
                 if (node.getValue().contains("procon")) {
                     this.proconNodeMap.put(node.getName(), node);

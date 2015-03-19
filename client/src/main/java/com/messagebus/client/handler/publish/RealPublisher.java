@@ -4,9 +4,8 @@ import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.message.model.IMessage;
+import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.client.message.transfer.MsgBodyTransfer;
 import com.messagebus.client.model.HandlerModel;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
@@ -30,16 +29,15 @@ public class RealPublisher extends AbstractHandler {
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
         try {
-            for (IMessage msg : context.getMessages()) {
-                byte[] msgBody = MsgBodyTransfer.box(msg.getMessageBody());
-                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg.getMessageHeader());
+            for (Message msg : context.getMessages()) {
+                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
 
                 List<Node> publishNodes = (List<Node>) context.getOtherParams().get("publishList");
                 for (Node node : publishNodes) {
                     ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                           context.getChannel(),
                                           node.getRoutingKey(),
-                                          msgBody,
+                                          msg.getContent(),
                                           properties);
                 }
             }
