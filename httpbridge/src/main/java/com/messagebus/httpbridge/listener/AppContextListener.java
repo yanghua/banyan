@@ -1,6 +1,5 @@
 package com.messagebus.httpbridge.listener;
 
-import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusPool;
 import com.messagebus.httpbridge.util.Constants;
 import org.apache.commons.logging.Log;

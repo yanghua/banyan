@@ -37,8 +37,7 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
     private final Condition mainBlocker  = mainLock.newCondition();
 
     public GenericConsumer() {
-        this.currentThread = new Thread(this);
-        this.currentThread.setDaemon(true);
+
     }
 
     @Override
@@ -81,6 +80,8 @@ public class GenericConsumer extends AbstractMessageCarryer implements Runnable,
         this.timeout = timeout;
         this.timeUnit = unit;
         this.secret = secret;
+        this.currentThread = new Thread(this);
+        this.currentThread.setDaemon(true);
 
         this.startup();
     }

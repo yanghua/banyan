@@ -22,8 +22,8 @@ public class Message {
 
     private short deliveryMode = 2;
 
-    private MessageType   msgType;
-    private byte[]        content;
+    private MessageType msgType;
+    private byte[]      content;
 
     public MessageType getMessageType() {
         return this.msgType;

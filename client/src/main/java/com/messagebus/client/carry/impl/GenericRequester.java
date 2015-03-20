@@ -30,7 +30,7 @@ public class GenericRequester extends AbstractMessageCarryer implements IRequest
      */
     @Override
     public Message request(String secret, String to, Message msg,
-                            String token, long timeout) throws MessageResponseTimeoutException {
+                           String token, long timeout) throws MessageResponseTimeoutException {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setToken(token);

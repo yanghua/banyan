@@ -1,7 +1,6 @@
 package com.messagebus.client.carry;
 
 import com.messagebus.client.IMessageReceiveListener;
-import com.messagebus.client.carry.impl.GenericConsumer;
 import com.messagebus.client.message.model.Message;
 
 import java.util.List;

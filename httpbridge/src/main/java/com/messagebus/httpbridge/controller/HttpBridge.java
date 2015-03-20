@@ -2,7 +2,6 @@ package com.messagebus.httpbridge.controller;
 
 import com.google.common.base.Strings;
 import com.messagebus.client.*;
-import com.messagebus.client.carry.impl.GenericConsumer;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageJSONSerializer;
 import com.messagebus.client.message.model.MessageType;
