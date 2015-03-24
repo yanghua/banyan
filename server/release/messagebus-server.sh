@@ -11,6 +11,7 @@ EXCEPTION="Usage: messagebus-server {start|stop|restart|check|status}"
 RETVAL=0
 MESSAGEBUS_SERVER_PID=$PID_PATH/$NAME.pid
 MESSAGEBUS_SERVER_STOP_PID=$PID_PATH/$NAME_stop.pid
+source /etc/profile
 
 usage()
 {
