@@ -46,7 +46,10 @@ public class NodeFetcher implements IDataFetcher {
                 node.setAppId(rs.getString("APP_ID"));
                 node.setAvailable(rs.getBoolean("AVAILABLE"));
                 node.setInner(rs.getBoolean("IS_INNER"));
+                node.setVirtual(rs.getBoolean("IS_VIRTUAL"));
                 node.setCommunicateType(rs.getString("COMMUNICATE_TYPE"));
+                node.setThreshold(rs.getString("THRESHOLD"));
+                node.setMsgBodySize(rs.getString("MSG_BODY_SIZE"));
 
                 nodes.add(node);
             }

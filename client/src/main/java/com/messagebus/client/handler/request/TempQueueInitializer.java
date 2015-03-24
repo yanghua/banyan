@@ -22,11 +22,11 @@ public class TempQueueInitializer extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        long msgId = context.getMessages()[0].getMessageId();
-        context.getMessages()[0].setCorrelationId(String.valueOf(msgId));
+        String correlationId = context.getSourceNode().getName();
+        context.getMessages()[0].setCorrelationId(correlationId);
         QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());
         try {
-            queueManager.create(String.valueOf(msgId));
+            queueManager.create(correlationId);
             chain.handle(context);
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "[TempQueueInitializer]");

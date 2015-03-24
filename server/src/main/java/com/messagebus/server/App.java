@@ -4,6 +4,7 @@ import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.business.exchanger.IDataFetcher;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusConnectedFailedException;
+import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
@@ -14,6 +15,7 @@ import com.messagebus.server.daemon.ServiceLoader;
 import com.messagebus.server.dataaccess.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.IOException;
@@ -216,18 +218,17 @@ public class App {
         String pubsuberHost = serverConfig.getProperty(com.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_HOST);
         int pubsuberPort = Integer.parseInt(serverConfig.getProperty(com.messagebus.server.Constants.KEY_MESSAGEBUS_SERVER_PUBSUBER_PORT));
 
-        MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
-        Messagebus commonClient = pool.getResource();
+        //TODO: do not use single pool
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxTotal(10);
+        MessagebusPool messagebusPool = new MessagebusPool(pubsuberHost, pubsuberPort, poolConfig);
 
-        context.put(com.messagebus.server.Constants.GLOBAL_CLIENT_POOL, pool);
-        context.put(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT, commonClient);
+        context.put(com.messagebus.server.Constants.GLOBAL_CLIENT_POOL, messagebusPool);
     }
 
     private static void destroy(Map<String, Object> context) {
         if (context != null) {
             MessagebusSinglePool pool = (MessagebusSinglePool) context.get(com.messagebus.server.Constants.GLOBAL_CLIENT_POOL);
-            Messagebus client = (Messagebus) context.get(com.messagebus.server.Constants.GLOBAL_CLIENT_OBJECT);
-            pool.returnResource(client);
             pool.destroy();
         }
     }

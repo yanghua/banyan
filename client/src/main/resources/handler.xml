@@ -6,6 +6,10 @@
             <handler-path>com.messagebus.client.handler.produce.ProduceParamValidator</handler-path>
         </handler>
         <handler>
+            <handler-name>Message-Body-Size</handler-name>
+            <handler-path>com.messagebus.client.handler.common.MessageBodySizeLimiter</handler-path>
+        </handler>
+        <handler>
             <handler-name>Produce-Permission-Checker</handler-name>
             <handler-path>com.messagebus.client.handler.produce.ProducePermission</handler-path>
         </handler>
@@ -44,6 +48,10 @@
         <handler>
             <handler-name>Validate-Handler</handler-name>
             <handler-path>com.messagebus.client.handler.request.RequestParamValidator</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Message-Body-Size</handler-name>
+            <handler-path>com.messagebus.client.handler.common.MessageBodySizeLimiter</handler-path>
         </handler>
         <handler>
             <handler-name>Request-Permission-Checker</handler-name>

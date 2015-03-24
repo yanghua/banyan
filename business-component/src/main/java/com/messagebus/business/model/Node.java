@@ -18,7 +18,10 @@ public class Node implements Serializable, Comparable<Node> {
     private boolean available;
     private String  appId;
     private boolean isInner;
+    private boolean isVirtual;
     private String  communicateType;
+    private String threshold;
+    private String msgBodySize;
 
     public Node() {
     }
@@ -95,6 +98,14 @@ public class Node implements Serializable, Comparable<Node> {
         this.available = available;
     }
 
+    public boolean isVirtual() {
+        return isVirtual;
+    }
+
+    public void setVirtual(boolean isVirtual) {
+        this.isVirtual = isVirtual;
+    }
+
     public String getAppId() {
         return appId;
     }
@@ -117,6 +128,22 @@ public class Node implements Serializable, Comparable<Node> {
 
     public void setCommunicateType(String communicateType) {
         this.communicateType = communicateType;
+    }
+
+    public String getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(String threshold) {
+        this.threshold = threshold;
+    }
+
+    public String getMsgBodySize() {
+        return msgBodySize;
+    }
+
+    public void setMsgBodySize(String msgBodySize) {
+        this.msgBodySize = msgBodySize;
     }
 
     @Override

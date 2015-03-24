@@ -39,12 +39,12 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
      */
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        long msgId = context.getMessages()[0].getMessageId();
+        String correlationId = context.getMessages()[0].getCorrelationId();
 
         try {
             //just receive one
             QueueingConsumer consumer = ProxyConsumer.consume(context.getChannel(),
-                                                              String.valueOf(msgId),
+                                                              correlationId,
                                                               context.getConsumerTag());
             QueueingConsumer.Delivery delivery = consumer.nextDelivery(context.getTimeout() * 1000);
 
@@ -59,7 +59,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
 
             context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             //destroy queue
-            QueueManager.defaultQueueManager(context.getHost()).delete(String.valueOf(msgId));
+            QueueManager.defaultQueueManager(context.getHost()).delete(correlationId);
 
             String msgTypeStr = properties.getType();
             if (msgTypeStr == null || msgTypeStr.isEmpty()) {
@@ -75,7 +75,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
         } finally {
             //delete temp queue
             QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());
-            String msgIdStr = String.valueOf(msgId);
+            String msgIdStr = String.valueOf(correlationId);
             try {
                 if (queueManager.exists(msgIdStr)) {
                     queueManager.delete(msgIdStr);

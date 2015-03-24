@@ -29,6 +29,7 @@ public class MessageIdGenerator extends AbstractHandler {
             UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), Constants.DEFAULT_DATACENTER_ID_FOR_UUID);
             logger.debug("message id is : " + generator.nextId());
             msg.setMessageId(generator.nextId());
+            msg.setCorrelationId(context.getSourceNode().getName());
         }
 
         chain.handle(context);

@@ -2,6 +2,7 @@ package com.messagebus.server.daemon.impl;
 
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.Messagebus;
+import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.server.Constants;
 import com.messagebus.server.daemon.DaemonService;
@@ -17,23 +18,28 @@ public class MsgLogService extends AbstractService {
 
     private static final Log    logger = LogFactory.getLog(MsgLogService.class);
     private              String secret = "hkajhdfiuwxjdhakjdshuuuqoxdfasg";
-    private Messagebus client;
+    private MessagebusPool messagebusPool;
 
     public MsgLogService(Map<String, Object> context) {
         super(context);
 
-        client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
+        messagebusPool = (MessagebusPool) this.context.get(Constants.GLOBAL_CLIENT_POOL);
     }
 
     @Override
     public void run() {
-        client.consume(secret, Integer.MAX_VALUE, TimeUnit.SECONDS,
-                       new IMessageReceiveListener() {
-                           @Override
-                           public void onMessage(Message message) {
-                               logger.info(formatLog(message));
-                           }
-                       });
+        Messagebus client = messagebusPool.getResource();
+        try {
+            client.consume(secret, Integer.MAX_VALUE, TimeUnit.SECONDS,
+                           new IMessageReceiveListener() {
+                               @Override
+                               public void onMessage(Message message) {
+                                   logger.info(formatLog(message));
+                               }
+                           });
+        } finally {
+            messagebusPool.returnResource(client);
+        }
     }
 
     private String formatLog(Message msg) {

@@ -1,6 +1,7 @@
 package com.messagebus.server.bootstrap;
 
 
+import com.google.common.base.Strings;
 import com.messagebus.business.model.Node;
 import com.messagebus.interactor.pubsub.IDataConverter;
 import com.messagebus.interactor.pubsub.PubSuberFactory;
@@ -75,16 +76,35 @@ public class RabbitmqInitializer extends AbstractInitializer {
 
         //declare queue
         for (Node node : sortedQueueNodes) {
-            channel.queueDeclare(node.getValue(), true, false, false, null);
+            if (!node.isVirtual()) {
+                Map<String, Object> queueConfig = new HashMap<>(2);
+                String thresholdStr = node.getThreshold();
+
+                if (!Strings.isNullOrEmpty(thresholdStr)) {
+                    int threshold = Integer.parseInt(thresholdStr);
+                    queueConfig.put("x-max-length", threshold);
+                }
+
+                String msgSizeOfBodyStr = node.getMsgBodySize();
+                if (!Strings.isNullOrEmpty(thresholdStr) && !Strings.isNullOrEmpty(msgSizeOfBodyStr)) {
+                    int threshold = Integer.parseInt(thresholdStr);
+                    int msgSizeOfBody = Integer.parseInt(msgSizeOfBodyStr);
+                    int allMsgSize = threshold * msgSizeOfBody * 1000;
+                    queueConfig.put("x-max-length-bytes", allMsgSize);
+                }
+
+                channel.queueDeclare(node.getValue(), true, false, false, queueConfig);
+            }
         }
 
         //bind queue
         for (Node node : sortedQueueNodes) {
-            channel.queueBind(node.getValue(), nodeMap.get(node.getParentId()).getValue(), node.getRoutingKey());
+            if (!node.isVirtual()) {
+                channel.queueBind(node.getValue(), nodeMap.get(node.getParentId()).getValue(), node.getRoutingKey());
 
-            //binding to event exchange
-            channel.queueBind(node.getValue(),
-                              com.messagebus.common.Constants.NOTIFICATION_EXCHANGE_NAME, "");
+                //binding to event exchange
+                channel.queueBind(node.getValue(), com.messagebus.common.Constants.NOTIFICATION_EXCHANGE_NAME, "");
+            }
         }
 
         super.close();

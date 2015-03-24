@@ -2,6 +2,7 @@ package com.messagebus.server.daemon.impl;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.client.Messagebus;
+import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -23,7 +24,7 @@ public class CommandService extends AbstractService {
 
     private final Object lockObj = new Object();
 
-    private Messagebus       client;
+    private MessagebusPool   messagebusPool;
     private Message          responseMsg;
     private Properties       serverConfig;
     private ExchangerManager exchangeManager;
@@ -33,7 +34,7 @@ public class CommandService extends AbstractService {
 
         serverConfig = (Properties) this.context.get(Constants.KEY_SERVER_CONFIG);
 
-        client = (Messagebus) this.context.get(Constants.GLOBAL_CLIENT_OBJECT);
+        messagebusPool = (MessagebusPool) this.context.get(Constants.GLOBAL_CLIENT_POOL);
 
         responseMsg = MessageFactory.createMessage(MessageType.QueueMessage);
         Map<String, Object> headers = new HashMap<>(1);

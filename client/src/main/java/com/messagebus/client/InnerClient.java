@@ -18,7 +18,7 @@ abstract class InnerClient {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    //inject with reflector
+    //inject by reflector
     private ExchangerManager exchangeManager;
     private ConfigManager    configManager;
     private Connection       connection;

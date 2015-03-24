@@ -14,7 +14,7 @@ public class MessagebusSinglePool extends MessagebusPool {
     }
 
     /**
-     * inner class : default messagebus pool
+     * inner class : single messagebus instance config
      */
     private static class DefaultMessagebusPoolConfig extends GenericObjectPoolConfig {
 
