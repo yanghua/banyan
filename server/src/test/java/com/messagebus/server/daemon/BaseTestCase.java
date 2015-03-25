@@ -9,7 +9,7 @@ import junit.framework.TestCase;
  */
 public class BaseTestCase extends TestCase {
 
-    protected String host = "127.0.0.1";
+    protected String host = "172.16.206.29";
     protected int    port = 6379;
 
     protected MessagebusSinglePool singlePool;

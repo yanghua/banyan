@@ -28,15 +28,21 @@ public class ProducePermission extends PermissionChecker {
 
         String token = context.getToken();
 
-        hasPermission = context.getConfigManager().getProconNodeMap().containsKey(sourceNode.getName());
-        hasPermission = hasPermission && context.getConfigManager().getProconNodeMap().containsKey(targetNode.getName());
-        hasPermission = hasPermission && context.getConfigManager().getTokenSinkMap().containsKey(token);
+        //send to itself queue
+        if (token.equals(context.getSecret())) {
+            hasPermission = sourceNode.getNodeId().equals(targetNode.getNodeId());
+            hasPermission = hasPermission && sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE_CONSUME);
+        } else {
+            hasPermission = context.getConfigManager().getProconNodeMap().containsKey(sourceNode.getName());
+            hasPermission = hasPermission && context.getConfigManager().getProconNodeMap().containsKey(targetNode.getName());
+            hasPermission = hasPermission && context.getConfigManager().getTokenSinkMap().containsKey(token);
 
-        Sink sink = context.getConfigManager().getTokenSinkMap().get(token);
-        hasPermission = hasPermission && sink.getFlowFrom().equals(sourceNode.getNodeId());
-        hasPermission = hasPermission && sink.getFlowTo().equals(targetNode.getNodeId());
-        hasPermission = hasPermission && targetNode.isAvailable()
-            && !targetNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE);
+            Sink sink = context.getConfigManager().getTokenSinkMap().get(token);
+            hasPermission = hasPermission && sink.getFlowFrom().equals(sourceNode.getNodeId());
+            hasPermission = hasPermission && sink.getFlowTo().equals(targetNode.getNodeId());
+            hasPermission = hasPermission && targetNode.isAvailable()
+                && !targetNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE);
+        }
 
         if (!hasPermission) {
             logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +

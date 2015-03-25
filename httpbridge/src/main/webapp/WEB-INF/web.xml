@@ -11,7 +11,7 @@
 
     <context-param>
         <param-name>pubsuberHost</param-name>
-        <param-value>127.0.0.1</param-value>
+        <param-value>172.16.206.250</param-value>
     </context-param>
 
     <context-param>

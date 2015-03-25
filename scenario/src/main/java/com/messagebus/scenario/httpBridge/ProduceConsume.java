@@ -26,7 +26,7 @@ public class ProduceConsume {
 
     private static final Gson gson = new Gson();
 
-    private static String testHost = "localhost";
+    private static String testHost = "172.16.206.29";
     private static int    testPort = 8080;
 
     public static void main(String[] args) {
