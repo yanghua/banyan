@@ -19,7 +19,7 @@ public class Constants {
     public static final int MIN_CONSUME_NUM = 1;
 
     //consume mode push
-    public static final long MAX_CONSUME_CONTINUATION_TIMEOUT = 10_000L;
+    public static final long MAX_CONSUME_CONTINUATION_TIMEOUT = 15_000L;
 
     //request timeout
     public static final long MAX_REQUEST_TIMEOUT = 60_000L;

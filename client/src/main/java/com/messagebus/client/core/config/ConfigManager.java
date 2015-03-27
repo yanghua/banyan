@@ -67,7 +67,8 @@ public class ConfigManager implements IExchangerListener {
     private Map<String, Config>  clientConfigMap;
     private ExchangerManager     exchangeManager;
     private Map<String, Sink>    tokenSinkMap;
-    private Map<String, Channel> tokenChannelMap;
+    private Map<String, String> pubsubChannelMap;
+    private Node                 notificationExchangeNode;
 
     public ConfigManager() {
         this.inited = this.init();
@@ -204,8 +205,8 @@ public class ConfigManager implements IExchangerListener {
         return tokenSinkMap;
     }
 
-    public Map<String, Channel> getTokenChannelMap() {
-        return tokenChannelMap;
+    public Map<String, String> getPubsubChannelMap() {
+        return pubsubChannelMap;
     }
 
     public Map<String, Config> getClientConfigMap() {
@@ -228,6 +229,13 @@ public class ConfigManager implements IExchangerListener {
         this.serverState = serverState;
     }
 
+    public Node getNotificationExchangeNode() {
+        return notificationExchangeNode;
+    }
+
+    public void setNotificationExchangeNode(Node notificationExchangeNode) {
+        this.notificationExchangeNode = notificationExchangeNode;
+    }
 
     private void parseHandlers(String messageCarryTypeStr,
                                List<HandlerModel> handlerModels) {
@@ -413,6 +421,11 @@ public class ConfigManager implements IExchangerListener {
 
         for (Node node : nodes) {
             idNodeMap.put(node.getNodeId(), node);
+
+            if (node.getType().equals("0") && node.getName().equals(Constants.NOTIFICATION_EXCHANGE_NAME)) {
+                this.notificationExchangeNode = node;
+            }
+
             if (node.getType().equals("1") || !node.isInner()) {
                 this.secretNodeMap.put(node.getSecret(), node);
                 if (node.getValue().contains("procon")) {
@@ -447,10 +460,17 @@ public class ConfigManager implements IExchangerListener {
     }
 
     private void processChannel(Channel[] channels) {
-        tokenChannelMap = new ConcurrentHashMap<>(channels.length);
+        pubsubChannelMap = new ConcurrentHashMap<>();
 
         for (Channel channel : channels) {
-            tokenChannelMap.put(channel.getToken(), channel);
+            if (pubsubChannelMap.containsKey(channel.getPushFrom())) {
+                String tmp = pubsubChannelMap.get(channel.getPushFrom());
+                tmp += ("," + channel.getPushTo());
+
+                pubsubChannelMap.put(channel.getPushFrom(), tmp);
+            } else {
+                pubsubChannelMap.put(channel.getPushFrom(), channel.getPushTo());
+            }
         }
     }
 

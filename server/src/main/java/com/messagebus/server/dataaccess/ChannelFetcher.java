@@ -30,14 +30,13 @@ public class ChannelFetcher implements IDataFetcher {
     @Override
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<Channel> channels = new ArrayList<>();
-        String sql = "SELECT * FROM CHANNEL WHERE AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
+        String sql = "SELECT * FROM CHANNEL WHERE ENABLE = 1 AND AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
 
         try (Connection connection = this.dbAccessor.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 Channel channel = new Channel();
-                channel.setToken(rs.getString("TOKEN"));
                 channel.setPushFrom(rs.getString("PUSH_FROM"));
                 channel.setPushTo(rs.getString("PUSH_TO"));
                 channels.add(channel);

@@ -7,6 +7,7 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
+import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,9 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class ProduceConsume {
 
     private static final Log logger = LogFactory.getLog(ProduceConsume.class);
-
-    private static final String host = "127.0.0.1";
-    private static final int    port = 6379;
 
     public static void main(String[] args) {
         produce();
@@ -38,7 +36,9 @@ public class ProduceConsume {
     private static void produce() {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
         String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
+            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port")));
         Messagebus client = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
@@ -54,7 +54,9 @@ public class ProduceConsume {
 
     private static void consumeWithPullStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
+            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port")));
         Messagebus client = singlePool.getResource();
 
         List<Message> msgs = client.consume(secret, 1);
@@ -69,7 +71,10 @@ public class ProduceConsume {
 
     private static void ConsumeWithPushStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
+            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port"))
+        );
         Messagebus client = singlePool.getResource();
 
         client.consume(secret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
@@ -111,7 +116,10 @@ public class ProduceConsume {
         @Override
         public void run() {
             String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-            singlePool = new MessagebusSinglePool(host, port);
+            singlePool = new MessagebusSinglePool(
+                PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
+                Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port"))
+            );
             client = singlePool.getResource();
 
             //register notification listener

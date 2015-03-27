@@ -17,10 +17,9 @@ public class GenericBroadcaster extends AbstractMessageCarryer implements IBroad
     }
 
     @Override
-    public void broadcast(String secret, Message[] msgs, String token) {
+    public void broadcast(String secret, Message[] msgs) {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
-        ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.BROADCAST);
         ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(ctx.getSecret()));
         ctx.setMessages(msgs);

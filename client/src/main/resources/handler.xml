@@ -166,6 +166,10 @@
             <handler-path>com.messagebus.client.handler.broadcast.BroadcastParamValidator</handler-path>
         </handler>
         <handler>
+            <handler-name>Broadcast-Permission-Checker</handler-name>
+            <handler-path>com.messagebus.client.handler.broadcast.BroadcastPermission</handler-path>
+        </handler>
+        <handler>
             <handler-name>Real-Broadcaster</handler-name>
             <handler-path>com.messagebus.client.handler.broadcast.RealBroadcaster</handler-path>
         </handler>

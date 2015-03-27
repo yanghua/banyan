@@ -7,19 +7,10 @@ import java.io.Serializable;
  */
 public class Channel implements Serializable {
 
-    private String token;
     private String pushFrom;
     private String pushTo;
 
     public Channel() {
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getPushFrom() {

@@ -2,7 +2,7 @@ package com.messagebus.benchmark.client.testCase;
 
 import com.messagebus.benchmark.client.Benchmark;
 import com.messagebus.benchmark.client.IFetcher;
-import com.messagebus.benchmark.client.ITerminater;
+import com.messagebus.benchmark.client.ILifeCycle;
 import com.messagebus.benchmark.client.TestConfigConstant;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
@@ -21,20 +21,28 @@ public class OriginalConsumeTestCase extends Benchmark {
 
     private static final Log logger = LogFactory.getLog(OriginalConsumeTestCase.class);
 
-    public static class BasicConsume extends AbstractInitializer implements Runnable, ITerminater, IFetcher {
+    public static class BasicConsume extends AbstractInitializer implements Runnable, ILifeCycle, IFetcher {
 
         private static final String  consumerTag   = "tag.consumer.msgLog";
         private              boolean flag          = true;
         private              long    counter       = 0;
         private              String  realQueueName = "";
+        private Thread currentThread;
 
         public BasicConsume(String host) {
             super(host);
+            currentThread = new Thread(this);
+            currentThread.setDaemon(true);
         }
 
         @Override
         public long fetch() {
             return this.counter;
+        }
+
+        @Override
+        public void start() {
+            this.currentThread.start();
         }
 
         @Override
@@ -113,14 +121,12 @@ public class OriginalConsumeTestCase extends Benchmark {
 //            e.printStackTrace();
 //        }
 
-        String host = "172.16.206.30";
-
         OriginalConsumeTestCase testCase = new OriginalConsumeTestCase();
-        BasicConsume task = new BasicConsume(host);
+        BasicConsume task = new BasicConsume(TestConfigConstant.RABBITMQ_SERVER_HOST);
         task.setRealQueueName("queue.proxy.message.business.crm");
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS, TestConfigConstant.FETCH_NUM,
-                      "single_thread_original_consume_async_" + TestConfigConstant.MSG_BODY_SIZE_OF_KB + "_KB");
+                      "single_thread_original_consume_async_" + TestConfigConstant.MSG_BODY_SIZE_OF_BYTE + "_KB");
     }
 
 }

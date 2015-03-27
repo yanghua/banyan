@@ -13,9 +13,12 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 
-public class OriginalProduceTestCase extends Benchmark {
+/**
+ * Created by yanghua on 3/25/15.
+ */
+public class OriginalProduceWithoutTopologyTestCase extends Benchmark {
 
-    private static final Log logger = LogFactory.getLog(OriginalProduceTestCase.class);
+    private static final Log logger = LogFactory.getLog(OriginalProduceWithoutTopologyTestCase.class);
 
     private static class BasicProduce extends AbstractInitializer implements Runnable, ILifeCycle, IFetcher {
 
@@ -48,7 +51,7 @@ public class OriginalProduceTestCase extends Benchmark {
                 this.init();
                 AMQP.BasicProperties header = MessageHeaderTransfer.box(msg);
                 while (flag) {
-                    ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
+                    ProxyProducer.produce(TestConfigConstant.DEFAULT_EXCHANGE_NAME_WITHOUT_TOPOLOGY,
                                           this.channel,
                                           this.getRoutingkey(),
                                           msg.getContent(),
@@ -84,10 +87,10 @@ public class OriginalProduceTestCase extends Benchmark {
         OriginalProduceTestCase testCase = new OriginalProduceTestCase();
 
         BasicProduce task = new BasicProduce(TestConfigConstant.RABBITMQ_SERVER_HOST, TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
-        task.setRoutingkey(TestConfigConstant.ORIGINAL_PRODUCE_ROUTING_KEY);
+        task.setRoutingkey("");
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS,
-                      TestConfigConstant.FETCH_NUM, "one_thread_original_produce_one_by_one_" +
+                      TestConfigConstant.FETCH_NUM, "one_thread_original_produce_without_topology_one_by_one_" +
                 TestConfigConstant.MSG_BODY_SIZE_OF_BYTE + "_Byte");
     }
 

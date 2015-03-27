@@ -68,15 +68,15 @@ public class TestUtility {
     }
 
     public static void produce(long total) {
-        Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_KB);
+        Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(TestConfigConstant.HOST,
-                                                                   TestConfigConstant.PORT);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(TestConfigConstant.PUBSUBER_HOST,
+                                                                   TestConfigConstant.PUBSUBER_PORT);
         Messagebus client = singlePool.getResource();
 
         try {
             for (int i = 0; i < total; i++) {
-//                client.produce(, TestConfigConstant.QUEUE_NAME, msg, );
+                client.produce(TestConfigConstant.PRODUCER_SECRET, TestConfigConstant.CONSUMER_QUEUE_NAME, msg, TestConfigConstant.PRODUCER_TOKEN);
             }
         } catch (MessagebusUnOpenException e) {
             e.printStackTrace();

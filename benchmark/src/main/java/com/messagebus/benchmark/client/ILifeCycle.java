@@ -1,6 +1,8 @@
 package com.messagebus.benchmark.client;
 
-public interface ITerminater {
+public interface ILifeCycle {
+
+    void start();
 
     void terminate();
 

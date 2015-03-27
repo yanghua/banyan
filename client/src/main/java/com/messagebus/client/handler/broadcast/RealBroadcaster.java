@@ -1,5 +1,6 @@
 package com.messagebus.client.handler.broadcast;
 
+import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
@@ -20,12 +21,13 @@ public class RealBroadcaster extends AbstractHandler {
 
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
+        Node notificationExchangeNode = context.getConfigManager().getNotificationExchangeNode();
         try {
             for (Message msg : context.getMessages()) {
                 AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                       context.getChannel(),
-                                      Constants.NOTIFICATION_ROUTING_KEY,
+                                      notificationExchangeNode.getValue(),
                                       msg.getContent(),
                                       properties);
             }

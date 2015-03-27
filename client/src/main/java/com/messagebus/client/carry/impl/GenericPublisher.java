@@ -17,10 +17,9 @@ public class GenericPublisher extends AbstractMessageCarryer implements IPublish
     }
 
     @Override
-    public void publish(String secret, Message[] msgs, String token) {
+    public void publish(String secret, Message[] msgs) {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
-        ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.PUBLISH);
         ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(secret));
         ctx.setMessages(msgs);

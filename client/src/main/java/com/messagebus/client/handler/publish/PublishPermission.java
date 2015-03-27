@@ -1,5 +1,6 @@
 package com.messagebus.client.handler.publish;
 
+import com.google.common.base.Strings;
 import com.messagebus.business.model.Channel;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
@@ -19,12 +20,7 @@ public class PublishPermission extends PermissionChecker {
             throw new RuntimeException("can not publish message ");
         }
 
-        String token = context.getToken();
         hasPermission = context.getConfigManager().getPubsubNodeMap().containsKey(sourceNode.getName());
-        hasPermission = hasPermission && context.getConfigManager().getTokenChannelMap().containsKey(token);
-
-        Channel channel = context.getConfigManager().getTokenChannelMap().get(token);
-        hasPermission = hasPermission && channel.getPushFrom().equals(sourceNode.getNodeId());
 
         if (!hasPermission) {
             throw new RuntimeException("can not publish message ");

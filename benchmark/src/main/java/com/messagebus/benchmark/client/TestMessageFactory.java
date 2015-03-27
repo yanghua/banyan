@@ -6,19 +6,19 @@ import com.messagebus.client.message.model.MessageType;
 
 public class TestMessageFactory {
 
-    public static Message create(MessageType type, double sizeOfKB) {
+    public static Message create(MessageType type, int sizeOfByte) {
         Message msg = MessageFactory.createMessage(type);
 
-        byte[] content = generate(sizeOfKB);
+        byte[] content = generate(sizeOfByte);
 
         msg.setContent(content);
 
         return msg;
     }
 
-    public static Message[] create(MessageType type, int sizeOfKB, int num) {
+    public static Message[] create(MessageType type, int sizeOfByte, int num) {
         Message[] msgs = new Message[num];
-        Message msg = create(type, sizeOfKB);
+        Message msg = create(type, sizeOfByte);
         for (int i = 0; i < num; i++) {
             msgs[i] = msg;
         }
@@ -26,8 +26,7 @@ public class TestMessageFactory {
         return msgs;
     }
 
-    private static byte[] generate(double sizeOfKB) {
-        int sizeOfByte = (int) (sizeOfKB * 1024);
+    private static byte[] generate(int sizeOfByte) {
         byte[] result = new byte[sizeOfByte];
         for (int i = 0; i < sizeOfByte; i++) {
             result[i] = (byte) 1;

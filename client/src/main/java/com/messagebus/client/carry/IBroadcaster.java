@@ -4,6 +4,6 @@ import com.messagebus.client.message.model.Message;
 
 public interface IBroadcaster {
 
-    public void broadcast(String secret, Message[] msgs, String token);
+    public void broadcast(String secret, Message[] msgs);
 
 }

@@ -182,7 +182,7 @@ public class HttpBridge extends HttpServlet {
         Messagebus messagebus = pool.getResource();
 
         try {
-            messagebus.publish(request.getParameter("secret"), msgArr, token);
+            messagebus.publish(request.getParameter("secret"), msgArr);
             ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
         } catch (Exception e) {
             ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
@@ -367,14 +367,14 @@ public class HttpBridge extends HttpServlet {
         try {
             messages = messagebus.consume(request.getParameter("secret"), num);
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "", "", "'[']");
+            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "", "", "[]");
             return;
         } finally {
             pool.returnResource(messagebus);
         }
 
         if (messages == null) {
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "\"[\"]");
+            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
         } else {
             String msgsStr = MessageJSONSerializer.serializeMessages(messages);
             ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgsStr);
@@ -389,7 +389,7 @@ public class HttpBridge extends HttpServlet {
         if (continuation.isExpired()) {
             ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "timeout",
                                   "there is no message could be consumed in " +
-                                      Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "\"\"");
+                                      Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "[]");
             return;
         }
 
@@ -408,6 +408,8 @@ public class HttpBridge extends HttpServlet {
                     if (receivedMsgs.size() != 0) {
                         String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
                         ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                    } else {
+                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
                     }
                 } catch (IOException e) {
                     logger.error("[onComplete] occurs a IOException : " + e.getMessage());

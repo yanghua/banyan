@@ -42,7 +42,7 @@ public class PublishSubscribe {
 
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        client.publish(secret, new Message[]{msg}, token);
+        client.publish(secret, new Message[]{msg});
 
         singlePool.returnResource(client);
         singlePool.destroy();

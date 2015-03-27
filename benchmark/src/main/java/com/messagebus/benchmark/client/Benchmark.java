@@ -20,9 +20,8 @@ public abstract class Benchmark {
         xArr[0] = 0;
         yArr[0] = 0;
 
-        Thread testThread = new Thread(testTask);
-        testThread.setDaemon(true);
-        testThread.start();
+        ILifeCycle testCase = (ILifeCycle) testTask;
+        testCase.start();
 
         try {
             for (int i = 1; i < fetchNum; i++) {
@@ -32,7 +31,7 @@ public abstract class Benchmark {
                 yArr[i] = ((IFetcher) testTask).fetch();
             }
 
-            ((ITerminater) testTask).terminate();
+            ((ILifeCycle) testTask).terminate();
 
             //write to report file
             TestUtility.writeFile(fileName, xArr, yArr);

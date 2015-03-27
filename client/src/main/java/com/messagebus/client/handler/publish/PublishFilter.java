@@ -1,6 +1,7 @@
 package com.messagebus.client.handler.publish;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.messagebus.business.model.Channel;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
@@ -18,8 +19,12 @@ public class PublishFilter extends AbstractHandler {
 
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        Channel channel = context.getConfigManager().getTokenChannelMap().get(context.getToken());
-        String pushToIds = channel.getPushTo();
+        Node sourceNode = context.getSourceNode();
+        String pushToIds = context.getConfigManager().getPubsubChannelMap().get(sourceNode.getNodeId());
+
+        if (Strings.isNullOrEmpty(pushToIds)) {
+            return;
+        }
 
         Iterator<String> pushToIdIterator = Splitter.on(',').split(pushToIds).iterator();
 

@@ -48,8 +48,6 @@ public class MsgLogService extends AbstractService {
         sb.append(msg.getMessageId());
         sb.append(" [type] ");
         sb.append(msg.getType());
-        sb.append(" [appId] ");
-        sb.append(msg.getAppId());
         sb.append(" [replyTo] ");
         sb.append(msg.getReplyTo());
 

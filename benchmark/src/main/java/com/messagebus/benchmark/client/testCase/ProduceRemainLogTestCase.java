@@ -10,9 +10,12 @@ import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProduceTestCase extends Benchmark {
+/**
+ * Created by yanghua on 3/25/15.
+ */
+public class ProduceRemainLogTestCase extends Benchmark {
 
-    private static final Log logger = LogFactory.getLog(ProduceTestCase.class);
+    private static final Log logger = LogFactory.getLog(ProduceRemainLogTestCase.class);
 
     private static class BasicProduce implements Runnable, ILifeCycle, IFetcher {
 
@@ -69,7 +72,8 @@ public class ProduceTestCase extends Benchmark {
         Runnable task = new BasicProduce(TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS,
-                      TestConfigConstant.FETCH_NUM, "one_thread_produce_one_by_one_" +
+                      TestConfigConstant.FETCH_NUM, "one_thread_remain_log_produce_one_by_one_" +
                 TestConfigConstant.MSG_BODY_SIZE_OF_BYTE + "_Byte");
     }
+
 }

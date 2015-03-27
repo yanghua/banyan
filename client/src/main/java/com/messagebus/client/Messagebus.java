@@ -88,9 +88,9 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void publish(String secret, Message[] msgs, String token) {
+    public void publish(String secret, Message[] msgs) {
         publisher.setContext(context);
-        publisher.publish(secret, msgs, token);
+        publisher.publish(secret, msgs);
     }
 
     @Override
@@ -100,9 +100,9 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
-    public void broadcast(String secret, Message[] msgs, String token) {
+    public void broadcast(String secret, Message[] msgs) {
         broadcaster.setContext(context);
-        broadcaster.broadcast(secret, msgs, token);
+        broadcaster.broadcast(secret, msgs);
     }
 
     public void setNotificationListener(IMessageReceiveListener notificationListener) {

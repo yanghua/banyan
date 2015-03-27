@@ -3,6 +3,7 @@ package com.messagebus.scenario.httpBridge;
 import com.google.gson.Gson;
 import com.messagebus.client.message.model.*;
 import com.messagebus.common.Constants;
+import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -26,9 +27,6 @@ public class ProduceConsume {
 
     private static final Gson gson = new Gson();
 
-    private static String testHost = "172.16.206.29";
-    private static int    testPort = 8080;
-
     public static void main(String[] args) {
         testProduce();
 
@@ -41,7 +39,12 @@ public class ProduceConsume {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
         String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
 
-        String url = String.format(testUrlFormat, testHost, testPort, testQueue, secret, token);
+        String url = String.format(testUrlFormat,
+                                   PropertiesHelper.getPropertyValue("messagebus.httpbridge.host"),
+                                   Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.httpbridge.port")),
+                                   testQueue,
+                                   secret,
+                                   token);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -83,7 +86,11 @@ public class ProduceConsume {
         String testUrlFormat = "http://%s:%s/messagebus/queues/messages?secret=%s&type=consume&mode=%s&num=1";
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
 
-        String url = String.format(testUrlFormat, testHost, testPort, secret, mode);
+        String url = String.format(testUrlFormat,
+                                   PropertiesHelper.getPropertyValue("messagebus.httpbridge.host"),
+                                   Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.httpbridge.port")),
+                                   secret,
+                                   mode);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
