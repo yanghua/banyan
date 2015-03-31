@@ -25,8 +25,6 @@ public class CommandService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(CommandService.class);
 
-    private final Object lockObj = new Object();
-
     private MessagebusPool   messagebusPool;
     private ExchangerManager exchangeManager;
 

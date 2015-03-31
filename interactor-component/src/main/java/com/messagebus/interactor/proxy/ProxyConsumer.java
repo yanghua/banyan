@@ -1,6 +1,7 @@
 package com.messagebus.interactor.proxy;
 
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.FlowListener;
 import com.rabbitmq.client.GetResponse;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
@@ -25,14 +26,13 @@ public class ProxyConsumer {
                                            String queueName,
                                            String consumerTag) throws IOException {
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName, false, consumerTag, consumer);
+        channel.basicConsume(queueName, true, consumerTag, consumer);
         return consumer;
     }
 
     public static GetResponse consumeSingleMessage(Channel channel,
                                                    String queueName) throws IOException {
-        boolean notAutoAck = false;
-        return channel.basicGet(queueName, notAutoAck);
+        return channel.basicGet(queueName, true);
     }
 
 }

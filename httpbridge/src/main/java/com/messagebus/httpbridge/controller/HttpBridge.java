@@ -6,8 +6,10 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageJSONSerializer;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.httpbridge.util.CommonUtil;
 import com.messagebus.httpbridge.util.Constants;
 import com.messagebus.httpbridge.util.ResponseUtil;
+import com.messagebus.httpbridge.util.TextMessageJSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.continuation.Continuation;
@@ -37,16 +39,16 @@ public class HttpBridge extends HttpServlet {
         String apiType = req.getParameter("type");
 
         if (Strings.isNullOrEmpty(apiType)) {
-            ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
-                                  "the query string : type can not be null or empty",
-                                  "", "''");
+            ResponseUtil.responseForJsonp(resp, Constants.HTTP_FAILED_CODE,
+                                          "the query string : type can not be null or empty",
+                                          "", "''");
             return;
         }
 
         String secret = req.getParameter("secret");
         if (Strings.isNullOrEmpty(secret)) {
-            ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
-                                  "param : secret can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(resp, Constants.HTTP_FAILED_CODE,
+                                          "param : secret can not be null or empty", "", "''");
             return;
         }
 
@@ -74,21 +76,21 @@ public class HttpBridge extends HttpServlet {
                 break;
 
             case RESPONSE:
-                ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
-                                      "unsupported type : " + msgCarryType.toString(), "", "''");
+                ResponseUtil.responseForJsonp(resp, Constants.HTTP_FAILED_CODE,
+                                              "unsupported type : " + msgCarryType.toString(), "", "''");
                 break;
 
             default:
-                ResponseUtil.response(resp, Constants.HTTP_FAILED_CODE,
-                                      "invalidate type", "", "''");
+                ResponseUtil.responseForJsonp(resp, Constants.HTTP_FAILED_CODE,
+                                              "invalidate type", "", "''");
         }
     }
 
-    private void produce(HttpServletRequest request, HttpServletResponse response)
+    private void produce(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("post")) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "error http request method", "", "");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "error http request method", "", "");
             return;
         }
 
@@ -97,61 +99,70 @@ public class HttpBridge extends HttpServlet {
         String msgArrStr = request.getParameter("messages");
 
         if (Strings.isNullOrEmpty(queueName)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "param : qname can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "param : qname can not be null or empty", "", "''");
             return;
         }
 
         if (Strings.isNullOrEmpty(token)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "param : token can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "param : token can not be null or empty", "", "''");
             return;
         }
 
         if (Strings.isNullOrEmpty(msgArrStr)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "param : messages can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "param : messages can not be null or empty", "", "''");
             return;
         }
 
-        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+        Message[] msgArr = TextMessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+
+        boolean mergedValidResult = true;
+        for (Message msg : msgArr) {
+            mergedValidResult = mergedValidResult && CommonUtil.validMessageType(msg.getContentType());
+            if (!mergedValidResult) {
+                ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "invalid message content type", "", "''");
+                return;
+            }
+        }
 
         MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         Messagebus messagebus = pool.getResource();
 
         try {
             messagebus.batchProduce(request.getParameter("secret"), queueName, msgArr, token);
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", "''");
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "[produce] occurs a exception : " + e.getMessage(), "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "[produce] occurs a exception : " + e.getMessage(), "", "''");
         } finally {
             pool.returnResource(messagebus);
         }
     }
 
-    private void consume(HttpServletRequest request, HttpServletResponse response)
+    private void consume(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("get")) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "error http request method", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "error http request method", "", "''");
             return;
         }
 
         String mode = request.getParameter("mode");
         if (Strings.isNullOrEmpty(mode)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "the param : mode can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "the param : mode can not be null or empty", "", "''");
             return;
         }
 
         switch (mode.toLowerCase()) {
             case CONSUME_MODE_PULL:
-                this.consumeWithPull(request, response);
+                this.consumeWithPull(request, responseForJsonp);
                 break;
 
             case CONSUME_MODE_PUSH:
-                this.consumeWithPush(request, response);
+                this.consumeWithPush(request, responseForJsonp);
                 break;
 
             default:
@@ -159,59 +170,61 @@ public class HttpBridge extends HttpServlet {
         }
     }
 
-    private void publish(HttpServletRequest request, HttpServletResponse response)
+    private void publish(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("post")) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "error http request method", "", "");
-            return;
-        }
-
-        String token = request.getParameter("token");
-        if (Strings.isNullOrEmpty(token)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "param : token can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "error http request method", "", "");
             return;
         }
 
         String msgArrStr = request.getParameter("messages");
 
-        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+        Message[] msgArr = TextMessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+
+        boolean mergedValidResult = true;
+        for (Message msg : msgArr) {
+            mergedValidResult = CommonUtil.validMessageType(msg.getContentType());
+            if (!mergedValidResult) {
+                ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "invalid message content type", "", "''");
+                return;
+            }
+        }
 
         MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         Messagebus messagebus = pool.getResource();
 
         try {
             messagebus.publish(request.getParameter("secret"), msgArr);
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", "''");
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "[produce] occurs a exception : " + e.getMessage(), "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "[produce] occurs a exception : " + e.getMessage(), "", "''");
         } finally {
             pool.returnResource(messagebus);
         }
 
     }
 
-    private void subscribe(final HttpServletRequest request, final HttpServletResponse response)
+    private void subscribe(final HttpServletRequest request, final HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         if (!request.getMethod().toLowerCase().equals("get")) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "error http request method", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "error http request method", "", "''");
             return;
         }
 
         final Continuation continuation = ContinuationSupport.getContinuation(request);
 
         if (continuation.isExpired()) {
-            ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "timeout",
-                                  "there is no message could be consumed in " +
-                                      Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "\"\"");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_TIMEOUT_CODE, "timeout",
+                                          "there is no message could be consumed in " +
+                                              Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "\"\"");
             return;
         }
 
         continuation.setTimeout(Constants.MAX_CONSUME_CONTINUATION_TIMEOUT);
-        continuation.suspend(response);
+        continuation.suspend(responseForJsonp);
 
         final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         final Messagebus messagebus = pool.getResource();
@@ -222,8 +235,8 @@ public class HttpBridge extends HttpServlet {
             public void onComplete(Continuation continuation) {
                 try {
                     if (receivedMsgs.size() != 0) {
-                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                        String msgStr = TextMessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
                     }
                 } catch (IOException e) {
                     logger.error("[onComplete] occurs a IOException : " + e.getMessage());
@@ -234,10 +247,10 @@ public class HttpBridge extends HttpServlet {
             public void onTimeout(Continuation continuation) {
                 try {
                     if (receivedMsgs.size() == 0) {
-                        ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
                     } else {
-                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                        String msgStr = TextMessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
                     }
                 } catch (IOException e) {
                     logger.error("[onTimeout] occurs a IOException : " + e.getMessage());
@@ -257,26 +270,26 @@ public class HttpBridge extends HttpServlet {
         } catch (Exception e) {
             logger.error("[consumeWithPush] occurs a Exception : " + e.getMessage());
             continuation.undispatch();
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
         } finally {
             pool.returnResource(messagebus);
             continuation.complete();
         }
     }
 
-    private void request(HttpServletRequest request, HttpServletResponse response)
+    private void request(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
 
         if (!request.getMethod().toLowerCase().equals("post")) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "error request method !", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "error request method !", "", "''");
             return;
         }
 
 
         String timeoutStr = request.getParameter("timeout");
         if (Strings.isNullOrEmpty(timeoutStr)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : timeout can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "param : timeout can not be null or empty", "", "''");
             return;
         }
 
@@ -284,20 +297,20 @@ public class HttpBridge extends HttpServlet {
         try {
             timeout = Long.parseLong(timeoutStr);
         } catch (NumberFormatException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "illegal param : timeout ", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "illegal param : timeout ", "", "''");
             return;
         }
 
         if (timeout < Constants.MIN_REQUEST_TIMEOUT || timeout > Constants.MAX_REQUEST_TIMEOUT) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "invalid param : timeout it should be greater than :" + Constants.MIN_REQUEST_TIMEOUT +
-                                      "and less than : " + Constants.MAX_REQUEST_TIMEOUT, "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "invalid param : timeout it should be greater than :" + Constants.MIN_REQUEST_TIMEOUT +
+                                              "and less than : " + Constants.MAX_REQUEST_TIMEOUT, "", "''");
             return;
         }
 
         String token = request.getParameter("token");
         if (Strings.isNullOrEmpty(token)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : token can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "param : token can not be null or empty", "", "''");
             return;
         }
 
@@ -305,42 +318,42 @@ public class HttpBridge extends HttpServlet {
         String msgStr = request.getParameter("message");
 
         if (Strings.isNullOrEmpty(msgStr)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "param : msgStr can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "param : msgStr can not be null or empty", "", "''");
             return;
         }
 
-        Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
+        Message msg = TextMessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
 
         MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         Messagebus messagebus = pool.getResource();
         try {
-            Message responseMsg = messagebus.request(request.getParameter("secret"), queueName, msg, token, timeout);
+            Message responseForJsonpMsg = messagebus.request(request.getParameter("secret"), queueName, msg, token, timeout);
 
-            String respMsgStr = MessageJSONSerializer.serialize(responseMsg);
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
+            String respMsgStr = TextMessageJSONSerializer.serialize(responseForJsonpMsg);
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", respMsgStr);
         } catch (MessagebusUnOpenException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "occurs a messagebus unopen exception", "", "''");
         } catch (MessageResponseTimeoutException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a response timeout exception", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "occurs a responseForJsonp timeout exception", "", "''");
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "occurs a exception : " + e.getMessage(), "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "occurs a exception : " + e.getMessage(), "", "''");
         } finally {
             pool.returnResource(messagebus);
         }
     }
 
     @Deprecated
-    private void response(HttpServletRequest request, HttpServletResponse response)
+    private void response(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         throw new UnsupportedOperationException("unsupported operation!");
     }
 
-    private void consumeWithPull(HttpServletRequest request, HttpServletResponse response)
+    private void consumeWithPull(HttpServletRequest request, HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
         String numStr = request.getParameter("num");
         if (Strings.isNullOrEmpty(numStr)) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "when consume with pull mode the param :  num can not be null or empty", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "when consume with pull mode the param :  num can not be null or empty", "", "''");
             return;
         }
         int num = 0;
@@ -348,15 +361,15 @@ public class HttpBridge extends HttpServlet {
         try {
             num = Integer.parseInt(numStr);
         } catch (NumberFormatException e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "invalidate param : num, it must be a integer!", "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "invalidate param : num, it must be a integer!", "", "''");
             return;
         }
 
         if (num < Constants.MIN_CONSUME_NUM || num > Constants.MAX_CONSUME_NUM) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  " invalidate param : num , it should be less than "
-                                      + Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM, "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          " invalidate param : num , it should be less than "
+                                              + Constants.MAX_CONSUME_NUM + " and greater than " + Constants.MIN_CONSUME_NUM, "", "''");
             return;
         }
 
@@ -367,34 +380,34 @@ public class HttpBridge extends HttpServlet {
         try {
             messages = messagebus.consume(request.getParameter("secret"), num);
         } catch (Exception e) {
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE, "", "", "[]");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE, "", "", "[]");
             return;
         } finally {
             pool.returnResource(messagebus);
         }
 
         if (messages == null) {
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
         } else {
-            String msgsStr = MessageJSONSerializer.serializeMessages(messages);
-            ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgsStr);
+            String msgsStr = TextMessageJSONSerializer.serializeMessages(messages);
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", msgsStr);
         }
     }
 
-    private void consumeWithPush(HttpServletRequest request, final HttpServletResponse response)
+    private void consumeWithPush(HttpServletRequest request, final HttpServletResponse responseForJsonp)
         throws ServletException, IOException {
 
         final Continuation continuation = ContinuationSupport.getContinuation(request);
 
         if (continuation.isExpired()) {
-            ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "timeout",
-                                  "there is no message could be consumed in " +
-                                      Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "[]");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_TIMEOUT_CODE, "timeout",
+                                          "there is no message could be consumed in " +
+                                              Constants.MAX_CONSUME_CONTINUATION_TIMEOUT + " ms", "[]");
             return;
         }
 
         continuation.setTimeout(Constants.MAX_CONSUME_CONTINUATION_TIMEOUT);
-        continuation.suspend(response);
+        continuation.suspend(responseForJsonp);
 
         final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         final Messagebus messagebus = pool.getResource();
@@ -406,10 +419,10 @@ public class HttpBridge extends HttpServlet {
             public void onComplete(Continuation continuation) {
                 try {
                     if (receivedMsgs.size() != 0) {
-                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                        String msgStr = TextMessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
                     } else {
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", "[]");
                     }
                 } catch (IOException e) {
                     logger.error("[onComplete] occurs a IOException : " + e.getMessage());
@@ -420,10 +433,10 @@ public class HttpBridge extends HttpServlet {
             public void onTimeout(Continuation continuation) {
                 try {
                     if (receivedMsgs.size() == 0) {
-                        ResponseUtil.response(response, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_TIMEOUT_CODE, "", "", "''");
                     } else {
-                        String msgStr = MessageJSONSerializer.serializeMessages(receivedMsgs);
-                        ResponseUtil.response(response, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
+                        String msgStr = TextMessageJSONSerializer.serializeMessages(receivedMsgs);
+                        ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_SUCCESS_CODE, "", "", msgStr);
                     }
                 } catch (IOException e) {
                     logger.error("[onTimeout] occurs a IOException : " + e.getMessage());
@@ -444,8 +457,8 @@ public class HttpBridge extends HttpServlet {
         } catch (Exception e) {
             logger.error("[consumeWithPush] occurs a Exception : " + e.getMessage());
             continuation.undispatch();
-            ResponseUtil.response(response, Constants.HTTP_FAILED_CODE,
-                                  "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
+            ResponseUtil.responseForJsonp(responseForJsonp, Constants.HTTP_FAILED_CODE,
+                                          "[consumeWithPush] occurs a Exception : " + e.getMessage(), "", "''");
         } finally {
             pool.returnResource(messagebus);
             continuation.complete();

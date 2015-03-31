@@ -61,7 +61,6 @@ public class ConfigManager implements IExchangerListener {
     private Map<String, Node>    proconNodeMap;
     private Map<String, Node>    reqrespNodeMap;
     private Map<String, Node>    pubsubNodeMap;
-    private Map<String, Node>    notificationNodeMap;
     private Map<String, Node>    idNodeMap;
     private Map<String, Node>    secretNodeMap;
     private Map<String, Config>  clientConfigMap;
@@ -193,10 +192,6 @@ public class ConfigManager implements IExchangerListener {
 
     public Map<String, Node> getIdNodeMap() {
         return idNodeMap;
-    }
-
-    public Map<String, Node> getNotificationNodeMap() {
-        return notificationNodeMap;
     }
 
     //endregion
@@ -415,7 +410,6 @@ public class ConfigManager implements IExchangerListener {
         this.secretNodeMap = new ConcurrentHashMap<>();
         this.proconNodeMap = new ConcurrentHashMap<>();
         this.pubsubNodeMap = new ConcurrentHashMap<>();
-        this.notificationNodeMap = new ConcurrentHashMap<>();
         this.reqrespNodeMap = new ConcurrentHashMap<>();
         this.idNodeMap = new ConcurrentHashMap<>(nodes.length);
 
@@ -434,8 +428,6 @@ public class ConfigManager implements IExchangerListener {
                     this.reqrespNodeMap.put(node.getName(), node);
                 } else if (node.getValue().contains("pubsub")) {
                     this.pubsubNodeMap.put(node.getName(), node);
-                } else if (node.getValue().contains("notification")) {
-                    this.notificationNodeMap.put(node.getName(), node);
                 }
             }
 

@@ -2,6 +2,7 @@ package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.client.core.config.ConfigManager;
+import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,6 +12,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -93,26 +95,34 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
     @Override
     public boolean validateObject(PooledObject<Messagebus> pooledObject) {
         Messagebus client = pooledObject.getObject();
-        return client != null;
+        if (client != null && !client.isOpen()) {
+            try {
+                openMethod.invoke(client);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                ExceptionHelper.logException(logger, e, "validateObject");
+            }
+        }
+
+        return client != null && client.isOpen();
     }
 
     @Override
     public void activateObject(PooledObject<Messagebus> pooledObject) throws Exception {
-        Messagebus client = pooledObject.getObject();
-        if (client != null) {
-            if (!client.isOpen()) {
-                openMethod.invoke(client);
-            }
-        }
+//        Messagebus client = pooledObject.getObject();
+//        if (client != null) {
+//            if (!client.isOpen()) {
+//                openMethod.invoke(client);
+//            }
+//        }
     }
 
     @Override
     public void passivateObject(PooledObject<Messagebus> pooledObject) throws Exception {
-        Messagebus client = pooledObject.getObject();
-        if (client != null) {
-            if (client.isOpen()) {
-                closeMethod.invoke(client);
-            }
-        }
+//        Messagebus client = pooledObject.getObject();
+//        if (client != null) {
+//            if (client.isOpen()) {
+//                closeMethod.invoke(client);
+//            }
+//        }
     }
 }

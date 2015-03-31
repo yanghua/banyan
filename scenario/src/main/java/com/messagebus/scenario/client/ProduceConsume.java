@@ -27,10 +27,10 @@ public class ProduceConsume {
         ConsumeWithPushStyle();
 
         //or
-        consumeWithPullStyle();
+//        consumeWithPullStyle();
 
         //or async consume
-        asyncConsume();
+//        asyncConsume();
     }
 
     private static void produce() {

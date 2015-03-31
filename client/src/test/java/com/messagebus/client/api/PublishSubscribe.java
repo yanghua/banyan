@@ -1,6 +1,7 @@
 package com.messagebus.client.api;
 
 import com.messagebus.client.IMessageReceiveListener;
+import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;

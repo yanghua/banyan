@@ -1,9 +1,14 @@
-package com.messagebus.client.message.model;
+package com.messagebus.httpbridge.model;
+
+import com.messagebus.client.message.model.MessageType;
 
 import java.util.Date;
 import java.util.Map;
 
-public class Message {
+/**
+ * Created by yanghua on 3/31/15.
+ */
+public class TextMessage {
 
     //header
     private long                messageId;
@@ -23,13 +28,13 @@ public class Message {
     private short deliveryMode = 2;
 
     private MessageType msgType;
-    private byte[]      content;
+    private String      content;
 
     public MessageType getMessageType() {
         return this.msgType;
     }
 
-    public Message() {
+    public TextMessage() {
         this.msgType = MessageType.QueueMessage;
         this.type = MessageType.QueueMessage.getType();
     }
@@ -138,11 +143,11 @@ public class Message {
         this.correlationId = correlationId;
     }
 
-    public byte[] getContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setContent(byte[] content) {
+    public void setContent(String content) {
         this.content = content;
     }
 

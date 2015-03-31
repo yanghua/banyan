@@ -1,6 +1,7 @@
 package com.messagebus.client.api;
 
 import com.messagebus.client.IMessageReceiveListener;
+import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -39,7 +40,7 @@ public class ProduceConsumeLoopback extends BaseTestCase {
         commonProduce();
 
         String consumeSecret = "jnmzqwemnjaksdfqjnkajfjasndfnw";
-        client.consume(consumeSecret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
+        client.consume(consumeSecret, 10, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 assertNotNull(message);

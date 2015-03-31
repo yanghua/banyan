@@ -5,6 +5,8 @@ import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

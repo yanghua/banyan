@@ -24,18 +24,6 @@ class InnerPool extends AbstractPool<Messagebus> {
              );
     }
 
-//    public InnerPool(String pubsuberHost, int pubsuberPort,
-//                     ExchangerManager exchangeManager,
-//                     ConfigManager configManager,
-//                     Connection connection) {
-//        super(new DefaultMessagebusPool(), new MessagebusFactory(pubsuberHost,
-//                                                                 pubsuberPort,
-//                                                                 exchangeManager,
-//                                                                 configManager,
-//                                                                 connection));
-//    }
-
-
     /**
      * inner class : default messagebus pool
      */

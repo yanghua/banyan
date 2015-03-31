@@ -26,4 +26,23 @@ public class ResponseUtil {
         writer.close();
     }
 
+    public static void responseForJsonp(HttpServletResponse response,
+                                        int statusCode,
+                                        String err,
+                                        String msg,
+                                        String data) throws IOException {
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/javascript");
+        String responseStr = "{ \"statusCode\" : " + statusCode + "," +
+            " \"error\" : \"" + err + "\"," +
+            " \"msg\" : \"" + msg + "\", " +
+            " \"data\" : " + data +
+            "}";
+        response.setContentLength(responseStr.getBytes(Charset.defaultCharset()).length);
+        PrintWriter writer = response.getWriter();
+        writer.write(responseStr);
+        writer.flush();
+        writer.close();
+    }
+
 }

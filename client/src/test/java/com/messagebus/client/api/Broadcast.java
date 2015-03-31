@@ -1,6 +1,7 @@
 package com.messagebus.client.api;
 
 import com.messagebus.client.IMessageReceiveListener;
+import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -28,8 +29,7 @@ public class Broadcast extends BaseTestCase {
     }
 
     public void testBroadcast() throws Exception {
-        String secret = "mucasdjfaskdufhqiiuuasdfasdnus";
-        String token = "qiakdjfanekisdfadfhkqljwqheu";
+        String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
 
         Message msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
         msg.setContentType("text/plain");

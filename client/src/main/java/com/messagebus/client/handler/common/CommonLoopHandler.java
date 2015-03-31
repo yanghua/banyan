@@ -33,7 +33,7 @@ public abstract class CommonLoopHandler extends AbstractHandler {
                 AMQP.BasicProperties properties = delivery.getProperties();
                 byte[] msgBody = delivery.getBody();
 
-                context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+//                context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
                 String msgTypeStr = properties.getType();
                 if (msgTypeStr == null || msgTypeStr.isEmpty()) {
@@ -62,8 +62,8 @@ public abstract class CommonLoopHandler extends AbstractHandler {
             }
         } catch (InterruptedException e) {
             logger.info("[run] close the consumer's message handler!");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            ExceptionHelper.logException(logger, e, "common loop handler");
         } finally {
             chain.handle(context);
         }

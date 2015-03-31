@@ -23,8 +23,8 @@ public class MessageBodySizeLimiter extends AbstractHandler {
             if (msgBodySize != -1) {
                 Message[] msgs = context.getMessages();
                 for (Message msg : msgs) {
-                    if (msg.getContent().length > msgBodySize * 1000) {
-                        throw new RuntimeException("message body's size can not be more than : " + msgBodySizeStr + " KB");
+                    if (msg.getContent().length > msgBodySize ) {
+                        throw new RuntimeException("message body's size can not be more than : " + msgBodySizeStr + " B");
                     }
                 }
             }

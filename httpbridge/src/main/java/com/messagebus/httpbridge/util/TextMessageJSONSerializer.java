@@ -1,16 +1,27 @@
-package com.messagebus.client.message.model;
+package com.messagebus.httpbridge.util;
 
-import com.google.common.base.Strings;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
 import java.util.Collection;
 
-public class MessageJSONSerializer {
+/**
+ * Created by yanghua on 3/30/15.
+ */
+public class TextMessageJSONSerializer {
 
-    private static final Log  logger = LogFactory.getLog(MessageJSONSerializer.class);
-    private static final Gson gson   = new GsonBuilder().serializeNulls().create();
+    private static final Log  logger = LogFactory.getLog(TextMessageJSONSerializer.class);
+    private static final Gson gson   = new GsonBuilder()
+        .serializeNulls()
+        .registerTypeAdapter(byte[].class,
+                             new TextMessageJSONSerializer.ByteArrAdapter())
+        .create();
 
     public static String serialize(Message msg) {
         checkMessageType(msg.getMessageType());
@@ -77,6 +88,31 @@ public class MessageJSONSerializer {
                              ", now just support QueueMessage");
             throw new UnsupportedOperationException("unsupport message type : " + type.toString() +
                                                         ", now just support QueueMessage");
+        }
+    }
+
+    private static class ByteArrAdapter extends TypeAdapter<byte[]> {
+
+        @Override
+        public void write(JsonWriter jsonWriter, byte[] bytes) throws IOException {
+            if (bytes == null) {
+                jsonWriter.nullValue();
+            } else {
+                jsonWriter.value(new String(bytes));
+            }
+        }
+
+        @Override
+        public byte[] read(JsonReader jsonReader) throws IOException {
+            if (jsonReader.peek() == null) {
+                return null;
+            }
+
+            String tmp = jsonReader.nextString();
+            if (tmp == null)
+                return new byte[0];
+
+            return tmp.getBytes();
         }
     }
 

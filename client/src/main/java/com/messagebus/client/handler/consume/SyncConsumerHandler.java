@@ -45,7 +45,7 @@ class SyncConsumerHandler extends AbstractHandler {
                     AMQP.BasicProperties properties = response.getProps();
                     byte[] msgBody = response.getBody();
 
-                    context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
+//                    context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
 
                     String msgTypeStr = properties.getType();
                     if (msgTypeStr == null || msgTypeStr.isEmpty()) {

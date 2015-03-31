@@ -1,9 +1,13 @@
-package com.messagebus.scenario.httpBridge;
+package com.messagebus.httpbridge.controller;
 
 import com.google.gson.Gson;
-import com.messagebus.client.message.model.*;
+import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.MessageFactory;
+import com.messagebus.client.message.model.MessageJSONSerializer;
+import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
-import com.messagebus.scenario.util.PropertiesHelper;
+import com.messagebus.httpbridge.util.PropertiesHelper;
+import com.messagebus.httpbridge.util.TextMessageJSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -25,10 +29,12 @@ public class ProduceConsume {
 
     private static final Log logger = LogFactory.getLog(ProduceConsume.class);
 
+    private static final Gson gson = new Gson();
+
     public static void main(String[] args) {
         testProduce();
 
-        testConsume("pull");
+        testConsume("push");
     }
 
     private static void testProduce() {
@@ -50,13 +56,12 @@ public class ProduceConsume {
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setReplyTo(testQueue);
-        msg.setContentType("text/plain");
 
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         List<Message> msgs = new ArrayList<>(1);
         msgs.add(msg);
-        String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
+        String msgs2json = TextMessageJSONSerializer.serializeMessages(msgs);
 
         try {
             HttpPost postRequest = new HttpPost(url);

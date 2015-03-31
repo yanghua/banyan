@@ -3,6 +3,7 @@ package com.messagebus.client.handler.consume;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
+import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
@@ -32,7 +33,8 @@ public class RealConsumer extends AbstractHandler {
                                                  context.getSourceNode().getValue(),
                                                  context.getConsumerTag());
             } catch (IOException e) {
-                logger.error("[handler] occurs a IOException : " + e.getMessage());
+                ExceptionHelper.logException(logger, e, "real consumer");
+                throw new RuntimeException(e);
             }
 
             //add external params

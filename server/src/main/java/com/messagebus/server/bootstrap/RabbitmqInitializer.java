@@ -99,8 +99,18 @@ public class RabbitmqInitializer extends AbstractInitializer {
                 if (!Strings.isNullOrEmpty(thresholdStr) && !Strings.isNullOrEmpty(msgSizeOfBodyStr)) {
                     int threshold = Integer.parseInt(thresholdStr);
                     int msgSizeOfBody = Integer.parseInt(msgSizeOfBodyStr);
-                    int allMsgSize = threshold * msgSizeOfBody * 1000;
+                    int allMsgSize = threshold * msgSizeOfBody;
                     queueConfig.put("x-max-length-bytes", allMsgSize);
+                }
+
+                String ttl = node.getTtl();
+                if (!Strings.isNullOrEmpty(ttl)) {
+                    queueConfig.put("x-expires", Integer.parseInt(ttl));
+                }
+
+                String ttlPerMsg = node.getTtlPerMsg();
+                if (!Strings.isNullOrEmpty(ttlPerMsg)) {
+                    queueConfig.put("x-message-ttl", Integer.parseInt(ttlPerMsg));
                 }
 
                 channel.queueDeclare(node.getValue(), true, false, false, queueConfig);

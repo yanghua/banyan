@@ -5,6 +5,7 @@ import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;

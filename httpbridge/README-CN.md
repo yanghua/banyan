@@ -21,7 +21,30 @@ request params :
 	* token - 授权token （必填）
 	* type - 鉴别API，值为 `produce` （必填）
 * request body : 
-	* messages - 消息对象列表 （必填）
+	* messages - 消息对象数组 （必填）
+	
+message对象键值对：
+
+```js
+{
+	messageId: 582793753824251900,
+	type: "queue",
+	timestamp: "Mar 31, 2015 2:37:13 PM",
+	priority: 0,
+	expiration: null,
+	headers: null,
+	contentEncoding: null,
+	contentType: "text/plain",
+	replyTo: "emapDemoConsume",
+	appId: "4",
+	userId: null,
+	clusterId: null,
+	correlationId: "erpDemoProduce",
+	deliveryMode: 2,
+	msgType: "QueueMessage",
+	content: "test"
+}
+```
 	
 response :
 
@@ -30,7 +53,26 @@ response :
 	statusCode: 10200,
 	error: "",
 	msg: "",
-	data: ''
+	data: [
+		{
+			messageId: 582794572548239400,
+			type: "queue",
+			timestamp: "Mar 31, 2015 2:40:28 PM",
+			priority: 0,
+			expiration: null,
+			headers: null,
+			contentEncoding: null,
+			contentType: "text/plain",
+			replyTo: "emapDemoConsume",
+			appId: "4",
+			userId: null,
+			clusterId: null,
+			correlationId: "erpDemoProduce",
+			deliveryMode: 2,
+			msgType: "QueueMessage",
+			content: "test"
+		}
+	]
 }
 ```
 
@@ -98,7 +140,7 @@ response :
 
 ###publish
 ```
-/messagebus/queues/messages?secret={secret}&token={token}&type={type}
+/messagebus/queues/messages?secret={secret}&type={type}
 ```
 
 http method : `POST` 
@@ -107,7 +149,6 @@ request params :
 
 * querystring :
 	* secret - 自身标识 （必填）
-	* token - 授权token (必填)
 	* type - 鉴别API，值为 `publish` (必填)
 * request body :
 	* messages - 推送消息对象集合

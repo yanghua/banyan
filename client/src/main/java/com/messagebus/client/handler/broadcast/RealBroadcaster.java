@@ -27,7 +27,7 @@ public class RealBroadcaster extends AbstractHandler {
                 AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                       context.getChannel(),
-                                      notificationExchangeNode.getValue(),
+                                      notificationExchangeNode.getRoutingKey(),
                                       msg.getContent(),
                                       properties);
             }

@@ -1,5 +1,6 @@
 package com.messagebus.client.handler.broadcast;
 
+import com.google.common.base.Strings;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.AbstractParamValidator;
@@ -23,7 +24,6 @@ public class BroadcastParamValidator extends AbstractParamValidator {
             throw new RuntimeException("the message carry type should be broadcast");
         }
 
-
         this.validateMessageProperties(context);
 
         chain.handle(context);
@@ -33,7 +33,7 @@ public class BroadcastParamValidator extends AbstractParamValidator {
         Date currentDate = new Date();
         for (Message msg : context.getMessages()) {
             //app id
-            if (msg.getAppId() == null || msg.getAppId().isEmpty())
+            if (Strings.isNullOrEmpty(msg.getAppId()))
                 msg.setAppId(context.getSourceNode().getAppId());
 
             //timestamp

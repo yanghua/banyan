@@ -19,9 +19,13 @@ public class Node implements Serializable, Comparable<Node> {
     private String  appId;
     private boolean isInner;
     private boolean isVirtual;
+    private boolean canBroadcast;
     private String  communicateType;
+    private String rateLimit;
     private String threshold;
     private String msgBodySize;
+    private String ttl;
+    private String ttlPerMsg;
 
     public Node() {
     }
@@ -122,6 +126,14 @@ public class Node implements Serializable, Comparable<Node> {
         this.isInner = isInner;
     }
 
+    public String getRateLimit() {
+        return rateLimit;
+    }
+
+    public void setRateLimit(String rateLimit) {
+        this.rateLimit = rateLimit;
+    }
+
     public String getCommunicateType() {
         return communicateType;
     }
@@ -144,6 +156,30 @@ public class Node implements Serializable, Comparable<Node> {
 
     public void setMsgBodySize(String msgBodySize) {
         this.msgBodySize = msgBodySize;
+    }
+
+    public String getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(String ttl) {
+        this.ttl = ttl;
+    }
+
+    public String getTtlPerMsg() {
+        return ttlPerMsg;
+    }
+
+    public void setTtlPerMsg(String ttlPerMsg) {
+        this.ttlPerMsg = ttlPerMsg;
+    }
+
+    public boolean isCanBroadcast() {
+        return canBroadcast;
+    }
+
+    public void setCanBroadcast(boolean canBroadcast) {
+        this.canBroadcast = canBroadcast;
     }
 
     @Override

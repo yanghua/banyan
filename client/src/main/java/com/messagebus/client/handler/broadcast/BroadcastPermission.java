@@ -20,13 +20,12 @@ public class BroadcastPermission extends PermissionChecker {
         }
 
         Node sourceNode = context.getSourceNode();
-        hasPermission = context.getConfigManager().getNotificationNodeMap().containsKey(sourceNode.getName());
+        hasPermission = sourceNode.isCanBroadcast();
 
         if (!hasPermission) {
             throw new RuntimeException("permission error!");
         }
 
         chain.handle(context);
-
     }
 }
