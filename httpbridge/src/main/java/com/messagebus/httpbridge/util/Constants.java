@@ -11,7 +11,6 @@ public class Constants {
     public static final  int HTTP_NOT_FOUND_CODE     = HTTP_BASE_CODE + 404;
     //endregion
 
-    public static final String HTTP_BRIDGE_APP_KEY        = "AJDSLFKJALSDFJLAS;DFK";
     public static final String KEY_OF_MESSAGEBUS_POOL_OBJ = "messagebusPool";
 
     //consume mode pull
@@ -24,5 +23,8 @@ public class Constants {
     //request timeout
     public static final long MAX_REQUEST_TIMEOUT = 60_000L;
     public static final long MIN_REQUEST_TIMEOUT = 100L;
+
+    public static final String TEXT_PLAIN_CONTENT_TYPE = "text/plain";
+
 
 }

@@ -12,7 +12,7 @@ public class CommonUtil {
             return false;
         }
 
-        return msgTypeStr.equals("text/plain");
+        return msgTypeStr.equals(Constants.TEXT_PLAIN_CONTENT_TYPE);
     }
 
 }

@@ -7,7 +7,6 @@ import com.messagebus.client.message.model.MessageJSONSerializer;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import com.messagebus.httpbridge.util.PropertiesHelper;
-import com.messagebus.httpbridge.util.TextMessageJSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -61,7 +60,7 @@ public class ProduceConsume {
 
         List<Message> msgs = new ArrayList<>(1);
         msgs.add(msg);
-        String msgs2json = TextMessageJSONSerializer.serializeMessages(msgs);
+        String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
 
         try {
             HttpPost postRequest = new HttpPost(url);

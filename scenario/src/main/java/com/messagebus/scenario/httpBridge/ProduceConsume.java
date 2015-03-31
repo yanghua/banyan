@@ -1,6 +1,5 @@
 package com.messagebus.scenario.httpBridge;
 
-import com.google.gson.Gson;
 import com.messagebus.client.message.model.*;
 import com.messagebus.common.Constants;
 import com.messagebus.scenario.util.PropertiesHelper;
@@ -26,16 +25,18 @@ public class ProduceConsume {
     private static final Log logger = LogFactory.getLog(ProduceConsume.class);
 
     public static void main(String[] args) {
-        testProduce();
+//        testProduceWithPost();
+
+        testProduceWithGet();
 
         testConsume("pull");
     }
 
-    private static void testProduce() {
-        String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?secret=%s&type=produce&token=%s";
+    private static void testProduceWithPost() {
+        String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?secret=%s&apiType=produce&token=%s";
         String testQueue = "emapDemoConsume";
-        String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
-        String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
+        String secret = "iojawdnaisdflknoiankjfdblaidcas";
+        String token = "iojawdnaisdflknoiankjfdblaidcas";
 
         String url = String.format(testUrlFormat,
                                    PropertiesHelper.getPropertyValue("messagebus.httpbridge.host"),
@@ -81,9 +82,45 @@ public class ProduceConsume {
         }
     }
 
+    private static void testProduceWithGet() {
+        String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?secret=%s&apiType=produce&token=%s";
+        String testQueue = "emapDemoConsume";
+        String secret = "iojawdnaisdflknoiankjfdblaidcas";
+        String token = "iojawdnaisdflknoiankjfdblaidcas";
+
+        String url = String.format(testUrlFormat,
+                                   PropertiesHelper.getPropertyValue("messagebus.httpbridge.host"),
+                                   Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.httpbridge.port")),
+                                   testQueue,
+                                   secret,
+                                   token);
+        url += "&content=text&contentType=text/plain";
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+
+        try {
+            response = httpClient.execute(new HttpGet(url));
+
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                logger.info("response is : " + EntityUtils.toString(entity));
+            }
+        } catch (IOException e) {
+            logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
+        } finally {
+            if (response != null)
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
+                }
+        }
+    }
+
     private static void testConsume(String mode) {
-        String testUrlFormat = "http://%s:%s/messagebus/queues/messages?secret=%s&type=consume&mode=%s&num=1";
-        String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
+        String testUrlFormat = "http://%s:%s/messagebus/queues/messages?secret=%s&apiType=consume&mode=%s&num=1";
+        String secret = "iojawdnaisdflknoiankjfdblaidcas";
 
         String url = String.format(testUrlFormat,
                                    PropertiesHelper.getPropertyValue("messagebus.httpbridge.host"),

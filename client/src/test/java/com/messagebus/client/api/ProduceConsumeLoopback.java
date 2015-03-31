@@ -25,21 +25,21 @@ public class ProduceConsumeLoopback extends BaseTestCase {
     }
 
     private void commonProduce() {
-        String secret = "jnmzqwemnjaksdfqjnkajfjasndfnw";
-        String token = "jnmzqwemnjaksdfqjnkajfjasndfnw";
+        String secret = "iojawdnaisdflknoiankjfdblaidcas";
+        String token = "iojawdnaisdflknoiankjfdblaidcas";
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        client.produce(secret, "erpDemoProduce-Consume", msg, token);
+        client.produce(secret, "appDataQueue", msg, token);
     }
 
     public void testLoopBack() throws Exception {
         commonProduce();
 
-        String consumeSecret = "jnmzqwemnjaksdfqjnkajfjasndfnw";
+        String consumeSecret = "iojawdnaisdflknoiankjfdblaidcas";
         client.consume(consumeSecret, 10, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {

@@ -8,7 +8,7 @@ httpbridge 如其名，它是消息总线接口基于http的实现。用于衔�
 ###produce：
 
 ```
-/messagebus/queues/{qname}/messages?secret={secret}&token={token}&type={produce}
+/messagebus/queues/{qname}/messages?secret={secret}&token={token}&apiType={apiType}
 ```
 
 http method : `POST`
@@ -19,7 +19,7 @@ request params :
 * querystring : 
 	* secret - 自身标识 （必填）
 	* token - 授权token （必填）
-	* type - 鉴别API，值为 `produce` （必填）
+	* apiType - 鉴别API，值为 `produce` （必填）
 * request body : 
 	* messages - 消息对象数组 （必填）
 	
@@ -53,33 +53,14 @@ response :
 	statusCode: 10200,
 	error: "",
 	msg: "",
-	data: [
-		{
-			messageId: 582794572548239400,
-			type: "queue",
-			timestamp: "Mar 31, 2015 2:40:28 PM",
-			priority: 0,
-			expiration: null,
-			headers: null,
-			contentEncoding: null,
-			contentType: "text/plain",
-			replyTo: "emapDemoConsume",
-			appId: "4",
-			userId: null,
-			clusterId: null,
-			correlationId: "erpDemoProduce",
-			deliveryMode: 2,
-			msgType: "QueueMessage",
-			content: "test"
-		}
-	]
+	data: ''
 }
 ```
 
 ###consume:
 
 ```
-/messagebus/queues/messages?secret={secret}&type={consume}&mode={sync}&num={num}
+/messagebus/queues/messages?secret={secret}&apiType={apiType}&mode={sync}&num={num}
 ```
 
 http method : `GET`
@@ -88,7 +69,7 @@ request params :
 
 * querystring : 
 	* secret - 自身标识 （必填）
-	* type - 鉴别API，值为 `consume` （必填）
+	* apiType - 鉴别API，值为 `consume` （必填）
 	* mode - 取值 `pull` 或 `push` （必填）
 	* num - 希望获取的消息数目，范围 0 < num <=100 （mode 为`pull`时有效）
 	
@@ -140,7 +121,7 @@ response :
 
 ###publish
 ```
-/messagebus/queues/messages?secret={secret}&type={type}
+/messagebus/queues/messages?secret={secret}&apiType={apiType}
 ```
 
 http method : `POST` 
@@ -149,7 +130,7 @@ request params :
 
 * querystring :
 	* secret - 自身标识 （必填）
-	* type - 鉴别API，值为 `publish` (必填)
+	* apiType - 鉴别API，值为 `publish` (必填)
 * request body :
 	* messages - 推送消息对象集合
 	
@@ -166,7 +147,7 @@ response :
 
 ###subscribe
 ```
-/messagebus/queues/messages?secret={secret}&type={type}
+/messagebus/queues/messages?secret={secret}&apiType={apiType}
 ```
 
 http method : `GET`
@@ -175,7 +156,7 @@ request params :
 
 * querystring :
 	* secret - 自身标识（必填）
-	* type - 鉴别API，值为 `subscribe` (必填)
+	* apiType - 鉴别API，值为 `subscribe` (必填)
 
 response :
 
@@ -222,7 +203,7 @@ response :
 ###request:
 
 ```
-/messagebus/queues/{qname}/messages?secret={secret}&token={token}&type={type}&timeout={timeout}
+/messagebus/queues/{qname}/messages?secret={secret}&token={token}&apiType={apiType}&timeout={timeout}
 ```
 
 http method : `POST`
@@ -233,7 +214,7 @@ request params :
 * querystring : 
 	* secret - 自身标识 （必填）
 	* token - 授权token (必填)
-	* type - 鉴别API，值为 `request`（必填）
+	* apiType - 鉴别API，值为 `request`（必填）
 	* timeout - 超时时间，单位为秒（必填）
 * request body : 
 	* message - 消息对象 （客户端为阻塞等待，每次只能请求一条）
