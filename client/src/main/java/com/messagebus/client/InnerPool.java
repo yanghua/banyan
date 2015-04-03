@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
-import com.messagebus.client.core.config.ConfigManager;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 

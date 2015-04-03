@@ -34,7 +34,7 @@ public class ProduceConsume {
 
     private static void testProduceWithPost() {
         String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?secret=%s&apiType=produce&token=%s";
-        String testQueue = "emapDemoConsume";
+        String testQueue = "appDataQueue";
         String secret = "iojawdnaisdflknoiankjfdblaidcas";
         String token = "iojawdnaisdflknoiankjfdblaidcas";
 
@@ -84,7 +84,7 @@ public class ProduceConsume {
 
     private static void testProduceWithGet() {
         String testUrlFormat = "http://%s:%s/messagebus/queues/%s/messages?secret=%s&apiType=produce&token=%s";
-        String testQueue = "emapDemoConsume";
+        String testQueue = "appDataQueue";
         String secret = "iojawdnaisdflknoiankjfdblaidcas";
         String token = "iojawdnaisdflknoiankjfdblaidcas";
 

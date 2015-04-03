@@ -18,8 +18,6 @@ public class Constants {
     public static final String KEY_ARG_SERVER_LOG4J_PROPERTY_PATH = "serverLog4jPropertyPath";
     public static final String KEY_ARG_COMMAND                    = "cmd";
 
-    public static final String LOG_OF_FILE_QUEUE_NAME = "file";
-
     public static final String KEY_SERVER_CONFIG = "SERVER_CONFIG";
 
     public static final String GLOBAL_CLIENT_POOL      = "clientPool";
@@ -29,6 +27,7 @@ public class Constants {
     public static final int    PORT = 15672;
 
     public static final String   HTTP_API_OVERVIEW = "/api/overview";
+    public static final String   HTTP_API_QUEUES = "/api/queues";
     public static final AuthInfo DEFAULT_AUTH_INFO = new AuthInfo("guest", "guest");
 
 

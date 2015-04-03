@@ -99,18 +99,6 @@
             <handler-name>Response-Loop-Handler</handler-name>
             <handler-path>com.messagebus.client.handler.response.ResponseLoopHandler</handler-path>
         </handler>
-        <!--<handler>-->
-        <!--<handler-name>MessageId-Generator</handler-name>-->
-        <!--<handler-path>com.messagebus.client.handler.common.MessageIdGenerator</handler-path>-->
-        <!--</handler>-->
-        <!--<handler>-->
-        <!--<handler-name>Validate-Handler</handler-name>-->
-        <!--<handler-path>com.messagebus.client.handler.response.ResponseParamValidator</handler-path>-->
-        <!--</handler>-->
-        <!--<handler>-->
-        <!--<handler-name>Response-Sender</handler-name>-->
-        <!--<handler-path>com.messagebus.client.handler.response.ResponseSender</handler-path>-->
-        <!--</handler>-->
     </response>
     <publish>
         <handler>

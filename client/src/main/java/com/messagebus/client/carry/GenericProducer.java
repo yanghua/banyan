@@ -1,9 +1,7 @@
-package com.messagebus.client.carry.impl;
+package com.messagebus.client.carry;
 
 import com.messagebus.business.model.Node;
-import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.carry.IProducer;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
@@ -13,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * a generic producer implements the IProducer interface
  */
-public class GenericProducer extends AbstractMessageCarryer implements IProducer {
+ class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
 
@@ -36,23 +34,6 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
     }
 
     /**
-     * simple producer just produces a message but surrounds with a transaction
-     * Note: make sure that your scenario very care about security, otherwise do NOT use it!
-     *
-     * @param secret
-     * @param to     the message's destination
-     * @param msg    a general message
-     * @param token
-     */
-    @Override
-    public void produceWithTX(String secret, String to, Message msg, String token) {
-        MessageContext context = this.innerProduce(secret, to, token);
-        context.setMessages(new Message[]{msg});
-        context.setEnableTransaction(true);
-        commonCarry(context);
-    }
-
-    /**
      * a producer produces a set of messages
      *
      * @param secret
@@ -64,23 +45,6 @@ public class GenericProducer extends AbstractMessageCarryer implements IProducer
     public void batchProduce(String secret, String to, Message[] msgs, String token) {
         MessageContext context = this.innerProduce(secret, to, token);
         context.setMessages(msgs);
-        commonCarry(context);
-    }
-
-    /**
-     * a producer produces a set of messages but surrounds with a transaction
-     * Note: make sure that your scenario very care about security, otherwise do NOT use it!
-     *
-     * @param secret
-     * @param to     the message's destination
-     * @param msgs   a general message's array
-     * @param token
-     */
-    @Override
-    public void batchProduceWithTX(String secret, String to, Message[] msgs, String token) {
-        MessageContext context = this.innerProduce(secret, to, token);
-        context.setMessages(msgs);
-        context.setEnableTransaction(true);
         commonCarry(context);
     }
 

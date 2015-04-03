@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
-import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.common.Constants;
 import com.messagebus.common.RandomHelper;
 import com.rabbitmq.client.Connection;

@@ -57,7 +57,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
             AMQP.BasicProperties properties = delivery.getProperties();
             byte[] msgBody = delivery.getBody();
 
-            context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+//            context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             //destroy queue
             QueueManager.defaultQueueManager(context.getHost()).delete(correlationId);
 

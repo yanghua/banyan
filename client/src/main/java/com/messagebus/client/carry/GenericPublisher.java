@@ -1,15 +1,13 @@
-package com.messagebus.client.carry.impl;
+package com.messagebus.client.carry;
 
-import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.carry.IPublisher;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
+ class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
 
     private static final Log logger = LogFactory.getLog(GenericPublisher.class);
 

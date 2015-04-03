@@ -65,6 +65,14 @@ public abstract class CommonLoopHandler extends AbstractHandler {
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "common loop handler");
         } finally {
+            //close the consume based on this channel
+            try {
+                if (context.getChannel().isOpen()) {
+                    context.getChannel().basicCancel(context.getConsumerTag());
+                }
+            } catch (IOException e1) {
+                ExceptionHelper.logException(logger, e1, "cancel a consumer");
+            }
             chain.handle(context);
         }
     }

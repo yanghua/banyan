@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.client.carry.*;
-import com.messagebus.client.carry.impl.*;
 import com.messagebus.client.message.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,89 +18,68 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    private GenericProducer    producer;
-    private GenericConsumer    consumer;
-    private GenericPublisher   publisher;
-    private GenericSubscriber  subscriber;
-    private GenericRequester   requester;
-    private GenericResponser   responser;
-    private GenericBroadcaster broadcaster;
+    private IProducer    producer;
+    private IConsumer    consumer;
+    private IPublisher   publisher;
+    private ISubscriber  subscriber;
+    private IRequester   requester;
+    private IResponser   responser;
+    private IBroadcaster broadcaster;
 
     private Messagebus() {
         super();
 
-        producer = new GenericProducer();
-        consumer = new GenericConsumer();
-        publisher = new GenericPublisher();
-        subscriber = new GenericSubscriber();
-        requester = new GenericRequester();
-        responser = new GenericResponser();
-        broadcaster = new GenericBroadcaster();
+        producer = CarryFactory.createProducer(context);
+        consumer = CarryFactory.createConsumer(context);
+        publisher = CarryFactory.createPublisher(context);
+        subscriber = CarryFactory.createSubscriber(context);
+        requester = CarryFactory.createRequester(context);
+        responser = CarryFactory.createResponser(context);
+        broadcaster = CarryFactory.createBroadcaster(context);
     }
 
     @Override
     public void produce(String secret, String to, Message msg, String token) {
-        producer.setContext(context);
         producer.produce(secret, to, msg, token);
     }
 
     @Override
-    public void produceWithTX(String secret, String to, Message msg, String token) {
-        producer.setContext(context);
-        producer.produceWithTX(secret, to, msg, token);
-    }
-
-    @Override
     public void batchProduce(String secret, String to, Message[] msgs, String token) {
-        producer.setContext(context);
         producer.batchProduce(secret, to, msgs, token);
     }
 
     @Override
-    public void batchProduceWithTX(String secret, String to, Message[] msgs, String token) {
-        producer.setContext(context);
-        producer.batchProduceWithTX(secret, to, msgs, token);
-    }
-
-    @Override
     public void consume(String secret, long timeout, TimeUnit unit, IMessageReceiveListener onMessage) {
-        consumer.setContext(context);
         consumer.consume(secret, timeout, unit, onMessage);
     }
 
     @Override
     public List<Message> consume(String secret, int expectedNum) {
-        consumer.setContext(context);
         return consumer.consume(secret, expectedNum);
     }
 
     @Override
     public Message request(String secret, String to, Message msg, String token, long timeout) throws MessageResponseTimeoutException {
-        requester.setContext(context);
         return requester.request(secret, to, msg, token, timeout);
     }
 
     @Override
     public void response(String secret, IRequestListener requestListener, long timeout, TimeUnit timeUnit) {
-        responser.setContext(context);
         responser.response(secret, requestListener, timeout, timeUnit);
     }
 
     @Override
     public void publish(String secret, Message[] msgs) {
-        publisher.setContext(context);
         publisher.publish(secret, msgs);
     }
 
     @Override
     public void subscribe(String secret, IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
-        subscriber.setContext(context);
         subscriber.subscribe(secret, onMessage, timeout, unit);
     }
 
     @Override
     public void broadcast(String secret, Message[] msgs) {
-        broadcaster.setContext(context);
         broadcaster.broadcast(secret, msgs);
     }
 

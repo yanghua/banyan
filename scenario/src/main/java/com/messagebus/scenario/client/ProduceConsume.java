@@ -24,7 +24,7 @@ public class ProduceConsume {
     public static void main(String[] args) {
         produce();
 
-        ConsumeWithPushStyle();
+        consumeWithPushStyle();
 
         //or
 //        consumeWithPullStyle();
@@ -69,7 +69,7 @@ public class ProduceConsume {
         singlePool.destroy();
     }
 
-    private static void ConsumeWithPushStyle() {
+    private static void consumeWithPushStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
         MessagebusSinglePool singlePool = new MessagebusSinglePool(
             PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
@@ -77,7 +77,7 @@ public class ProduceConsume {
         );
         Messagebus client = singlePool.getResource();
 
-        client.consume(secret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
+        client.consume(secret, 10, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageId());

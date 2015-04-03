@@ -1,5 +1,7 @@
-package com.messagebus.client;
+package com.messagebus.client.carry;
 
+import com.messagebus.client.GenericContext;
+import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.common.Constants;
 
@@ -7,7 +9,7 @@ import com.messagebus.common.Constants;
  * abstract class of message carryer
  * in message bus, we treat producer and consumer as carryer
  */
-public abstract class AbstractMessageCarryer {
+ abstract class AbstractMessageCarryer  {
 
     private   GenericContext context;
     protected IHandlerChain  handlerChain;

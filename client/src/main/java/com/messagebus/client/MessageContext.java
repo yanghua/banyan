@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.business.model.Node;
-import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.client.handler.common.AsyncEventLoop;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;

@@ -14,11 +14,11 @@ public class Constants {
     public static final String KEY_OF_MESSAGEBUS_POOL_OBJ = "messagebusPool";
 
     //consume mode pull
-    public static final int MAX_CONSUME_NUM = 100;
+    public static final int MAX_CONSUME_NUM = 500;
     public static final int MIN_CONSUME_NUM = 1;
 
     //consume mode push
-    public static final long MAX_CONSUME_CONTINUATION_TIMEOUT = 15_000L;
+    public static final long MAX_CONSUME_CONTINUATION_TIMEOUT = 30_000L;
 
     //request timeout
     public static final long MAX_REQUEST_TIMEOUT = 60_000L;

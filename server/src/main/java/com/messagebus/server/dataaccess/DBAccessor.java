@@ -1,5 +1,6 @@
 package com.messagebus.server.dataaccess;
 
+import com.messagebus.common.ExceptionHelper;
 import com.messagebus.server.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +48,8 @@ public class DBAccessor {
                 conn.close();
             }
         } catch (SQLException e) {
-            logger.error("[closeConnection] occurs SQLException :  " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "closeConnection");
+            throw new RuntimeException(e);
         }
     }
 

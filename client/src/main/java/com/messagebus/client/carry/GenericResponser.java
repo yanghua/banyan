@@ -1,9 +1,7 @@
-package com.messagebus.client.carry.impl;
+package com.messagebus.client.carry;
 
-import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.carry.IResponser;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.handler.common.AsyncEventLoop;
@@ -16,7 +14,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class GenericResponser extends AbstractMessageCarryer implements Runnable, IResponser {
+ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResponser {
 
     private static final Log logger = LogFactory.getLog(GenericResponser.class);
 

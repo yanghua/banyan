@@ -1,6 +1,5 @@
 package com.messagebus.client;
 
-import com.messagebus.client.core.config.ConfigManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 

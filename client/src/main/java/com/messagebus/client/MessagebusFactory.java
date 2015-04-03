@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
-import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;

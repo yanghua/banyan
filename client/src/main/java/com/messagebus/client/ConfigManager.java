@@ -1,4 +1,4 @@
-package com.messagebus.client.core.config;
+package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.business.exchanger.IExchangerListener;
@@ -93,15 +93,15 @@ public class ConfigManager implements IExchangerListener {
             initHandlers(this.subscribeHandlerModels, this.subscribeHandlerChain);
             initHandlers(this.broadcastHandlerModels, this.broadcastHandlerChain);
 
-            if (logger.isDebugEnabled()) {
-                printHandlerChain(MessageCarryType.PRODUCE, this.produceHandlerModels);
-                printHandlerChain(MessageCarryType.CONSUME, this.consumeHandlerModels);
-                printHandlerChain(MessageCarryType.REQUEST, this.requestHandlerModels);
-                printHandlerChain(MessageCarryType.RESPONSE, this.responseHandlerModels);
-                printHandlerChain(MessageCarryType.PUBLISH, this.publishHandlerModels);
-                printHandlerChain(MessageCarryType.SUBSCRIBE, this.subscribeHandlerModels);
-                printHandlerChain(MessageCarryType.BROADCAST, this.broadcastHandlerModels);
-            }
+//            if (logger.isDebugEnabled()) {
+//                printHandlerChain(MessageCarryType.PRODUCE, this.produceHandlerModels);
+//                printHandlerChain(MessageCarryType.CONSUME, this.consumeHandlerModels);
+//                printHandlerChain(MessageCarryType.REQUEST, this.requestHandlerModels);
+//                printHandlerChain(MessageCarryType.RESPONSE, this.responseHandlerModels);
+//                printHandlerChain(MessageCarryType.PUBLISH, this.publishHandlerModels);
+//                printHandlerChain(MessageCarryType.SUBSCRIBE, this.subscribeHandlerModels);
+//                printHandlerChain(MessageCarryType.BROADCAST, this.broadcastHandlerModels);
+//            }
 
             return true;
         } catch (Exception e) {

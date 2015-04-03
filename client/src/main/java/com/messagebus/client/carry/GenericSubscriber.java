@@ -1,10 +1,8 @@
-package com.messagebus.client.carry.impl;
+package com.messagebus.client.carry;
 
 import com.messagebus.business.model.Node;
-import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.carry.ISubscriber;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.handler.common.AsyncEventLoop;
@@ -17,7 +15,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class GenericSubscriber extends AbstractMessageCarryer implements Runnable, ISubscriber {
+ class GenericSubscriber extends AbstractMessageCarryer implements Runnable, ISubscriber {
 
     private static final Log logger = LogFactory.getLog(GenericSubscriber.class);
 

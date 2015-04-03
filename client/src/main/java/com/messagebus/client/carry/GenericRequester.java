@@ -1,17 +1,15 @@
-package com.messagebus.client.carry.impl;
+package com.messagebus.client.carry;
 
 import com.messagebus.business.model.Node;
-import com.messagebus.client.AbstractMessageCarryer;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.MessageResponseTimeoutException;
-import com.messagebus.client.carry.IRequester;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class GenericRequester extends AbstractMessageCarryer implements IRequester {
+ class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
     private static final Log logger = LogFactory.getLog(GenericRequester.class);
 

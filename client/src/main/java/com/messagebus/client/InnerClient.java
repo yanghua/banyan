@@ -1,12 +1,9 @@
 package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
-import com.messagebus.client.core.config.ConfigManager;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ShutdownListener;
-import com.rabbitmq.client.ShutdownSignalException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +29,7 @@ abstract class InnerClient {
     private AtomicBoolean isOpen = new AtomicBoolean(false);
 
     public InnerClient() {
-
+        context = new GenericContext();
     }
 
     private void open() throws MessagebusConnectedFailedException {
@@ -41,7 +38,6 @@ abstract class InnerClient {
 
         try {
             this.channel = this.connection.createChannel();
-            context = new GenericContext();
             context.setChannel(this.channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
