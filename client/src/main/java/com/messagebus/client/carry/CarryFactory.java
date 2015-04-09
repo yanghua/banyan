@@ -18,7 +18,7 @@ public class CarryFactory {
         GenericConsumer consumer = new GenericConsumer();
         consumer.setContext(context);
 
-        return  consumer;
+        return consumer;
     }
 
     public static IProducer createProducer(GenericContext context) {
@@ -47,6 +47,20 @@ public class CarryFactory {
         responser.setContext(context);
 
         return responser;
+    }
+
+    public static IRpcRequester createRpcRequester(GenericContext context) {
+        GenericRpcRequester rpcRequester = new GenericRpcRequester();
+        rpcRequester.setContext(context);
+
+        return rpcRequester;
+    }
+
+    public static IRpcResponser createRpcResponser(GenericContext context) {
+        GenericRpcResponser rpcResponser = new GenericRpcResponser();
+        rpcResponser.setContext(context);
+
+        return rpcResponser;
     }
 
     public static ISubscriber createSubscriber(GenericContext context) {

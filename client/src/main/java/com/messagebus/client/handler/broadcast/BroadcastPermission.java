@@ -1,6 +1,5 @@
 package com.messagebus.client.handler.broadcast;
 
-import com.messagebus.business.model.Channel;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;

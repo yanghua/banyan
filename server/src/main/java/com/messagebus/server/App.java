@@ -2,7 +2,6 @@ package com.messagebus.server;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.business.exchanger.IDataFetcher;
-import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusConnectedFailedException;
 import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.MessagebusSinglePool;

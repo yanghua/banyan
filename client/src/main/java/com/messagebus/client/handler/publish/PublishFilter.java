@@ -2,7 +2,6 @@ package com.messagebus.client.handler.publish;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.messagebus.business.model.Channel;
 import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;

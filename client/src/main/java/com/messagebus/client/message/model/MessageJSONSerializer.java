@@ -1,6 +1,5 @@
 package com.messagebus.client.message.model;
 
-import com.google.common.base.Strings;
 import com.google.gson.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<student xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="producerSchema.xml">
+    <studentId>A07021012</studentId>
+    <name>jack</name>
+    <sex>1</sex>
+    <birthday>1986/10/20</birthday>
+    <major>Computer Since and technology</major>
+</student>
+
+
+        <!--<?xml version="1.0" encoding="ISO-8859-1"?>-->
+        <!--<catalog>-->
+        <!--<cd>-->
+        <!--<title>Empire Burlesque</title>-->
+        <!--<artist>Bob Dylan</artist>-->
+        <!--<country>USA</country>-->
+        <!--<company>Columbia</company>-->
+        <!--<price>10.90</price>-->
+        <!--<year>1985</year>-->
+        <!--</cd>-->
+        <!--</catalog>-->
+

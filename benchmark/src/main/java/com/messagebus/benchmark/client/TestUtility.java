@@ -6,6 +6,7 @@ import com.messagebus.client.MessagebusUnOpenException;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.common.TestVariableInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,8 +71,8 @@ public class TestUtility {
     public static void produce(long total) {
         Message msg = TestMessageFactory.create(MessageType.QueueMessage, TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(TestConfigConstant.PUBSUBER_HOST,
-                                                                   TestConfigConstant.PUBSUBER_PORT);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(TestVariableInfo.PUBSUBER_HOST,
+                                                                   TestVariableInfo.PUBSUBER_PORT);
         Messagebus client = singlePool.getResource();
 
         try {

@@ -9,7 +9,7 @@ import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
- class GenericRequester extends AbstractMessageCarryer implements IRequester {
+class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
     private static final Log logger = LogFactory.getLog(GenericRequester.class);
 

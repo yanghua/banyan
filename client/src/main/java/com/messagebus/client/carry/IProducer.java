@@ -1,6 +1,5 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.client.GenericContext;
 import com.messagebus.client.message.model.Message;
 
 /**

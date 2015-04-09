@@ -3,9 +3,7 @@ package com.messagebus.client.feature;
 import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.core.MessageUtil;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.common.Constants;
 
 /**
  * Created by yanghua on 3/27/15.

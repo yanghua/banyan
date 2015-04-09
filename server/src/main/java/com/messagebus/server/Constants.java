@@ -27,7 +27,7 @@ public class Constants {
     public static final int    PORT = 15672;
 
     public static final String   HTTP_API_OVERVIEW = "/api/overview";
-    public static final String   HTTP_API_QUEUES = "/api/queues";
+    public static final String   HTTP_API_QUEUES   = "/api/queues";
     public static final AuthInfo DEFAULT_AUTH_INFO = new AuthInfo("guest", "guest");
 
 

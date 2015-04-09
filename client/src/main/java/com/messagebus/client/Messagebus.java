@@ -13,18 +13,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class Messagebus extends InnerClient implements IProducer, IConsumer,
                                                        IRequester, IResponser,
+                                                       IRpcRequester, IRpcResponser,
                                                        IPublisher, ISubscriber,
                                                        IBroadcaster {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    private IProducer    producer;
-    private IConsumer    consumer;
-    private IPublisher   publisher;
-    private ISubscriber  subscriber;
-    private IRequester   requester;
-    private IResponser   responser;
-    private IBroadcaster broadcaster;
+    private IProducer     producer;
+    private IConsumer     consumer;
+    private IPublisher    publisher;
+    private ISubscriber   subscriber;
+    private IRequester    requester;
+    private IResponser    responser;
+    private IRpcRequester rpcRequester;
+    private IRpcResponser rpcResponser;
+    private IBroadcaster  broadcaster;
 
     private Messagebus() {
         super();
@@ -35,6 +38,8 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
         subscriber = CarryFactory.createSubscriber(context);
         requester = CarryFactory.createRequester(context);
         responser = CarryFactory.createResponser(context);
+        rpcRequester = CarryFactory.createRpcRequester(context);
+        rpcResponser = CarryFactory.createRpcResponser(context);
         broadcaster = CarryFactory.createBroadcaster(context);
     }
 
@@ -66,6 +71,16 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     @Override
     public void response(String secret, IRequestListener requestListener, long timeout, TimeUnit timeUnit) {
         responser.response(secret, requestListener, timeout, timeUnit);
+    }
+
+    @Override
+    public Object call(String secret, String target, String methodName, Object[] params, String token, long timeoutOfMilliSecond) {
+        return rpcRequester.call(secret, target, methodName, params, token, timeoutOfMilliSecond);
+    }
+
+    @Override
+    public void callback(String secret, Class<?> clazzOfInterface, Object serviceProvider, long timeout, TimeUnit timeUnit) {
+        rpcResponser.callback(secret, clazzOfInterface, serviceProvider, timeout, timeUnit);
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
- class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
+class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
 
     private static final Log logger = LogFactory.getLog(GenericPublisher.class);
 

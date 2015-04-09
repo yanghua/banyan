@@ -15,7 +15,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
- class GenericSubscriber extends AbstractMessageCarryer implements Runnable, ISubscriber {
+class GenericSubscriber extends AbstractMessageCarryer implements Runnable, ISubscriber {
 
     private static final Log logger = LogFactory.getLog(GenericSubscriber.class);
 

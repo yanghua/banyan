@@ -9,7 +9,7 @@ import com.messagebus.common.Constants;
  * abstract class of message carryer
  * in message bus, we treat producer and consumer as carryer
  */
- abstract class AbstractMessageCarryer  {
+abstract class AbstractMessageCarryer {
 
     private   GenericContext context;
     protected IHandlerChain  handlerChain;

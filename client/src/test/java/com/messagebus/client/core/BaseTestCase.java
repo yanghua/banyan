@@ -2,6 +2,7 @@ package com.messagebus.client.core;
 
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
+import com.messagebus.common.TestVariableInfo;
 import junit.framework.TestCase;
 
 /**
@@ -9,8 +10,8 @@ import junit.framework.TestCase;
  */
 public class BaseTestCase extends TestCase {
 
-    protected String host = "172.16.206.250";
-    protected int    port = 6379;
+    protected String host = TestVariableInfo.PUBSUBER_HOST;
+    protected int    port = TestVariableInfo.PUBSUBER_PORT;
 
     protected MessagebusSinglePool singlePool;
     protected Messagebus           client;

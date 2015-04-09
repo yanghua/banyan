@@ -5,6 +5,7 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.Constants;
+import com.messagebus.common.TestVariableInfo;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
@@ -86,7 +87,7 @@ public class OriginalProduceWithoutTopologyTestCase extends Benchmark {
     public static void main(String[] args) {
         OriginalProduceTestCase testCase = new OriginalProduceTestCase();
 
-        BasicProduce task = new BasicProduce(TestConfigConstant.RABBITMQ_SERVER_HOST, TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
+        BasicProduce task = new BasicProduce(TestVariableInfo.RABBITMQ_SERVER_HOST, TestConfigConstant.MSG_BODY_SIZE_OF_BYTE);
         task.setRoutingkey("");
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS,

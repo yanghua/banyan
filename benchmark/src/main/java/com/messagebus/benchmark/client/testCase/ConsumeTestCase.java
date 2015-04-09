@@ -6,6 +6,7 @@ import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.MessagebusUnOpenException;
 import com.messagebus.client.message.model.Message;
+import com.messagebus.common.TestVariableInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,7 +24,7 @@ public class ConsumeTestCase extends Benchmark {
         private Thread currentThread;
 
         private BasicConsume() {
-            singlePool = new MessagebusSinglePool(TestConfigConstant.PUBSUBER_HOST, TestConfigConstant.PUBSUBER_PORT);
+            singlePool = new MessagebusSinglePool(TestVariableInfo.PUBSUBER_HOST, TestVariableInfo.PUBSUBER_PORT);
             client = singlePool.getResource();
             currentThread = new Thread(this);
             currentThread.setDaemon(true);

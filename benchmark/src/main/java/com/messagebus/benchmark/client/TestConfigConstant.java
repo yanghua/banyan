@@ -2,11 +2,6 @@ package com.messagebus.benchmark.client;
 
 public class TestConfigConstant {
 
-    public static final String PUBSUBER_HOST = "172.16.206.250";
-    public static final int    PUBSUBER_PORT = 6379;
-
-    public static final String RABBITMQ_SERVER_HOST = "172.16.206.29";
-
     public static final String ORIGINAL_PRODUCE_ROUTING_KEY = "routingkey.proxy.message.procon.erpDemoConsume";
     public static final String DEFAULT_EXCHANGE_NAME_WITHOUT_TOPOLOGY = "amq.fanout";
 

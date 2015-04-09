@@ -2,7 +2,6 @@ package com.messagebus.server.daemon.impl;
 
 import com.google.common.base.Strings;
 import com.messagebus.business.model.Node;
-import com.messagebus.common.Constants;
 import com.messagebus.common.GsonUtil;
 import com.messagebus.common.HttpHelper;
 import com.messagebus.common.RandomHelper;
@@ -60,7 +59,7 @@ public class RateWarningMonitorService extends AbstractService {
                         rateWarningObj.put("NODE_ID", queue.getNodeId());
                         rateWarningObj.put("RATE_LIMIT", queue.getRateLimit());
                         rateWarningObj.put("REAL_RATE", publishDetailMap.get("rate").toString());
-                        rateWarningObj.put("FROM_DATE",  new Date(new java.util.Date().getTime()));
+                        rateWarningObj.put("FROM_DATE", new Date(new java.util.Date().getTime()));
                         BusinessDataAccessor.addRateWarning(rateWarningObj, dbAccessor);
                     }
                 }

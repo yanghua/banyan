@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * a generic producer implements the IProducer interface
  */
- class GenericProducer extends AbstractMessageCarryer implements IProducer {
+class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
 

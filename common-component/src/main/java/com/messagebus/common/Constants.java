@@ -25,16 +25,19 @@ public class Constants {
     public static final String AUDIT_TYPE_CODE_FAILED  = "AUDIT_FAILED";
 
 
-    public static final String COMMUNICATE_TYPE_PRODUCE           = "produce";
-    public static final String COMMUNICATE_TYPE_CONSUME           = "consume";
-    public static final String COMMUNICATE_TYPE_PRODUCE_CONSUME   = "produce-consume";
-    public static final String COMMUNICATE_TYPE_REQUEST           = "request";
-    public static final String COMMUNICATE_TYPE_RESPONSE          = "response";
-    public static final String COMMUNICATE_TYPE_REQUEST_RESPONSE  = "request-response";
-    public static final String COMMUNICATE_TYPE_PUBLISH           = "publish";
-    public static final String COMMUNICATE_TYPE_SUBSCRIBE         = "subscribe";
-    public static final String COMMUNICATE_TYPE_PUBLISH_SUBSCRIBE = "publish-subscribe";
-    public static final String COMMUNICATE_TYPE_BROADCAST         = "broadcast";
+    public static final String COMMUNICATE_TYPE_PRODUCE                = "produce";
+    public static final String COMMUNICATE_TYPE_CONSUME                = "consume";
+    public static final String COMMUNICATE_TYPE_PRODUCE_CONSUME        = "produce-consume";
+    public static final String COMMUNICATE_TYPE_REQUEST                = "request";
+    public static final String COMMUNICATE_TYPE_RESPONSE               = "response";
+    public static final String COMMUNICATE_TYPE_REQUEST_RESPONSE       = "request-response";
+    public static final String COMMUNICATE_TYPE_RPCREQUEST             = "rpcrequest";
+    public static final String COMMUNICATE_TYPE_RPCRESPONSE            = "rpcresponse";
+    public static final String COMMUNICATE_TYPE_RPCREQUEST_RPCRESPONSE = "rpcrequest-rpcresponse";
+    public static final String COMMUNICATE_TYPE_PUBLISH                = "publish";
+    public static final String COMMUNICATE_TYPE_SUBSCRIBE              = "subscribe";
+    public static final String COMMUNICATE_TYPE_PUBLISH_SUBSCRIBE      = "publish-subscribe";
+    public static final String COMMUNICATE_TYPE_BROADCAST              = "broadcast";
 
     public static final String MESSAGEBUS_SERVER_EVENT_STARTED = "started";
     public static final String MESSAGEBUS_SERVER_EVENT_STOPPED = "stopped";

@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,7 @@ public class BusinessDataAccessor {
             statement.setString(2, rateWarning.get("NODE_ID").toString());
             statement.setString(3, rateWarning.get("RATE_LIMIT").toString());
             statement.setString(4, rateWarning.get("REAL_RATE").toString());
-            statement.setDate(5, (java.sql.Date)rateWarning.get("FROM_DATE"));
+            statement.setDate(5, (java.sql.Date) rateWarning.get("FROM_DATE"));
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);

@@ -7,7 +7,7 @@ import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
- class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster {
+class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster {
 
     private static final Log logger = LogFactory.getLog(GenericBroadcaster.class);
 

@@ -53,11 +53,15 @@ public abstract class CommonLoopHandler extends AbstractHandler {
 
                 context.setConsumedMsg(msg);
 
-                if (msgType.equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
-                    IMessageReceiveListener noticeListener = context.getNoticeListener();
-                    noticeListener.onMessage(msg);
-                } else {
-                    process(context);
+                try {
+                    if (msgType.equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
+                        IMessageReceiveListener noticeListener = context.getNoticeListener();
+                        noticeListener.onMessage(msg);
+                    } else {
+                        process(context);
+                    }
+                } catch (Exception e) {
+                    ExceptionHelper.logException(logger, e, "outer of message handler");
                 }
             }
         } catch (InterruptedException e) {

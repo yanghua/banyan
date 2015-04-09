@@ -39,35 +39,40 @@ public class ConfigManager implements IExchangerListener {
     private volatile String  serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
-    private List<HandlerModel> produceHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> consumeHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> requestHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> responseHandlerModels  = new ArrayList<>();
-    private List<HandlerModel> publishHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> subscribeHandlerModels = new ArrayList<>();
-    private List<HandlerModel> broadcastHandlerModels = new ArrayList<>();
+    private List<HandlerModel> produceHandlerModels     = new ArrayList<>();
+    private List<HandlerModel> consumeHandlerModels     = new ArrayList<>();
+    private List<HandlerModel> requestHandlerModels     = new ArrayList<>();
+    private List<HandlerModel> responseHandlerModels    = new ArrayList<>();
+    private List<HandlerModel> publishHandlerModels     = new ArrayList<>();
+    private List<HandlerModel> subscribeHandlerModels   = new ArrayList<>();
+    private List<HandlerModel> broadcastHandlerModels   = new ArrayList<>();
+    private List<HandlerModel> rpcRequestHandlerModels  = new ArrayList<>();
+    private List<HandlerModel> rpcResponseHandlerModels = new ArrayList<>();
     //endregion
 
     //region handler instance
-    private List<AbstractHandler> produceHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> consumeHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> requestHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> responseHandlerChain  = new ArrayList<>();
-    private List<AbstractHandler> publishHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> subscribeHandlerChain = new ArrayList<>();
-    private List<AbstractHandler> broadcastHandlerChain = new ArrayList<>();
+    private List<AbstractHandler> produceHandlerChain     = new ArrayList<>();
+    private List<AbstractHandler> consumeHandlerChain     = new ArrayList<>();
+    private List<AbstractHandler> requestHandlerChain     = new ArrayList<>();
+    private List<AbstractHandler> responseHandlerChain    = new ArrayList<>();
+    private List<AbstractHandler> publishHandlerChain     = new ArrayList<>();
+    private List<AbstractHandler> subscribeHandlerChain   = new ArrayList<>();
+    private List<AbstractHandler> broadcastHandlerChain   = new ArrayList<>();
+    private List<AbstractHandler> rpcRequestHandlerChain  = new ArrayList<>();
+    private List<AbstractHandler> rpcResponseHandlerChain = new ArrayList<>();
     //endregion
 
-    private Map<String, Node>    proconNodeMap;
-    private Map<String, Node>    reqrespNodeMap;
-    private Map<String, Node>    pubsubNodeMap;
-    private Map<String, Node>    idNodeMap;
-    private Map<String, Node>    secretNodeMap;
-    private Map<String, Config>  clientConfigMap;
-    private ExchangerManager     exchangeManager;
-    private Map<String, Sink>    tokenSinkMap;
+    private Map<String, Node>   proconNodeMap;
+    private Map<String, Node>   reqrespNodeMap;
+    private Map<String, Node>   rpcReqRespNodeMap;
+    private Map<String, Node>   pubsubNodeMap;
+    private Map<String, Node>   idNodeMap;
+    private Map<String, Node>   secretNodeMap;
+    private Map<String, Config> clientConfigMap;
+    private ExchangerManager    exchangeManager;
+    private Map<String, Sink>   tokenSinkMap;
     private Map<String, String> pubsubChannelMap;
-    private Node                 notificationExchangeNode;
+    private Node                notificationExchangeNode;
 
     public ConfigManager() {
         this.inited = this.init();
@@ -83,6 +88,8 @@ public class ConfigManager implements IExchangerListener {
             parseHandlers("publish", this.publishHandlerModels);
             parseHandlers("subscribe", this.subscribeHandlerModels);
             parseHandlers("broadcast", this.broadcastHandlerModels);
+            parseHandlers("rpcrequest", this.rpcRequestHandlerModels);
+            parseHandlers("rpcresponse", this.rpcResponseHandlerModels);
 
             //box
             initHandlers(this.produceHandlerModels, this.produceHandlerChain);
@@ -92,16 +99,8 @@ public class ConfigManager implements IExchangerListener {
             initHandlers(this.publishHandlerModels, this.publishHandlerChain);
             initHandlers(this.subscribeHandlerModels, this.subscribeHandlerChain);
             initHandlers(this.broadcastHandlerModels, this.broadcastHandlerChain);
-
-//            if (logger.isDebugEnabled()) {
-//                printHandlerChain(MessageCarryType.PRODUCE, this.produceHandlerModels);
-//                printHandlerChain(MessageCarryType.CONSUME, this.consumeHandlerModels);
-//                printHandlerChain(MessageCarryType.REQUEST, this.requestHandlerModels);
-//                printHandlerChain(MessageCarryType.RESPONSE, this.responseHandlerModels);
-//                printHandlerChain(MessageCarryType.PUBLISH, this.publishHandlerModels);
-//                printHandlerChain(MessageCarryType.SUBSCRIBE, this.subscribeHandlerModels);
-//                printHandlerChain(MessageCarryType.BROADCAST, this.broadcastHandlerModels);
-//            }
+            initHandlers(this.rpcRequestHandlerModels, this.rpcRequestHandlerChain);
+            initHandlers(this.rpcResponseHandlerModels, this.rpcResponseHandlerChain);
 
             return true;
         } catch (Exception e) {
@@ -140,6 +139,14 @@ public class ConfigManager implements IExchangerListener {
         return broadcastHandlerModels;
     }
 
+    public List<HandlerModel> getRpcRequestHandlerModels() {
+        return rpcRequestHandlerModels;
+    }
+
+    public List<HandlerModel> getRpcResponseHandlerModels() {
+        return rpcResponseHandlerModels;
+    }
+
     //endregion
 
     //region handler chain list
@@ -171,6 +178,15 @@ public class ConfigManager implements IExchangerListener {
     public List<AbstractHandler> getBroadcastHandlerChain() {
         return broadcastHandlerChain;
     }
+
+    public List<AbstractHandler> getRpcRequestHandlerChain() {
+        return rpcRequestHandlerChain;
+    }
+
+    public List<AbstractHandler> getRpcResponseHandlerChain() {
+        return rpcResponseHandlerChain;
+    }
+
     //endregion
 
     //region node map
@@ -184,6 +200,10 @@ public class ConfigManager implements IExchangerListener {
 
     public Map<String, Node> getReqrespNodeMap() {
         return reqrespNodeMap;
+    }
+
+    public Map<String, Node> getRpcReqRespNodeMap() {
+        return rpcReqRespNodeMap;
     }
 
     public Map<String, Node> getSecretNodeMap() {
@@ -411,6 +431,7 @@ public class ConfigManager implements IExchangerListener {
         this.proconNodeMap = new ConcurrentHashMap<>();
         this.pubsubNodeMap = new ConcurrentHashMap<>();
         this.reqrespNodeMap = new ConcurrentHashMap<>();
+        this.rpcReqRespNodeMap = new ConcurrentHashMap<>();
         this.idNodeMap = new ConcurrentHashMap<>(nodes.length);
 
         for (Node node : nodes) {
@@ -428,9 +449,10 @@ public class ConfigManager implements IExchangerListener {
                     this.reqrespNodeMap.put(node.getName(), node);
                 } else if (node.getValue().contains("pubsub")) {
                     this.pubsubNodeMap.put(node.getName(), node);
+                } else if (node.getValue().contains("rpc")) {
+                    this.rpcReqRespNodeMap.put(node.getName(), node);
                 }
             }
-
         }
     }
 

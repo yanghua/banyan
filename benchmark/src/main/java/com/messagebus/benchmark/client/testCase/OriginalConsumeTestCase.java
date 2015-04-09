@@ -8,6 +8,7 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.common.TestVariableInfo;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;
 import com.rabbitmq.client.AMQP;
@@ -122,7 +123,7 @@ public class OriginalConsumeTestCase extends Benchmark {
 //        }
 
         OriginalConsumeTestCase testCase = new OriginalConsumeTestCase();
-        BasicConsume task = new BasicConsume(TestConfigConstant.RABBITMQ_SERVER_HOST);
+        BasicConsume task = new BasicConsume(TestVariableInfo.RABBITMQ_SERVER_HOST);
         task.setRealQueueName("queue.proxy.message.business.crm");
 
         testCase.test(task, TestConfigConstant.HOLD_TIME_OF_MILLIS, TestConfigConstant.FETCH_NUM,

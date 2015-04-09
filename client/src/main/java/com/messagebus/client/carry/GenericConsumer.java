@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * a async consumer
  */
- class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsumer {
+class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsumer {
 
     private static final Log logger = LogFactory.getLog(GenericConsumer.class);
 
@@ -35,7 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
     private final Condition mainBlocker  = mainLock.newCondition();
 
     public GenericConsumer() {
-
     }
 
     @Override

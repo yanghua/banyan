@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 @DaemonService(value = "sentinelService", policy = RunPolicy.ONCE)

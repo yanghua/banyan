@@ -1,6 +1,5 @@
 package com.messagebus.server.daemon.impl;
 
-import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusPool;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @DaemonService(value = "systemMonitorService", policy = RunPolicy.ONCE)
 public class SystemMonitorService extends AbstractService {
 
-    private static final Log logger = LogFactory.getLog(SystemMonitorService.class);
+    private static final Log    logger = LogFactory.getLog(SystemMonitorService.class);
     private static final String secret = "iqwjasdfklakqoiajsidfoasidjoqw";
 
     private MessagebusPool messagebusPool;

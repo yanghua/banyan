@@ -162,4 +162,28 @@
             <handler-path>com.messagebus.client.handler.broadcast.RealBroadcaster</handler-path>
         </handler>
     </broadcast>
+    <rpcrequest>
+        <handler>
+            <handler-name>Request-Permission-Checker</handler-name>
+            <handler-path>com.messagebus.client.handler.rpcRequest.RpcRequestPermission</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Real-RpcRequest</handler-name>
+            <handler-path>com.messagebus.client.handler.rpcRequest.RealRpcRequest</handler-path>
+        </handler>
+    </rpcrequest>
+    <rpcresponse>
+        <!--<handler>-->
+        <!--<handler-name>Validate-Handler</handler-name>-->
+        <!--<handler-path>com.messagebus.client.handler.response.ResponseParamValidator</handler-path>-->
+        <!--</handler>-->
+        <!--<handler>-->
+        <!--<handler-name>Response-Handler</handler-name>-->
+        <!--<handler-path>com.messagebus.client.handler.response.ResponsePermission</handler-path>-->
+        <!--</handler>-->
+        <handler>
+            <handler-name>Real-RpcResponse</handler-name>
+            <handler-path>com.messagebus.client.handler.rpcResponse.RealRpcResponser</handler-path>
+        </handler>
+    </rpcresponse>
 </handler-plugins>

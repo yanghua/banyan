@@ -14,7 +14,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
- class GenericResponser extends AbstractMessageCarryer implements Runnable, IResponser {
+class GenericResponser extends AbstractMessageCarryer implements Runnable, IResponser {
 
     private static final Log logger = LogFactory.getLog(GenericResponser.class);
 

@@ -47,6 +47,14 @@ public class MessageCarryHandlerChain implements IHandlerChain {
                 handlerChain = genericContext.getConfigManager().getBroadcastHandlerChain();
                 break;
 
+            case RPCREQUEST:
+                handlerChain = genericContext.getConfigManager().getRpcRequestHandlerChain();
+                break;
+
+            case RPCRESPONSE:
+                handlerChain = genericContext.getConfigManager().getRpcResponseHandlerChain();
+                break;
+
             default:
                 throw new InvalidParameterException("invalid message carry type : " + type.toString());
         }
