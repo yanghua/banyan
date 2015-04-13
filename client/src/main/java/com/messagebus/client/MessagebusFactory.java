@@ -78,7 +78,7 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
         openMethod.invoke(client);
 
-        return new DefaultPooledObject<>(client);
+        return new DefaultPooledObject<Messagebus>(client);
     }
 
     @Override
@@ -97,7 +97,9 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         if (client != null && !client.isOpen()) {
             try {
                 openMethod.invoke(client);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (IllegalAccessException e) {
+                ExceptionHelper.logException(logger, e, "validateObject");
+            } catch (InvocationTargetException e) {
                 ExceptionHelper.logException(logger, e, "validateObject");
             }
         }
@@ -107,21 +109,11 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
     @Override
     public void activateObject(PooledObject<Messagebus> pooledObject) throws Exception {
-//        Messagebus client = pooledObject.getObject();
-//        if (client != null) {
-//            if (!client.isOpen()) {
-//                openMethod.invoke(client);
-//            }
-//        }
+
     }
 
     @Override
     public void passivateObject(PooledObject<Messagebus> pooledObject) throws Exception {
-//        Messagebus client = pooledObject.getObject();
-//        if (client != null) {
-//            if (client.isOpen()) {
-//                closeMethod.invoke(client);
-//            }
-//        }
+
     }
 }

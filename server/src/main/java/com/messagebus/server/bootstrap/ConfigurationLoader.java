@@ -39,8 +39,12 @@ public class ConfigurationLoader {
             filePathStr = DEFAULT_CONFIG_FILE_PATH;
 
         this.configProperties = new Properties();
-        try (InputStream fileIS = new FileInputStream(filePathStr)) {
+        InputStream fileIS = null;
+        try {
+            fileIS = new FileInputStream(filePathStr);
             this.configProperties.load(fileIS);
+        } finally {
+            if (fileIS != null) fileIS.close();
         }
     }
 

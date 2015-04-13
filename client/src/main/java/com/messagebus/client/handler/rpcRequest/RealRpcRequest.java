@@ -33,11 +33,14 @@ public class RealRpcRequest extends AbstractHandler {
             }
             Object respObj = client.call(context.getOtherParams().get("methodName").toString(), params);
             context.getOtherParams().put("result", respObj);
-        } catch (IOException | JsonRpcException e) {
+        } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "rpc request handler : RealRpcRequest");
             throw new RuntimeException(e);
         } catch (TimeoutException e) {
             context.setIsTimeout(true);
+        } catch (JsonRpcException e) {
+            ExceptionHelper.logException(logger, e, "rpc request handler : RealRpcRequest");
+            throw new RuntimeException(e);
         } finally {
 
         }

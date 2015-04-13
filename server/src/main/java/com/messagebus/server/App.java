@@ -128,7 +128,7 @@ public class App {
     }
 
     private static Map<String, String> extractRunArgs(String[] args) {
-        Map<String, String> argMap = new HashMap<>(args.length);
+        Map<String, String> argMap = new HashMap<String, String>(args.length);
 
         for (String arg : args) {
             String[] splitKV = arg.split("=");
@@ -173,32 +173,24 @@ public class App {
             return;
         }
 
-        switch (cmd) {
-            case "start":
-                startup();
-                break;
+        if (cmd.equals("start")) {
+            startup();
+        } else if (cmd.equals("stop")) {
+            stop();
+        } else if (cmd.equals("restart")) {
 
-            case "stop":
-                stop();
-                break;
-
-            case "restart":
-                //outer invoke(start-stop-daemon)
-                break;
-
-            default: {
-                logger.error("illegal argument command : " + cmd);
-                throw new IllegalArgumentException("illegal argument command : " + cmd);
-            }
+        } else {
+            logger.error("illegal argument command : " + cmd);
+            throw new IllegalArgumentException("illegal argument command : " + cmd);
         }
     }
 
     private static Map<String, Object> buildContext(Properties serverConfig) {
-        Map<String, Object> context = new ConcurrentHashMap<>();
+        Map<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put(com.messagebus.server.Constants.KEY_SERVER_CONFIG, serverConfig);
 
         DBAccessor dbAccessor = new DBAccessor(serverConfig);
-        Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<>();
+        Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<String, IDataFetcher>();
         tableDataFetcherMap.put("NODE", new NodeFetcher(dbAccessor));
         tableDataFetcherMap.put("CONFIG", new ConfigFetcher(dbAccessor));
         tableDataFetcherMap.put("SINK", new SinkFetcher(dbAccessor));

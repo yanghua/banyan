@@ -87,7 +87,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
         //declare queue
         for (Node node : sortedQueueNodes) {
             if (!node.isVirtual()) {
-                Map<String, Object> queueConfig = new HashMap<>(2);
+                Map<String, Object> queueConfig = new HashMap<String, Object>(2);
                 String thresholdStr = node.getThreshold();
 
                 if (!Strings.isNullOrEmpty(thresholdStr)) {
@@ -135,7 +135,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     private Map<String, Node> buildNodeMap(Node[] nodes) {
-        Map<String, Node> nodeMap = new HashMap<>(nodes.length);
+        Map<String, Node> nodeMap = new HashMap<String, Node>(nodes.length);
         for (Node node : nodes) {
             nodeMap.put(node.getNodeId(), node);
         }
@@ -144,7 +144,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     private TreeSet<Node> extractExchangeNodes(Node[] nodes) {
-        TreeSet<Node> exchangeSet = new TreeSet<>();
+        TreeSet<Node> exchangeSet = new TreeSet<Node>();
         for (Node node : nodes) {
             if (node.getType().equals("0"))
                 exchangeSet.add(node);
@@ -154,7 +154,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     private TreeSet<Node> extractQueueNodes(Node[] nodes) {
-        TreeSet<Node> queueSet = new TreeSet<>();
+        TreeSet<Node> queueSet = new TreeSet<Node>();
         for (Node node : nodes) {
             if (node.getType().equals("1"))
                 queueSet.add(node);

@@ -1,5 +1,6 @@
 package com.messagebus.interactor.pubsub.impl.zookeeper;
 
+import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.pubsub.IPubSubListener;
 import com.messagebus.interactor.pubsub.IPubSuber;
 import org.apache.commons.logging.Log;
@@ -37,7 +38,7 @@ public class LongLiveZookeeper implements IPubSuber {
     private void init() {
         try {
             zooKeeper = new ZooKeeper(host + ":" + port, 30000, new SessionWatcher());
-            watchedPaths = new ArrayList<>();
+            watchedPaths = new ArrayList<String>();
         } catch (IOException e) {
             throw new RuntimeException("[createZKClient] occurs a IOException : " + e.getMessage());
         }
@@ -139,7 +140,7 @@ public class LongLiveZookeeper implements IPubSuber {
                     case NodeDeleted:
                         byte[] data = this.zooKeeper.getData(path, false, null);
                         ZKEventType eventType = new ZKEventType(watchedEvent.getType());
-                        Map<String, Object> params = new HashMap<>(1);
+                        Map<String, Object> params = new HashMap<String, Object>(1);
                         params.put("eventType", eventType);
                         this.listener.onChange(path, data, params);
                         break;
@@ -148,15 +149,17 @@ public class LongLiveZookeeper implements IPubSuber {
                         break;
 
                 }
-            } catch (KeeperException | InterruptedException e) {
-                logger.error("[process] occurs a Exception : " + e.getMessage());
+            } catch (KeeperException e) {
+                ExceptionHelper.logException(logger, e, "process");
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
             } finally {
                 try {
                     this.zooKeeper.exists(path, this);
                 } catch (KeeperException e) {
-                    logger.error("[process] finally occurs a KeeperException : " + e.getMessage());
+                    ExceptionHelper.logException(logger, e, "process");
                 } catch (InterruptedException e) {
-                    logger.error("[process] finally occurs a InterruptedException : " + e.getMessage());
+                    ExceptionHelper.logException(logger, e, "process");
                 }
             }
         }
@@ -172,9 +175,9 @@ public class LongLiveZookeeper implements IPubSuber {
 
             return this.zooKeeper.getData(path, null, null);
         } catch (KeeperException e) {
-            logger.error("[getConfig] occurs a KeeperException : " + e.getMessage());
+            ExceptionHelper.logException(logger, e, "get");
+            throw new RuntimeException(e);
         } catch (InterruptedException e) {
-            logger.error("[getConfig] occurs a InterruptedException : " + e.getMessage());
         }
 
         return new byte[0];

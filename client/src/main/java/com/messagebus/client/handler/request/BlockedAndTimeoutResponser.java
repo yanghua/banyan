@@ -70,8 +70,9 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
             Message msg = MessageFactory.createMessage(msgType);
             initMessage(msg, msgType, properties, msgBody);
             context.setConsumedMsg(msg);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             logger.error("[handle] occurs a exception : " + e.getMessage());
+        } catch (InterruptedException e) {
         } finally {
             //delete temp queue
             QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());

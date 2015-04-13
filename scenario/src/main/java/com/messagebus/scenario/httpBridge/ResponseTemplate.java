@@ -76,7 +76,7 @@ public class ResponseTemplate {
                 String msg2json = MessageJSONSerializer.serialize(testMsg);
 
                 HttpPost postRequest = new HttpPost(url);
-                List<NameValuePair> nvps = new ArrayList<>();
+                List<NameValuePair> nvps = new ArrayList<NameValuePair>();
                 nvps.add(new BasicNameValuePair("message", msg2json));
                 postRequest.setEntity(new UrlEncodedFormEntity(nvps));
 
@@ -137,7 +137,7 @@ public class ResponseTemplate {
                         String msg2json = MessageJSONSerializer.serialize(testMsg);
 
                         HttpPost postRequest = new HttpPost(responseUrl);
-                        List<NameValuePair> nvps = new ArrayList<>();
+                        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
                         nvps.add(new BasicNameValuePair("message", msg2json));
                         postRequest.setEntity(new UrlEncodedFormEntity(nvps));
 

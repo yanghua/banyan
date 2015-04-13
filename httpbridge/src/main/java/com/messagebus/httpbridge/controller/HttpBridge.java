@@ -90,14 +90,10 @@ public class HttpBridge extends HttpServlet {
     private void produce(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         String httpMethod = request.getMethod().toLowerCase();
-        switch (httpMethod) {
-            case "get":
-                produceWithGet(request, response);
-                break;
-
-            case "post":
+        if (httpMethod.equals("get")) {
+            produceWithGet(request, response);
+        } else if (httpMethod.equals("post")) {
                 produceWithPost(request, response);
-                break;
         }
     }
 
@@ -259,17 +255,13 @@ public class HttpBridge extends HttpServlet {
             return;
         }
 
-        switch (mode.toLowerCase()) {
-            case CONSUME_MODE_PULL:
-                this.consumeWithPull(request, response);
-                break;
-
-            case CONSUME_MODE_PUSH:
-                this.consumeWithPush(request, response);
-                break;
-
-            default:
-                logger.error("[consume] invalidate param : mode with value - " + mode);
+        String lowerMode = mode.toLowerCase();
+        if (lowerMode.equals(CONSUME_MODE_PULL)) {
+            this.consumeWithPull(request, response);
+        } else if (lowerMode.equals(CONSUME_MODE_PUSH)) {
+            this.consumeWithPush(request, response);
+        } else {
+            logger.error("[consume] invalidate param : mode with value - " + mode);
         }
     }
 
@@ -331,7 +323,7 @@ public class HttpBridge extends HttpServlet {
 
         final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         final Messagebus messagebus = pool.getResource();
-        final List<Message> receivedMsgs = new ArrayList<>();
+        final List<Message> receivedMsgs = new ArrayList<Message>();
 
         continuation.addContinuationListener(new ContinuationListener() {
             @Override
@@ -515,7 +507,7 @@ public class HttpBridge extends HttpServlet {
         final MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         final Messagebus messagebus = pool.getResource();
 
-        final List<Message> receivedMsgs = new ArrayList<>();
+        final List<Message> receivedMsgs = new ArrayList<Message>();
 
         continuation.addContinuationListener(new ContinuationListener() {
             @Override

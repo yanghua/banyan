@@ -25,13 +25,17 @@ public class NodeFetcher implements IDataFetcher {
 
     @Override
     public byte[] fetchData(IDataConverter converter) {
-        ArrayList<Node> nodes = new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<Node>();
 
         String sql = "SELECT * FROM NODE ORDER BY PARENT_ID ASC ";
 
-        try (Connection connection = this.dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = this.dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
 
             while (rs.next()) {
                 Node node = new Node();
@@ -60,6 +64,14 @@ public class NodeFetcher implements IDataFetcher {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
 
         if (nodes.isEmpty()) {

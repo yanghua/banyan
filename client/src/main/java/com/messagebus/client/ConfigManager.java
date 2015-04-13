@@ -39,27 +39,27 @@ public class ConfigManager implements IExchangerListener {
     private volatile String  serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
 
     //region handle models
-    private List<HandlerModel> produceHandlerModels     = new ArrayList<>();
-    private List<HandlerModel> consumeHandlerModels     = new ArrayList<>();
-    private List<HandlerModel> requestHandlerModels     = new ArrayList<>();
-    private List<HandlerModel> responseHandlerModels    = new ArrayList<>();
-    private List<HandlerModel> publishHandlerModels     = new ArrayList<>();
-    private List<HandlerModel> subscribeHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> broadcastHandlerModels   = new ArrayList<>();
-    private List<HandlerModel> rpcRequestHandlerModels  = new ArrayList<>();
-    private List<HandlerModel> rpcResponseHandlerModels = new ArrayList<>();
+    private List<HandlerModel> produceHandlerModels     = new ArrayList<HandlerModel>();
+    private List<HandlerModel> consumeHandlerModels     = new ArrayList<HandlerModel>();
+    private List<HandlerModel> requestHandlerModels     = new ArrayList<HandlerModel>();
+    private List<HandlerModel> responseHandlerModels    = new ArrayList<HandlerModel>();
+    private List<HandlerModel> publishHandlerModels     = new ArrayList<HandlerModel>();
+    private List<HandlerModel> subscribeHandlerModels   = new ArrayList<HandlerModel>();
+    private List<HandlerModel> broadcastHandlerModels   = new ArrayList<HandlerModel>();
+    private List<HandlerModel> rpcRequestHandlerModels  = new ArrayList<HandlerModel>();
+    private List<HandlerModel> rpcResponseHandlerModels = new ArrayList<HandlerModel>();
     //endregion
 
     //region handler instance
-    private List<AbstractHandler> produceHandlerChain     = new ArrayList<>();
-    private List<AbstractHandler> consumeHandlerChain     = new ArrayList<>();
-    private List<AbstractHandler> requestHandlerChain     = new ArrayList<>();
-    private List<AbstractHandler> responseHandlerChain    = new ArrayList<>();
-    private List<AbstractHandler> publishHandlerChain     = new ArrayList<>();
-    private List<AbstractHandler> subscribeHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> broadcastHandlerChain   = new ArrayList<>();
-    private List<AbstractHandler> rpcRequestHandlerChain  = new ArrayList<>();
-    private List<AbstractHandler> rpcResponseHandlerChain = new ArrayList<>();
+    private List<AbstractHandler> produceHandlerChain     = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> consumeHandlerChain     = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> requestHandlerChain     = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> responseHandlerChain    = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> publishHandlerChain     = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> subscribeHandlerChain   = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> broadcastHandlerChain   = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> rpcRequestHandlerChain  = new ArrayList<AbstractHandler>();
+    private List<AbstractHandler> rpcResponseHandlerChain = new ArrayList<AbstractHandler>();
     //endregion
 
     private Map<String, Node>   proconNodeMap;
@@ -302,7 +302,13 @@ public class ConfigManager implements IExchangerListener {
                 handler.init(model);
                 handlerChain.add(handler);
             }
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (InstantiationException e) {
+            ExceptionHelper.logException(logger, e, "initHandlers");
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            ExceptionHelper.logException(logger, e, "initHandlers");
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             ExceptionHelper.logException(logger, e, "initHandlers");
             throw new RuntimeException(e);
         }
@@ -323,32 +329,17 @@ public class ConfigManager implements IExchangerListener {
     @Override
     public void onChannelDataChanged(String channel, Object obj) {
         logger.debug("** [onChannelDataChanged] ** received change from path : " + channel);
-        switch (channel) {
-            case Constants.PUBSUB_ROUTER_CHANNEL: {
-                this.extractDifferentNodes((Node[]) obj);
-            }
-            break;
-
-            case Constants.PUBSUB_CONFIG_CHANNEL: {
-                this.extractClientConfigs((Config[]) obj);
-            }
-            break;
-
-            case Constants.PUBSUB_EVENT_CHANNEL: {
-                logger.debug("received event value : " + obj.toString());
-                this.setServerState(obj.toString());
-            }
-            break;
-
-            case Constants.PUBSUB_SINK_CHANNEL: {
-                this.processSink((Sink[]) obj);
-            }
-            break;
-
-            case Constants.PUBSUB_CHANNEL_CHANNEL: {
-                this.processChannel((Channel[]) obj);
-            }
-            break;
+        if (channel.equals(Constants.PUBSUB_ROUTER_CHANNEL)) {
+            this.extractDifferentNodes((Node[]) obj);
+        } else if (channel.equals(Constants.PUBSUB_CONFIG_CHANNEL)) {
+            this.extractClientConfigs((Config[]) obj);
+        } else if (channel.equals(Constants.PUBSUB_EVENT_CHANNEL)) {
+            logger.debug("received event value : " + obj.toString());
+            this.setServerState(obj.toString());
+        } else if (channel.equals(Constants.PUBSUB_SINK_CHANNEL)) {
+            this.processSink((Sink[]) obj);
+        } else if (channel.equals(Constants.PUBSUB_CHANNEL_CHANNEL)) {
+            this.processChannel((Channel[]) obj);
         }
     }
 
@@ -427,12 +418,12 @@ public class ConfigManager implements IExchangerListener {
     }
 
     private void extractDifferentNodes(Node[] nodes) {
-        this.secretNodeMap = new ConcurrentHashMap<>();
-        this.proconNodeMap = new ConcurrentHashMap<>();
-        this.pubsubNodeMap = new ConcurrentHashMap<>();
-        this.reqrespNodeMap = new ConcurrentHashMap<>();
-        this.rpcReqRespNodeMap = new ConcurrentHashMap<>();
-        this.idNodeMap = new ConcurrentHashMap<>(nodes.length);
+        this.secretNodeMap = new ConcurrentHashMap<String, Node>();
+        this.proconNodeMap = new ConcurrentHashMap<String, Node>();
+        this.pubsubNodeMap = new ConcurrentHashMap<String, Node>();
+        this.reqrespNodeMap = new ConcurrentHashMap<String, Node>();
+        this.rpcReqRespNodeMap = new ConcurrentHashMap<String, Node>();
+        this.idNodeMap = new ConcurrentHashMap<String, Node>(nodes.length);
 
         for (Node node : nodes) {
             idNodeMap.put(node.getNodeId(), node);
@@ -457,7 +448,7 @@ public class ConfigManager implements IExchangerListener {
     }
 
     private void extractClientConfigs(Config[] configs) {
-        this.clientConfigMap = new ConcurrentHashMap<>();
+        this.clientConfigMap = new ConcurrentHashMap<String, Config>();
 
         for (Config config : configs) {
             if (config.getKey().contains("client"))
@@ -466,7 +457,7 @@ public class ConfigManager implements IExchangerListener {
     }
 
     private void processSink(Sink[] sinks) {
-        tokenSinkMap = new ConcurrentHashMap<>(sinks.length);
+        tokenSinkMap = new ConcurrentHashMap<String, Sink>(sinks.length);
 
         for (Sink sink : sinks) {
             tokenSinkMap.put(sink.getToken(), sink);
@@ -474,7 +465,7 @@ public class ConfigManager implements IExchangerListener {
     }
 
     private void processChannel(Channel[] channels) {
-        pubsubChannelMap = new ConcurrentHashMap<>();
+        pubsubChannelMap = new ConcurrentHashMap<String, String>();
 
         for (Channel channel : channels) {
             if (pubsubChannelMap.containsKey(channel.getPushFrom())) {

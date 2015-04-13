@@ -54,7 +54,7 @@ public class RateWarningMonitorService extends AbstractService {
                     int realRate = Integer.parseInt(publishDetailMap.get("rate").toString());
                     //log to rate limit
                     if (realRate > benchmark) {
-                        Map<String, Object> rateWarningObj = new HashMap<>(1);
+                        Map<String, Object> rateWarningObj = new HashMap<String, Object>(1);
                         rateWarningObj.put("WARNING_ID", RandomHelper.randomNumberAndCharacter(12));
                         rateWarningObj.put("NODE_ID", queue.getNodeId());
                         rateWarningObj.put("RATE_LIMIT", queue.getRateLimit());
@@ -68,7 +68,7 @@ public class RateWarningMonitorService extends AbstractService {
     }
 
     private String getQueuesInfo() {
-        Map<String, Object> requestParamDic = new HashMap<>(3);
+        Map<String, Object> requestParamDic = new HashMap<String, Object>(3);
         requestParamDic.put("host", com.messagebus.server.Constants.HOST);
         requestParamDic.put("port", com.messagebus.server.Constants.PORT);
         requestParamDic.put("path", com.messagebus.server.Constants.HTTP_API_QUEUES);

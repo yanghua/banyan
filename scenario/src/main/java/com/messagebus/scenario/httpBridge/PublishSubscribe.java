@@ -55,13 +55,13 @@ public class PublishSubscribe {
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
-        List<Message> msgs = new ArrayList<>(1);
+        List<Message> msgs = new ArrayList<Message>(1);
         msgs.add(msg);
         String msgs2json = MessageJSONSerializer.serializeMessages(msgs);
 
         try {
             HttpPost postRequest = new HttpPost(url);
-            List<NameValuePair> nvps = new ArrayList<>();
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("messages", msgs2json));
             postRequest.setEntity(new UrlEncodedFormEntity(nvps));
 

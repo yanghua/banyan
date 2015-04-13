@@ -21,12 +21,16 @@ public class BusinessDataAccessor {
     private static final Log logger = LogFactory.getLog(BusinessDataAccessor.class);
 
     public static List<Node> filterRateLimitedQueues(DBAccessor dbAccessor) {
-        List<Node> nodes = new ArrayList<>();
+        List<Node> nodes = new ArrayList<Node>();
         String sql = "SELECT * FROM NODE  WHERE TYPE = 1 AND AUDIT_TYPE_CODE = 'AUDIT_SUCCESS' AND RATE_LIMIT != null AND RATE_LIMIT != '' ORDER BY PARENT_ID ASC";
 
-        try (Connection connection = dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
 
             while (rs.next()) {
                 Node node = new Node();
@@ -55,6 +59,14 @@ public class BusinessDataAccessor {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
 
         return nodes;
@@ -62,8 +74,12 @@ public class BusinessDataAccessor {
 
     public static void addRateWarning(Map<String, Object> rateWarning, DBAccessor dbAccessor) {
         String sql = "INSERT INTO QUEUE_RATE_WARNING VALUE(?,?,?,?,?)";
-        try (Connection connection = dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+
             statement.setString(1, rateWarning.get("WARNING_ID").toString());
             statement.setString(2, rateWarning.get("NODE_ID").toString());
             statement.setString(3, rateWarning.get("RATE_LIMIT").toString());
@@ -72,6 +88,13 @@ public class BusinessDataAccessor {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
     }
 

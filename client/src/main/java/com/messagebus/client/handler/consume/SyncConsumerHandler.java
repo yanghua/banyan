@@ -31,7 +31,7 @@ class SyncConsumerHandler extends AbstractHandler {
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
         if (context.isSync()) {
-            List<Message> consumeMsgs = new ArrayList<>(context.getConsumeMsgNum());
+            List<Message> consumeMsgs = new ArrayList<Message>(context.getConsumeMsgNum());
             context.setConsumeMsgs(consumeMsgs);
             try {
                 int countDown = context.getConsumeMsgNum();
@@ -63,7 +63,9 @@ class SyncConsumerHandler extends AbstractHandler {
                     initMessage(msg, msgType, properties, msgBody);
                     consumeMsgs.add(msg);
                 }
-            } catch (IOException | RuntimeException e) {
+            } catch (IOException e) {
+                ExceptionHelper.logException(logger, e, "handle");
+            } catch (RuntimeException e) {
                 ExceptionHelper.logException(logger, e, "handle");
             }
         }

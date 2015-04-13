@@ -51,9 +51,13 @@ public class HttpHelper {
                     return "";
                 }
             }
-        } catch (IOException | URISyntaxException e) {
-            logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "syncHTTPGet");
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            ExceptionHelper.logException(logger, e, "syncHTTPGet");
+            throw new RuntimeException(e);
+        }finally{
             if (response != null)
                 try {
                     response.close();

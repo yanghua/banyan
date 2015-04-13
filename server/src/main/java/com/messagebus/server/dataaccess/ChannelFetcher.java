@@ -29,12 +29,17 @@ public class ChannelFetcher implements IDataFetcher {
 
     @Override
     public byte[] fetchData(IDataConverter converter) {
-        ArrayList<Channel> channels = new ArrayList<>();
+        ArrayList<Channel> channels = new ArrayList<Channel>();
         String sql = "SELECT * FROM CHANNEL WHERE ENABLE = 1 AND AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
 
-        try (Connection connection = this.dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = this.dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
+
             while (rs.next()) {
                 Channel channel = new Channel();
                 channel.setPushFrom(rs.getString("PUSH_FROM"));
@@ -44,6 +49,14 @@ public class ChannelFetcher implements IDataFetcher {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
 
         Channel[] channelArr = channels.toArray(new Channel[channels.size()]);

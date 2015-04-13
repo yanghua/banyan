@@ -51,7 +51,7 @@ public class SystemMonitorService extends AbstractService {
     }
 
     private String getRabbitmqServerInfo() {
-        Map<String, Object> requestParamDic = new HashMap<>(3);
+        Map<String, Object> requestParamDic = new HashMap<String, Object>(3);
         requestParamDic.put("host", Constants.HOST);
         requestParamDic.put("port", Constants.PORT);
         requestParamDic.put("path", Constants.HTTP_API_OVERVIEW);

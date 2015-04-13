@@ -25,13 +25,17 @@ public class ConfigFetcher implements IDataFetcher {
 
     @Override
     public byte[] fetchData(IDataConverter converter) {
-        ArrayList<Config> configs = new ArrayList<>();
+        ArrayList<Config> configs = new ArrayList<Config>();
 
         String sql = "SELECT * FROM CONFIG ";
 
-        try (Connection connection = this.dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = this.dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
 
             while (rs.next()) {
                 Config config = new Config();
@@ -43,6 +47,14 @@ public class ConfigFetcher implements IDataFetcher {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
 
         if (configs.isEmpty()) {

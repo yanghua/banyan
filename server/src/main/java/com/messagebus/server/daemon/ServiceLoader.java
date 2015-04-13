@@ -69,8 +69,8 @@ public class ServiceLoader {
     private void scan() {
         Set<Class<IService>> classes = this.traverse();
 
-        runOnceServiceMap = new ConcurrentHashMap<>();
-        scheduleCycleServiceMap = new ConcurrentHashMap<>();
+        runOnceServiceMap = new ConcurrentHashMap<String, IService>();
+        scheduleCycleServiceMap = new ConcurrentHashMap<String, IService>();
 
         try {
             for (Class<IService> clazz : classes) {
@@ -121,7 +121,7 @@ public class ServiceLoader {
     }
 
     private Set<Class<IService>> traverse() {
-        Set<Class<IService>> classes = new LinkedHashSet<>();
+        Set<Class<IService>> classes = new LinkedHashSet<Class<IService>>();
         boolean recursive = true;
         String packageDirName = packageStr.replace('.', '/');
 

@@ -60,29 +60,20 @@ public class CommandService extends AbstractService {
                     if (baseCheck) {
                         String cmd = headers.get("COMMAND").toString();
                         logger.debug("received " + cmd + " command!");
-                        switch (cmd) {
-                            case "PING":
-                                respHeader.put("COMMAND", "PONG");
-                                break;
-
-                            case "INSERT":
-                            case "UPDATE":
-                            case "DELETE": {
-                                if (headers.containsKey("TABLE") && headers.get("TABLE") != null) {
-                                    process(headers.get("TABLE").toString());
-                                    respMsg.setContent("OK".getBytes());
-                                    respHeader.put("COMMAND", cmd);
-                                } else {
-                                    respMsg.setContent("ERROR".getBytes());
-                                    logger.error("received illegal cmd : " + cmd + " TABLE is empty! ");
-                                }
-                            }
-                            break;
-
-                            default: {
+                        if (cmd.equals("PING")) {
+                            respHeader.put("COMMAND", "PONG");
+                        } else if (cmd.equals("INSERT") || cmd.equals("UPDATE") || cmd.equals("DELETE")) {
+                            if (headers.containsKey("TABLE") && headers.get("TABLE") != null) {
+                                process(headers.get("TABLE").toString());
+                                respMsg.setContent("OK".getBytes());
+                                respHeader.put("COMMAND", cmd);
+                            } else {
                                 respMsg.setContent("ERROR".getBytes());
-                                logger.error("received unsupported cmd : " + cmd);
+                                logger.error("received illegal cmd : " + cmd + " TABLE is empty! ");
                             }
+                        } else {
+                            respMsg.setContent("ERROR".getBytes());
+                            logger.error("received unsupported cmd : " + cmd);
                         }
                     }
 

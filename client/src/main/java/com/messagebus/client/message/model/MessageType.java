@@ -13,7 +13,7 @@ public enum MessageType {
     BroadcastMessage("broadcast", 1);
 
     private static final Log                      logger     = LogFactory.getLog(MessageType.class);
-    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<>(2);
+    private static       Map<String, MessageType> lookupList = new ConcurrentHashMap<String, MessageType>(2);
 
     static {
         lookupList.put("queue", QueueMessage);

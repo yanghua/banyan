@@ -18,8 +18,11 @@ public class ZookeeperDataConverter implements IDataConverter {
     @Override
     public <T> byte[] serialize(Serializable obj) {
         byte[] bytes;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+        ByteArrayOutputStream baos = null;
+        ObjectOutputStream oos = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(baos);
             oos.writeObject(obj);
             oos.flush();
 
@@ -27,6 +30,13 @@ public class ZookeeperDataConverter implements IDataConverter {
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "serialize");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (baos != null) baos.close();
+                if (oos != null) oos.close();
+            } catch (IOException e) {
+
+            }
         }
 
         return bytes;

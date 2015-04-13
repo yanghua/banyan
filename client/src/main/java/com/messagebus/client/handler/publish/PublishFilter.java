@@ -27,7 +27,7 @@ public class PublishFilter extends AbstractHandler {
 
         Iterator<String> pushToIdIterator = Splitter.on(',').split(pushToIds).iterator();
 
-        List<Node> pushToNodes = new ArrayList<>();
+        List<Node> pushToNodes = new ArrayList<Node>();
 
         while (pushToIdIterator.hasNext()) {
             String pushToId = pushToIdIterator.next();

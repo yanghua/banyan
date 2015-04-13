@@ -29,12 +29,16 @@ public class SinkFetcher implements IDataFetcher {
 
     @Override
     public byte[] fetchData(IDataConverter converter) {
-        ArrayList<Sink> sinks = new ArrayList<>();
+        ArrayList<Sink> sinks = new ArrayList<Sink>();
         String sql = "SELECT * FROM SINK WHERE AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
 
-        try (Connection connection = this.dbAccessor.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = this.dbAccessor.getConnection();
+            statement = connection.prepareStatement(sql);
+            rs = statement.executeQuery();
             while (rs.next()) {
                 Sink sink = new Sink();
                 sink.setToken(rs.getString("TOKEN"));
@@ -45,6 +49,14 @@ public class SinkFetcher implements IDataFetcher {
         } catch (SQLException e) {
             ExceptionHelper.logException(logger, e, "fetchData");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+
+            }
         }
 
         Sink[] sinkArr = sinks.toArray(new Sink[sinks.size()]);
