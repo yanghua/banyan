@@ -59,15 +59,10 @@ public class CommandService extends BaseTestCase {
                         if (baseCheck) {
                             String cmd = headers.get("COMMAND").toString();
                             logger.debug("received " + cmd + " command from app id : ");
-                            switch (cmd) {
-                                case "PING":
-                                    //responseMsg pong
-                                    respMsg.setContent("PONG".getBytes());
-                                    break;
-
-                                default:
-                                    respMsg.setContent("ERROR".getBytes());
-                                    break;
+                            if (cmd.equals("PING")) {
+                                respMsg.setContent("PONG".getBytes());
+                            } else {
+                                respMsg.setContent("ERROR".getBytes());
                             }
                         } else {
                             respMsg.setContent("ERROR".getBytes());
@@ -92,7 +87,7 @@ public class CommandService extends BaseTestCase {
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
 
-        Map<String, Object> headerMap = new HashMap<>(1);
+        Map<String, Object> headerMap = new HashMap<String, Object>(1);
         headerMap.put("COMMAND", "PING");
         msg.setHeaders(headerMap);
 

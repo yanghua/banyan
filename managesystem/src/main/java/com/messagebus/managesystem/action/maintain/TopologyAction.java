@@ -59,12 +59,13 @@ public class TopologyAction extends BaseAction {
     }
 
     private Map<String, Node> buildHashmap() {
-        Map<String, Node> hashedNodeMap = new HashMap<>(this.getNodeList().size());
-        for (Node n : this.getNodeList()) {
-            hashedNodeMap.put(n.getNodeId(), n);
-        }
-
-        return hashedNodeMap;
+//        Map<String, Node> hashedNodeMap = new HashMap<>(this.getNodeList().size());
+//        for (Node n : this.getNodeList()) {
+//            hashedNodeMap.put(n.getNodeId(), n);
+//        }
+//
+//        return hashedNodeMap;
+        return null;
     }
 
     public List<Node> getNodeList() {

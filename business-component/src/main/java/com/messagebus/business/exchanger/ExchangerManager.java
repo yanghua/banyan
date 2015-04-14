@@ -48,7 +48,7 @@ public class ExchangerManager {
 
         scan();
 
-        registry = new ConcurrentHashMap<>();
+        registry = new ConcurrentHashMap<String, ChannelListenerEntry>();
 
         watchPubSuber();
     }
@@ -142,7 +142,7 @@ public class ExchangerManager {
         if (!registry.containsKey(clientId)) {
             ChannelListenerEntry entry = new ChannelListenerEntry();
             entry.setOnChanged(onChanged);
-            List<String> channels = new ArrayList<>();
+            List<String> channels = new ArrayList<String>();
             channels.add(channel);
             entry.setChannels(channels);
 
@@ -191,11 +191,11 @@ public class ExchangerManager {
     private void scan() {
         Set<Class<IDataExchanger>> classes = traverse("com.messagebus.business.exchanger.impl");
 
-        exchangers = new CopyOnWriteArrayList<>();
+        exchangers = new CopyOnWriteArrayList<IDataExchanger>();
 
-        channelExchangeMap = new ConcurrentHashMap<>(classes.size());
-        tableChannelMap = new ConcurrentHashMap<>(classes.size());
-        channels = new CopyOnWriteArrayList<>();
+        channelExchangeMap = new ConcurrentHashMap<String, IDataExchanger>(classes.size());
+        tableChannelMap = new ConcurrentHashMap<String, String>(classes.size());
+        channels = new CopyOnWriteArrayList<String>();
         IDataConverter converter = PubSuberFactory.createConverter();
 
         try {
@@ -267,7 +267,7 @@ public class ExchangerManager {
     }
 
     private static Set<Class<IDataExchanger>> traverse(String packageStr) {
-        Set<Class<IDataExchanger>> classes = new LinkedHashSet<>();
+        Set<Class<IDataExchanger>> classes = new LinkedHashSet<Class<IDataExchanger>>();
         boolean recursive = true;
         String packageDirName = packageStr.replace('.', '/');
 

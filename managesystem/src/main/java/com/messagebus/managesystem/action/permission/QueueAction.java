@@ -244,57 +244,59 @@ public class QueueAction extends BaseAction {
     }
 
     private Map<String, List<Integer>> filterGrantIds(String originalIds, String targetIds) {
-        Map<String, List<Integer>> filteredMap = new HashMap<>(2);
+//        Map<String, List<Integer>> filteredMap = new HashMap<>(2);
+//
+//        targetIds = targetIds.equals("") ? "," : targetIds;
+//        originalIds = originalIds.equals("") ? "," : originalIds;
+//
+//        String[] originalIdArr = originalIds.split(",");
+//        String[] targetIdArr = targetIds.split(",");
+//
+//        List<Integer> inserting;
+//        List<Integer> deleting;
+//
+//        if (originalIdArr.length == 0 && targetIdArr.length != 0) {
+//            deleting = Collections.emptyList();
+//            inserting = new ArrayList<>(targetIdArr.length);
+//
+//            //inserting
+//            for (int i = 0; i < targetIdArr.length; i++) {
+//                inserting.add(Integer.valueOf(targetIdArr[i]));
+//            }
+//        } else if (originalIdArr.length != 0 && targetIdArr.length == 0) {
+//            inserting = Collections.emptyList();
+//            deleting = new ArrayList<>(originalIdArr.length);
+//
+//            //deleting
+//            for (int i = 0; i < originalIdArr.length; i++) {
+//                deleting.add(Integer.valueOf(originalIdArr[i]));
+//            }
+//        } else {    //both
+//            List<String> originalIdList = Arrays.asList(originalIdArr);
+//            List<String> targetIdList = Arrays.asList(targetIdArr);
+//
+//            inserting = new ArrayList<>();
+//            deleting = new ArrayList<>();
+//
+//            for (String originalId : originalIdList) {
+//                if (!targetIdList.contains(originalId)) {
+//                    deleting.add(Integer.valueOf(originalId));
+//                }
+//            }
+//
+//            for (String targetId : targetIdList) {
+//                if (!originalIdList.contains(targetId)) {
+//                    inserting.add(Integer.valueOf(targetId));
+//                }
+//            }
+//        }
+//
+//        //inserting
+//        filteredMap.put("inserting", inserting);
+//        filteredMap.put("deleting", deleting);
+//
+//        return filteredMap;
 
-        targetIds = targetIds.equals("") ? "," : targetIds;
-        originalIds = originalIds.equals("") ? "," : originalIds;
-
-        String[] originalIdArr = originalIds.split(",");
-        String[] targetIdArr = targetIds.split(",");
-
-        List<Integer> inserting;
-        List<Integer> deleting;
-
-        if (originalIdArr.length == 0 && targetIdArr.length != 0) {
-            deleting = Collections.emptyList();
-            inserting = new ArrayList<>(targetIdArr.length);
-
-            //inserting
-            for (int i = 0; i < targetIdArr.length; i++) {
-                inserting.add(Integer.valueOf(targetIdArr[i]));
-            }
-        } else if (originalIdArr.length != 0 && targetIdArr.length == 0) {
-            inserting = Collections.emptyList();
-            deleting = new ArrayList<>(originalIdArr.length);
-
-            //deleting
-            for (int i = 0; i < originalIdArr.length; i++) {
-                deleting.add(Integer.valueOf(originalIdArr[i]));
-            }
-        } else {    //both
-            List<String> originalIdList = Arrays.asList(originalIdArr);
-            List<String> targetIdList = Arrays.asList(targetIdArr);
-
-            inserting = new ArrayList<>();
-            deleting = new ArrayList<>();
-
-            for (String originalId : originalIdList) {
-                if (!targetIdList.contains(originalId)) {
-                    deleting.add(Integer.valueOf(originalId));
-                }
-            }
-
-            for (String targetId : targetIdList) {
-                if (!originalIdList.contains(targetId)) {
-                    inserting.add(Integer.valueOf(targetId));
-                }
-            }
-        }
-
-        //inserting
-        filteredMap.put("inserting", inserting);
-        filteredMap.put("deleting", deleting);
-
-        return filteredMap;
+        return null;
     }
 }

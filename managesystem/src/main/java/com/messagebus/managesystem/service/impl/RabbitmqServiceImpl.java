@@ -16,21 +16,25 @@ public class RabbitmqServiceImpl implements IRabbitmqService {
 
     @Override
     public String overview() {
-        Map<String, Object> requestParamDic = new HashMap<>(3);
-        requestParamDic.put("host", ConfigManager.HOST);
-        requestParamDic.put("port", ConfigManager.PORT);
-        requestParamDic.put("path", ConfigManager.HTTP_API_OVERVIEW);
-        return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+//        Map<String, Object> requestParamDic = new HashMap<>(3);
+//        requestParamDic.put("host", ConfigManager.HOST);
+//        requestParamDic.put("port", ConfigManager.PORT);
+//        requestParamDic.put("path", ConfigManager.HTTP_API_OVERVIEW);
+//        return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+
+        return null;
     }
 
 
     @Override
     public String nodelistOfcluster() {
-        Map<String, Object> requestParamDic = new HashMap<>(3);
-        requestParamDic.put("host", ConfigManager.HOST);
-        requestParamDic.put("port", ConfigManager.PORT);
-        requestParamDic.put("path", ConfigManager.HTTP_API_NODES);
-        return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+//        Map<String, Object> requestParamDic = new HashMap<>(3);
+//        requestParamDic.put("host", ConfigManager.HOST);
+//        requestParamDic.put("port", ConfigManager.PORT);
+//        requestParamDic.put("path", ConfigManager.HTTP_API_NODES);
+//        return HttpHelper.syncHTTPGet(requestParamDic, ConfigManager.DEFAULT_AUTH_INFO);
+
+        return null;
     }
 
     //endregion

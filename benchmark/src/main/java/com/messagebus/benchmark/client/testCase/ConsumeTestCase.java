@@ -67,7 +67,7 @@ public class ConsumeTestCase extends Benchmark {
 
     public static void main(String[] args) {
 //        produce some message for consuming
-        TestUtility.produce(50_0000);
+        TestUtility.produce(500000);
 
         try {
             TimeUnit.SECONDS.sleep(30);

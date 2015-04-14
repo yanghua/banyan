@@ -101,28 +101,29 @@ public class Queue {
     }
 
     public static Queue parse(JsonElement queueJsonElement) {
-        JsonObject queueObj = queueJsonElement.getAsJsonObject();
-        Queue queue = new Queue();
-        queue.setName(queueObj.get("name").getAsString());
-        queue.setState(queueObj.get("state").getAsString());
-        queue.setDurable(queueObj.get("durable").getAsString());
-        queue.setAutoDelete(queueObj.get("auto_delete").getAsString());
-        queue.setMemSizeOfMB(queueObj.get("memory").getAsLong() / 1_000_000);
-
-        //inner property
-        JsonObject queueStatusObj = queueObj.getAsJsonObject("backing_queue_status");
-        double air = queueStatusObj.get("avg_ingress_rate").getAsDouble();
-        queue.setAvgIngressRate(NumberHelper.fractionDigits(air, 2));
-
-        double aer = queueStatusObj.get("avg_egress_rate").getAsDouble();
-        queue.setAvgAckEgressRate(NumberHelper.fractionDigits(aer, 2));
-
-        double aair = queueStatusObj.get("avg_ack_ingress_rate").getAsDouble();
-        queue.setAvgAckIngressRate(NumberHelper.fractionDigits(aair, 2));
-
-        double aaer = queueStatusObj.get("avg_ack_egress_rate").getAsDouble();
-        queue.setAvgAckEgressRate(NumberHelper.fractionDigits(aaer, 2));
-
-        return queue;
+//        JsonObject queueObj = queueJsonElement.getAsJsonObject();
+//        Queue queue = new Queue();
+//        queue.setName(queueObj.get("name").getAsString());
+//        queue.setState(queueObj.get("state").getAsString());
+//        queue.setDurable(queueObj.get("durable").getAsString());
+//        queue.setAutoDelete(queueObj.get("auto_delete").getAsString());
+//        queue.setMemSizeOfMB(queueObj.get("memory").getAsLong() / 1_000_000);
+//
+//        //inner property
+//        JsonObject queueStatusObj = queueObj.getAsJsonObject("backing_queue_status");
+//        double air = queueStatusObj.get("avg_ingress_rate").getAsDouble();
+//        queue.setAvgIngressRate(NumberHelper.fractionDigits(air, 2));
+//
+//        double aer = queueStatusObj.get("avg_egress_rate").getAsDouble();
+//        queue.setAvgAckEgressRate(NumberHelper.fractionDigits(aer, 2));
+//
+//        double aair = queueStatusObj.get("avg_ack_ingress_rate").getAsDouble();
+//        queue.setAvgAckIngressRate(NumberHelper.fractionDigits(aair, 2));
+//
+//        double aaer = queueStatusObj.get("avg_ack_egress_rate").getAsDouble();
+//        queue.setAvgAckEgressRate(NumberHelper.fractionDigits(aaer, 2));
+//
+//        return queue;
+        return null;
     }
 }

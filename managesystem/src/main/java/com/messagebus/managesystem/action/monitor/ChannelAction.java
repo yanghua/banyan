@@ -37,13 +37,13 @@ public class ChannelAction extends BaseAction {
     }
 
     public void test() {
-        HttpServletResponse response = ServletActionContext.getResponse();
-        try (PrintWriter writer = response.getWriter();) {
-            writer.print(channelService.list());
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        HttpServletResponse response = ServletActionContext.getResponse();
+//        try (PrintWriter writer = response.getWriter();) {
+//            writer.print(channelService.list());
+//            writer.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 }

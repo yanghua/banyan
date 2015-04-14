@@ -35,16 +35,17 @@ public class MessagebusService {
     }
 
     public void produceDBOperate(String cmd, String tbName) {
-        Message operateMsg = (Message) MessageFactory.createMessage(MessageType.QueueMessage);
-        Map<String, Object> headerMap = new HashMap<>(2);
-        headerMap.put("COMMAND", cmd);
-        headerMap.put("TABLE", tbName);
-//        operateMsg.getMessageHeader().setHeaders(headerMap);
-//        Message.MessageBody body = new Message.MessageBody();
-//        body.setContent(new byte[0]);
-//        operateMsg.setMessageBody(body);
+//        Message operateMsg = (Message) MessageFactory.createMessage(MessageType.QueueMessage);
+//        Map<String, Object> headerMap = new HashMap<>(2);
+//        headerMap.put("COMMAND", cmd);
+//        headerMap.put("TABLE", tbName);
+////        operateMsg.getMessageHeader().setHeaders(headerMap);
+////        Message.MessageBody body = new Message.MessageBody();
+////        body.setContent(new byte[0]);
+////        operateMsg.setMessageBody(body);
+//
+//        this.produceMessage(Constants.SERVER_QUEUE_NAME, operateMsg);
 
-        this.produceMessage(Constants.SERVER_QUEUE_NAME, operateMsg);
     }
 
 }

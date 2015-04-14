@@ -29,16 +29,28 @@ public class TestUtility {
             throw new RuntimeException(e);
         }
 
-        try (FileWriter fileWriter = new FileWriter(filePath);
-             PrintWriter out = new PrintWriter(fileWriter)) {
+        FileWriter fileWriter = null;
+        PrintWriter out = null;
+        try {
+            fileWriter = new FileWriter(filePath);
+            out = new PrintWriter(fileWriter);
             out.println("#x y");
 
             for (int i = 0; i < xArr.length; i++) {
                 out.println(xArr[i] + " " + yArr[i]);
             }
+
+            out.flush();
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "writeFile");
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (fileWriter != null) fileWriter.close();
+                if (out != null) out.close();
+            } catch (IOException e) {
+
+            }
         }
     }
 
@@ -56,14 +68,24 @@ public class TestUtility {
                 throw new RuntimeException(e.toString());
             }
 
-            try (InputStreamReader ir = new InputStreamReader(process.getInputStream());
-                 LineNumberReader input = new LineNumberReader(ir)) {
+            InputStreamReader ir = null;
+            LineNumberReader input = null;
+            try {
+                ir = new InputStreamReader(process.getInputStream());
+                input = new LineNumberReader(ir);
                 String line;
                 while ((line = input.readLine()) != null)
                     System.out.println(line);
             } catch (IOException e) {
                 ExceptionHelper.logException(logger, e, "exec");
                 throw new RuntimeException(e.toString());
+            } finally {
+                try {
+                    if (ir != null) ir.close();
+                    if (input != null) input.close();
+                } catch (IOException e) {
+
+                }
             }
         }
     }

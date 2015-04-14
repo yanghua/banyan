@@ -59,8 +59,8 @@ public class MBServerSentinelListener implements ServletContextListener {
             this.messagebus = mb;
             this.servletContextEvent = contextEvent;
 
-            Map<String, Object> header = new HashMap<>(1);
-            header.put("COMMAND", "PING");
+//            Map<String, Object> header = new HashMap<>(1);
+//            header.put("COMMAND", "PING");
 //            pingCmdMsg = MessageFactory.createMessage(MessageType.QueueMessage);
 //            pingCmdMsg.getMessageHeader().setHeaders(header);
 //

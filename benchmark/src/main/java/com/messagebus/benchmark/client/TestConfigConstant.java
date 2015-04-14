@@ -13,7 +13,7 @@ public class TestConfigConstant {
     public static final String OUTPUT_FILE_PATH_FORMAT = "/tmp/%s.data";
 
     public static final int MSG_BODY_SIZE_OF_BYTE = 3000;                  //B
-    public static final int HOLD_TIME_OF_MILLIS   = 60_000;             //one minute
+    public static final int HOLD_TIME_OF_MILLIS   = 60000;             //one minute
     public static final int FETCH_NUM             = 6;
 
 }

@@ -26,26 +26,4 @@
 
     </dependencies>
 
-    <build>
-        <finalName>messagebus-scenario</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

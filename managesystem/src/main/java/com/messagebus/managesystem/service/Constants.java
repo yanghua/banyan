@@ -14,7 +14,7 @@ public class Constants {
     public static final String MESSAGEBUS_KEY    = "messagebus";
     public static final String SERVER_QUEUE_NAME = "server";
 
-    public static final long PING_SERVER_TIME_INTERVAL = 10_000;
+    public static final long PING_SERVER_TIME_INTERVAL = 10000;
 
     public static final String IS_SERVER_ONLINE = "isServerOnline";
 

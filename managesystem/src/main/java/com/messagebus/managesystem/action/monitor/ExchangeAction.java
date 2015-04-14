@@ -38,13 +38,13 @@ public class ExchangeAction extends BaseAction {
     }
 
     public void test() {
-        HttpServletResponse response = ServletActionContext.getResponse();
-        try (PrintWriter writer = response.getWriter();) {
-            writer.print(exchangeService.list());
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        HttpServletResponse response = ServletActionContext.getResponse();
+//        try (PrintWriter writer = response.getWriter();) {
+//            writer.print(exchangeService.list());
+//            writer.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 }

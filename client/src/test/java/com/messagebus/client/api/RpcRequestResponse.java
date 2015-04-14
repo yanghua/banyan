@@ -49,7 +49,7 @@ public class RpcRequestResponse extends BaseTestCase {
         String targetQueue = "emapDemoRpcResponse";
         String token = "klasehnfkljashdnflhkjahwlekdjf";
         String methodName = "sayHello";
-        Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10_000);
+        Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10000);
 
         assertNull(responseObj);
 
@@ -81,7 +81,7 @@ public class RpcRequestResponse extends BaseTestCase {
         String targetQueue = "emapDemoRpcResponse";
         String token = "klasehnfkljashdnflhkjahwlekdjf";
         String methodName = "returnValueMethod";
-        Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10_000);
+        Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10000);
 
         assertNotNull(responseObj);
         assertEquals("hello world", responseObj.toString());
@@ -114,7 +114,7 @@ public class RpcRequestResponse extends BaseTestCase {
         String targetQueue = "emapDemoRpcResponse";
         String token = "klasehnfkljashdnflhkjahwlekdjf";
         String methodName = "printParam";
-        Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10_000);
+        Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10000);
 
         singlePool.returnResource(client);
         singlePool.destroy();
@@ -144,7 +144,7 @@ public class RpcRequestResponse extends BaseTestCase {
         String targetQueue = "emapDemoRpcResponse";
         String token = "klasehnfkljashdnflhkjahwlekdjf";
         String methodName = "returnParam";
-        Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10_000);
+        Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10000);
 
         assertNotNull(responseObj);
         assertEquals("hello world", responseObj.toString());
