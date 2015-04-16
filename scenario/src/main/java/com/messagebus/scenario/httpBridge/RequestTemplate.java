@@ -5,9 +5,9 @@ import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 public class RequestTemplate {
 
@@ -23,9 +23,8 @@ public class RequestTemplate {
     public static void main(String[] args) {
         String url = String.format(testUrlFormat, testHost, testPort, testQueue, appkey, timeout);
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setReplyTo(testQueue);

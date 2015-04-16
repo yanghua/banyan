@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.messagebus.business.model.Node;
-import com.messagebus.client.handler.common.AsyncEventLoop;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import com.rabbitmq.client.Channel;
@@ -30,7 +29,6 @@ public class MessageContext {
     private Node                    sourceNode;
     private Node                    targetNode;
     private Channel                 channel;
-    private AsyncEventLoop          asyncEventLoop;
     private IMessageReceiveListener receiveListener;
     private long                    timeout;
     private boolean                 hasTimeout;
@@ -93,14 +91,6 @@ public class MessageContext {
 
     public void setChannel(Channel channel) {
         this.channel = channel;
-    }
-
-    public AsyncEventLoop getAsyncEventLoop() {
-        return asyncEventLoop;
-    }
-
-    public void setAsyncEventLoop(AsyncEventLoop asyncEventLoop) {
-        this.asyncEventLoop = asyncEventLoop;
     }
 
     public MessageCarryType getCarryType() {

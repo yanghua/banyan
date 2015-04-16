@@ -9,13 +9,13 @@ import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -48,9 +48,8 @@ public class PublishSubscribe {
 
         String url = String.format(testUrlFormat, testHost, testPort, secret, token);
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
@@ -72,13 +71,6 @@ public class PublishSubscribe {
             }
         } catch (IOException e) {
             logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
     }
 
@@ -88,8 +80,8 @@ public class PublishSubscribe {
 
         String url = String.format(testUrlFormat, testHost, testPort, secret);
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         try {
             response = httpClient.execute(new HttpGet(url));
@@ -100,13 +92,6 @@ public class PublishSubscribe {
             }
         } catch (IOException e) {
             logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
     }
 

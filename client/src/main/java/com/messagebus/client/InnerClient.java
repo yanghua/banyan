@@ -50,14 +50,16 @@ abstract class InnerClient {
 
     private void close() {
         //release all resource
-        try {
-            if (this.channel != null && this.channel.isOpen())
-                this.channel.close();
+        synchronized (this.channel) {
+            try {
+                if (this.channel != null && this.channel.isOpen())
+                    this.channel.close();
 
-            this.isOpen.compareAndSet(true, false);
-        } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "close");
-            throw new RuntimeException(e);
+                this.isOpen.compareAndSet(true, false);
+            } catch (IOException e) {
+                ExceptionHelper.logException(logger, e, "close");
+                throw new RuntimeException(e);
+            }
         }
     }
 

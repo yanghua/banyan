@@ -3,8 +3,7 @@ package com.messagebus.client;
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.common.Constants;
 import com.messagebus.common.RandomHelper;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;
@@ -83,10 +82,21 @@ public class MessagebusPool {
         try {
             this.configManager.parseRealTimeData();
 
-            String host = this.configManager.getClientConfigMap().get("messagebus.client.host").getValue();
-
             ConnectionFactory connectionFactory = new ConnectionFactory();
+            String host = this.configManager.getClientConfigMap().get("messagebus.client.host").getValue();
             connectionFactory.setHost(host);
+
+            if (this.configManager.getClientConfigMap().containsKey("messagebus.client.port")) {
+                int port = Integer.parseInt(this.configManager.getClientConfigMap().get("messagebus.client.port").getValue().toString());
+                connectionFactory.setPort(port);
+            } else {
+                connectionFactory.setPort(connectionFactory.DEFAULT_AMQP_PORT);
+            }
+
+            connectionFactory.setAutomaticRecoveryEnabled(true);
+            connectionFactory.setTopologyRecoveryEnabled(true);
+            connectionFactory.setConnectionTimeout(5000);
+            connectionFactory.setRequestedHeartbeat(5);
 
             this.connection = connectionFactory.newConnection();
         } catch (IOException e) {

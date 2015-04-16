@@ -1,7 +1,7 @@
 package com.messagebus.server.dataaccess;
 
 import com.messagebus.business.exchanger.IDataFetcher;
-import com.messagebus.business.model.Channel;
+import com.messagebus.business.model.Sink;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.pubsub.IDataConverter;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class ChannelFetcher implements IDataFetcher {
 
-    private static final Log logger = LogFactory.getLog(Channel.class);
+    private static final Log logger = LogFactory.getLog(ChannelFetcher.class);
 
     private DBAccessor dbAccessor;
 
@@ -29,8 +29,9 @@ public class ChannelFetcher implements IDataFetcher {
 
     @Override
     public byte[] fetchData(IDataConverter converter) {
-        ArrayList<Channel> channels = new ArrayList<Channel>();
-        String sql = "SELECT * FROM CHANNEL WHERE ENABLE = 1 AND AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
+        ArrayList<Sink> channels = new ArrayList<Sink>();
+        String sql = "SELECT * FROM SINK WHERE ENABLE = 1 AND AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'"
+            + " AND FROM_COMMUNICATE_TYPE IN ('publish','publish-subscribe') AND TO_COMMUNICATE_TYPE IN ('subscribe')";
 
         Connection connection = null;
         PreparedStatement statement = null;
@@ -41,9 +42,9 @@ public class ChannelFetcher implements IDataFetcher {
             rs = statement.executeQuery();
 
             while (rs.next()) {
-                Channel channel = new Channel();
-                channel.setPushFrom(rs.getString("PUSH_FROM"));
-                channel.setPushTo(rs.getString("PUSH_TO"));
+                Sink channel = new Sink();
+                channel.setFlowFrom(rs.getString("FLOW_FROM"));
+                channel.setFlowTo(rs.getString("FLOW_TO"));
                 channels.add(channel);
             }
         } catch (SQLException e) {
@@ -59,7 +60,7 @@ public class ChannelFetcher implements IDataFetcher {
             }
         }
 
-        Channel[] channelArr = channels.toArray(new Channel[channels.size()]);
+        Sink[] channelArr = channels.toArray(new Sink[channels.size()]);
         return converter.serialize(channelArr);
     }
 }

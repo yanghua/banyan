@@ -33,7 +33,7 @@ public class RateWarningMonitorService extends AbstractService {
 
     @Override
     public void run() {
-        DBAccessor dbAccessor = new DBAccessor(this.serverConfig);
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(this.serverConfig);
         List<Node> rateLimitedQueues = BusinessDataAccessor.filterRateLimitedQueues(dbAccessor);
 
         String jsonData = getQueuesInfo();

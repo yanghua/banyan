@@ -30,7 +30,8 @@ public class SinkFetcher implements IDataFetcher {
     @Override
     public byte[] fetchData(IDataConverter converter) {
         ArrayList<Sink> sinks = new ArrayList<Sink>();
-        String sql = "SELECT * FROM SINK WHERE AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'";
+        String sql = "SELECT * FROM SINK WHERE AUDIT_TYPE_CODE = '" + Constants.AUDIT_TYPE_CODE_SUCCESS + "'"
+            + " AND FROM_COMMUNICATE_TYPE NOT IN ('publish','publish-subscribe') AND TO_COMMUNICATE_TYPE NOT IN ('subscribe')";
 
         Connection connection = null;
         PreparedStatement statement = null;

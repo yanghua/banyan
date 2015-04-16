@@ -2,7 +2,6 @@ package com.messagebus.client;
 
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.business.exchanger.IExchangerListener;
-import com.messagebus.business.model.Channel;
 import com.messagebus.business.model.Config;
 import com.messagebus.business.model.Node;
 import com.messagebus.business.model.Sink;
@@ -339,7 +338,7 @@ public class ConfigManager implements IExchangerListener {
         } else if (channel.equals(Constants.PUBSUB_SINK_CHANNEL)) {
             this.processSink((Sink[]) obj);
         } else if (channel.equals(Constants.PUBSUB_CHANNEL_CHANNEL)) {
-            this.processChannel((Channel[]) obj);
+            this.processChannel((Sink[]) obj);
         }
     }
 
@@ -413,7 +412,7 @@ public class ConfigManager implements IExchangerListener {
     }
 
     public synchronized void parseChannel() {
-        Channel[] channels = (Channel[]) this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_CHANNEL_CHANNEL);
+        Sink[] channels = (Sink[]) this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_CHANNEL_CHANNEL);
         this.processChannel(channels);
     }
 
@@ -464,17 +463,17 @@ public class ConfigManager implements IExchangerListener {
         }
     }
 
-    private void processChannel(Channel[] channels) {
+    private void processChannel(Sink[] channels) {
         pubsubChannelMap = new ConcurrentHashMap<String, String>();
 
-        for (Channel channel : channels) {
-            if (pubsubChannelMap.containsKey(channel.getPushFrom())) {
-                String tmp = pubsubChannelMap.get(channel.getPushFrom());
-                tmp += ("," + channel.getPushTo());
+        for (Sink channel : channels) {
+            if (pubsubChannelMap.containsKey(channel.getFlowFrom())) {
+                String tmp = pubsubChannelMap.get(channel.getFlowFrom());
+                tmp += ("," + channel.getFlowTo());
 
-                pubsubChannelMap.put(channel.getPushFrom(), tmp);
+                pubsubChannelMap.put(channel.getFlowFrom(), tmp);
             } else {
-                pubsubChannelMap.put(channel.getPushFrom(), channel.getPushTo());
+                pubsubChannelMap.put(channel.getFlowFrom(), channel.getFlowTo());
             }
         }
     }

@@ -2,9 +2,7 @@ package com.messagebus.client.carry;
 
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
-import com.messagebus.client.handler.common.AsyncEventLoop;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
@@ -28,47 +26,27 @@ class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsu
     private IMessageReceiveListener onMessage;
     private TimeUnit                timeUnit;
 
-    private       long      timeout      = 0;
-    private final Lock      eventLocker  = new ReentrantLock();
-    private final Condition eventBlocker = eventLocker.newCondition();
-    private final Lock      mainLock     = new ReentrantLock();
-    private final Condition mainBlocker  = mainLock.newCondition();
+    private       long      timeout     = 0;
+    private final Lock      mainLock    = new ReentrantLock();
+    private final Condition mainBlocker = mainLock.newCondition();
 
     public GenericConsumer() {
     }
 
     @Override
     public void run() {
-        eventLocker.lock();
         final MessageContext ctx = initMessageContext();
-        try {
-            ctx.setSecret(this.secret);
-            ctx.setCarryType(MessageCarryType.CONSUME);
-            ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
-            ctx.setReceiveListener(onMessage);
-            ctx.setSync(false);
-            ctx.setNoticeListener(getContext().getNoticeListener());
+        ctx.setSecret(this.secret);
+        ctx.setCarryType(MessageCarryType.CONSUME);
+        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
+        ctx.setReceiveListener(onMessage);
+        ctx.setSync(false);
+        ctx.setNoticeListener(getContext().getNoticeListener());
 
-            checkState();
+        checkState();
 
-            this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
-            //async consume
-            this.asyncConsume(ctx, handlerChain);
-
-            if (this.timeout != 0) {
-                eventBlocker.await(this.timeout,
-                                   this.timeUnit == null ? TimeUnit.SECONDS : this.timeUnit);
-            } else {
-                eventBlocker.await();
-            }
-        } catch (InterruptedException e) {
-        } finally {
-            if (ctx.getAsyncEventLoop().isAlive()) {
-                ctx.getAsyncEventLoop().shutdown();
-            }
-
-            eventLocker.unlock();
-        }
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
+        this.handlerChain.handle(ctx);
     }
 
     @Override
@@ -121,21 +99,6 @@ class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsu
             }
         } else {
             this.currentThread.start();
-        }
-    }
-
-    private void asyncConsume(MessageContext context,
-                              IHandlerChain chain) {
-        AsyncEventLoop eventLoop = new AsyncEventLoop();
-        eventLoop.setChain(chain);
-        eventLoop.setContext(context);
-        context.setAsyncEventLoop(eventLoop);
-
-        //repeat current handler
-        if (chain instanceof MessageCarryHandlerChain) {
-            eventLoop.startEventLoop();
-        } else {
-            throw new RuntimeException("the type of chain's instance is not MessageCarryHandlerChain");
         }
     }
 

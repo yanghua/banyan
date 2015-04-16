@@ -28,6 +28,6 @@ public class BaseTestCase extends TestCase {
         singlePool.destroy();
     }
 
-    public void testVirtual() throws Exception {
-    }
+//    public void testVirtual() throws Exception {
+//    }
 }

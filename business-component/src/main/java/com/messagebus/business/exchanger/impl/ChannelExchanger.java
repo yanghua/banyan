@@ -1,7 +1,7 @@
 package com.messagebus.business.exchanger.impl;
 
 import com.messagebus.business.exchanger.Exchanger;
-import com.messagebus.business.model.Channel;
+import com.messagebus.business.model.Sink;
 import com.messagebus.common.Constants;
 import com.messagebus.interactor.pubsub.IPubSuber;
 
@@ -23,11 +23,11 @@ public class ChannelExchanger extends AbstractExchanger {
     @Override
     public Object download() {
         byte[] originalData = this.pubsuber.get(channel);
-        return this.dataConverter.deSerializeArray(originalData, Channel[].class);
+        return this.dataConverter.deSerializeArray(originalData, Sink[].class);
     }
 
     @Override
     public Object download(byte[] originalData) {
-        return this.dataConverter.deSerializeArray(originalData, Channel[].class);
+        return this.dataConverter.deSerializeArray(originalData, Sink[].class);
     }
 }

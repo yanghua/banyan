@@ -48,7 +48,7 @@ public class RabbitmqInitializer extends AbstractInitializer {
     }
 
     private void initTopologyComponent() throws IOException {
-        DBAccessor dbAccessor = new DBAccessor(this.properties);
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(this.properties);
         NodeFetcher nodeFetcher = new NodeFetcher(dbAccessor);
         IDataConverter dataConverter = PubSuberFactory.createConverter();
         Node[] sortedNodes = dataConverter.deSerializeArray(
@@ -105,11 +105,13 @@ public class RabbitmqInitializer extends AbstractInitializer {
 
                 String ttl = node.getTtl();
                 if (!Strings.isNullOrEmpty(ttl)) {
+                    channel.queueDelete(node.getValue());
                     queueConfig.put("x-expires", Integer.parseInt(ttl));
                 }
 
                 String ttlPerMsg = node.getTtlPerMsg();
                 if (!Strings.isNullOrEmpty(ttlPerMsg)) {
+                    channel.queueDelete(node.getValue());
                     queueConfig.put("x-message-ttl", Integer.parseInt(ttlPerMsg));
                 }
 

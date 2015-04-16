@@ -3,11 +3,11 @@ package com.messagebus.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -24,9 +24,9 @@ public class HttpHelper {
 
 
     public static String syncHTTPGet(Map<String, Object> requestParamDic, AuthInfo authInfo) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpClient httpClient = new DefaultHttpClient();
 
-        CloseableHttpResponse response = null;
+        HttpResponse response = null;
         try {
             URI uri = new URIBuilder()
                 .setScheme("http")
@@ -57,13 +57,6 @@ public class HttpHelper {
         } catch (URISyntaxException e) {
             ExceptionHelper.logException(logger, e, "syncHTTPGet");
             throw new RuntimeException(e);
-        }finally{
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
 
         return "";

@@ -2,9 +2,7 @@ package com.messagebus.client.carry;
 
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
-import com.messagebus.client.handler.common.AsyncEventLoop;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,11 +21,9 @@ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResp
     private IRequestListener onRequest;
     private TimeUnit         timeUnit;
 
-    private       long      timeout      = 0;
-    private final Lock      eventLocker  = new ReentrantLock();
-    private final Condition eventBlocker = eventLocker.newCondition();
-    private final Lock      mainLock     = new ReentrantLock();
-    private final Condition mainBlocker  = mainLock.newCondition();
+    private       long      timeout     = 0;
+    private final Lock      mainLock    = new ReentrantLock();
+    private final Condition mainBlocker = mainLock.newCondition();
 
     public GenericResponser() {
         this.currentThread = new Thread(this);
@@ -46,33 +42,16 @@ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResp
 
     @Override
     public void run() {
-        eventLocker.lock();
         final MessageContext ctx = initMessageContext();
-        try {
-            ctx.setCarryType(MessageCarryType.RESPONSE);
-            ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
-            ctx.setRequestListener(this.onRequest);
-            ctx.setNoticeListener(getContext().getNoticeListener());
+        ctx.setCarryType(MessageCarryType.RESPONSE);
+        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
+        ctx.setRequestListener(this.onRequest);
+        ctx.setNoticeListener(getContext().getNoticeListener());
 
-            checkState();
+        checkState();
 
-            this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RESPONSE, this.getContext());
-            this.genericResponse(ctx, handlerChain);
-
-            if (this.timeout != 0) {
-                eventBlocker.await(this.timeout,
-                                   this.timeUnit == null ? TimeUnit.SECONDS : this.timeUnit);
-            } else {
-                eventBlocker.await();
-            }
-        } catch (InterruptedException e) {
-        } finally {
-            if (ctx.getAsyncEventLoop().isAlive()) {
-                ctx.getAsyncEventLoop().shutdown();
-            }
-
-            eventLocker.unlock();
-        }
+        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RESPONSE, this.getContext());
+        this.handlerChain.handle(ctx);
     }
 
     private void startup() {
@@ -91,19 +70,6 @@ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResp
             }
         } else {
             this.currentThread.start();
-        }
-    }
-
-    private void genericResponse(MessageContext context, IHandlerChain chain) {
-        AsyncEventLoop eventLoop = new AsyncEventLoop();
-        eventLoop.setChain(chain);
-        eventLoop.setContext(context);
-        context.setAsyncEventLoop(eventLoop);
-
-        if (chain instanceof MessageCarryHandlerChain) {
-            eventLoop.startEventLoop();
-        } else {
-            throw new RuntimeException("the type of chain's instance is not MessageCarryHandlerChain");
         }
     }
 

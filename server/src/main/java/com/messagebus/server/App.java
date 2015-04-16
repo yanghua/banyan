@@ -17,9 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -41,11 +40,13 @@ public class App {
 
         Map<String, String> argMap = extractRunArgs(args);
 
+        File log4jPropertiesFile = new File(DEFAULT_SERVER_LOG4J_PROPERTY_PATH);
+
         if (argMap.containsKey(
             com.messagebus.server.Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH)) {
             PropertyConfigurator.configure(
                 argMap.get(com.messagebus.server.Constants.KEY_ARG_SERVER_LOG4J_PROPERTY_PATH));
-        } else if (Files.exists(Paths.get(DEFAULT_SERVER_LOG4J_PROPERTY_PATH))) {
+        } else if (log4jPropertiesFile.exists() && !log4jPropertiesFile.isDirectory()) {
             PropertyConfigurator.configure(DEFAULT_SERVER_LOG4J_PROPERTY_PATH);
         }
 
@@ -67,7 +68,6 @@ public class App {
             rabbitmqInitializer.launch();
         } catch (IOException e) {
             logger.error("[main] RabbitmqInitializer#launch occurs a IOException : " + e.getMessage());
-            System.exit(1);
         }
 
         logger.debug("building context ...");
@@ -189,7 +189,7 @@ public class App {
         Map<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put(com.messagebus.server.Constants.KEY_SERVER_CONFIG, serverConfig);
 
-        DBAccessor dbAccessor = new DBAccessor(serverConfig);
+        DBAccessor dbAccessor = DBAccessor.defaultAccessor(serverConfig);
         Map<String, IDataFetcher> tableDataFetcherMap = new HashMap<String, IDataFetcher>();
         tableDataFetcherMap.put("NODE", new NodeFetcher(dbAccessor));
         tableDataFetcherMap.put("CONFIG", new ConfigFetcher(dbAccessor));

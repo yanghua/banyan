@@ -15,12 +15,11 @@ public class DBAccessor {
     private static final Log    logger           = LogFactory.getLog(DBAccessor.class);
     private static       String jdbcUrlFormatStr = "jdbc:mysql://%s:3306/%s?user=%s&password=%s&" +
         "useunicode=true&characterEncoding=utf8";
+    private static volatile DBAccessor instance;
 
-    private Properties properties;
     private String     jdbcUrlStr;
 
-    public DBAccessor(Properties config) {
-        this.properties = config;
+    private DBAccessor(Properties config) {
         this.jdbcUrlStr = String.format(jdbcUrlFormatStr,
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_HOST),
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_SCHEMA),
@@ -28,14 +27,23 @@ public class DBAccessor {
                                         config.getProperty(Constants.KEY_MESSAGEBUS_SERVER_DB_PASSWORD)
                                        );
 
-        logger.debug("jdbc url is : " + this.jdbcUrlStr);
-
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             logger.error("[constructor] occurs a ClassNotFoundException : " + e.getMessage());
         }
+    }
 
+    public static DBAccessor defaultAccessor(Properties config) {
+        synchronized (DBAccessor.class) {
+            if (instance == null) {
+                synchronized (DBAccessor.class) {
+                    instance = new DBAccessor(config);
+                }
+            }
+        }
+
+        return instance;
     }
 
     public Connection getConnection() throws SQLException {

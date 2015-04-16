@@ -6,13 +6,13 @@ import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -45,9 +45,8 @@ public class ProduceConsume {
                                    secret,
                                    token);
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setReplyTo(testQueue);
@@ -72,13 +71,6 @@ public class ProduceConsume {
             }
         } catch (IOException e) {
             logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
     }
 
@@ -96,8 +88,8 @@ public class ProduceConsume {
                                    token);
         url += "&content=text&contentType=text/plain";
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         try {
             response = httpClient.execute(new HttpGet(url));
@@ -108,13 +100,6 @@ public class ProduceConsume {
             }
         } catch (IOException e) {
             logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
     }
 
@@ -128,8 +113,8 @@ public class ProduceConsume {
                                    secret,
                                    mode);
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = null;
 
         try {
             response = httpClient.execute(new HttpGet(url));
@@ -140,13 +125,6 @@ public class ProduceConsume {
             }
         } catch (IOException e) {
             logger.error("[syncHTTPGet] occurs a IOException : " + e.getMessage());
-        } finally {
-            if (response != null)
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    logger.error("[syncHTTPGet] finally block occurs a IOException : " + e.getMessage());
-                }
         }
     }
 
