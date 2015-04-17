@@ -2,7 +2,7 @@ package com.messagebus.benchmark.client;
 
 public class TestConfigConstant {
 
-    public static final String ORIGINAL_PRODUCE_ROUTING_KEY = "routingkey.proxy.message.procon.erpDemoConsume";
+    public static final String ORIGINAL_PRODUCE_ROUTING_KEY           = "routingkey.proxy.message.procon.erpDemoConsume";
     public static final String DEFAULT_EXCHANGE_NAME_WITHOUT_TOPOLOGY = "amq.fanout";
 
     public static final String PRODUCER_SECRET     = "kljasdoifqoikjhhhqwhebasdfasdf";

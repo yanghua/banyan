@@ -6,8 +6,13 @@ import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.common.ExceptionHelper;
+import com.rabbitmq.client.RpcClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
@@ -49,6 +54,30 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
             throw new MessageResponseTimeoutException("message request time out.");
 
         return ctx.getConsumedMsg();
+    }
+
+    @Override
+    public byte[] primitiveRequest(String secret, String target, byte[] requestMsg, String token, long timeoutOfMilliSecond) {
+        Node sourceNode = this.getContext().getConfigManager().getSecretNodeMap().get(secret);
+        Node targetNode = this.getContext().getConfigManager().getRpcReqRespNodeMap().get(target);
+
+        RpcClient innerRpcClient = null;
+        try {
+            innerRpcClient = new RpcClient(this.getContext().getChannel(), "exchange.proxy", targetNode.getRoutingKey(), (int) timeoutOfMilliSecond);
+            return innerRpcClient.primitiveCall(requestMsg);
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "primitive request ");
+        } catch (TimeoutException e) {
+            logger.info("primitiveRequest timeout : " + "[secret] " + secret + " [target] " + target);
+        } finally {
+            try {
+                if (innerRpcClient != null) innerRpcClient.close();
+            } catch (IOException e) {
+                ExceptionHelper.logException(logger, e, "primitive request finally close inner rpc client");
+            }
+        }
+
+        return new byte[0];
     }
 
 

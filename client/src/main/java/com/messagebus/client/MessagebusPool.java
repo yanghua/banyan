@@ -3,7 +3,8 @@ package com.messagebus.client;
 import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.common.Constants;
 import com.messagebus.common.RandomHelper;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;

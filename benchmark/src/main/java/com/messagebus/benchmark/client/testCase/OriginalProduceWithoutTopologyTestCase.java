@@ -4,7 +4,6 @@ import com.messagebus.benchmark.client.*;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.common.Constants;
 import com.messagebus.common.TestVariableInfo;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;

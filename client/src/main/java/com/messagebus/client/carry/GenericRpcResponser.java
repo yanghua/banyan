@@ -1,11 +1,21 @@
 package com.messagebus.client.carry;
 
+import com.messagebus.business.model.Node;
+import com.messagebus.client.IRpcMessageProcessor;
 import com.messagebus.client.MessageContext;
+import com.messagebus.client.WrappedRpcServer;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.common.ExceptionHelper;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.RpcServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -83,5 +93,45 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
 
     public void shutdown() {
         this.currentThread.interrupt();
+    }
+
+    @Override
+    public WrappedRpcServer buildRpcServer(String secret, final IRpcMessageProcessor rpcMsgProcessor) {
+        Node source = this.getContext().getConfigManager().getSecretNodeMap().get(secret);
+        try {
+            RpcServer aServer = new RpcServer(this.getContext().getChannel(), source.getValue()) {
+
+                @Override
+                public byte[] handleCall(QueueingConsumer.Delivery request, AMQP.BasicProperties replyProperties) {
+                    return rpcMsgProcessor.onRpcMessage(request.getBody());
+                }
+
+            };
+
+            Constructor<WrappedRpcServer> rpcServerConstructor = WrappedRpcServer.class.getDeclaredConstructor(RpcServer.class);
+            rpcServerConstructor.setAccessible(true);
+            WrappedRpcServer wrappedRpcServer = rpcServerConstructor.newInstance(aServer);
+            rpcServerConstructor.setAccessible(false);
+
+            return wrappedRpcServer;
+        } catch (IOException e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            throw new RuntimeException(e);
+        }
     }
 }

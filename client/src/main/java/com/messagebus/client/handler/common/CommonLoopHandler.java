@@ -7,9 +7,7 @@ import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.ExceptionHelper;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,31 +28,33 @@ public abstract class CommonLoopHandler extends AbstractHandler {
             while (true) {
                 QueueingConsumer.Delivery delivery = currentConsumer.nextDelivery();
 
-                AMQP.BasicProperties properties = delivery.getProperties();
-                byte[] msgBody = delivery.getBody();
+                Message msg = MessageFactory.createMessage(delivery);
 
-//                context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-
-                String msgTypeStr = properties.getType();
-                if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-                    logger.error("[run] message type is null or empty");
-                    continue;
-                }
-
-                MessageType msgType = null;
-                try {
-                    msgType = MessageType.lookup(msgTypeStr);
-                } catch (UnknownError unknownError) {
-                    ExceptionHelper.logException(logger, unknownError, "common loop handler");
-                    continue;
-                }
-                Message msg = MessageFactory.createMessage(msgType);
-                initMessage(msg, msgType, properties, msgBody);
+//                AMQP.BasicProperties properties = delivery.getProperties();
+//                byte[] msgBody = delivery.getBody();
+//
+////                context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+//
+//                String msgTypeStr = properties.getType();
+//                if (msgTypeStr == null || msgTypeStr.isEmpty()) {
+//                    logger.error("[run] message type is null or empty");
+//                    continue;
+//                }
+//
+//                MessageType msgType = null;
+//                try {
+//                    msgType = MessageType.lookup(msgTypeStr);
+//                } catch (UnknownError unknownError) {
+//                    ExceptionHelper.logException(logger, unknownError, "common loop handler");
+//                    continue;
+//                }
+//                Message msg = MessageFactory.createMessage(msgType);
+//                initMessage(msg, properties, msgBody);
 
                 context.setConsumedMsg(msg);
 
                 try {
-                    if (msgType.equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
+                    if (msg.getMessageType().equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
                         IMessageReceiveListener noticeListener = context.getNoticeListener();
                         noticeListener.onMessage(msg);
                     } else {
@@ -85,8 +85,8 @@ public abstract class CommonLoopHandler extends AbstractHandler {
 
     public abstract void process(MessageContext msgContext);
 
-    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderTransfer.unbox(properties, msg);
-        msg.setContent(bodyData);
-    }
+//    private void initMessage(Message msg, AMQP.BasicProperties properties, byte[] bodyData) {
+//        MessageHeaderTransfer.unbox(properties, msg);
+//        msg.setContent(bodyData);
+//    }
 }

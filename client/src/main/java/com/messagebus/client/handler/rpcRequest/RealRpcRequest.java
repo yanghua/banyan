@@ -22,8 +22,9 @@ public class RealRpcRequest extends AbstractHandler {
 
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
+        JsonRpcClient client = null;
         try {
-            JsonRpcClient client = new JsonRpcClient(context.getChannel(),
+            client = new JsonRpcClient(context.getChannel(),
                                                      Constants.PROXY_EXCHANGE_NAME,
                                                      context.getTargetNode().getRoutingKey(),
                                                      (int) context.getTimeout());
@@ -42,7 +43,11 @@ public class RealRpcRequest extends AbstractHandler {
             ExceptionHelper.logException(logger, e, "rpc request handler : RealRpcRequest");
             throw new RuntimeException(e);
         } finally {
+            try {
+                if (client != null) client.close();
+            } catch (IOException e) {
 
+            }
         }
     }
 

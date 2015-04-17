@@ -69,6 +69,11 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     }
 
     @Override
+    public byte[] primitiveRequest(String secret, String target, byte[] requestMsg, String token, long timeoutOfMilliSecond) {
+        return requester.primitiveRequest(secret, target, requestMsg, token, timeoutOfMilliSecond);
+    }
+
+    @Override
     public void response(String secret, IRequestListener requestListener, long timeout, TimeUnit timeUnit) {
         responser.response(secret, requestListener, timeout, timeUnit);
     }
@@ -81,6 +86,11 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     @Override
     public void callback(String secret, Class<?> clazzOfInterface, Object serviceProvider, long timeout, TimeUnit timeUnit) {
         rpcResponser.callback(secret, clazzOfInterface, serviceProvider, timeout, timeUnit);
+    }
+
+    @Override
+    public WrappedRpcServer buildRpcServer(String secret, IRpcMessageProcessor rpcMsgProcessor) {
+        return rpcResponser.buildRpcServer(secret, rpcMsgProcessor);
     }
 
     @Override
