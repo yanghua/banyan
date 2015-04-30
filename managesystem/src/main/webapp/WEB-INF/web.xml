@@ -21,15 +21,6 @@
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
 
-    <!-- spring -->
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:applicationContext.xml</param-value>
-    </context-param>
-    <receiveListener>
-        <receiveListener-class>org.springframework.web.context.ContextLoaderListener</receiveListener-class>
-    </receiveListener>
-
     <!-- jsp tag for freemarker -->
     <servlet>
         <servlet-name>JspSupportServlet</servlet-name>

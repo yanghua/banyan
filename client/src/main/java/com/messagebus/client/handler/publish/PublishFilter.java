@@ -1,14 +1,10 @@
 package com.messagebus.client.handler.publish;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
+import com.messagebus.client.model.Node;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -18,28 +14,8 @@ public class PublishFilter extends AbstractHandler {
 
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
-        Node sourceNode = context.getSourceNode();
-        String pushToIds = context.getConfigManager().getPubsubChannelMap().get(sourceNode.getNodeId());
-
-        if (Strings.isNullOrEmpty(pushToIds)) {
-            return;
-        }
-
-        Iterator<String> pushToIdIterator = Splitter.on(',').split(pushToIds).iterator();
-
-        List<Node> pushToNodes = new ArrayList<Node>();
-
-        while (pushToIdIterator.hasNext()) {
-            String pushToId = pushToIdIterator.next();
-            Node pushToNode = context.getConfigManager().getIdNodeMap().get(pushToId);
-            if (pushToNode == null) continue;
-            if (pushToNode.getType().equals("0")) continue;
-            if (!pushToNode.isAvailable()) continue;
-            String nodeName = pushToNode.getName();
-            if (!context.getConfigManager().getPubsubNodeMap().containsKey(nodeName)) continue;
-
-            pushToNodes.add(pushToNode);
-        }
+        List<Node> pushToNodes = context.getConfigManager().getNodeView(context.getSecret()).getSubscribeNodes();
+        if (pushToNodes == null || pushToNodes.size() == 0) return;
 
         context.getOtherParams().put("publishList", pushToNodes);
 

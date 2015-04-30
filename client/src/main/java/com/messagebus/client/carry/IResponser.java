@@ -9,15 +9,14 @@ public interface IResponser {
 
     /**
      * response a temp message to a named queue
-     *
-     * @param toTmpQueue      the temp queue name
+     *  @param toTmpQueue      the temp queue name
      * @param msg             the entity of message
      * @param receiveListener
      * @param secret
-     * @param requestListener
+     * @param onRequest
      * @param timeout
      * @param timeUnit
      */
-    public void response(String secret, IRequestListener requestListener, long timeout, TimeUnit timeUnit);
+    public void response(String secret, IRequestListener onRequest, long timeout, TimeUnit timeUnit);
 
 }

@@ -1,6 +1,8 @@
 package com.messagebus.interactor.proxy;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.GetResponse;
+import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

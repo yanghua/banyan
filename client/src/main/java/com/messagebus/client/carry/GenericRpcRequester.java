@@ -1,9 +1,9 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,9 +25,9 @@ public class GenericRpcRequester extends AbstractMessageCarryer implements IRpcR
         ctx.setSecret(secret);
         ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.RPCREQUEST);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setTimeout(timeoutOfMilliSecond);
-        Node node = this.getContext().getConfigManager().getRpcReqRespNodeMap().get(target);
+        Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(target);
         ctx.setTargetNode(node);
         Map<String, Object> otherParams = ctx.getOtherParams();
         otherParams.put("methodName", methodName);

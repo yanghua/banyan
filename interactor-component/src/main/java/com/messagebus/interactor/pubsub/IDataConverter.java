@@ -9,6 +9,8 @@ public interface IDataConverter {
 
     public <T> byte[] serialize(Serializable obj);
 
+    public <T> byte[] serialize(Serializable obj, Class<T> clazz);
+
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz);
 
     public <T> T[] deSerializeArray(byte[] originalData, Class<T[]> clazz);

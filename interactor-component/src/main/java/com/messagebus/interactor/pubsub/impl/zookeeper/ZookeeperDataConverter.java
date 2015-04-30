@@ -43,6 +43,11 @@ public class ZookeeperDataConverter implements IDataConverter {
     }
 
     @Override
+    public <T> byte[] serialize(Serializable obj, Class<T> clazz) {
+        return this.serialize(obj);
+    }
+
+    @Override
     public <T> T[] deSerializeArray(byte[] originalData, Class<T[]> clazz) {
         Object obj = this.deSerialize(originalData);
 
@@ -51,6 +56,17 @@ public class ZookeeperDataConverter implements IDataConverter {
 
     @Override
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
+        if (originalData == null || originalData.length == 0)
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException e) {
+                ExceptionHelper.logException(logger, e, "");
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                ExceptionHelper.logException(logger, e, "");
+                throw new RuntimeException(e);
+            }
+
         if (clazz.equals(String.class)) {
             String tmp = new String(originalData, Charset.defaultCharset());
             return (T) tmp;

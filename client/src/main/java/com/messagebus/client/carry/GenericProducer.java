@@ -1,10 +1,10 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,15 +48,19 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
         commonCarry(context);
     }
 
-    private MessageContext innerProduce(String secret,
-                                        String to, String token) {
+    private MessageContext innerProduce(String secret, String to, String token) {
         MessageContext context = initMessageContext();
         context.setSecret(secret);
         context.setCarryType(MessageCarryType.PRODUCE);
-        context.setSourceNode(this.getContext().getConfigManager()
-                                  .getSecretNodeMap().get(secret));
-        Node node = this.getContext().getConfigManager().getProconNodeMap().get(to);
-        context.setTargetNode(node);
+        context.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+
+        if (to.equals(context.getSourceNode().getName())) {
+            context.setTargetNode(context.getSourceNode());
+        } else {
+            Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(to);
+            context.setTargetNode(node);
+        }
+
         context.setToken(token);
 
         return context;

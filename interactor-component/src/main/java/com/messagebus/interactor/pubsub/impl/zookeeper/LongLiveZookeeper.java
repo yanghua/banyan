@@ -166,7 +166,6 @@ public class LongLiveZookeeper implements IPubSuber {
 
     }
 
-
     public byte[] get(String path) {
         try {
             Stat stat = this.zooKeeper.exists(path, false);
@@ -181,6 +180,36 @@ public class LongLiveZookeeper implements IPubSuber {
         }
 
         return new byte[0];
+    }
+
+    @Override
+    public boolean exists(String key) {
+        try {
+            return this.zooKeeper.exists(key, false) != null;
+        } catch (KeeperException e) {
+            ExceptionHelper.logException(logger, e, "exists");
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void set(String path, byte[] data) {
+        try {
+            logger.info("[setConfig] path is : " + path);
+            Stat stat = this.zooKeeper.exists(path, false);
+            if (stat == null) {
+                this.zooKeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            } else {
+                int version = stat.getVersion();
+                this.zooKeeper.setData(path, data, version);
+            }
+        } catch (KeeperException e) {
+            logger.error("[setConfig] occurs a KeeperException : " + e.getMessage());
+        } catch (InterruptedException e) {
+            logger.error("[setConfig] occurs a InterruptedException : " + e.getMessage());
+        }
     }
 
     public void publish(String path, byte[] newData) {

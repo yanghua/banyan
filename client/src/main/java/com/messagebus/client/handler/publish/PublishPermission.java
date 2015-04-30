@@ -1,9 +1,9 @@
 package com.messagebus.client.handler.publish;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.PermissionChecker;
+import com.messagebus.client.model.Node;
 
 /**
  * Created by yanghua on 3/17/15.
@@ -18,7 +18,8 @@ public class PublishPermission extends PermissionChecker {
             throw new RuntimeException("can not publish message ");
         }
 
-        hasPermission = context.getConfigManager().getPubsubNodeMap().containsKey(sourceNode.getName());
+        hasPermission = sourceNode.getCommunicateType().equals("publish")
+            || sourceNode.getCommunicateType().equals("publish-subscribe");
 
         if (!hasPermission) {
             throw new RuntimeException("can not publish message ");

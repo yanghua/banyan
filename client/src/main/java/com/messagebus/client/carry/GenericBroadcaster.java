@@ -19,7 +19,7 @@ class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster 
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.BROADCAST);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(ctx.getSecret()));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setMessages(msgs);
 
         checkState();

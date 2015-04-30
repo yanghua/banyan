@@ -1,8 +1,8 @@
 package com.messagebus.client;
 
-import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.common.Constants;
 import com.messagebus.common.RandomHelper;
+import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -14,12 +14,12 @@ import java.io.IOException;
  */
 public class MessagebusPool {
 
-    private String           poolId;
-    private String           pubsuberHost;
-    private int              pubsuberPort;
-    private ExchangerManager exchangeManager;
-    private ConfigManager    configManager;
-    private Connection       connection;
+    private String          poolId;
+    private String          pubsuberHost;
+    private int             pubsuberPort;
+    private PubsuberManager exchangeManager;
+    private ConfigManager   configManager;
+    private Connection      connection;
 
     protected InnerPool innerPool;
 
@@ -64,31 +64,30 @@ public class MessagebusPool {
     }
 
     protected void init() {
-        this.exchangeManager = new ExchangerManager(this.pubsuberHost, this.pubsuberPort);
+        this.exchangeManager = new PubsuberManager(this.pubsuberHost, this.pubsuberPort);
 
         if (!this.exchangeManager.isPubsuberAlive())
             throw new RuntimeException("can not connect to pubsub server.");
 
         this.configManager = new ConfigManager();
-        this.configManager.setExchangeManager(this.exchangeManager);
+        this.configManager.setPubsuberManager(this.exchangeManager);
         this.poolId = RandomHelper.randomNumberAndCharacter(12);
         this.exchangeManager.registerWithMultiChannels(poolId, this.configManager, new String[]{
-            Constants.PUBSUB_ROUTER_CHANNEL,
+            Constants.PUBSUB_NODEVIEW_CHANNEL,
             Constants.PUBSUB_CONFIG_CHANNEL,
-            Constants.PUBSUB_EVENT_CHANNEL,
-            Constants.PUBSUB_SINK_CHANNEL,
-            Constants.PUBSUB_CHANNEL_CHANNEL,
+            Constants.PUBSUB_SERVER_STATE_CHANNEL,
+            Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL
         });
 
         try {
-            this.configManager.parseRealTimeData();
+            this.configManager.checkServerState();
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
-            String host = this.configManager.getClientConfigMap().get("messagebus.client.host").getValue();
+            String host = this.configManager.getConfig("messagebus.client.host");
             connectionFactory.setHost(host);
 
-            if (this.configManager.getClientConfigMap().containsKey("messagebus.client.port")) {
-                int port = Integer.parseInt(this.configManager.getClientConfigMap().get("messagebus.client.port").getValue().toString());
+            if (this.configManager.getPubsuberManager().exists("messagebus.client.port")) {
+                int port = Integer.parseInt(this.configManager.getConfig("messagebus.client.port"));
                 connectionFactory.setPort(port);
             } else {
                 connectionFactory.setPort(connectionFactory.DEFAULT_AMQP_PORT);

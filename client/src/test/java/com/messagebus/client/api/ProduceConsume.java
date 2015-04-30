@@ -64,7 +64,7 @@ public class ProduceConsume extends BaseTestCase {
     public void testProduceAndConsumeWithPushStyle() {
         commonProduce();
 
-        client.consume(consumeSecret, 2, TimeUnit.SECONDS, new IMessageReceiveListener() {
+        client.consume(consumeSecret, 60, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 assertNotNull(message);

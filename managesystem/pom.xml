@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>com.messagebus</groupId>
-            <artifactId>business-component</artifactId>
+            <artifactId>service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

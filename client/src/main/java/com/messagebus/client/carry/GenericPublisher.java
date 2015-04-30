@@ -19,7 +19,7 @@ class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.PUBLISH);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setMessages(msgs);
 
         checkState();

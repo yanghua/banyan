@@ -5,8 +5,8 @@ package com.messagebus.common;
  */
 public class TestVariableInfo {
 
-    public static String PUBSUBER_HOST        = "172.16.206.250";
+    public static String PUBSUBER_HOST        = "127.0.0.1";
     public static int    PUBSUBER_PORT        = 6379;
-    public static String RABBITMQ_SERVER_HOST = "172.16.206.29";
+    public static String RABBITMQ_SERVER_HOST = "127.0.0.1";
 
 }

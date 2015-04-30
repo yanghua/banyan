@@ -31,8 +31,8 @@ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResp
     }
 
     @Override
-    public void response(String secret, IRequestListener requestListener, long timeout, TimeUnit timeUnit) {
-        this.onRequest = requestListener;
+    public void response(String secret, IRequestListener onRequest, long timeout, TimeUnit timeUnit) {
+        this.onRequest = onRequest;
         this.timeout = timeout;
         this.timeUnit = timeUnit;
         this.secret = secret;
@@ -44,7 +44,7 @@ class GenericResponser extends AbstractMessageCarryer implements Runnable, IResp
     public void run() {
         final MessageContext ctx = initMessageContext();
         ctx.setCarryType(MessageCarryType.RESPONSE);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setRequestListener(this.onRequest);
         ctx.setNoticeListener(getContext().getNoticeListener());
 

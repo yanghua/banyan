@@ -34,7 +34,6 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
 
 
     public void testThriftRpc() throws Exception {
-        //client code
         TTransport transport = new TAMQPClientTransport(this.client,
                                                         "kliwhiduhaiucvarkjajksdbfkjabw",
                                                         "emapDemoRpcResponse",
@@ -50,9 +49,10 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
 
     public static void main(String[] args) {
         String host = TestVariableInfo.PUBSUBER_HOST;
-        int    port = TestVariableInfo.PUBSUBER_PORT;
+        int port = TestVariableInfo.PUBSUBER_PORT;
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);;
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        ;
         Messagebus client = singlePool.getResource();
 
         //server code
@@ -62,7 +62,7 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
             TProtocolFactory inProtocolFactory = new TJSONProtocol.Factory();
             TProtocolFactory outProtocolFactory = new TJSONProtocol.Factory();
             rpcServer = client.buildRpcServer("mshdfjbqwejhfgasdfbjqkygaksdfa",
-                new ThriftMessageHandler(processor, inProtocolFactory, outProtocolFactory));
+                                              new ThriftMessageHandler(processor, inProtocolFactory, outProtocolFactory));
 
             rpcServer.mainLoop();
         } finally {

@@ -1,11 +1,11 @@
 package com.messagebus.client.handler.broadcast;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
+import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;

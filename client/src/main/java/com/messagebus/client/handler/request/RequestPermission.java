@@ -1,11 +1,9 @@
 package com.messagebus.client.handler.request;
 
-import com.messagebus.business.model.Node;
-import com.messagebus.business.model.Sink;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.PermissionChecker;
-import com.messagebus.common.Constants;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,15 +26,8 @@ public class RequestPermission extends PermissionChecker {
 
         String token = context.getToken();
 
-        hasPermission = context.getConfigManager().getReqrespNodeMap().containsKey(sourceNode.getName());
-        hasPermission = hasPermission && context.getConfigManager().getReqrespNodeMap().containsKey(targetNode.getName());
-        hasPermission = hasPermission && context.getConfigManager().getTokenSinkMap().containsKey(token);
-
-        Sink sink = context.getConfigManager().getTokenSinkMap().get(token);
-        hasPermission = hasPermission && sink.getFlowFrom().equals(sourceNode.getNodeId());
-        hasPermission = hasPermission && sink.getFlowTo().equals(targetNode.getNodeId());
-        hasPermission = hasPermission && targetNode.isAvailable()
-            && !targetNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_REQUEST);
+        hasPermission = hasPermission && context.getConfigManager()
+                                                .getNodeView(context.getSecret()).getSinkTokens().contains(token);
 
         if (!hasPermission) {
             logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +

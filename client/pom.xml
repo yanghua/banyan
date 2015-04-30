@@ -25,12 +25,6 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.messagebus</groupId>
-            <artifactId>business-component</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
         <!-- apache common pool -->
         <dependency>
             <groupId>org.apache.commons</groupId>

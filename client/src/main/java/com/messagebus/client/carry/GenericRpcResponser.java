@@ -1,11 +1,11 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.IRpcMessageProcessor;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.WrappedRpcServer;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
@@ -47,7 +47,7 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
         MessageContext ctx = initMessageContext();
         ctx.setSecret(this.secret);
         ctx.setCarryType(MessageCarryType.RPCRESPONSE);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         Map<String, Object> otherParams = ctx.getOtherParams();
         otherParams.put("serviceProvider", this.serviceProvider);
         otherParams.put("clazzOfInterface", this.clazzOfInterface);
@@ -97,7 +97,7 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
 
     @Override
     public WrappedRpcServer buildRpcServer(String secret, final IRpcMessageProcessor rpcMsgProcessor) {
-        Node source = this.getContext().getConfigManager().getSecretNodeMap().get(secret);
+        Node source = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
         try {
             RpcServer aServer = new RpcServer(this.getContext().getChannel(), source.getValue()) {
 

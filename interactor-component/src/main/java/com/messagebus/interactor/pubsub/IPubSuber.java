@@ -13,9 +13,13 @@ public interface IPubSuber {
 
     public void watch(String[] channels, IPubSubListener listener);
 
-    public void publish(String channel, byte[] jsonStrBytes);
+    public void publish(String channel, byte[] bytes);
 
-    public byte[] get(String channel);
+    public byte[] get(String key);
+
+    public void set(String key, byte[] data);
+
+    public boolean exists(String key);
 
     public void setHost(String host);
 

@@ -1,8 +1,8 @@
 package com.messagebus.client;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

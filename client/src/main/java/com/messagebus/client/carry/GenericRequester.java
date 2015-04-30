@@ -1,11 +1,11 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.RpcClient;
 import org.apache.commons.logging.Log;
@@ -38,8 +38,8 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         ctx.setSecret(secret);
         ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.REQUEST);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(secret));
-        Node node = this.getContext().getConfigManager().getReqrespNodeMap().get(to);
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(to);
         ctx.setTargetNode(node);
         ctx.setTimeout(timeout);
         ctx.setMessages(new Message[]{msg});
@@ -58,8 +58,8 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
     @Override
     public byte[] primitiveRequest(String secret, String target, byte[] requestMsg, String token, long timeoutOfMilliSecond) {
-        Node sourceNode = this.getContext().getConfigManager().getSecretNodeMap().get(secret);
-        Node targetNode = this.getContext().getConfigManager().getRpcReqRespNodeMap().get(target);
+        Node sourceNode = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
+        Node targetNode = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(target);
 
         RpcClient innerRpcClient = null;
         try {

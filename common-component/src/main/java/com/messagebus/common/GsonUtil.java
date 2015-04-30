@@ -4,7 +4,6 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ public class GsonUtil {
 
     /**
      * convert json-object string to map
+     *
      * @param jsonObjStr the string representation of json-object
      * @return the map object
      */

@@ -1,6 +1,7 @@
 package com.messagebus.interactor.pubsub.impl.redis;
 
 import com.google.gson.Gson;
+import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,8 +33,25 @@ public class RedisDataConverter implements IDataConverter {
         return tmp.getBytes(Charset.defaultCharset());
     }
 
+
+    @Override
+    public <T> byte[] serialize(Serializable obj, Class<T> clazz) {
+        String tmp;
+        tmp = gson.toJson(obj, clazz);
+        return tmp.getBytes(Charset.defaultCharset());
+    }
+
     @Override
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
+        if (originalData == null || originalData.length == 0)
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException e) {
+                ExceptionHelper.logException(logger, e, "");
+            } catch (IllegalAccessException e) {
+                ExceptionHelper.logException(logger, e, "");
+            }
+
         String jsonStr = new String(originalData, Charset.defaultCharset());
         return gson.fromJson(jsonStr, clazz);
     }

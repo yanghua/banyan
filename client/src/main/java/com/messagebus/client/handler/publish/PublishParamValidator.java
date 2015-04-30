@@ -1,12 +1,12 @@
 package com.messagebus.client.handler.publish;
 
 import com.google.common.base.Strings;
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.AbstractParamValidator;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

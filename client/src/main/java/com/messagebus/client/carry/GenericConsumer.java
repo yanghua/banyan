@@ -35,10 +35,11 @@ class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsu
 
     @Override
     public void run() {
+        logger.debug("current secret is : " + secret);
         final MessageContext ctx = initMessageContext();
         ctx.setSecret(this.secret);
         ctx.setCarryType(MessageCarryType.CONSUME);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(this.secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setReceiveListener(onMessage);
         ctx.setSync(false);
         ctx.setNoticeListener(getContext().getNoticeListener());
@@ -66,7 +67,7 @@ class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsu
         final MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.CONSUME);
-        ctx.setSourceNode(this.getContext().getConfigManager().getSecretNodeMap().get(secret));
+        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setConsumeMsgNum(expectedNum);
         ctx.setSync(true);
 

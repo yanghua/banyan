@@ -25,9 +25,9 @@ public class RealRpcRequest extends AbstractHandler {
         JsonRpcClient client = null;
         try {
             client = new JsonRpcClient(context.getChannel(),
-                                                     Constants.PROXY_EXCHANGE_NAME,
-                                                     context.getTargetNode().getRoutingKey(),
-                                                     (int) context.getTimeout());
+                                       Constants.PROXY_EXCHANGE_NAME,
+                                       context.getTargetNode().getRoutingKey(),
+                                       (int) context.getTimeout());
             Object[] params = null;
             if (context.getOtherParams().get("params") != null) {
                 params = (Object[]) context.getOtherParams().get("params");

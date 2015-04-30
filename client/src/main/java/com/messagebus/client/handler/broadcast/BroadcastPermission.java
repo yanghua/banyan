@@ -1,9 +1,9 @@
 package com.messagebus.client.handler.broadcast;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.PermissionChecker;
+import com.messagebus.client.model.Node;
 
 /**
  * Created by yanghua on 3/17/15.

@@ -1,7 +1,7 @@
 package com.messagebus.client;
 
-import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,18 +21,18 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
     private static final Log logger = LogFactory.getLog(MessagebusFactory.class.getName());
 
-    private String           pubsuberHost;
-    private int              pubsuberPort;
-    private ExchangerManager exchangeManager;
-    private ConfigManager    configManager;
-    private Connection       connection;
+    private String          pubsuberHost;
+    private int             pubsuberPort;
+    private PubsuberManager exchangeManager;
+    private ConfigManager   configManager;
+    private Connection      connection;
 
     private final Method openMethod;
     private final Method closeMethod;
 
     public MessagebusFactory(String pubsuberHost,
                              int pubsuberPort,
-                             ExchangerManager exchangeManager,
+                             PubsuberManager exchangeManager,
                              ConfigManager configManager,
                              Connection connection) {
         this.pubsuberHost = pubsuberHost;

@@ -1,15 +1,12 @@
 package com.messagebus.client;
 
-import com.messagebus.business.exchanger.ExchangerManager;
-import com.messagebus.business.exchanger.IExchangerListener;
-import com.messagebus.business.model.Config;
-import com.messagebus.business.model.Node;
-import com.messagebus.business.model.Sink;
+import com.google.common.base.Strings;
 import com.messagebus.client.handler.AbstractHandler;
-import com.messagebus.client.model.HandlerModel;
-import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.*;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.interactor.pubsub.IPubsuberDataListener;
+import com.messagebus.interactor.pubsub.PubsuberManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -18,8 +15,6 @@ import org.dom4j.Element;
 import org.dom4j.XPath;
 import org.dom4j.io.SAXReader;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,12 +25,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * the config manager
  */
-public class ConfigManager implements IExchangerListener {
+public class ConfigManager implements IPubsuberDataListener {
 
     private static final Log logger = LogFactory.getLog(ConfigManager.class);
 
-    private          boolean inited      = false;
-    private volatile String  serverState = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
+    private boolean inited = false;
+
+    private volatile String                serverState       = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
+    private          Map<String, NodeView> secretNodeViewMap = new ConcurrentHashMap<String, NodeView>();
+    private          Map<String, String>   configMap         = new ConcurrentHashMap<String, String>();
 
     //region handle models
     private List<HandlerModel> produceHandlerModels     = new ArrayList<HandlerModel>();
@@ -61,17 +59,8 @@ public class ConfigManager implements IExchangerListener {
     private List<AbstractHandler> rpcResponseHandlerChain = new ArrayList<AbstractHandler>();
     //endregion
 
-    private Map<String, Node>   proconNodeMap;
-    private Map<String, Node>   reqrespNodeMap;
-    private Map<String, Node>   rpcReqRespNodeMap;
-    private Map<String, Node>   pubsubNodeMap;
-    private Map<String, Node>   idNodeMap;
-    private Map<String, Node>   secretNodeMap;
-    private Map<String, Config> clientConfigMap;
-    private ExchangerManager    exchangeManager;
-    private Map<String, Sink>   tokenSinkMap;
-    private Map<String, String> pubsubChannelMap;
-    private Node                notificationExchangeNode;
+    private PubsuberManager pubsuberManager;
+    private Node            notificationExchangeNode;
 
     public ConfigManager() {
         this.inited = this.init();
@@ -188,51 +177,12 @@ public class ConfigManager implements IExchangerListener {
 
     //endregion
 
-    //region node map
-    public Map<String, Node> getProconNodeMap() {
-        return proconNodeMap;
+    public PubsuberManager getPubsuberManager() {
+        return pubsuberManager;
     }
 
-    public Map<String, Node> getPubsubNodeMap() {
-        return pubsubNodeMap;
-    }
-
-    public Map<String, Node> getReqrespNodeMap() {
-        return reqrespNodeMap;
-    }
-
-    public Map<String, Node> getRpcReqRespNodeMap() {
-        return rpcReqRespNodeMap;
-    }
-
-    public Map<String, Node> getSecretNodeMap() {
-        return secretNodeMap;
-    }
-
-    public Map<String, Node> getIdNodeMap() {
-        return idNodeMap;
-    }
-
-    //endregion
-
-    public Map<String, Sink> getTokenSinkMap() {
-        return tokenSinkMap;
-    }
-
-    public Map<String, String> getPubsubChannelMap() {
-        return pubsubChannelMap;
-    }
-
-    public Map<String, Config> getClientConfigMap() {
-        return clientConfigMap;
-    }
-
-    public ExchangerManager getExchangeManager() {
-        return exchangeManager;
-    }
-
-    public void setExchangeManager(ExchangerManager exchangeManager) {
-        this.exchangeManager = exchangeManager;
+    public void setPubsuberManager(PubsuberManager pubsuberManager) {
+        this.pubsuberManager = pubsuberManager;
     }
 
     public synchronized String getServerState() {
@@ -241,14 +191,6 @@ public class ConfigManager implements IExchangerListener {
 
     public synchronized void setServerState(String serverState) {
         this.serverState = serverState;
-    }
-
-    public Node getNotificationExchangeNode() {
-        return notificationExchangeNode;
-    }
-
-    public void setNotificationExchangeNode(Node notificationExchangeNode) {
-        this.notificationExchangeNode = notificationExchangeNode;
     }
 
     private void parseHandlers(String messageCarryTypeStr,
@@ -292,7 +234,6 @@ public class ConfigManager implements IExchangerListener {
         }
     }
 
-
     private void initHandlers(List<HandlerModel> handlerModels,
                               List<AbstractHandler> handlerChain) {
         try {
@@ -327,18 +268,17 @@ public class ConfigManager implements IExchangerListener {
 
     @Override
     public void onChannelDataChanged(String channel, Object obj) {
-        logger.debug("** [onChannelDataChanged] ** received change from path : " + channel);
-        if (channel.equals(Constants.PUBSUB_ROUTER_CHANNEL)) {
-            this.extractDifferentNodes((Node[]) obj);
+        logger.debug("=-=-=-=-=-=- received change from channel : " + channel + " =-=-=-=-=-=-");
+        if (channel.equals(Constants.PUBSUB_NODEVIEW_CHANNEL)) {
+            String secret = obj.toString();
+            this.updateNodeView(secret);
+        } else if (channel.equals(Constants.PUBSUB_SERVER_STATE_CHANNEL)) {
+            String serverState = obj.toString();
+            this.setServerState(serverState);
         } else if (channel.equals(Constants.PUBSUB_CONFIG_CHANNEL)) {
-            this.extractClientConfigs((Config[]) obj);
-        } else if (channel.equals(Constants.PUBSUB_EVENT_CHANNEL)) {
-            logger.debug("received event value : " + obj.toString());
-            this.setServerState(obj.toString());
-        } else if (channel.equals(Constants.PUBSUB_SINK_CHANNEL)) {
-            this.processSink((Sink[]) obj);
-        } else if (channel.equals(Constants.PUBSUB_CHANNEL_CHANNEL)) {
-            this.processChannel((Sink[]) obj);
+            this.updateConfig(obj.toString());
+        } else if (channel.equals(Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL)) {
+            this.updateNotificationNode();
         }
     }
 
@@ -373,108 +313,64 @@ public class ConfigManager implements IExchangerListener {
 
     }
 
-    public synchronized void parseRealTimeData() throws IOException {
-        this.parseRouterInfo();
-        this.parseConfigInfo();
-        this.parseSink();
-        this.parseChannel();
-        //parse event
-        Object tmp = this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_EVENT_CHANNEL);
+    public synchronized void checkServerState() {
+        String tmp = this.getPubsuberManager().get(Constants.PUBSUB_SERVER_STATE_CHANNEL, String.class);
+        logger.debug("current server state is : " + tmp);
         if (tmp != null) {
-            String serverState = tmp.toString();
-            this.setServerState(serverState);
+            this.setServerState(tmp);
         }
     }
 
-    public synchronized void parseRouterInfo() {
-        if (this.getExchangeManager() == null) {
-            throw new NullPointerException(" the field exchangeManager can not be null.");
-        }
-
-        Node[] nodes = (Node[]) this.getExchangeManager().
-            downloadWithChannel(Constants.PUBSUB_ROUTER_CHANNEL);
-        this.extractDifferentNodes(nodes);
-    }
-
-    public synchronized void parseConfigInfo() throws MalformedURLException {
-        if (this.getExchangeManager() == null) {
-            throw new NullPointerException(" the field exchangeManager can not be null.");
-        }
-
-        Config[] configs = (Config[]) this.getExchangeManager()
-                                          .downloadWithChannel(Constants.PUBSUB_CONFIG_CHANNEL);
-        this.extractClientConfigs(configs);
-    }
-
-    public synchronized void parseSink() {
-        Sink[] sinks = (Sink[]) this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_SINK_CHANNEL);
-        this.processSink(sinks);
-    }
-
-    public synchronized void parseChannel() {
-        Sink[] channels = (Sink[]) this.getExchangeManager().downloadWithChannel(Constants.PUBSUB_CHANNEL_CHANNEL);
-        this.processChannel(channels);
-    }
-
-    private void extractDifferentNodes(Node[] nodes) {
-        this.secretNodeMap = new ConcurrentHashMap<String, Node>();
-        this.proconNodeMap = new ConcurrentHashMap<String, Node>();
-        this.pubsubNodeMap = new ConcurrentHashMap<String, Node>();
-        this.reqrespNodeMap = new ConcurrentHashMap<String, Node>();
-        this.rpcReqRespNodeMap = new ConcurrentHashMap<String, Node>();
-        this.idNodeMap = new ConcurrentHashMap<String, Node>(nodes.length);
-
-        for (Node node : nodes) {
-            idNodeMap.put(node.getNodeId(), node);
-
-            if (node.getType().equals("0") && node.getName().equals(Constants.NOTIFICATION_EXCHANGE_NAME)) {
-                this.notificationExchangeNode = node;
-            }
-
-            if (node.getType().equals("1") || !node.isInner()) {
-                this.secretNodeMap.put(node.getSecret(), node);
-                if (node.getValue().contains("procon")) {
-                    this.proconNodeMap.put(node.getName(), node);
-                } else if (node.getValue().contains("reqresp")) {
-                    this.reqrespNodeMap.put(node.getName(), node);
-                } else if (node.getValue().contains("pubsub")) {
-                    this.pubsubNodeMap.put(node.getName(), node);
-                } else if (node.getValue().contains("rpc")) {
-                    this.rpcReqRespNodeMap.put(node.getName(), node);
-                }
-            }
+    public synchronized String getConfig(String key) {
+        if (this.configMap.containsKey(key)) {
+            return this.configMap.get(key);
+        } else {
+            String configValue = this.pubsuberManager.get(key, String.class);
+            this.configMap.put(key, configValue);
+            return configValue;
         }
     }
 
-    private void extractClientConfigs(Config[] configs) {
-        this.clientConfigMap = new ConcurrentHashMap<String, Config>();
-
-        for (Config config : configs) {
-            if (config.getKey().contains("client"))
-                this.clientConfigMap.put(config.getKey(), config);
+    public synchronized void updateConfig(String key) {
+        if (this.configMap.containsKey(key)) {
+            this.configMap.remove(key);
+            this.getConfig(key);
         }
     }
 
-    private void processSink(Sink[] sinks) {
-        tokenSinkMap = new ConcurrentHashMap<String, Sink>(sinks.length);
-
-        for (Sink sink : sinks) {
-            tokenSinkMap.put(sink.getToken(), sink);
+    public synchronized Node getNotificationExchangeNode() {
+        if (this.notificationExchangeNode != null) {
+            return this.notificationExchangeNode;
+        } else {
+            this.notificationExchangeNode = this.pubsuberManager.get(
+                Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL, Node.class);
+            return this.notificationExchangeNode;
         }
     }
 
-    private void processChannel(Sink[] channels) {
-        pubsubChannelMap = new ConcurrentHashMap<String, String>();
+    public synchronized void updateNotificationNode() {
+        this.notificationExchangeNode = null;
+        this.getNotificationExchangeNode();
+    }
 
-        for (Sink channel : channels) {
-            if (pubsubChannelMap.containsKey(channel.getFlowFrom())) {
-                String tmp = pubsubChannelMap.get(channel.getFlowFrom());
-                tmp += ("," + channel.getFlowTo());
+    public synchronized NodeView getNodeView(String secret) {
+        if (Strings.isNullOrEmpty(secret)) {
+            throw new NullPointerException("the secret can not be null or empty");
+        }
 
-                pubsubChannelMap.put(channel.getFlowFrom(), tmp);
-            } else {
-                pubsubChannelMap.put(channel.getFlowFrom(), channel.getFlowTo());
-            }
+        if (this.secretNodeViewMap.containsKey(secret)) {   //local cache
+            return this.secretNodeViewMap.get(secret);
+        } else {                                            //remote data then local cache
+            NodeView nodeViewObj = this.pubsuberManager.get(secret, NodeView.class);
+            this.secretNodeViewMap.put(secret, nodeViewObj);
+            return nodeViewObj;
+        }
+    }
+
+    public synchronized void updateNodeView(String secret) {
+        if (this.secretNodeViewMap.containsKey(secret)) {
+            this.secretNodeViewMap.remove(secret);
+            this.getNodeView(secret);
         }
     }
 

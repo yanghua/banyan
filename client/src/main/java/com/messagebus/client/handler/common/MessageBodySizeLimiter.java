@@ -1,11 +1,11 @@
 package com.messagebus.client.handler.common;
 
 import com.google.common.base.Strings;
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.message.model.Message;
+import com.messagebus.client.model.Node;
 
 /**
  * Created by yanghua on 3/23/15.

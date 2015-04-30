@@ -14,15 +14,10 @@ public class Constants {
 
     public static final byte[] EMPTY_PRIMITIVE_BYTE_ARRAY = new byte[0];
 
-    public static final String PUBSUB_ROUTER_CHANNEL  = "/router";
-    public static final String PUBSUB_CONFIG_CHANNEL  = "/config";
-    public static final String PUBSUB_EVENT_CHANNEL   = "/event";
-    public static final String PUBSUB_SINK_CHANNEL    = "/sink";
-    public static final String PUBSUB_CHANNEL_CHANNEL = "/channel";
-
-    public static final String AUDIT_TYPE_CODE_BEFORE  = "AUDIT_BEFORE";
-    public static final String AUDIT_TYPE_CODE_SUCCESS = "AUDIT_SUCCESS";
-    public static final String AUDIT_TYPE_CODE_FAILED  = "AUDIT_FAILED";
+    public static final String PUBSUB_NODEVIEW_CHANNEL              = "/event/nodeView";
+    public static final String PUBSUB_CONFIG_CHANNEL                = "/event/config";
+    public static final String PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL = "/event/notification";
+    public static final String PUBSUB_SERVER_STATE_CHANNEL          = "/event/serverState";
 
 
     public static final String COMMUNICATE_TYPE_PRODUCE                = "produce";

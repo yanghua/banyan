@@ -1,9 +1,9 @@
 package com.messagebus.client.handler.response;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.handler.common.PermissionChecker;
+import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 
 /**
@@ -19,7 +19,6 @@ public class ResponsePermission extends PermissionChecker {
 
         Node sourceNode = context.getSourceNode();
         boolean hasPermission = !sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_REQUEST);
-        hasPermission = hasPermission && context.getConfigManager().getReqrespNodeMap().containsKey(sourceNode.getName());
 
         if (!hasPermission) {
             throw new RuntimeException("permission error : can not consume ");

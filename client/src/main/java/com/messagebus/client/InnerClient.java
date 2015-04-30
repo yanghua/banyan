@@ -1,7 +1,7 @@
 package com.messagebus.client;
 
-import com.messagebus.business.exchanger.ExchangerManager;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
@@ -18,9 +18,9 @@ abstract class InnerClient {
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
     //inject by reflector
-    private ExchangerManager exchangeManager;
-    private ConfigManager    configManager;
-    private Connection       connection;
+    private PubsuberManager exchangeManager;
+    private ConfigManager   configManager;
+    private Connection      connection;
 
     private   Channel                 channel;
     protected GenericContext          context;

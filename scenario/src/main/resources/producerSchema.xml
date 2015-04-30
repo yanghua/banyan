@@ -20,14 +20,14 @@
                 <xs:element name="sex">
                     <xs:simpleType>
                         <xs:restriction base="xs:unsignedShort">
-                            <xs:maxLength value="1" />
+                            <xs:maxLength value="1"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="birthday">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="20" />
+                            <xs:maxLength value="20"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>

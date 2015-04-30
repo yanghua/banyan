@@ -1,10 +1,9 @@
 package com.messagebus.client.handler.common;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
-import com.messagebus.client.handler.ParamValidateFailedException;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,15 +25,15 @@ public abstract class AbstractParamValidator extends AbstractHandler {
                        IHandlerChain chain) {
         Node sourceNode = context.getSourceNode();
         if (sourceNode == null) {
-            throw new ParamValidateFailedException(" the source node is illegal. ");
+            throw new RuntimeException(" the source node is illegal. ");
         }
 
         if (sourceNode.getType().equals("0")) {
-            throw new ParamValidateFailedException(" the appId's owner must be a queue node");
+            throw new RuntimeException(" the node with name " + sourceNode.getName() + " must be a queue ");
         }
 
         if (!sourceNode.isAvailable()) {
-            throw new ParamValidateFailedException(" the appid's owner is not available");
+            throw new RuntimeException(" the queue " + sourceNode.getName() + " is not available ");
         }
     }
 }

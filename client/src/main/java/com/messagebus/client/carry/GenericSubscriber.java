@@ -1,10 +1,10 @@
 package com.messagebus.client.carry;
 
-import com.messagebus.business.model.Node;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.MessageCarryHandlerChain;
 import com.messagebus.client.model.MessageCarryType;
+import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,7 +34,7 @@ class GenericSubscriber extends AbstractMessageCarryer implements Runnable, ISub
         final MessageContext ctx = initMessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
         ctx.setSecret(this.secret);
-        Node sourceNode = this.getContext().getConfigManager().getSecretNodeMap().get(this.secret);
+        Node sourceNode = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
         ctx.setSourceNode(sourceNode);
         ctx.setReceiveListener(this.onMessage);
         ctx.setSync(false);

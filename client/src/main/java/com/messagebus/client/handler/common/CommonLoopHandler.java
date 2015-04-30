@@ -30,26 +30,7 @@ public abstract class CommonLoopHandler extends AbstractHandler {
 
                 Message msg = MessageFactory.createMessage(delivery);
 
-//                AMQP.BasicProperties properties = delivery.getProperties();
-//                byte[] msgBody = delivery.getBody();
-//
-////                context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-//
-//                String msgTypeStr = properties.getType();
-//                if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-//                    logger.error("[run] message type is null or empty");
-//                    continue;
-//                }
-//
-//                MessageType msgType = null;
-//                try {
-//                    msgType = MessageType.lookup(msgTypeStr);
-//                } catch (UnknownError unknownError) {
-//                    ExceptionHelper.logException(logger, unknownError, "common loop handler");
-//                    continue;
-//                }
-//                Message msg = MessageFactory.createMessage(msgType);
-//                initMessage(msg, properties, msgBody);
+                if (msg == null) continue;
 
                 context.setConsumedMsg(msg);
 

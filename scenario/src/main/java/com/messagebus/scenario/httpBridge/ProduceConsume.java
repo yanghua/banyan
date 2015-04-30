@@ -1,6 +1,9 @@
 package com.messagebus.scenario.httpBridge;
 
-import com.messagebus.client.message.model.*;
+import com.messagebus.client.message.model.Message;
+import com.messagebus.client.message.model.MessageFactory;
+import com.messagebus.client.message.model.MessageJSONSerializer;
+import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;

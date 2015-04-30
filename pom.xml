@@ -10,14 +10,13 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>client</module>
-        <module>server</module>
         <module>common-component</module>
         <module>managesystem</module>
         <module>interactor-component</module>
         <module>scenario</module>
         <module>httpbridge</module>
         <module>benchmark</module>
-        <module>business-component</module>
+        <module>service</module>
     </modules>
     <name>a message bus</name>
 

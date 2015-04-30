@@ -20,28 +20,28 @@
                 <xs:element name="XSXB">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="10" />
+                            <xs:maxLength value="10"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="CSNF">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="10" />
+                            <xs:maxLength value="10"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="CSYF">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="10" />
+                            <xs:maxLength value="10"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="CSRQ">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="10" />
+                            <xs:maxLength value="10"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
