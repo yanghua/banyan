@@ -78,18 +78,6 @@ the sequence of order is defined in config file[handler.xml](https://github.com/
 * IHandlerChain: defined handle method，used to implement `handler-chain`
 * MessageCarryHandlerChain: implemented ***IHandlerChain*** ,and built a handler-chain for processing message
 
-###router info
-the message's router model depends the rabbitmq's topic mode and a tree topology structure. And the tree node just has two types: `exchange`, `queue`.
-
-here, both of them were be abstracted as a structure `Node`.
-
-it's structure listed below：
-![img 7][7]
-
-It is a simple Java POJO.
-
-this is data base's table schema:
-![img 8][8]
 
 ##server
 the message bus also depends some core service build around the RabbitMQ. These service run as a long-time deamon service host in a server. the service itself is the user of `client` and it use queue `proxy.message.system.server`.
