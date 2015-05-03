@@ -79,37 +79,6 @@ the sequence of order is defined in config file[handler.xml](https://github.com/
 * MessageCarryHandlerChain: implemented ***IHandlerChain*** ,and built a handler-chain for processing message
 
 
-##server
-the message bus also depends some core service build around the RabbitMQ. These service run as a long-time deamon service host in a server. the service itself is the user of `client` and it use queue `proxy.message.system.server`.
-
-`server` contains three parts：
-
-- app : the enter of server and supported the start-logic 
-- bootstrap : server's core service，Generally it contains：rabbitmq-server's startup/zookeeper's startup；they start sychorizely and can noe be failure.
-- daemon : defined some daemon service
-
-##interactor-component
-the module encapsulated the interaction with RabbitMW (used rabbitmq-java-client). and stop the direct dependency of rabbitmq-java-client
-
-now it contains three parts:
-
-* rabbitmq : encapsoluted rabbitmq中exchange/queue/channel/topology operate interface
-* proxy : provided produce and consume message's api
-* message : provided message header / body 's adapter and box and unbox message
-
-
-##common-component
-common component provides some common structure's definition(such as message header and message body) and some common util methods.
-
-the message's definition:
-
-![img 9][9]
-
-##business-component
-it is the message bus's business component
-
-##httpbridge
-it's the http api of message bus that used to connect those apps built without java technology.
 
 ###restful
 ####produce：
@@ -281,13 +250,10 @@ response :
 ```
 
 ##scenario & usage
-scenario is used to show:
-
-* message bus's client use-scenario
-* test message bus's function
-* test message bus's client api
 
 ###produce & consume
+
+* [produce](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L34) / [pull consume](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L46)
 
 ```java
 private static void produce() {
