@@ -28,9 +28,9 @@ public class ProduceConsume {
     private static final Log logger = LogFactory.getLog(ProduceConsume.class);
 
     public static void main(String[] args) {
-//        testProduceWithPost();
+        testProduceWithPost();
 
-        testProduceWithGet();
+//        testProduceWithGet();
 
         testConsume("pull");
     }
