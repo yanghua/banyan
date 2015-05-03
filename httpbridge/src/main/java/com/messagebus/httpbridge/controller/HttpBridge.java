@@ -93,7 +93,7 @@ public class HttpBridge extends HttpServlet {
         if (httpMethod.equals("get")) {
             produceWithGet(request, response);
         } else if (httpMethod.equals("post")) {
-                produceWithPost(request, response);
+            produceWithPost(request, response);
         }
     }
 
@@ -117,7 +117,7 @@ public class HttpBridge extends HttpServlet {
 
         if (Strings.isNullOrEmpty(queueName)) {
             ResponseUtil.responseForJsonp(response, callback,
-                                  Constants.HTTP_FAILED_CODE, "param : qname can not be null or empty", "", "\"\"");
+                                          Constants.HTTP_FAILED_CODE, "param : qname can not be null or empty", "", "\"\"");
             return;
         }
 
@@ -126,7 +126,6 @@ public class HttpBridge extends HttpServlet {
                                           Constants.HTTP_FAILED_CODE, "param : token can not be null or empty", "", "\"\"");
             return;
         }
-
 
 
         String contentEncoding = request.getParameter("contentEncoding");
