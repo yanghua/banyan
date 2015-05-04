@@ -259,205 +259,26 @@ response :
 * [produce-loopback](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsumeLoopback.java#L15) / [consume-loopback](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsumeLoopback.java#L15)
 
 
-###request
+###request & response
 
-```java
-public static void main(String[] args) {
-        Messagebus messagebus = Messagebus.getInstance(appkey);
-        messagebus.setZkHost(host);
-        messagebus.setZkPort(port);
+* [request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRequestResponse.java#L35) / [response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRequestResponse.java#L35) 
 
-        Message msg = MessageFactory.createMessage(MessageType.AppMessage);
-        String queueName = "crm";
+###publish & subscirbe
 
-        AppMessageBody appMessageBody = (AppMessageBody) msg.getMessageBody();
-        appMessageBody.setMessageBody("test".getBytes());
+* [publish](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FPublishSubscribe.java#L31) / [subscribe](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FPublishSubscribe.java#L31)
 
-        Message respMsg = null;
+###broadcast & notification-handler
 
-        try {
-            messagebus.open();
-            IRequester requester = messagebus.getRequester();
+* [broadcast](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FBroadcast.java#L31) / [notification-handler](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FBroadcast.java#L31)
 
-            respMsg = requester.request(msg, queueName, 10);
-            //use response message...
-            logger.info("response message : [" + respMsg.getMessageHeader().getMessageId() + "]");
-        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException |
-            MessageResponseTimeoutException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            messagebus.close();
-        }
-    }
-```
+###json-rpc(wrapped-offical-java-client)
 
-###response
+* [rpc-request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRpcRequestResponse.java#L28) / [rpc-response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRpcRequestResponse.java#L28)
 
-```java
-public static class ResponseService extends Thread {
+###thrift-rpc(thrid-party-rpc-integrated)
 
-        Messagebus client = Messagebus.getInstance(appkey);
+* [rpc-request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L36) / [rpc-response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L59)
 
-        String          appName        = "crm";
-        IConsumerCloser consumerCloser = null;
-        private final Object lockObj = new Object();
-
-        @Override
-        public void run() {
-            try {
-                synchronized (lockObj) {
-                    //set zookeeper info
-                    client.setZkHost(host);
-                    client.setZkPort(port);
-
-                    client.open();
-                    IConsumer consumer = client.getConsumer();
-                    final IResponser responser = client.getResponser();
-                    consumerCloser = consumer.consume(appName, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message) {
-                            //handle message
-                            String msgId = String.valueOf(message.getMessageHeader().getMessageId());
-                            logger.info("[" + msgId +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
-
-                            //send response
-                            responser.responseTmpMessage(message, msgId);
-                        }
-                    });
-
-                    logger.info("blocked for receiving message!");
-                    lockObj.wait(0);
-                    logger.info("released object lock!");
-                }
-            } catch (IOException | MessagebusUnOpenException |
-                MessagebusConnectedFailedException | InterruptedException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                logger.info("close client");
-                consumerCloser.closeConsumer();
-                client.close();
-            }
-        }
-
-        public void stopService() {
-            //style 1 : use lock released
-            synchronized (lockObj) {
-                lockObj.notifyAll();
-            }
-
-            //style 2 : use interrupt
-//            this.interrupt();
-        }
-    }
-```
-
-###publish
-
-```java
-public static void publish() {
-        Message msg = MessageFactory.createMessage(MessageType.PubSubMessage);
-        msg.getMessageHeader().setReplyTo("crm");
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
-
-        PubSubMessage.PubSubMessageBody body = new PubSubMessage.PubSubMessageBody();
-        body.setContent("test".getBytes());
-        msg.setMessageBody(body);
-
-        Messagebus client = Messagebus.createClient(appId);
-        client.setZkHost(host);
-        client.setZkPort(port);
-
-        try {
-            client.open();
-            client.getPublisher().publish(new Message[]{msg});
-        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
-            e.printStackTrace();
-        } finally {
-            client.close();
-        }
-    }
-```
-
-###subscirbe
-
-```java
-public static class SubscribeService extends Thread {
-
-        Messagebus client = Messagebus.createClient(appId);
-
-        List<String>      subQueueNames    = new CopyOnWriteArrayList<>(new String[]{"crm"});
-        ISubscribeManager subscribeManager = null;
-        final Object lockObj = new Object();
-
-        @Override
-        public void run() {
-            try {
-                synchronized (lockObj) {
-                    //set zookeeper info
-                    client.setZkHost(host);
-                    client.setZkPort(port);
-
-                    client.open();
-                    ISubscriber subscriber = client.getSubscriber();
-                    subscribeManager = subscriber.subscribe(subQueueNames, new IMessageReceiveListener() {
-                        @Override
-                        public void onMessage(Message message, IReceiverCloser consumerCloser) {
-                            logger.info("[" + message.getMessageHeader().getMessageId() +
-                                            "]-[" + message.getMessageHeader().getType() + "]");
-                        }
-                    });
-
-                    logger.info("blocked for receiving message!");
-                    lockObj.wait(0);
-                    logger.info("released object lock!");
-                }
-            } catch (IOException | MessagebusUnOpenException |
-                MessagebusConnectedFailedException | InterruptedException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                logger.info("close client");
-                subscribeManager.close();
-                client.close();
-            }
-        }
-```
-
-###broadcast
-
-```java
-public static void broadcast() {
-        String queueName = "crm";
-        Message msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
-        msg.getMessageHeader().setReplyTo(queueName);
-        msg.getMessageHeader().setContentType("text/plain");
-        msg.getMessageHeader().setContentEncoding("utf-8");
-
-        BroadcastMessage.BroadcastMessageBody body = new BroadcastMessage.BroadcastMessageBody();
-        body.setContent("test".getBytes());
-        msg.setMessageBody(body);
-
-        Messagebus client = Messagebus.createClient(appId);
-        client.setZkHost(host);
-        client.setZkPort(port);
-
-        try {
-            client.open();
-            client.getBroadcaster().broadcast(new Message[]{msg});
-        } catch (MessagebusConnectedFailedException | MessagebusUnOpenException e) {
-            e.printStackTrace();
-        } finally {
-            client.close();
-        }
-    }
-```
 
 ###http-resut
 
