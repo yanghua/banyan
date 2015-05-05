@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://ofbiz.apache.org/dtds/widget-screen.xsd">
+
+    <screen name="main">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/>
+                <set field="titleProperty" value="PageTitleViewAppList"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-portal-page id="banyanDashboard"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="mqServerOverviewScreen">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://banyan/webapp/banyan/ftl/mqServerOverview.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queuedMsgChartScreen">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://banyan/webapp/banyan/ftl/queuedMsgChart.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="msgRateChartScreen">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://banyan/webapp/banyan/ftl/msgRateChart.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queuedMsgRateChartScreen">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://banyan/webapp/banyan/ftl/queuedMsgRateChart.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <!-- queue -->
+    <screen name="queueScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+                <set field="titleProperty" value="PageTitleViewQueueList"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+                <set field="requestParameters.isInner" value="0"/>
+                <set field="requestParameters.type" value="1"/>
+                <set field="requestParameters.creator" value="${userLogin.userLoginId}"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="menu-bar">
+                                        <container style="button-bar">
+                                            <link target="addQueue" style="buttontext create"
+                                                  text="${uiLabelMap.addQueue}"/>
+                                        </container>
+                                    </decorator-section>
+                                    <decorator-section name="search-options">
+                                        <include-form name="findQueueForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="queueListForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="addQueueScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+                <set field="titleProperty" value="PageTitleAddQueue"/>
+                <set field="donePage" from-field="parameters.DONE_PAGE" default-value="main"/>
+                <entity-condition entity-name="App" list="currentUserApps">
+                    <condition-list>
+                        <condition-expr field-name="creator" operator="equals" value="${userLogin.userLoginId}"/>
+                    </condition-list>
+                </entity-condition>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleAddQueue}"/>
+                        </container>
+                        <include-form name="createQueueForm"
+                                      location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="editQueueScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+                <set field="cancelPage" from-field="parameters.CANCEL_PAGE" default-value="queue"/>
+                <set field="nodeId" from-field="parameters.nodeId"/>
+                <entity-one entity-name="Node" value-field="editingQueue"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleEditQueue}"/>
+                        </container>
+                        <include-form name="updateQueueForm" location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queueDetailScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <container id="split50">
+                                    <container style="lefthalf">
+                                        <include-screen name="queueInfo"/>
+                                    </container>
+                                    <container style="righthalf">
+                                    </container>
+                                </container>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h2" text="error"/>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queueInfo">
+        <section>
+            <actions>
+                <entity-one entity-name="Node" value-field="lookupNode"/>
+            </actions>
+            <widgets>
+                <screenlet title="${uiLabelMap.NodeInformation}" navigation-menu-name="MenuQueueUpdate"
+                           id="NodeInformationPanel">
+                    <include-menu name="MenuQueueUpdate" location="component://banyan/widget/BanyanMenus.xml"/>
+                    <include-form name="queueDetailForm" location="component://banyan/widget/BanyanForms.xml"/>
+                </screenlet>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queueRateWarningScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+                <set field="titleProperty" value="PageTitleViewQueueList"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-form name="queueRateWarningListForm"
+                                              location="component://banyan/widget/BanyanForms.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <!-- sink -->
+    <screen name="sinkScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="sink"/>
+                <set field="titleProperty" value="PageTitleViewSinkList"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+                <set field="requestParameters.creator" value="${userLogin.userLoginId}"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="menu-bar">
+                                        <container style="button-bar">
+                                            <link target="addSink" style="buttontext create"
+                                                  text="${uiLabelMap.addSink}"/>
+                                        </container>
+                                    </decorator-section>
+                                    <decorator-section name="search-options">
+                                        <include-form name="findSinkForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="sinkListForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="addSinkScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="sink"/>
+                <set field="titleProperty" value="PageTitleAddSink"/>
+                <set field="donePage" from-field="parameters.DONE_PAGE" default-value="main"/>
+                <entity-condition entity-name="Node" list="availableQueues">
+                    <condition-list>
+                        <condition-expr field-name="available" operator="equals" value="1"/>
+                        <condition-expr field-name="isInner" operator="equals" value="0"/>
+                        <condition-expr field-name="auditTypeCode" operator="equals" value="AUDIT_SUCCESS"/>
+                        <condition-expr field-name="type" operator="equals" value="1"/>
+                    </condition-list>
+                </entity-condition>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleAddSink}"/>
+                        </container>
+                        <include-form name="createSinkForm"
+                                      location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <!-- maintain -->
+    <screen name="nodeMaintainScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="maintain"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuMaintainTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="search-options">
+                                        <include-form name="findNodeForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="nodeListForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="sinkMaintainScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="maintain"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuMaintainTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <link target="addSink" style="buttontext create" text="${uiLabelMap.addSink}"/>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="search-options">
+                                        <include-form name="findSinkForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="sinkListForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="appScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="maintain"/>
+                <set field="titleProperty" value="PageTitleViewAppList"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuMaintainTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <link target="addApp" style="buttontext create" text="${uiLabelMap.addApp}"/>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="search-options">
+                                        <include-form name="findAppForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="appListForm"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="addAppScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="maintain"/>
+                <set field="titleProperty" value="PageTitleAddApp"/>
+                <set field="donePage" from-field="parameters.DONE_PAGE" default-value="main"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleAddApp}"/>
+                        </container>
+                        <include-form name="createAppForm"
+                                      location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queueDetailScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="queue"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <container id="split50">
+                                    <container style="lefthalf">
+                                        <include-screen name="queueInfoScreenlet"/>
+                                    </container>
+                                    <container style="righthalf">
+                                    </container>
+                                </container>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h2" text="error"/>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="queueInfoScreenlet">
+        <section>
+            <actions>
+                <entity-one entity-name="Node" value-field="lookupNode"/>
+            </actions>
+            <widgets>
+                <screenlet title="${uiLabelMap.NodeInformation}" navigation-menu-name="MenuAppUpdate"
+                           id="NodeInformationPanel">
+                    <include-menu name="MenuAppUpdate" location="component://banyan/widget/BanyanMenus.xml"/>
+                    <include-form name="ViewNodeDetail" location="component://banyan/widget/BanyanForms.xml"/>
+                </screenlet>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="editAppScreen">
+        <section>
+            <actions>
+                <set field="cancelPage" from-field="parameters.CANCEL_PAGE" default-value="queueDetail"/>
+                <set field="nodeId" from-field="parameters.nodeId"/>
+                <entity-one entity-name="Node" value-field="editingNode"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleEditNode}"/>
+                        </container>
+                        <include-form name="editNodeForm" location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <!-- Config -->
+    <screen name="configMaintainScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="maintain"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="10"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuMaintainTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <link target="addConfigItem" style="buttontext create" text="${uiLabelMap.addConfig}"/>
+                                <decorator-screen name="FindScreenDecorator"
+                                                  location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="search-options">
+                                        <include-form name="findConfigItem"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="configItemList"
+                                                      location="component://banyan/widget/BanyanForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="addConfigItemScreen">
+        <section>
+            <actions>
+                <set field="headerItem" value="config"/>
+                <set field="titleProperty" value="PageTitleNewConfig"/>
+                <set field="donePage" from-field="parameters.DONE_PAGE" default-value="config"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <container style="h1">
+                            <label text="${uiLabelMap.PageTitleNewConfig}"/>
+                        </container>
+                        <include-form name="addConfigItemForm"
+                                      location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="editConfigItemScreen">
+        <section>
+            <actions>
+                <set field="cancelPage" from-field="parameters.CANCEL_PAGE" default-value="configMaintain"/>
+                <set field="configId" from-field="parameters.configId"/>
+                <entity-one entity-name="Config" value-field="editingConfigItem"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <label text="${uiLabelMap.PageTitleEditConfig}"/>
+                        <include-form name="editConfigItemForm"
+                                      location="component://banyan/widget/BanyanForms.xml"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <!-- audit -->
+    <screen name="auditScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="audit"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuAuditTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <include-portal-page id="auditDashboard"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">Error.</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="unAuditQueuesScreen">
+        <section>
+            <actions>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="5"/>
+                <set field="requestParameters.isInner" value="0"/>
+                <set field="requestParameters.type" value="1"/>
+                <set field="requestParameters.auditTypeCode" value="AUDIT_BEFORE"/>
+            </actions>
+            <widgets>
+                <container style="screenlet">
+                    <platform-specific>
+                        <html>
+                            <html-template location="component://banyan/webapp/banyan/ftl/unAuditQueues.ftl"/>
+                        </html>
+                    </platform-specific>
+                    <container style="screenlet-body">
+                        <section>
+                            <widgets>
+                                <include-form name="unAuditedQListSnapshotForm"
+                                              location="component://banyan/widget/BanyanForms.xml"/>
+                            </widgets>
+                        </section>
+                    </container>
+                </container>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="unAuditSinksScreen">
+        <section>
+            <actions>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="5"/>
+                <set field="requestParameters.auditTypeCode" value="AUDIT_BEFORE"/>
+            </actions>
+            <widgets>
+                <container style="screenlet">
+                    <platform-specific>
+                        <html>
+                            <html-template location="component://banyan/webapp/banyan/ftl/unAuditSinks.ftl"/>
+                        </html>
+                    </platform-specific>
+                    <container style="screenlet-body">
+                        <section>
+                            <widgets>
+                                <include-form name="unAuditedSinkListSnapshotForm"
+                                              location="component://banyan/widget/BanyanForms.xml"/>
+                            </widgets>
+                        </section>
+                    </container>
+                </container>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="queueAuditScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="audit"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="5"/>
+                <set field="requestParameters.isInner" value="0"/>
+                <set field="requestParameters.type" value="1"/>
+                <set field="requestParameters.auditTypeCode" value="AUDIT_BEFORE"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuAuditTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <include-form name="unAuditedQueueListForm"
+                                              location="component://banyan/widget/BanyanForms.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="sinkAuditScreen">
+        <section>
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN"/>
+            </condition>
+            <actions>
+                <set field="headerItem" value="audit"/>
+                <set field="viewIndex" from-field="parameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="parameters.VIEW_SIZE" type="Integer" default-value="5"/>
+                <set field="requestParameters.auditTypeCode" value="AUDIT_BEFORE"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="BanyanCommonDecorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <include-menu name="MenuAuditTabBar"
+                                              location="component://banyan/widget/BanyanMenus.xml"/>
+                                <include-form name="unAuditedSinkListForm"
+                                              location="component://banyan/widget/BanyanForms.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+</screens>

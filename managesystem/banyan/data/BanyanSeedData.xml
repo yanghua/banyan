@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+
+    <!-- audit type -->
+    <AuditType auditTypeCode="AUDIT_BEFORE" auditTypeName="未审核" />
+    <AuditType auditTypeCode="AUDIT_SUCCESS" auditTypeName="审核通过" />
+    <AuditType auditTypeCode="AUDIT_FAILED" auditTypeName="审核未通过" />
+
+    <!-- communicate type -->
+    <!--<CommunicateType communicateTypeId="1" typeName="produce" />-->
+    <!--<CommunicateType communicateTypeId="2" typeName="consume" />-->
+    <!--<CommunicateType communicateTypeId="3" typeName="produce-consume" />-->
+    <!--<CommunicateType communicateTypeId="4" typeName="request" />-->
+    <!--<CommunicateType communicateTypeId="5" typeName="response" />-->
+    <!--<CommunicateType communicateTypeId="6" typeName="request-response" />-->
+    <!--<CommunicateType communicateTypeId="7" typeName="publish" />-->
+    <!--<CommunicateType communicateTypeId="8" typeName="subscribe" />-->
+    <!--<CommunicateType communicateTypeId="9" typeName="publish-subscribe" />-->
+    <!--<CommunicateType communicateTypeId="10" typeName="broadcast" />-->
+
+    <!-- node -->
+    <Node nodeId="1" name="proxy" value="exchange.proxy" parentId="-1" type="0" routerType="fanout" routingKey="" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="2" name="log" value="exchange.proxy.log"  parentId="1" type="0" routerType="fanout" routingKey="" available="1" isInner="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Node nodeId="3" name="message" value="exchange.proxy.message" parentId="1" type="0" routerType="topic" routingKey="" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="4" name="procon" value="exchange.proxy.message.procon" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.procon.#" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="5" name="pubsub" value="exchange.proxy.message.pubsub" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.pubsub.#" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="6" name="reqresp" value="exchange.proxy.message.reqresp" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.reqresp.#" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="7" name="rpc" value="exchange.proxy.message.rpc" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.rpc.#" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="8" name="notification" value="exchange.proxy.message.notification" parentId="3" type="0" routerType="fanout" routingKey="routingkey.proxy.message.notification.#" available="1" isInner="1" creator="banyanAdmin" />
+    <Node nodeId="9" secret="hkajhdfiuwxjdhakjdshuuuqoxdfasg" name="file" value="exchange.proxy.log.file" parentId="2" type="1" routerType="" routingKey="" available="1" isInner="1" creator="banyanAdmin" communicateType="consume" />
+
+    <!-- inner app -->
+    <App appId="1" name="server" creator="admin" fromDate="2015-03-22 09:15:45" />
+    <App appId="2" name="console" creator="admin" fromDate="2015-03-22 09:15:45" />
+
+    <!-- node for inner app -->
+    <Node nodeId="10" secret="iqwjasdfklakqoiajsidfoasidjoqw" name="serverInfoResponse" value="queue.proxy.message.reqresp.serverInfoResponse" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.serverInfoResponse" available="1" isInner="0" creator="banyanAdmin" appId="1" auditTypeCode="AUDIT_SUCCESS" communicateType="response" isVirtual="0" />
+    <Node nodeId="11" secret="nadjfqulaudhfkauwaudhfakqajd" name="serverCmdResponse" value="queue.proxy.message.reqresp.serverCmdResponse" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.serverCmdResponse" available="1" isInner="0" creator="banyanAdmin" appId="1" auditTypeCode="AUDIT_SUCCESS" communicateType="response" isVirtual="0" />
+    <Node nodeId="12" secret="miuhqihusahdfuhaksjhfuiqweka" name="serverInfoRequest" value="queue.proxy.message.reqresp.serverInfoRequest" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.serverInfoRequest" available="1" isInner="0" creator="banyanAdmin" appId="2" auditTypeCode="AUDIT_SUCCESS" communicateType="request" isVirtual="0" />
+    <Node nodeId="13" secret="lauhsdjkfhqiuwequhiausdfhuah" name="serverCmdRequest" value="queue.proxy.message.reqresp.serverCmdRequest" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.serverCmdRequest" available="1" isInner="0" creator="banyanAdmin" appId="2" auditTypeCode="AUDIT_SUCCESS" communicateType="request" isVirtual="0" />
+
+    <!-- sink for inner node -->
+    <Sink sinkId="1" token="masdjfqiowieqooeirfajhfihfweld" flowFrom="12" fromCommunicateType="request" flowTo="10" toCommunicateType="response" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="2" token="masuehiuiauhfiuqoquhaisudfhuqe" flowFrom="13" fromCommunicateType="request" flowTo="11" toCommunicateType="response" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+
+    <!-- config -->
+    <Config configId="1" itemKey="messagebus.client.host" itemValue="127.0.0.1" type="client" />
+    <Config configId="2" itemKey="messagebus.client.port" itemValue="5672" type="client" />
+
+</entity-engine-xml>

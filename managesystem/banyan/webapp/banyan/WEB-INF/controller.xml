@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/site-conf.xsd">
+    <!-- The controller elements that are common to all OFBiz components
+         can be found in the following xml file. A component can override the
+         elements found in the common-controller.xml file. -->
+    <include location="component://common/webcommon/WEB-INF/common-controller.xml"/>
+
+    <description>Banyan Component Site Configuration File</description>
+
+    <handler name="soap" type="request" class="org.ofbiz.webapp.event.SOAPEventHandler"/>
+
+    <!-- Events to run on every request before security (chains exempt) -->
+    <!--
+    <preprocessor>
+    </preprocessor>
+    -->
+    <!-- Events to run on every request after all other processing (chains exempt) -->
+    <!--
+    <postprocessor>
+        <event name="test" type="java" path="org.ofbiz.webapp.event.TestEvent" invoke="test"/>
+    </postprocessor>
+    -->
+
+    <!-- Request Mappings -->
+    <request-map uri="main"><security https="false" auth="true"/><response name="success" type="view" value="main"/></request-map>
+    <request-map uri="getMQServerOverview"><security https="false" auth="true"/><event type="java" path="org.ofbiz.banyan.event.RabbitmqEvent" invoke="requestRabbitmqInfo" /><response name="success" type="request" value="json" /><response name="error" type="request" value="" /></request-map>
+
+    <!-- queue -->
+    <request-map uri="queue"><security https="false" auth="true" /><response name="success" type="view" value="queueScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="findQueue"><security https="false" auth="true" /><response name="success" type="view" value="findQueueScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="addQueue"><security https="false" auth="true" /><response name="success" type="view" value="addQueueScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="createQueue"><security https="false" auth="true" /><event type="service" invoke="createQueueService" /><response name="success" type="request-redirect" value="queue" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="editQueue"><security https="false" auth="true"/><response name="success" type="view" value="editQueueScreen"/><response name="error" type="view" value="main"/></request-map>
+    <request-map uri="updateQueue"><security https="false" auth="true"/><event type="service" invoke="updateQueueService"/><response name="success" type="request-redirect" value="queue"/><response name="error" type="request-redirect" value="queue"/></request-map>
+    <request-map uri="queueDetail"><security https="false" auth="true" /><response name="success" type="view" value="queueDetailScreen" /><response name="error" type="view" value="main" /></request-map>
+
+    <request-map uri="queueRateWarning"><security https="false" auth="true" /><response name="success" type="view" value="queueRateWarningScreen" /><response name="error" type="view" value="main" /></request-map>
+
+    <!-- sink -->
+    <request-map uri="sink"><security https="false" auth="true" /><response name="success" type="view" value="sinkScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="findSink"><security https="false" auth="true" /><response name="success" type="view" value="findSinkScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="addSink"><security https="false" auth="true" /><response name="success" type="view" value="addSinkScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="createSink"><security https="false" auth="true" /><event type="service" invoke="createSinkService" /><response name="success" type="request-redirect" value="sink" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="switchSink"><security https="false" auth="true" /><event type="service" invoke="switchSinkService" /><response name="success" type="request-redirect" value="sink" /><response name="error" type="request-redirect" value="sink" /></request-map>
+    <request-map uri="removeSink"><security https="false" auth="true" /><event type="service" invoke="removeSinkService" /><response name="success" type="request-redirect" value="sink" /><response name="error" type="request-redirect" value="sink" /></request-map>
+
+    <!-- maintain -->
+    <request-map uri="maintain"><security https="false" auth="true" /><response name="success" type="view" value="maintainScreen" /><response name="error" type="view" value="main" /></request-map>
+
+    <request-map uri="appMaintain"><security https="false" auth="true" /><response name="success" type="view" value="appMaintainScreen" /><response name="error" type="view" value="appMaintainScreen" /></request-map>
+    <request-map uri="findApp"><security https="false" auth="true" /><response name="success" type="view" value="findAppScreen" /></request-map>
+    <request-map uri="addApp"><security https="false" auth="true"/><response name="success" type="view" value="addAppScreen"/><response name="error" type="view" value="addAppScreen" /></request-map>
+    <request-map uri="createApp"><security https="false" auth="true"/><event type="service" invoke="createAppService"/><response name="success" type="request-redirect" value="app"/><response name="error" type="view" value="main"/></request-map>
+    <request-map uri="queueDetail"><security https="false" auth="true"/><response name="success" type="view" value="queueDetailScreen"/><response name="error" type="view" value="main"/></request-map>
+    <request-map uri="editApp"><security https="false" auth="true"/><response name="success" type="view" value="editAppScreen"/><response name="error" type="view" value="main"/></request-map>
+    <request-map uri="updateApp"><security https="false" auth="true"/><event type="service" invoke="updateAppService"/><response name="success" type="request-redirect" value="queueDetail"/><response name="error" type="view" value="main"/></request-map>
+    <!--<request-map uri="removeApp"><security https="false" auth="true"/><event type="service" invoke="deleteNode"/><response name="success" type="request-redirect" value="main"/><response name="error" type="view" value="main"/></request-map>-->
+
+    <!-- maintain (node) -->
+    <request-map uri="nodeMaintain"><security https="false" auth="true" /><response name="success" type="view" value="nodeMaintainScreen" /><response name="error" type="view" value="main" /></request-map>
+
+    <!-- maintain (sink) -->
+    <request-map uri="sinkMaintain"><security https="false" auth="true" /><response name="success" type="view" value="sinkMaintainScreen" /><response name="error" type="view" value="main" /></request-map>
+
+    <!-- maintain (config) -->
+    <request-map uri="configMaintain"><security https="false" auth="true" /><response name="success" type="view" value="configMaintainScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="findConfigItem"><security https="false" auth="true" /><response name="success" type="view" value="findConfigItem" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="addConfigItem"><security https="false" auth="true" /><response name="success" type="view" value="addConfigItemScreen" /><response name="error" type="view" value="main" /></request-map>
+    <request-map uri="createConfigItem"><security https="false" auth="true" /><event type="service" invoke="createConfigItemService" /><response name="success" type="request-redirect" value="configMaintain" /><response name="error" type="view" value="configMaintain" /></request-map>
+    <request-map uri="editConfigItem"><security https="false" auth="true" /><response name="success" type="view" value="editConfigItemScreen" /><response name="error" type="view" value="configMaintain" /></request-map>
+    <request-map uri="updateConfigItem"><security https="false" auth="true" /><event type="service" invoke="updateConfigItemService" /><response name="success" type="request-redirect" value="configMaintain" /><response name="error" type="request-redirect" value="configMaintain" /></request-map>
+    <request-map uri="removeConfigItem"><security https="false" auth="true" /><event type="service" invoke="removeConfigItemService" /><response name="success" type="request-redirect" value="configMaintain" /><response name="error" type="request-redirect" value="configMaintain" /></request-map>
+
+    <!-- audit -->
+    <request-map uri="audit"><security https="false" auth="true" /><response name="success" type="view" value="auditScreen" /><response name="error" type="view" value="auditScreen" /></request-map>
+    <request-map uri="audit/queueAuditScreen"><security https="false" auth="true" /><response name="success" type="view" value="queueAuditScreen" /><response name="error" type="view" value="queueAuditScreen" /></request-map>
+    <request-map uri="queueAudit"><security https="false" auth="true" /><event type="service" invoke="auditQueueService" /><response name="success" type="view" value="queueAuditScreen" /><response name="error" type="view" value="queueAuditScreen" /></request-map>
+    <request-map uri="audit/sinkAuditScreen"><security https="false" auth="true" /><response name="success" type="view" value="sinkAuditScreen" /><response name="error" type="view" value="sinkAuditScreen" /></request-map>
+    <request-map uri="sinkAudit"><security https="false" auth="true" /><event type="service" invoke="auditSinkService" /><response name="success" type="view" value="sinkAuditScreen" /><response name="error" type="view" value="sinkAuditScreen" /></request-map>
+
+    <!-- soap web service -->
+    <request-map uri="soapservice"><event type="soap" /><response name="success" type="none" /><response name="error" type="none" /></request-map>
+
+    <!-- lookup -->
+    <request-map uri="LookupQueueName"><security https="false" auth="true" /><response name="success" type="view" value="lookupQueueNameScreen" /><response name="error" type="view" value="lookupQueueNameScreen" /></request-map>
+    
+    <!--  ********************************** View Mappings ***********************************  -->
+    <view-map name="main" type="screen" page="component://banyan/widget/BanyanScreens.xml#main"/>
+
+    <!-- queue -->
+    <view-map name="queueScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueScreen" />
+    <view-map name="findQueueScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueScreen" />
+    <view-map name="addQueueScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#addQueueScreen" />
+    <view-map name="editQueueScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#editQueueScreen" />
+    <view-map name="queueDetailScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueDetailScreen" />
+    <view-map name="queueRateWarningScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueRateWarningScreen" />
+
+    <!-- sink -->
+    <view-map name="sinkScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#sinkScreen" />
+    <view-map name="findSinkScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#sinkScreen" />
+    <view-map name="addSinkScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#addSinkScreen" />
+
+    <!-- maintain -->
+    <view-map name="maintainScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#nodeMaintainScreen" />
+
+    <!-- maintain app -->
+    <view-map name="appMaintainScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#appScreen" />
+    <view-map name="findAppScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#appScreen" />
+    <view-map name="addAppScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#addAppScreen"/>
+    <view-map name="queueDetailScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueDetailScreen"/>
+    <view-map name="editAppScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#editAppScreen"/>
+
+    <view-map name="nodeMaintainScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#nodeMaintainScreen" />
+
+    <view-map name="sinkMaintainScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#sinkMaintainScreen" />
+
+    <view-map name="configMaintainScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#configMaintainScreen" />
+    <view-map name="findConfigItem" type="screen" page="component://banyan/widget/BanyanScreens.xml#config" />
+    <view-map name="addConfigItemScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#addConfigItemScreen" />
+    <view-map name="editConfigItemScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#editConfigItemScreen" />
+
+    <!-- audit -->
+    <view-map name="auditScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#auditScreen" />
+    <view-map name="queueAuditScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#queueAuditScreen" />
+    <view-map name="sinkAuditScreen" type="screen" page="component://banyan/widget/BanyanScreens.xml#sinkAuditScreen" />
+
+    <!-- lookup -->
+    <view-map name="lookupQueueNameScreen" type="screen" page="component://banyan/widget/LookupScreens.xml#lookupQueueNameScreen" />
+
+</site-conf>

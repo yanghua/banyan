@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+
+    <App appId="3" name="emap" creator="banyanAdmin" fromDate="2015-03-16 10:15:45" />
+    <App appId="4" name="erp" creator="banyanAdmin" fromDate="2015-03-16 10:15:45" />
+    <App appId="5" name="amp" creator="banyanAdmin" fromDate="2015-03-31 03:28:30" />
+    <App appId="6" name="logSys" creator="banyanAdmin" fromDate="2015-04-27 13:28:30" />
+    <App appId="7" name="remoteAmp" creator="banyanAdmin" fromDate="2015-04-28 20:10:30" />
+
+    <Node nodeId="43" secret="kljasdoifqoikjhhhqwhebasdfasdf" name="erpDemoProduce" value="queue.proxy.message.procon.erpDemoProduce" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.erpDemoProduce" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="produce" isVirtual="1" canBroadcast="1" />
+    <Node nodeId="44" secret="kjhasdfhlkuqjhgaebjhasgdfabfak" name="erpDemoConsume" value="queue.proxy.message.procon.erpDemoConsume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.erpDemoConsume" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="consume" isVirtual="0" threshold="20000" rateLimit="1000" msgBodySize="2000" ttlPerMsg="" ttl=""  />
+    <Node nodeId="45" secret="jnmzqwemnjaksdfqjnkajfjasndfnw" name="erpDemoProduce-Consume" value="queue.proxy.message.procon.erpDemoProduce-Consume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.erpDemoProduce-Consume" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="produce-consume" isVirtual="0" threshold="100" msgBodySize="500" ttlPerMsg="" />
+    <Node nodeId="46" secret="iuoqiwejicaoisfaisfbsqewnfjnfa" name="erpDemoRequest" value="queue.proxy.message.reqresp.erpDemoRequest" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.erpDemoRequest" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="request" isVirtual="1" />
+    <Node nodeId="47" secret="muciasnajjkasbdfbaskjdfkjkasja" name="erpDemoResponse" value="queue.proxy.message.reqresp.erpDemoResponse" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.erpDemoResponse" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="response" isVirtual="0" />
+    <Node nodeId="48" secret="qiwernjknfaawenkjasdfkjnakllas" name="erpDemoRequest-Response" value="queue.proxy.message.reqresp.erpDemoRequest-Response" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.erpDemoRequest-Response" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="request-response" isVirtual="0" />
+    <Node nodeId="49" secret="oiqwenncuicnsdfuasdfnkajkwqowe" name="erpDemoPublish" value="queue.proxy.message.pubsub.erpDemoPublish" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.erpDemoPublish" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="publish" isVirtual="1" />
+    <Node nodeId="50" secret="nckljsenlkjanefluiwnlanfmsdfas" name="erpDemoSubscribe" value="queue.proxy.message.pubsub.erpDemoSubscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.erpDemoSubscribe" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="subscribe" isVirtual="0" />
+    <Node nodeId="51" secret="xzmjsdafnkjanuwqijpasdfnanlkna" name="erpDemoPublish-Subscribe" value="queue.proxy.message.pubsub.erpDemoPublish-Subscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.erpDemoPublish-Subscribe" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="publish-subscribe" isVirtual="0" />
+    <Node nodeId="52" secret="kliwhiduhaiucvarkjajksdbfkjabw" name="erpDemoRpcRequest" value="queue.proxy.message.rpc.erpDemoRpcRequest" parentId="7" type="1" routingKey="routingkey.proxy.message.rpc.erpDemoRpcRequest" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="rpcrequest" isVirtual="1" />
+    <Node nodeId="53" secret="jhliquwdlaisudfqbjhasdfulquias" name="erpDemoRpcResponse" value="queue.proxy.message.rpc.erpDemoRpcResponse" parentId="7" type="1" routingKey="routingkey.proxy.message.rpc.erpDemoRpcResponse" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_SUCCESS" communicateType="rpcresponse" isVirtual="0" />
+
+    <Node nodeId="73" secret="muqwejlaksdfkljaliqwejflkasdfs" name="emapDemoProduce" value="queue.proxy.message.procon.emapDemoProduce" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.emapDemoProduce" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="produce" isVirtual="1"   />
+    <Node nodeId="74" secret="zxdjnflakwenklasjdflkqpiasdfnj" name="emapDemoConsume" value="queue.proxy.message.procon.emapDemoConsume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.emapDemoConsume" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="consume" isVirtual="0" rateLimit="2000" msgBodySize="1000" ttlPerMsg="" ttl="" />
+    <Node nodeId="75" secret="zxjnlasndflkjasdlflqwekjnflaks" name="emapDemoProduce-Consume" value="queue.proxy.message.procon.emapDemoProduce-Consume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.emapDemoProduce-Consume" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="produce-consume" isVirtual="0" />
+    <Node nodeId="76" secret="mzxhblawdblulawkwkkwksifhlaasd" name="emapDemoRequest" value="queue.proxy.message.reqresp.emapDemoRequest" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.emapDemoRequest" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="request" isVirtual="1" />
+    <Node nodeId="77" secret="zxjhvclawenlkfhsladfnqpwenflak" name="emapDemoResponse" value="queue.proxy.message.reqresp.emapDemoResponse" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.emapDemoResponse" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="response" isVirtual="0" />
+    <Node nodeId="78" secret="xcvnbladflkasudflwepqowiejfoas" name="emapDemoRequest-Response" value="queue.proxy.message.reqresp.emapDemoRequest-Response" parentId="6" type="1" routingKey="routingkey.proxy.message.reqresp.emapDemoRequest-Response" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="request-response" isVirtual="0" />
+    <Node nodeId="79" secret="zxcjvhlawenlkfhsalfqpiieiwqqsd" name="emapDemoPublish" value="queue.proxy.message.pubsub.emapDemoPublish" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.emapDemoPublish" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="publish" isVirtual="1" />
+    <Node nodeId="80" secret="zxcnvblawelkusahdfqwiuhowefhnx" name="emapDemoSubscribe" value="queue.proxy.message.pubsub.emapDemoSubscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.emapDemoSubscribe" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="subscribe" isVirtual="0" />
+    <Node nodeId="81" secret="zxcnvblaeflbwehiouhusduaflsuda" name="emapDemoPublish-Subscribe" value="queue.proxy.message.pubsub.emapDemoPublish-Subscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.emapDemoPublish-Subscribe" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="publish-subscribe" isVirtual="0" />
+    <Node nodeId="82" secret="jnhiuerhskjdhfiasdkjhasdlkwerf" name="emapDemoRpcRequest" value="queue.proxy.message.rpc.emapDemoRpcRequest" parentId="7" type="1" routingKey="routingkey.proxy.message.rpc.emapDemoRpcRequest" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="rpcrequest" isVirtual="0" />
+    <Node nodeId="83" secret="mshdfjbqwejhfgasdfbjqkygaksdfa" name="emapDemoRpcResponse" value="queue.proxy.message.rpc.emapDemoRpcResponse" parentId="7" type="1" routingKey="routingkey.proxy.message.rpc.emapDemoRpcResponse" available="1" isInner="0" creator="banyanAdmin" appId="3" auditTypeCode="AUDIT_SUCCESS" communicateType="rpcresponse" isVirtual="0" />
+
+
+    <!-- amp -->
+    <Node nodeId="200" secret="iojawdnaisdflknoiankjfdblaidcas" name="appDataQueue" value="queue.proxy.message.procon.appDataQueue" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.appDataQueue" available="1" isInner="0" creator="banyanAdmin" appId="5" auditTypeCode="AUDIT_SUCCESS" communicateType="produce-consume" isVirtual="0" />
+    <Node nodeId="201" secret="qliudwnfljainfqlhalsdbfqlwehfbl" name="appErrorEventQueue" value="queue.proxy.message.procon.appErrorEventQueue" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.appErrorEventQueue" available="1" isInner="0" creator="banyanAdmin" appId="5" auditTypeCode="AUDIT_SUCCESS" communicateType="consume" isVirtual="0" />
+
+    <!-- logSys -->
+    <Node nodeId="300" secret="liredkifnhaqweuhfqbablwddflawea" name="appErrorEventProducer" value="queue.proxy.message.procon.appErrorEventProducer" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.appErrorEventProducer" available="1" isInner="0" creator="banyanAdmin" appId="6" auditTypeCode="AUDIT_SUCCESS" communicateType="produce" isVirtual="1" />
+
+    <!-- remoteAmp -->
+    <Node nodeId="400" secret="jbdlhbcLQHDBLASBDALsdblASHBDjhn" name="appErrorRemoteQProducer" value="queue.proxy.message.procon.appErrorRemoteQProducer" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.appErrorRemoteQProducer" available="1" isInner="0" creator="banyanAdmin" appId="7" auditTypeCode="AUDIT_SUCCESS" communicateType="produce" isVirtual="1" />
+    <Node nodeId="401" secret="lkaqnwejnfalwefjbsdfkjasnfjqlas" name="appErrorRemoteQ" value="queue.proxy.message.procon.appErrorRemoteQ" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.appErrorRemoteQ" available="1" isInner="0" creator="banyanAdmin" appId="7" auditTypeCode="AUDIT_SUCCESS" communicateType="consume" isVirtual="0" />
+
+    <!-- Sink -->
+    <Sink sinkId="3" token="hlkasjdhfkqlwhlfalksjdhgssssas" flowFrom="43" fromCommunicateType="produce" flowTo="74" toCommunicateType="consume" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="4" token="jhlkasdfkjhasdfqwkasdfjqkwjhas" flowFrom="73" fromCommunicateType="produce" flowTo="45" toCommunicateType="produce-consume" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="5" token="cakjdhfjasdflqjoiajsdjflqkuwef" flowFrom="46" fromCommunicateType="request" flowTo="77" toCommunicateType="response" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="6" token="cnjasdfluqhwehlkjqwheaizjdhasd" flowFrom="78" fromCommunicateType="request-response" flowTo="47" toCommunicateType="response" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="7" token="klasehnfkljashdnflhkjahwlekdjf" flowFrom="52" fromCommunicateType="rpcrequest" flowTo="83" toCommunicateType="rpcresponse" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="8" token="kjashdlkfjabsdkfjhbakwjlkhqwjh" flowFrom="82" fromCommunicateType="rpcrequest" flowTo="53" toCommunicateType="rpcresponse" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+
+    <Sink sinkId="9" token="laksjdfkjiqwheiuudiuhvqweqwefa" flowFrom="49" fromCommunicateType="publish" flowTo="50" toCommunicateType="subscribe" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="10" token="nclajsdljhqiuwehfiusaiudfhiausd" flowFrom="49" fromCommunicateType="publish" flowTo="80" toCommunicateType="subscribe" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="11" token="njafjqwhefuyasdafkbdgfkauyeqwku" flowFrom="79" fromCommunicateType="publish" flowTo="50" toCommunicateType="subscribe" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="12" token="migurhiquehoiusdhfouwiefhasboudy" flowFrom="79" fromCommunicateType="publish" flowTo="80" toCommunicateType="subscribe" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+
+    <Sink sinkId="13" token="qjenfiuqwefqiefoiusdfie2hfbwhfbd" flowFrom="300" fromCommunicateType="produce" flowTo="201" toCommunicateType="consume" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+    <Sink sinkId="14" token="kjandkjfnasdjkfasndfalkjbwejlaas" flowFrom="400" fromCommunicateType="produce" flowTo="401" toCommunicateType="consume" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_SUCCESS" />
+
+    <!-- queue rate warning -->
+    <QueueRateWarning warningId="1" nodeId="74" rateLimit="2000" realRate="4000" fromDate="2015-03-28 10:12:11" />
+    <QueueRateWarning warningId="2" nodeId="74" rateLimit="2000" realRate="4321" fromDate="2015-03-28 11:02:11" />
+    <QueueRateWarning warningId="3" nodeId="74" rateLimit="2000" realRate="5242" fromDate="2015-03-28 12:43:11" />
+    <QueueRateWarning warningId="4" nodeId="74" rateLimit="2000" realRate="4324" fromDate="2015-03-28 13:45:11" />
+    <QueueRateWarning warningId="5" nodeId="74" rateLimit="2000" realRate="7645" fromDate="2015-03-28 14:23:11" />
+
+    <!-- demo for UI show-->
+    <App appId="100" name="cms" creator="banyanAdmin" fromDate="2015-03-28 10:15:45" />
+    <App appId="101" name="oa" creator="banyanAdmin" fromDate="2015-03-28 10:15:45" />
+
+    <Node nodeId="100" secret="kjhqwehuksadhjkhkqfkjshduwuhas" name="cmsDemoProduce" value="queue.proxy.message.procon.cmsDemoProduce" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.cmsDemoProduce" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="produce" isVirtual="1"  />
+    <Node nodeId="101" secret="qiuiuchvqihuchvqnuicoaudhfieqi" name="cmsDemoConsume" value="queue.proxy.message.procon.cmsDemoConsume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.cmsDemoConsume" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="consume" isVirtual="0" threshold="20000" rateLimit="1000" msgBodySize="2000" ttlPerMsg="" ttl=""  />
+    <Node nodeId="102" secret="ijwlieulcaisduhfilhliuhdfbsjhx" name="cmsDemoPublish" value="queue.proxy.message.pubsub.cmsDemoPublish" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.cmsDemoPublish" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="publish" isVirtual="1" />
+    <Node nodeId="103" secret="jnsdlkblkAWEHLIDVBAJSDlohkjasn" name="cmsDemoSubscribe" value="queue.proxy.message.pubsub.cmsDemoSubscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.cmsDemoSubscribe" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="subscribe" isVirtual="0" />
+
+    <Node nodeId="104" secret="mfqemwqkjdkuhxqnklhawjebuwyiud" name="oaDemoProduce" value="queue.proxy.message.procon.oaDemoProduce" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.oaDemoProduce" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="produce" isVirtual="1"  />
+    <Node nodeId="105" secret="miwenasuhqiboudfqiuhfiuhdfquha" name="oaDemoConsume" value="queue.proxy.message.procon.oaDemoConsume" parentId="4" type="1" routingKey="routingkey.proxy.message.procon.oaDemoConsume" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="consume" isVirtual="0" threshold="20000" rateLimit="1000" msgBodySize="2000" ttlPerMsg="" ttl=""  />
+    <Node nodeId="106" secret="ewoiasnflieunjkdflqienflsdifln" name="oaDemoPublish" value="queue.proxy.message.pubsub.oaDemoPublish" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.oaDemoPublish" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="publish" isVirtual="1" />
+    <Node nodeId="107" secret="mnxcblawkebflifiauhfqliwuhflan" name="oaDemoSubscribe" value="queue.proxy.message.pubsub.oaDemoSubscribe" parentId="5" type="1" routingKey="routingkey.proxy.message.pubsub.oaDemoSubscribe" available="1" isInner="0" creator="banyanAdmin" appId="4" auditTypeCode="AUDIT_BEFORE" communicateType="subscribe" isVirtual="0" />
+
+    <Sink sinkId="100" token="iuwqijshdiuqjbuisdfiuewiuhiuiqw" flowFrom="100" flowTo="105" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_BEFORE" />
+    <Sink sinkId="101" token="akjfqkanlkjsdhfiqnlkajdhaskjasd" flowFrom="104" flowTo="101" enable="1" creator="banyanAdmin" auditTypeCode="AUDIT_BEFORE" />
+
+</entity-engine-xml>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-menu.xsd">
+    <menu name="MainAppBar" title="${uiLabelMap.BanyanApplication}" extends="CommonAppBarMenu"
+          extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="main" title="${uiLabelMap.CommonMain}">
+            <link target="main"/>
+        </menu-item>
+
+        <menu-item name="queue" title="${uiLabelMap.MenuQueue}">
+            <link target="queue"/>
+        </menu-item>
+        <menu-item name="sink" title="${uiLabelMap.MenuSink}">
+            <link target="sink"/>
+        </menu-item>
+        <menu-item name="maintain" title="${uiLabelMap.MenuMaintain}">
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN" />
+            </condition>
+            <link target="maintain" />
+        </menu-item>
+        <menu-item name="audit" title="${uiLabelMap.MenuAudit}">
+            <condition>
+                <if-has-permission permission="BANYAN" action="ADMIN" />
+            </condition>
+            <link target="audit" />
+        </menu-item>
+    </menu>
+
+    <!-- second level (tab bar) -->
+    <menu name="MenuMaintainTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="MenuMaintainTabBarNode" title="${uiLabelMap.MenuMaintainTabBarNode}">
+            <link target="nodeMaintain" />
+        </menu-item>
+        <menu-item name="MenuMaintainTabBarApp" title="${uiLabelMap.MenuMaintainTabBarApp}">
+            <link target="appMaintain" />
+        </menu-item>
+        <menu-item name="MenuMaintainTabBarSink" title="${uiLabelMap.MenuMaintainTabBarSink}">
+            <link target="sinkMaintain" />
+        </menu-item>
+        <menu-item name="MenuMaintainTabBarConfig" title="${uiLabelMap.MenuMaintainTabBarConfig}">
+            <link target="configMaintain"/>
+        </menu-item>
+    </menu>
+    <menu name="MenuAuditTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="MenuAuditTabBarDashBoard" title="${uiLabelMap.MenuAuditTabBarDashBoard}">
+            <link target="audit" />
+        </menu-item>
+        <menu-item name="MenuAuditTabBarQueue" title="${uiLabelMap.MenuAuditTabBarQueue}">
+            <link target="audit/queueAuditScreen" />
+        </menu-item>
+        <menu-item name="MenuAuditTabBarSink" title="${uiLabelMap.MenuAuditTabBarSink}">
+            <link target="audit/sinkAuditScreen" />
+        </menu-item>
+    </menu>
+
+    <menu name="MenuAppUpdate">
+        <menu-item name="update" title="${uiLabelMap.CommonUpdate}">
+            <link target="editApp">
+                <parameter param-name="nodeId" from-field="parameters.nodeId"/>
+            </link>
+        </menu-item>
+    </menu>
+    <menu name="MenuQueueUpdate">
+        <menu-item name="update" title="${uiLabelMap.CommonUpdate}">
+            <link target="editQueue">
+                <parameter param-name="nodeId" from-field="parameters.nodeId"/>
+            </link>
+        </menu-item>
+    </menu>
+
+</menus>

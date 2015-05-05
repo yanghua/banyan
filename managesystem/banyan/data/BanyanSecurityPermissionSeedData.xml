@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <!-- banyan's common permission -->
+    <SecurityPermission description="View operations in the Banyan Component." permissionId="BANYAN_VIEW"/>
+    <SecurityPermission description="Create operations in the Banyan Component." permissionId="BANYAN_CREATE"/>
+    <SecurityPermission description="Update operations in the Banyan Component." permissionId="BANYAN_UPDATE"/>
+    <SecurityPermission description="Delete operations in the Banyan Component." permissionId="BANYAN_DELETE"/>
+    <SecurityPermission description="ALL operations in the Banyan Component." permissionId="BANYAN_ADMIN"/>
+
+    <SecurityPermission description="ALL operations in the Banyan Component." permissionId="BANYAN_ADMIN"/>
+
+    <!-- banyan's special permission -->
+    <SecurityPermission description="" permissionId="BANYAN_SINK_AUDIT" />
+    <SecurityPermission description="" permissionId="BANYAN_INNER_NODE_OPERATE" />
+
+    <!-- banyan security group -->
+    <SecurityGroup description="Banyan Admin group, has all Banyan permissions." groupId="BANYANADMIN"/>
+    <SecurityGroup description="Banyan's general user" groupId="BANYANUSER" />
+
+    <SecurityGroupPermission groupId="BANYANADMIN" permissionId="BANYAN_ADMIN"/>
+    <SecurityGroupPermission groupId="BANYANADMIN" permissionId="BANYAN_SINK_AUDIT" />
+    <SecurityGroupPermission groupId="BANYANADMIN" permissionId="BANYAN_INNER_NODE_OPERATE" />
+    <SecurityGroupPermission groupId="BANYANADMIN" permissionId="OFBTOOLS_VIEW" />
+
+    <SecurityGroupPermission groupId="BANYANUSER" permissionId="BANYAN_VIEW" />
+    <SecurityGroupPermission groupId="BANYANUSER" permissionId="BANYAN_CREATE" />
+    <SecurityGroupPermission groupId="BANYANUSER" permissionId="BANYAN_UPDATE" />
+    <SecurityGroupPermission groupId="BANYANUSER" permissionId="BANYAN_DELETE" />
+    <SecurityGroupPermission groupId="BANYANUSER" permissionId="OFBTOOLS_VIEW" />
+
+    <!-- password : ofbiz -->
+    <!--<Party partyId="10000" partyTypeId="PERSON"/>-->
+    <!--<Person partyId="10000" firstName="hua" lastName="yang"/>-->
+    <!--<PartyRole partyId="10000" roleTypeId="_NA_"/>-->
+    <UserLogin userLoginId="banyanAdmin" currentPassword="$SHA$/.$IRk3HgfcwOa6SOeQiLszKrIRRDs" passwordHint=""/>
+    <UserLogin userLoginId="user" currentPassword="$SHA$z0pQ$g0PqQpZswq9hpF5hYLlth6npT6Q" passwordHint=""/>
+    <UserLoginSecurityGroup groupId="BANYANADMIN" userLoginId="banyanAdmin" fromDate="2001-01-01 12:00:00.0"/>
+    <UserLoginSecurityGroup groupId="BANYANUSER" userLoginId="user" fromDate="2001-01-01 12:00:00.0"/>
+
+</entity-engine-xml>

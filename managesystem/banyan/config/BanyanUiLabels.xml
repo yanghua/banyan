@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!-- application common -->
+    <property key="BanyanApplication"><value xml:lang="en">Banyan Application</value><value xml:lang="zh">Banyan应用程序</value></property>
+    <property key="BanyanCompanyName">
+        <value xml:lang="en">OFBiz: Banyan</value>
+        <value xml:lang="zh">OFBiz: 消息总线控制台</value>
+    </property>
+    <property key="BanyanCompanySubtitle">
+        <value xml:lang="en">Part of the Open For Business Family of Open Source Software</value>
+        <value xml:lang="it">Un modulo della famiglia di software open source Open For Business</value>
+        <value xml:lang="zh">开源软件OFBiz的组成部分</value>
+    </property>
+    <property key="BanyanViewPermissionError">
+        <value xml:lang="en">You are not allowed to view this page.</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+
+    <!-- common -->
+    <property key="creator"><value xml:lang="en">creator</value><value xml:lang="zh">创建人</value></property>
+    <property key="CommonMore"><value xml:lang="en">more</value><value xml:lang="zh">更多</value></property>
+    <property key="CommonCreatedStamp">
+        <value xml:lang="en">created date</value>
+        <value xml:lang="zh">创建日期</value>
+    </property>
+    <property key="CommonLastUpdatedStamp">
+        <value xml:lang="en">last update date</value>
+        <value xml:lang="zh">上次修改日期</value>
+    </property>
+    <property key="CommonRefresh">
+        <value xml:lang="en">refresh</value>
+        <value xml:lang="zh">刷新</value>
+    </property>
+    <property key="CommonAudit">
+        <value xml:lang="en" >audit</value>
+        <value xml:lang="zh">审核</value>
+    </property>
+    <property key="mqServerOverview">
+        <value xml:lang="en">mq server overview</value>
+        <value xml:lang="zh">消息服务器概览</value>
+    </property>
+    <property key="queuedMsgChart">
+        <value xml:lang="en">queued message chart</value>
+        <value xml:lang="zh">入队消息</value>
+    </property>
+    <property key="msgRateChart">
+        <value xml:lang="en">msg rate chart</value>
+        <value xml:lang="zh">详细速率</value>
+    </property>
+    <property key="queuedMsgRateChart">
+        <value xml:lang="en">queued msg rate chart</value>
+        <value xml:lang="zh">消息速率</value>
+    </property>
+    <property key="unAuditQueues">
+        <value xml:lang="en">unaudit queues</value>
+        <value xml:lang="zh">未审核的队列</value>
+    </property>
+    <property key="unAuditSinks">
+        <value xml:lang="en">unaudit sinks</value>
+        <value xml:lang="zh">未审核的信道</value>
+    </property>
+    <property key="unAuditChannels">
+        <value xml:lang="en">unaudit channels</value>
+        <value xml:lang="zh">未审核的频道</value>
+    </property>
+
+    <!-- menu -->
+    <property key="MenuSink">
+        <value xml:lang="en">sink</value>
+        <value xml:lang="zh">信道</value>
+    </property>
+    <property key="MenuChannel">
+        <value xml:lang="en">channel</value>
+        <value xml:lang="zh">频道</value>
+    </property>
+    <property key="MenuApp">
+        <value xml:lang="en">App</value>
+        <value xml:lang="zh">应用</value>
+    </property>
+    <property key="MenuTabBarConfig">
+        <value xml:lang="en">Config</value>
+        <value xml:lang="zh">配置</value>
+    </property>
+    <property key="MenuQueue">
+        <value xml:lang="en">queue</value>
+        <value xml:lang="zh">队列</value>
+    </property>
+    <property key="MenuMaintain">
+        <value xml:lang="en">maintain</value>
+        <value xml:lang="zh">管理</value>
+    </property>
+    <property key="MenuAudit">
+        <value xml:lang="en">audit</value>
+        <value xml:lang="zh">审核</value>
+    </property>
+    <property key="MenuMaintainTabBarApp">
+        <value xml:lang="en">app</value>
+        <value xml:lang="zh">应用</value>
+    </property>
+    <property key="MenuMaintainTabBarNode">
+        <value xml:lang="en">node</value>
+        <value xml:lang="zh">节点</value>
+    </property>
+    <property key="MenuMaintainTabBarSink">
+        <value xml:lang="en">sink</value>
+        <value xml:lang="zh">信道</value>
+    </property>
+    <property key="MenuMaintainTabBarConfig">
+        <value xml:lang="en">config</value>
+        <value xml:lang="zh">配置</value>
+    </property>
+    <property key="MenuAuditTabBarDashBoard">
+        <value xml:lang="en">dash board</value>
+        <value xml:lang="zh">面板</value>
+    </property>
+    <property key="MenuAuditTabBarQueue">
+        <value xml:lang="en">queue audit</value>
+        <value xml:lang="zh">队列</value>
+    </property>
+    <property key="MenuAuditTabBarSink">
+        <value xml:lang="en">sink</value>
+        <value xml:lang="zh">信道</value>
+    </property>
+
+    <!-- page title start -->
+    <property key="PageTitleAddApp">
+        <value xml:lang="en">add app</value>
+        <value xml:lang="zh">新增应用</value>
+    </property>
+    <property key="PageTitleAddQueue">
+        <value xml:lang="en">add queue</value>
+        <value xml:lang="zh">新增队列</value>
+    </property>
+    <property key="PageTitleEditQueue">
+        <value xml:lang="en">edit queue</value>
+        <value xml:lang="zh">编辑队列</value>
+    </property>
+    <property key="PageTitleViewNodeDetail">
+        <value xml:lang="en">view node detail</value>
+        <value xml:lang="zh">节点明细</value>
+    </property>
+    <property key="NodeInformation">
+        <value xml:lang="en">Node Information</value>
+        <value xml:lang="zh">节点信息</value>
+    </property>
+    <property key="PageTitleAddSink">
+        <value xml:lang="en">add sink</value>
+        <value xml:lang="zh">新增信道</value>
+    </property>
+    <property key="PageTitleEditNode">
+        <value xml:lang="en">Edit Node</value>
+        <value xml:lang="zh">编辑节点</value>
+    </property>
+    <property key="PageTitleViewConfigList">
+        <value xml:lang="en">Config List</value>
+        <value xml:lang="zh">配置列表</value>
+    </property>
+    <property key="PageTitleViewAppList">
+        <value xml:lang="en">view app list</value>
+        <value xml:lang="zh">浏览应用列表</value>
+    </property>
+    <property key="PageTitleViewQueueList">
+        <value xml:lang="en">view queue list</value>
+        <value xml:lang="zh">浏览队列列表</value>
+    </property>
+    <property key="PageTitleNewConfig">
+        <value xml:lang="en">New Config</value>
+        <value xml:lang="zh">新增配置项</value>
+    </property>
+    <property key="PageTitleViewSinkList">
+        <value xml:lang="en">view sink list</value>
+        <value xml:lang="zh">浏览信道列表</value>
+    </property>
+    <property key="PageTitleViewChannelList">
+        <value xml:lang="en">view channel list</value>
+        <value xml:lang="zh">浏览频道列表</value>
+    </property>
+    <property key="PageTitleBanyanLookupQueueByName">
+        <value xml:lang="en">lookup queue by name</value>
+        <value xml:lang="zh">查找队列名称</value>
+    </property>
+    <property key="PageTitleEditConfig">
+        <value xml:lang="en">edit config</value>
+        <value xml:lang="zh">编辑配置项</value>
+    </property>
+    <!-- page title end -->
+
+    <!-- node -->
+    <property key="nodeInfo">
+        <value xml:lang="en">node info</value>
+        <value xml:lang="zh">节点信息</value>
+    </property>
+    <property key="nodeConfig">
+        <value xml:lang="en">node config</value>
+        <value xml:lang="zh">节点配置</value>
+    </property>
+    <property key="addNode">
+        <value xml:lang="en">add node</value>
+        <value xml:lang="zh">新节点</value>
+    </property>
+    <property key="ListNode">
+        <value xml:lang="en">List Node</value>
+        <value xml:lang="zh">节点列表</value>
+    </property>
+    <property key="NodeName">
+        <value xml:lang="en">Node Name</value>
+        <value xml:lang="zh">节点名称</value>
+    </property>
+    <property key="NodeValue">
+        <value xml:lang="en">Node Value</value>
+        <value xml:lang="zh">节点值</value>
+    </property>
+    <property key="routerType">
+        <value xml:lang="en">Router Type</value>
+        <value xml:lang="zh">路由类型</value>
+    </property>
+    <property key="routingKey">
+        <value xml:lang="en">Router Key</value>
+        <value xml:lang="zh">路由路径</value>
+    </property>
+    <property key="nodeType">
+        <value xml:lang="en">Node Type</value>
+        <value xml:lang="zh">节点类型</value>
+    </property>
+    <property key="carryType">
+        <value xml:lang="en">Carry Type</value>
+        <value xml:lang="zh">通信类型</value>
+    </property>
+    <property key="NodeNotFound">
+        <value xml:lang="en">error finding node records: ${errorString}</value>
+        <value xml:lang="zh">查找节点记录时出错：${errorString}</value>
+    </property>
+    <property key="cancelLink">
+        <value xml:lang="en">cancel</value>
+        <value xml:lang="zh">取消</value>
+    </property>
+
+    <!-- app -->
+    <property key="App">
+        <value xml:lang="en">App</value>
+        <value xml:lang="zh">应用</value>
+    </property>
+    <property key="addApp">
+        <value xml:lang="en">Add App</value>
+        <value xml:lang="zh">新应用</value>
+    </property>
+    <property key="appName">
+        <value xml:lang="en">app name</value>
+        <value xml:lang="zh">应用名称</value>
+    </property>
+    <property key="btnListQueues">
+        <value xml:lang="en">list queue</value>
+        <value xml:lang="zh">查看队列</value>
+    </property>
+
+    <!-- queue -->
+    <property key="addQueue">
+        <value xml:lang="en">Add Queue</value>
+        <value xml:lang="zh">新队列</value>
+    </property>
+    <property key="queueName">
+        <value xml:lang="en">queue name</value>
+        <value xml:lang="zh">队列名称</value>
+    </property>
+    <property key="communicateType">
+        <value xml:lang="en">communicate type</value>
+        <value xml:lang="zh">通信类型</value>
+    </property>
+    <property key="isVirtual">
+        <value xml:lang="en">virtual</value>
+        <value xml:lang="zh">虚拟节点</value>
+    </property>
+    <property key="rateLimit">
+        <value xml:lang="en">rate limit(per second)</value>
+        <value xml:lang="zh">速率(次/秒)</value>
+    </property>
+    <property key="threshold">
+        <value xml:lang="en">threshold(item)</value>
+        <value xml:lang="zh">阈值(个)</value>
+    </property>
+    <property key="msgBodySize">
+        <value xml:lang="en">msg body size(bytes)</value>
+        <value xml:lang="zh">消息体大小(字节)</value>
+    </property>
+    <property key="rateWarning">
+        <value xml:lang="en">rate warning</value>
+        <value xml:lang="zh">限速警告</value>
+    </property>
+    <property key="ttl">
+        <value xml:lang="en">ttl</value>
+        <value xml:lang="zh">存活时间</value>
+    </property>
+    <property key="ttlPerMsg">
+        <value xml:lang="en">ttl per msg</value>
+        <value xml:lang="zh">存活时间(消息)</value>
+    </property>
+    <property key="maxRate">
+        <value xml:lang="en">max rate(per second)</value>
+        <value xml:lang="zh">限速(条/秒)</value>
+    </property>
+    <property key="available">
+        <value xml:lang="en">available</value>
+        <value xml:lang="zh">是否可用</value>
+    </property>
+    <property key="canBroadcast">
+        <value xml:lang="en">can broadcast</value>
+        <value xml:lang="zh">是否可广播</value>
+    </property>
+    <property key="realRate">
+        <value xml:lang="en">real rate(per second)</value>
+        <value xml:lang="zh">真实速率(条/秒)</value>
+    </property>
+    <property key="rateWarningDate">
+        <value xml:lang="en">rate warning date</value>
+        <value xml:lang="zh">发生时间</value>
+    </property>
+
+    <!-- sink -->
+    <property key="addSink">
+        <value xml:lang="en">Add Sink</value>
+        <value xml:lang="zh">新信道</value>
+    </property>
+    <property key="flowFrom">
+        <value xml:lang="en">flow from</value>
+        <value xml:lang="zh">从队列</value>
+    </property>
+    <property key="fromCommunicateType">
+        <value xml:lang="en">from communicate type</value>
+        <value xml:lang="zh">源类型</value>
+    </property>
+    <property key="flowTo">
+        <value xml:lang="en">flow to</value>
+        <value xml:lang="zh">到队列</value>
+    </property>
+    <property key="toCommunicateType">
+        <value xml:lang="en">to communicate type</value>
+        <value xml:lang="zh">目标类型</value>
+    </property>
+    <property key="auditType">
+        <value xml:lang="en">audit type</value>
+        <value xml:lang="zh">授权进度</value>
+    </property>
+    <property key="CommonEnableDisable">
+        <value xml:lang="en">enable / disable</value>
+        <value xml:lang="zh">禁用/激活</value>
+    </property>
+    <property key="CommonEnable">
+        <value xml:lang="en">enable</value>
+        <value xml:lang="zh">激活</value>
+    </property>
+    <property key="CommonDisable">
+        <value xml:lang="en">disable</value>
+        <value xml:lang="zh">禁用</value>
+    </property>
+    <property key="enable">
+        <value xml:lang="en">enable</value>
+        <value xml:lang="zh">激活</value>
+    </property>
+    <property key="disable">
+        <value xml:lang="en">disable</value>
+        <value xml:lang="zh">禁用</value>
+    </property>
+
+    <!-- channel -->
+    <property key="pushFrom">
+        <value xml:lang="en">push from</value>
+        <value xml:lang="zh">订阅源</value>
+    </property>
+    <property key="pushTo">
+        <value xml:lang="en">push to</value>
+        <value xml:lang="zh">订阅者</value>
+    </property>
+    <property key="addChannel">
+        <value xml:lang="en">add channel</value>
+        <value xml:lang="zh">新频道</value>
+    </property>
+
+
+    <!-- config -->
+    <property key="addConfig">
+        <value xml:lang="en">add config</value>
+        <value xml:lang="zh">新配置项</value>
+    </property>
+    <property key="newConfigItem">
+        <value xml:lang="en">New Config Item</value>
+        <value xml:lang="zh">新配置项</value>
+    </property>
+    <property key="itemKey">
+        <value xml:lang="en">item key</value>
+        <value xml:lang="zh">配置项</value>
+    </property>
+    <property key="itemValue">
+        <value xml:lang="en">item value</value>
+        <value xml:lang="zh">配置值</value>
+    </property>
+    <property key="itemType">
+        <value xml:lang="en">item type</value>
+        <value xml:lang="zh">配置类型</value>
+    </property>
+
+    <!-- auditType -->
+    <property key="auditTypeCode">
+        <value xml:lang="en">audit type code</value>
+        <value xml:lang="zh">审核进度</value>
+    </property>
+
+</resource>
