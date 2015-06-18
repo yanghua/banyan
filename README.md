@@ -26,6 +26,7 @@ the necessity of encapsulating with RabbitMQ:
 * embed permission into client-jar
 * removed create & delete & update operation from client, replaced with central-register mode
 
+more information please see : [banyan-category](http://blog.csdn.net/column/details/banyan.html)
 
 ##tree topology structure
 the message bus's implementation is based on Rabbitmq. It can takes advantage of multiple message exchange-types rabbitmq provided and builds many kinds of router pattern. The message bus's router topology lists below:
