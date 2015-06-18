@@ -10,11 +10,15 @@ Thanks for [@ok95](https://github.com/ok95) & [@Joy-Zhang](https://github.com/Jo
 
 ![img 14][14]
 
-it can be used to communicate and integrate over multi-app. It used a [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
+banyan used to communicate and integrate over multi-app. It depends on [RabbitMQ](http://www.rabbitmq.com/) as backend broker(message exchanger). Most scenario:
 
 * enterprise information Integration
 * oriented-component & oriented-module distributed developer
-* provide support for simple esb or soa
+* infrastructure for esb or soa
+* json-rpc / IDL-RPC(thrift)
+* configured compress/uncompress
+* http-bridge for all platform
+* web-console UI
 
 the necessity of encapsulating with RabbitMQ:
 
@@ -245,7 +249,7 @@ response :
 * [rpc-request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L36) / [rpc-response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L59)
 
 
-###http-resut
+###http-restful
 TODO
 
 ##benchmark
