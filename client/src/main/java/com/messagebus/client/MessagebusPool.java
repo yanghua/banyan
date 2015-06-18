@@ -5,6 +5,8 @@ import com.messagebus.common.RandomHelper;
 import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.io.IOException;
  * Created by yanghua on 3/18/15.
  */
 public class MessagebusPool {
+
+    private static final Log logger = LogFactory.getLog(MessagebusPool.class);
 
     private String          poolId;
     private String          pubsuberHost;
@@ -100,6 +104,7 @@ public class MessagebusPool {
 
             this.connection = connectionFactory.newConnection();
         } catch (IOException e) {
+            logger.error("error", e);
             throw new RuntimeException(e);
         }
     }

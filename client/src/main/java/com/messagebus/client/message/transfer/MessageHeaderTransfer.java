@@ -5,6 +5,8 @@ import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Date;
+
 public class MessageHeaderTransfer {
 
     private static final Log logger = LogFactory.getLog(MessageHeaderTransfer.class);
@@ -23,7 +25,7 @@ public class MessageHeaderTransfer {
                       .headers(msg.getHeaders())
                       .priority((int) msg.getPriority())
                       .replyTo(msg.getReplyTo())
-                      .timestamp(msg.getTimestamp())
+                      .timestamp(new Date(msg.getTimestamp()))
                       .type(msg.getType())
                       .userId(msg.getUserId())
                       .build();
@@ -34,7 +36,7 @@ public class MessageHeaderTransfer {
         //common properties
         msg.setCorrelationId(properties.getCorrelationId());
         msg.setHeaders(properties.getHeaders());
-        msg.setTimestamp(properties.getTimestamp());
+        msg.setTimestamp(properties.getTimestamp().getTime());
         String msgIdStr = properties.getMessageId();
         if (msgIdStr != null && !msgIdStr.isEmpty())
             msg.setMessageId(Long.parseLong(msgIdStr));

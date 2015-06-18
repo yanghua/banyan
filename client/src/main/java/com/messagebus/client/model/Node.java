@@ -26,6 +26,7 @@ public class Node implements Serializable, Comparable<Node> {
     private String  msgBodySize;
     private String  ttl;
     private String  ttlPerMsg;
+    private String  compress;
 
     public Node() {
     }
@@ -180,6 +181,14 @@ public class Node implements Serializable, Comparable<Node> {
 
     public void setCanBroadcast(boolean canBroadcast) {
         this.canBroadcast = canBroadcast;
+    }
+
+    public String getCompress() {
+        return compress;
+    }
+
+    public void setCompress(String compress) {
+        this.compress = compress;
     }
 
     @Override

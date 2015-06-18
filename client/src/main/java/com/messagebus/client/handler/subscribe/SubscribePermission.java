@@ -17,16 +17,18 @@ public class SubscribePermission extends PermissionChecker {
         Node sourceNode = context.getSourceNode();
 
         if (!super.commonCheck(context)) {
-            logger.error("permission error : can not consume ");
-            throw new RuntimeException("permission error : can not consume ");
+            logger.error("permission error : can not subscribe ");
+            throw new RuntimeException("permission error : can not subscribe ");
         }
 
         boolean hasPermission = sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_SUBSCRIBE)
             || sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PUBLISH_SUBSCRIBE);
 
         if (!hasPermission) {
-            logger.error("permission error : can not subscribe ");
-            throw new RuntimeException("permission error : can not subscribe ");
+            logger.error("permission error : can not subscribe. may be communicate type is wrong . " +
+                             " current secret is : " + sourceNode.getSecret());
+            throw new RuntimeException("permission error : can not subscribe. may be communicate type is wrong . " +
+                                           " current secret is : " + sourceNode.getSecret());
         }
 
         chain.handle(context);

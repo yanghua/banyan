@@ -8,6 +8,9 @@ import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +41,7 @@ public class ProduceConsume extends BaseTestCase {
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
-        msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
+        msg.setContent("test".getBytes());
 
         client.produce(secret, "emapDemoConsume", msg, token);
     }
@@ -54,7 +57,7 @@ public class ProduceConsume extends BaseTestCase {
         Message result = msgs.get(0);
         assertNotNull(result);
         assertNotNull(result.getContent());
-        assertEquals("test", new String(result.getContent(), Constants.CHARSET_OF_UTF8));
+        assertEquals("test", new String(result.getContent()));
 
         for (Message item : msgs) {
             logger.info(item.getMessageId());
@@ -64,7 +67,7 @@ public class ProduceConsume extends BaseTestCase {
     public void testProduceAndConsumeWithPushStyle() {
         commonProduce();
 
-        client.consume(consumeSecret, 60, TimeUnit.SECONDS, new IMessageReceiveListener() {
+        client.consume(consumeSecret, 10, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 assertNotNull(message);
@@ -72,6 +75,5 @@ public class ProduceConsume extends BaseTestCase {
             }
         });
     }
-
 
 }

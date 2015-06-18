@@ -37,8 +37,8 @@ public class BroadcastParamValidator extends AbstractParamValidator {
                 msg.setAppId(context.getSourceNode().getAppId());
 
             //timestamp
-            if (msg.getTimestamp() == null)
-                msg.setTimestamp(currentDate);
+            if (msg.getTimestamp() == 0)
+                msg.setTimestamp(currentDate.getTime());
 
             if (!MessageType.BroadcastMessage.getType().equals(msg.getType())) {
                 logger.error("[validateMessagesProperites] the message's type is not Broadcast Message ");

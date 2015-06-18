@@ -5,7 +5,7 @@
     <parent>
         <artifactId>messagebus</artifactId>
         <groupId>com.messagebus</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,19 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.2.1</version>
+        </dependency>
+
+        <!-- for compressor -->
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.1.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ning</groupId>
+            <artifactId>compress-lzf</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 

@@ -1,15 +1,15 @@
 package com.messagebus.client.handler.consume;
 
+import com.google.common.base.Strings;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
 import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.common.compress.CompressorFactory;
+import com.messagebus.common.compress.ICompressor;
 import com.messagebus.interactor.proxy.ProxyConsumer;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,28 +39,12 @@ class SyncConsumerHandler extends AbstractHandler {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
                                                                               context.getSourceNode().getValue());
 
-                    if (response == null)
-                        continue;
+                    final Message msg = MessageFactory.createMessage(response);
 
-                    AMQP.BasicProperties properties = response.getProps();
-                    byte[] msgBody = response.getBody();
+                    if (msg == null) continue;
 
-//                    context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
+                    this.doUncompress(context, msg);
 
-                    String msgTypeStr = properties.getType();
-                    if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-                        logger.error("[handle] message type is null or empty");
-                        continue;
-                    }
-
-                    MessageType msgType = null;
-                    try {
-                        msgType = MessageType.lookup(msgTypeStr);
-                    } catch (UnknownError unknownError) {
-                        throw new RuntimeException("unknown message type : " + msgTypeStr);
-                    }
-                    Message msg = MessageFactory.createMessage(msgType);
-                    initMessage(msg, msgType, properties, msgBody);
                     consumeMsgs.add(msg);
                 }
             } catch (IOException e) {
@@ -73,8 +57,18 @@ class SyncConsumerHandler extends AbstractHandler {
         chain.handle(context);
     }
 
-    private void initMessage(Message msg, MessageType msgType, AMQP.BasicProperties properties, byte[] bodyData) {
-        MessageHeaderTransfer.unbox(properties, msg);
-        msg.setContent(bodyData);
+    public void doUncompress(MessageContext context, Message receivedMsg) {
+        String compressAlgo = context.getSourceNode().getCompress();
+        if (!Strings.isNullOrEmpty(compressAlgo)) {
+            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
+            if (compressor != null) {
+                receivedMsg.setContent(compressor.uncompress(receivedMsg.getContent()));
+            } else {
+                logger.error("the target node with name : " + context.getTargetNode().getName()
+                                 + " configured a compress named : " + compressAlgo
+                                 + " but client can not get the compressor instance. ");
+            }
+        }
     }
+
 }

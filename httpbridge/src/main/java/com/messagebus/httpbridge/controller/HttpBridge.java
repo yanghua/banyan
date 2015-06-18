@@ -167,7 +167,7 @@ public class HttpBridge extends HttpServlet {
         }
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
-        msg.setTimestamp(new Date());
+        msg.setTimestamp(new Date().getTime());
         msg.setContentEncoding(contentEncoding);
         msg.setContentType(contentType);
         msg.setReplyTo(replyTo);

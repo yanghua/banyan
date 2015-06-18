@@ -26,8 +26,8 @@ public class RequestPermission extends PermissionChecker {
 
         String token = context.getToken();
 
-        hasPermission = hasPermission && context.getConfigManager()
-                                                .getNodeView(context.getSecret()).getSinkTokens().contains(token);
+        hasPermission = hasPermission
+            && context.getConfigManager().getNodeView(context.getSecret()).getSinkTokens().contains(token);
 
         if (!hasPermission) {
             logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +

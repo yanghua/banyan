@@ -1,14 +1,15 @@
 package com.messagebus.client.message.model;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-public class Message {
+public class Message implements Cloneable {
 
     //header
     private long                messageId;
     private String              type;
-    private Date                timestamp;
+    private long                timestamp;
     private short               priority;
     private String              expiration;
     private Map<String, Object> headers;
@@ -50,11 +51,11 @@ public class Message {
         this.type = type;
     }
 
-    public Date getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -146,4 +147,19 @@ public class Message {
         this.content = content;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Message cloneObj = (Message) super.clone();
+        if (cloneObj.getHeaders() != null) {
+            HashMap<String, Object> header = new HashMap<String, Object>(cloneObj.getHeaders().size());
+            for (Map.Entry<String, Object> item : cloneObj.getHeaders().entrySet()) {
+                header.put(item.getKey(), item.getValue());
+            }
+            cloneObj.setHeaders(header);
+        } else {
+            cloneObj.setHeaders(new HashMap<String, Object>(1));
+        }
+
+        return cloneObj;
+    }
 }

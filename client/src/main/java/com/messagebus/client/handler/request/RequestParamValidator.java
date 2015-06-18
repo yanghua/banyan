@@ -53,8 +53,8 @@ public class RequestParamValidator extends AbstractParamValidator {
                 msg.setAppId(context.getSourceNode().getAppId());
 
             //timestamp
-            if (msg.getTimestamp() == null)
-                msg.setTimestamp(currentDate);
+            if (msg.getTimestamp() == 0)
+                msg.setTimestamp(currentDate.getTime());
 
             if (!MessageType.QueueMessage.getType().equals(msg.getType())) {
                 logger.error("[validateMessagesProperites] there is a message is not  `QueueMessage`. ");

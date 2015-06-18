@@ -25,7 +25,7 @@ public abstract class AbstractParamValidator extends AbstractHandler {
                        IHandlerChain chain) {
         Node sourceNode = context.getSourceNode();
         if (sourceNode == null) {
-            throw new RuntimeException(" the source node is illegal. ");
+            throw new RuntimeException(" the source node can not be null . the secret is : " + context.getSecret());
         }
 
         if (sourceNode.getType().equals("0")) {

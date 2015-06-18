@@ -46,4 +46,6 @@ public class Constants {
 
     public static final long DEFAULT_DATACENTER_ID_FOR_UUID = 00001L;
 
+    public static final String MESSAGE_HEADER_KEY_COMPRESS_ALGORITHM = "compressor";
+
 }

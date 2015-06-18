@@ -50,10 +50,10 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         //launch pre pipeline
         this.handlerChain.handle(ctx);
 
-        if (ctx.isTimeout() || ctx.getConsumedMsg() == null)
+        if (ctx.isTimeout() || ctx.getConsumeMsgs() == null || ctx.getConsumeMsgs().size() == 0)
             throw new MessageResponseTimeoutException("message request time out.");
 
-        return ctx.getConsumedMsg();
+        return ctx.getConsumeMsgs().get(0);
     }
 
     @Override

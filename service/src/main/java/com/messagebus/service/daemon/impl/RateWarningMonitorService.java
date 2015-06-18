@@ -48,7 +48,7 @@ public class RateWarningMonitorService extends AbstractService {
 
     private String getQueuesInfo() {
         Map<String, Object> requestParamDic = new HashMap<String, Object>(3);
-        requestParamDic.put("host", Constants.HOST);
+        requestParamDic.put("host", context.get(Constants.MQ_HOST_KEY).toString());
         requestParamDic.put("port", Constants.PORT);
         requestParamDic.put("path", Constants.HTTP_API_QUEUES);
         return HttpHelper.syncHTTPGet(requestParamDic, Constants.DEFAULT_AUTH_INFO);

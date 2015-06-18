@@ -52,7 +52,7 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
         int port = TestVariableInfo.PUBSUBER_PORT;
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        ;
+
         Messagebus client = singlePool.getResource();
 
         //server code

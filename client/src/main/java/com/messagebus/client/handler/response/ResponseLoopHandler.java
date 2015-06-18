@@ -23,10 +23,10 @@ public class ResponseLoopHandler extends CommonLoopHandler {
     @Override
     public void process(MessageContext msgContext) {
         IRequestListener requestListener = msgContext.getRequestListener();
-        Message requestMsg = msgContext.getConsumedMsg();
+        Message requestMsg = msgContext.getConsumeMsgs().get(0);
         String tempQueueName = requestMsg.getCorrelationId();
         msgContext.setTempQueueName(tempQueueName);
-        Message respMsg = requestListener.onRequest(msgContext.getConsumedMsg());
+        Message respMsg = requestListener.onRequest(msgContext.getConsumeMsgs().get(0));
 
         AMQP.BasicProperties properties = MessageHeaderTransfer.box(respMsg);
         try {

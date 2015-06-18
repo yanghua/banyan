@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class BlockedAndTimeoutResponser extends AbstractHandler {
 
@@ -54,24 +55,16 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
                 return;
             }
 
-            AMQP.BasicProperties properties = delivery.getProperties();
-            byte[] msgBody = delivery.getBody();
-
 //            context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-            //destroy queue
-            QueueManager.defaultQueueManager(context.getHost()).delete(correlationId);
+            final Message msg = MessageFactory.createMessage(delivery);
 
-            String msgTypeStr = properties.getType();
-            if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-                logger.error("[run] message type is null or empty");
-            }
+            if (msg == null) return;
 
-            MessageType msgType = MessageType.lookup(msgTypeStr);
-            Message msg = MessageFactory.createMessage(msgType);
-            initMessage(msg, msgType, properties, msgBody);
-            context.setConsumedMsg(msg);
+            context.setConsumeMsgs(new ArrayList<Message>(1) {{
+                this.add(msg);
+            }});
         } catch (IOException e) {
-            logger.error("[handle] occurs a exception : " + e.getMessage());
+            logger.error("[handle] occurs a exception : ", e);
         } catch (InterruptedException e) {
         } finally {
             //delete temp queue
@@ -82,7 +75,7 @@ public class BlockedAndTimeoutResponser extends AbstractHandler {
                     queueManager.delete(msgIdStr);
                 }
             } catch (IOException e) {
-                logger.error("[handle] finally block occurs a IOException : " + e.getMessage());
+                logger.error("[handle] finally block occurs a IOException : ", e);
             }
         }
     }

@@ -16,7 +16,7 @@ public class SubscribeLoopHandler extends CommonLoopHandler {
 
     @Override
     public void process(MessageContext msgContext) {
-        Message msg = msgContext.getConsumedMsg();
+        Message msg = msgContext.getConsumeMsgs().get(0);
         IMessageReceiveListener receiveListener = msgContext.getReceiveListener();
         receiveListener.onMessage(msg);
     }

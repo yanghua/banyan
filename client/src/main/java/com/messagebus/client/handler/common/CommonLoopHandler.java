@@ -1,5 +1,6 @@
 package com.messagebus.client.handler.common;
 
+import com.google.common.base.Strings;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.handler.AbstractHandler;
@@ -8,11 +9,14 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.ExceptionHelper;
+import com.messagebus.common.compress.CompressorFactory;
+import com.messagebus.common.compress.ICompressor;
 import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by yanghua on 2/22/15.
@@ -28,11 +32,17 @@ public abstract class CommonLoopHandler extends AbstractHandler {
             while (true) {
                 QueueingConsumer.Delivery delivery = currentConsumer.nextDelivery();
 
-                Message msg = MessageFactory.createMessage(delivery);
+                final Message msg = MessageFactory.createMessage(delivery);
 
                 if (msg == null) continue;
 
-                context.setConsumedMsg(msg);
+                if (msg.getMessageType().equals(MessageType.QueueMessage)) {
+                    this.doUncompress(context, msg);
+                }
+
+                context.setConsumeMsgs(new ArrayList<Message>(1) {{
+                    this.add(msg);
+                }});
 
                 try {
                     if (msg.getMessageType().equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
@@ -66,8 +76,18 @@ public abstract class CommonLoopHandler extends AbstractHandler {
 
     public abstract void process(MessageContext msgContext);
 
-//    private void initMessage(Message msg, AMQP.BasicProperties properties, byte[] bodyData) {
-//        MessageHeaderTransfer.unbox(properties, msg);
-//        msg.setContent(bodyData);
-//    }
+    public void doUncompress(MessageContext context, Message receivedMsg) {
+        String compressAlgo = context.getSourceNode().getCompress();
+        if (!Strings.isNullOrEmpty(compressAlgo)) {
+            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
+            if (compressor != null) {
+                receivedMsg.setContent(compressor.uncompress(receivedMsg.getContent()));
+            } else {
+                logger.error("the target node with name : " + context.getTargetNode().getName()
+                                 + " configured a compress named : " + compressAlgo
+                                 + " but client can not get the compressor instance. ");
+            }
+        }
+    }
+
 }

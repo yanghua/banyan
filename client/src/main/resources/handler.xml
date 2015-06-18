@@ -18,6 +18,10 @@
             <handler-path>com.messagebus.client.handler.common.MessageIdGenerator</handler-path>
         </handler>
         <handler>
+            <handler-name>Compressor</handler-name>
+            <handler-path>com.messagebus.client.handler.produce.CompressHandler</handler-path>
+        </handler>
+        <handler>
             <handler-name>Real-Produce</handler-name>
             <handler-path>com.messagebus.client.handler.produce.RealProduce</handler-path>
         </handler>
@@ -64,6 +68,10 @@
         <handler>
             <handler-name>Temp-Queue-Initializer</handler-name>
             <handler-path>com.messagebus.client.handler.request.TempQueueInitializer</handler-path>
+        </handler>
+        <handler>
+            <handler-name>Compressor</handler-name>
+            <handler-path>com.messagebus.client.handler.produce.CompressHandler</handler-path>
         </handler>
         <handler>
             <handler-name>Real-Requester</handler-name>

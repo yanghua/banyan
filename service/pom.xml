@@ -5,7 +5,7 @@
     <parent>
         <artifactId>messagebus</artifactId>
         <groupId>com.messagebus</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,19 +15,19 @@
         <dependency>
             <groupId>com.messagebus</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.messagebus</groupId>
             <artifactId>interactor-component</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.messagebus</groupId>
             <artifactId>client</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 

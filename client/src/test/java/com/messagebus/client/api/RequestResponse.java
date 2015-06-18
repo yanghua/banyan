@@ -62,7 +62,7 @@ public class RequestResponse extends BaseTestCase {
                         return respMsg;
                     }
 
-                }, 10, TimeUnit.SECONDS);
+                }, 15, TimeUnit.SECONDS);
 
                 singlePool.returnResource(client);
                 singlePool.destroy();

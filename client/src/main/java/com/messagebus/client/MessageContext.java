@@ -23,7 +23,6 @@ public class MessageContext {
     private String                  token;
     private boolean                 enableTransaction;
     private Message[]               messages;
-    private Message                 consumedMsg;
     private String                  consumerTag;
     private MessageCarryType        carryType;
     private Node                    sourceNode;
@@ -119,14 +118,6 @@ public class MessageContext {
 
     public Map<String, Object> getOtherParams() {
         return otherParams;
-    }
-
-    public Message getConsumedMsg() {
-        return consumedMsg;
-    }
-
-    public void setConsumedMsg(Message consumedMsg) {
-        this.consumedMsg = consumedMsg;
     }
 
     public IMessageReceiveListener getReceiveListener() {

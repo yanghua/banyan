@@ -22,12 +22,16 @@ public class ConsumePermission extends PermissionChecker {
 
         Node sourceNode = context.getSourceNode();
         boolean hasPermission = !Strings.isNullOrEmpty(sourceNode.getCommunicateType());
-        hasPermission = hasPermission && !sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE);
+        hasPermission = hasPermission &&
+            (sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_CONSUME)
+                ||  sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE_CONSUME));
         hasPermission = hasPermission || sourceNode.isInner();
 
         if (!hasPermission) {
-            logger.error("permission error : can not consume ");
-            throw new RuntimeException("permission error : can not consume ");
+            logger.error("permission error : can not consume. may be communicate type is wrong. " +
+                             " current secret is : " + sourceNode.getSecret());
+            throw new RuntimeException("permission error : can not consume. may be communicate type is wrong. " +
+                                           " current secret is : " + sourceNode.getSecret());
         }
 
         chain.handle(context);

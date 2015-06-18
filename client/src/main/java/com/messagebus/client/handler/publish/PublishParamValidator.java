@@ -43,8 +43,8 @@ public class PublishParamValidator extends AbstractParamValidator {
             }
 
             //timestamp
-            if (msg.getTimestamp() == null)
-                msg.setTimestamp(currentDate);
+            if (msg.getTimestamp() == 0)
+                msg.setTimestamp(currentDate.getTime());
         }
     }
 }
