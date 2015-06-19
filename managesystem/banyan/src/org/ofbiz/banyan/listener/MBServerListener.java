@@ -71,6 +71,18 @@ public class MBServerListener implements ServletContextListener {
             throw new RuntimeException("init mq topology component error : " + e.getMessage());
         }
 
+        //refresh mq host config
+        Debug.logInfo("refreshing config for mq host with new key : " + mqHost, module);
+        try {
+            List<GenericValue> results = delegator.findByAnd("Config", UtilMisc.toMap("itemKey", "messagebus.client.host"), null, false);
+            GenericValue oldConfigItem = results.get(0);
+            oldConfigItem.setString("itemValue", mqHost);
+            delegator.store(oldConfigItem);
+        } catch (GenericEntityException e) {
+            Debug.logError(e, module);
+            throw new RuntimeException("refresh config with key 'messagebus.client.host' error " + e.getMessage());
+        }
+
         //cache mete data
         Debug.logInfo("caching meta data to pubsuber.... ", module);
         String pubsuberHost = UtilProperties.getPropertyValue("MessagebusConfig", "messagebus.pubsuberHost");
@@ -78,6 +90,7 @@ public class MBServerListener implements ServletContextListener {
         Debug.logInfo("pubsuber host : " + pubsuberHost, module);
         Debug.logInfo("pubsuber port : " + pubsuberPort, module);
         PubsuberManager pubsuberManager = new PubsuberManager(pubsuberHost, pubsuberPort);
+
         //cache pubsuberManager
         UtilCache<String, Object> banyanGlobalCache = UtilCache.createUtilCache(Constants.KEY_OF_BANYAN_GLOBAL_CACHE);
         banyanGlobalCache.put(Constants.KEY_OF_MESSAGEBUS_PUBSUBER_MANAGER, pubsuberManager);
@@ -97,8 +110,9 @@ public class MBServerListener implements ServletContextListener {
 
         //start up daemon service
         Debug.logInfo("=-=-=-=-=-=-=-=-=-=-=-=-=-=daemon service (start)-=-=-=-=-=-=-=-=-=-=-=-=-=-", module);
-        Map<String, Object> ctx = new HashMap<>(1);
+        Map<String, Object> ctx = new HashMap<String, Object>(2);
         ctx.put(com.messagebus.service.Constants.GLOBAL_CLIENT_POOL, innerMessagebusPool);
+        ctx.put(com.messagebus.service.Constants.MQ_HOST_KEY, mqHost);
         ServiceLoader serviceLoader = ServiceLoader.getInstance(ctx);
 
         Debug.logInfo("initializing deamon service : rateWarningMonitorService ...", module);
@@ -159,7 +173,7 @@ public class MBServerListener implements ServletContextListener {
     }
 
     private List<Node> findAllNode(Delegator delegator) {
-        List<String> orderByList = new ArrayList<>(1);
+        List<String> orderByList = new ArrayList<String>(1);
         orderByList.add("+parentId");
         List<GenericValue> nodeList = null;
         try {

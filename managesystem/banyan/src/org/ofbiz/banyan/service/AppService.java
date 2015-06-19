@@ -27,20 +27,84 @@ public class AppService {
 
         String appName = (String) context.get("name");
 
-        GenericValue app = delegator.makeValue("App");
-        app.setString("appId", delegator.getNextSeqId("App"));
-        app.setString("name", appName);
-        app.setString("creator", userLogin.getString("userLoginId"));
-        app.setString("fromDate", UtilDateTime.nowTimestamp().toString());
+        String appId = null;
+        Object optionalAppId = context.get("appId");
+        if (optionalAppId != null) {
+            appId = optionalAppId.toString();
+        }
 
         try {
-            delegator.create(app);
+            long countWithAppName = delegator.findCountByCondition("App", EntityCondition.makeCondition(
+                UtilMisc.toMap("name", appName)), null, null);
+
+            if (countWithAppName != 0) ServiceUtil.returnError("the app with name : " + appName + " exists");
+
+            if (appId != null) {
+                long countWithAppId = delegator.findCountByCondition("App", EntityCondition.makeCondition(
+                    UtilMisc.toMap("appId", appId)), null, null);
+
+                if (countWithAppId != 0) ServiceUtil.returnError("the app with id : " + appId + " exists");
+            }
+        } catch (GenericEntityException e) {
+            Debug.logError(e, module);
+            return ServiceUtil.returnError(e.getMessage());
+        }
+
+        if (innerCreateApp(delegator, userLogin, appId, appName)) {
+            return ServiceUtil.returnSuccess();
+        } else {
+            return ServiceUtil.returnError("create app error.");
+        }
+    }
+
+    public static Map<String, Object> batchCreateApp(DispatchContext ctx, Map<String, ? extends Object> context) {
+        Delegator delegator = ctx.getDelegator();
+        Locale locale = (Locale) context.get("locale");
+        GenericValue userLogin = (GenericValue) context.get("userLogin");
+
+        Map<String, ? extends Object> apps = (Map) context.get("apps");
+        try {
+            for (Map.Entry<String, ? extends Object> app : apps.entrySet()) {
+                String appId = app.getKey();
+                String appName = app.getValue() == null ? null : (String) app.getValue();
+                long countWithAppName = delegator.findCountByCondition("App", EntityCondition.makeCondition(
+                    UtilMisc.toMap("name", appName)), null, null);
+
+                if (countWithAppName != 0) continue;
+
+                if (appId != null) {
+                    long countWithAppId = delegator.findCountByCondition("App", EntityCondition.makeCondition(
+                        UtilMisc.toMap("appId", appId)), null, null);
+
+                    if (countWithAppId != 0) continue;
+                }
+
+                innerCreateApp(delegator, userLogin, appId, appName);
+            }
         } catch (GenericEntityException e) {
             Debug.logError(e, module);
             return ServiceUtil.returnError(e.getMessage());
         }
 
         return ServiceUtil.returnSuccess();
+    }
+
+    private static boolean innerCreateApp(Delegator delegator, GenericValue userLogin, String appId, String appName) {
+        try {
+            GenericValue app = delegator.makeValue("App");
+            app.setString("appId", appId == null ? delegator.getNextSeqId("App") : appId);
+            app.setString("name", appName);
+            app.setString("creator", userLogin.getString("userLoginId"));
+            app.setString("fromDate", UtilDateTime.nowTimestamp().toString());
+
+
+            delegator.create(app);
+        } catch (GenericEntityException e) {
+            Debug.logError(e, module);
+            return false;
+        }
+
+        return true;
     }
 
     public static Map<String, Object> updateApp(DispatchContext ctx, Map<String, ? extends Object> context) {

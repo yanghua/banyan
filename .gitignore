@@ -5,3 +5,4 @@
 META-INF/*
 *.rdb
 *.MF
+*.class

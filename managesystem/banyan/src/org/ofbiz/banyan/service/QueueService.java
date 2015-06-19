@@ -8,12 +8,20 @@ import org.ofbiz.base.util.UtilMisc;
 import org.ofbiz.entity.Delegator;
 import org.ofbiz.entity.GenericEntityException;
 import org.ofbiz.entity.GenericValue;
+import org.ofbiz.entity.condition.EntityCondition;
+import org.ofbiz.entity.condition.EntityJoinOperator;
+import org.ofbiz.entity.util.EntityFindOptions;
 import org.ofbiz.service.DispatchContext;
 import org.ofbiz.service.GenericServiceException;
 import org.ofbiz.service.LocalDispatcher;
 import org.ofbiz.service.ServiceUtil;
 
+import java.lang.Exception;
+import java.lang.RuntimeException;
+import java.lang.String;
+import java.util.*;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +52,18 @@ public class QueueService {
         Debug.logInfo("param : name is null : " + (context.get("name") == null), module);
 
         String nodeName = (String) context.get("name");
-        String carryTypeValue = (String) context.get("carryType");
+        String carryTypeValue = (String) context.get("communicateType");
+
+        //check exists node name
+        try {
+            EntityCondition whereCondition = EntityCondition.makeCondition(UtilMisc.toMap("name", nodeName));
+            long count = delegator.findCountByCondition("Node", whereCondition, null, null);
+            if (count > 0) {
+                return ServiceUtil.returnError("the node with name : " + nodeName + " is exists ");
+            }
+        } catch (GenericEntityException e) {
+            return ServiceUtil.returnError(e.getMessage());
+        }
 
         String nodeValue;
         String parentId;
@@ -105,6 +124,7 @@ public class QueueService {
         }
 
         GenericValue node = delegator.makeValue("Node");
+
         node.setString("nodeId", delegator.getNextSeqId("Node"));
         node.setString("secret", RandomHelper.randomNumberAndCharacter(20));
         node.setString("name", nodeName);
@@ -126,6 +146,9 @@ public class QueueService {
         node.set("ttl", context.get("ttl"));
         node.set("ttlPerMsg", context.get("ttlPerMsg"));
         node.set("canBroadcast", context.get("canBroadcast"));
+        node.set("description", context.get("description"));
+        Debug.log("the compress field is : " + context.get("compress"), module);
+        node.set("compress", context.get("compress"));
 
         try {
             delegator.create(node);
@@ -145,8 +168,22 @@ public class QueueService {
         String nodeName = (String) context.get("name");
         String available = (String) context.get("available");
         String canBroadcast = (String) context.get("canBroadcast");
+        String description = (String) context.get("description");
 
         try {
+            //check exists node name
+            EntityCondition oneCondition = EntityCondition.makeCondition(UtilMisc.toMap("name", nodeName));
+            EntityCondition anotherCondition = EntityCondition.makeConditionWhere(" NODE_ID != '" + nodeId + "'");
+
+            EntityCondition whereCondition = EntityCondition.makeCondition(oneCondition,
+                                                                           EntityJoinOperator.AND,
+                                                                           anotherCondition);
+
+            long count = delegator.findCountByCondition("Node", whereCondition, null, null);
+            if (count > 0) {
+                return ServiceUtil.returnError("the node with name : " + nodeName + " is exists ");
+            }
+
             GenericValue queue = delegator.findOne("Node", UtilMisc.toMap("nodeId", nodeId), false);
             String oldName = queue.getString("name");
             String oldVal = queue.getString("value");
@@ -157,6 +194,7 @@ public class QueueService {
             queue.set("routingKey", oldRoutingKey.replace(oldName, nodeName));
             queue.set("available", available);
             queue.set("canBroadcast", canBroadcast);
+            queue.set("description", description);
 
             delegator.store(queue, true);
 
@@ -195,6 +233,77 @@ public class QueueService {
         LocalDispatcher dispatcher = ctx.getDispatcher();
         try {
             Map<String, Object> resultCtx = dispatcher.runSync("performFind", context);
+            return resultCtx;
+        } catch (GenericServiceException e) {
+            Debug.logError(e, module);
+            return ServiceUtil.returnError(e.getMessage());
+        }
+    }
+
+    public static Map<String, Object> getAvailableFlowToQueues(DispatchContext ctx, Map<String, Object> context) {
+        LocalDispatcher dispatcher = ctx.getDispatcher();
+        Delegator delegator = ctx.getDelegator();
+        String flowFromId = (String) context.get("flowFromId");
+
+        if (flowFromId != null && !flowFromId.isEmpty()) {
+            //if there is a flowFromId key , it will be failed when exec performFind
+            context.remove("flowFromId");
+        }
+
+        GenericValue queue = null;
+        try {
+            queue = delegator.findOne("Node", UtilMisc.toMap("nodeId", flowFromId), false);
+        } catch (GenericEntityException e) {
+            Debug.logError(e, module);
+            return ServiceUtil.returnError(e.getMessage());
+        }
+
+        String communicateType = queue.getString("communicateType");
+
+        String flowToCommTypeSubStr = "";
+        switch (communicateType) {
+            case "produce":
+            case "produce-consume":
+                flowToCommTypeSubStr = "consume";
+                break;
+
+            case "publish":
+            case "publish-subscribe":
+                flowToCommTypeSubStr = "subscribe";
+                break;
+
+
+            case "request":
+            case "request-response":
+                flowToCommTypeSubStr = "response";
+                break;
+
+            case "rpcrequest":
+                flowToCommTypeSubStr = "rpcresponse";
+                break;
+
+            default:
+                Debug.logError("unknown communicate type : " +
+                                   communicateType + "the flow from id is : " + flowFromId, module);
+        }
+
+        context.put("entityName", "Node");
+
+        Map<String, Object> inputFields = new HashMap<>();
+
+        inputFields.put("appId_op", "notEqual");
+        inputFields.put("appId", flowFromId);
+        inputFields.put("appId_ic", "Y");
+
+        inputFields.put("communicateType_op", "contains");
+        inputFields.put("communicateType", flowToCommTypeSubStr);
+        inputFields.put("communicateType_ic", "Y");
+        context.put("inputFields", inputFields);
+
+        context.put("noConditionFind", "N");
+
+        try {
+            Map<String, Object> resultCtx = dispatcher.runSync("performFindList", context);
             return resultCtx;
         } catch (GenericServiceException e) {
             Debug.logError(e, module);

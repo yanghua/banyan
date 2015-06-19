@@ -466,9 +466,9 @@
                 <entity-one entity-name="Node" value-field="lookupNode"/>
             </actions>
             <widgets>
-                <screenlet title="${uiLabelMap.NodeInformation}" navigation-menu-name="MenuAppUpdate"
+                <screenlet title="${uiLabelMap.NodeInformation}" navigation-menu-name="MenuQueueUpdate"
                            id="NodeInformationPanel">
-                    <include-menu name="MenuAppUpdate" location="component://banyan/widget/BanyanMenus.xml"/>
+                    <include-menu name="MenuQueueUpdate" location="component://banyan/widget/BanyanMenus.xml"/>
                     <include-form name="ViewNodeDetail" location="component://banyan/widget/BanyanForms.xml"/>
                 </screenlet>
             </widgets>
@@ -477,6 +477,7 @@
     <screen name="editAppScreen">
         <section>
             <actions>
+                <set field="headerItem" value="queue"/>
                 <set field="cancelPage" from-field="parameters.CANCEL_PAGE" default-value="queueDetail"/>
                 <set field="nodeId" from-field="parameters.nodeId"/>
                 <entity-one entity-name="Node" value-field="editingNode"/>

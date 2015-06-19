@@ -64,6 +64,14 @@
         <value xml:lang="en">unaudit channels</value>
         <value xml:lang="zh">未审核的频道</value>
     </property>
+    <property key="description">
+        <value xml:lang="en">description</value>
+        <value xml:lang="zh">描述</value>
+    </property>
+    <property key="compress">
+        <value xml:lang="en">compress mode</value>
+        <value xml:lang="zh">压缩方式</value>
+    </property>
 
     <!-- menu -->
     <property key="MenuSink">
@@ -210,6 +218,10 @@
     <property key="NodeValue">
         <value xml:lang="en">Node Value</value>
         <value xml:lang="zh">节点值</value>
+    </property>
+    <property key="secret">
+        <value xml:lang="en">secret</value>
+        <value xml:lang="zh">密钥</value>
     </property>
     <property key="routerType">
         <value xml:lang="en">Router Type</value>

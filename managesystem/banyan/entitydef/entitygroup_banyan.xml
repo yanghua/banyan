@@ -10,5 +10,7 @@
     <entity-group group="org.ofbiz.banyan" entity="Config" />
     <entity-group group="org.ofbiz.banyan" entity="QueueRateWarning" />
     <entity-group group="org.ofbiz.banyan" entity="SinkAndNode" />
+    <entity-group group="org.ofbiz.banyan" entity="QueueRateWarningView" />
+    <entity-group group="org.ofbiz.banyan" entity="NodeAndApp" />
 
 </entitygroup>

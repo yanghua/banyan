@@ -48,6 +48,8 @@
         <field name="canBroadcast" type="indicator" />
         <field name="fromDate" type="date-time" />
         <field name="thruDate" type="date-time" />
+        <field name="description" type="value" />
+        <field name="compress" type="value" />
         <prim-key field="nodeId"/>
         <relation type="one" rel-entity-name="UserLogin" fk-name="fk_Node_UserLogin">
             <key-map field-name="creator" rel-field-name="userLoginId"/>
@@ -59,6 +61,16 @@
             <key-map field-name="appId"/>
         </relation>
     </entity>
+
+    <view-entity entity-name="NodeAndApp" package-name="org.ofbiz.banyan" title="sink and node">
+        <member-entity entity-alias="NDE" entity-name="Node" />
+        <member-entity entity-alias="APP" entity-name="App" />
+        <alias-all entity-alias="NDE" />
+        <alias name="appName" field="name" entity-alias="APP" />
+        <view-link entity-alias="NDE" rel-entity-alias="APP">
+            <key-map field-name="appId" rel-field-name="appId" />
+        </view-link>
+    </view-entity>
     
     <entity entity-name="Sink" package-name="org.ofbiz.banyan" title="Sink Entity">
         <field name="sinkId" type="id-ne" />
@@ -89,14 +101,29 @@
         <member-entity entity-alias="SNK" entity-name="Sink" />
         <member-entity entity-alias="NDE_1" entity-name="Node" />
         <member-entity entity-alias="NDE_2" entity-name="Node" />
+        <member-entity entity-alias="APP_1" entity-name="App" />
+        <member-entity entity-alias="APP_2" entity-name="App" />
         <alias-all entity-alias="SNK" />
         <alias name="flowFromNodeName" field="name" entity-alias="NDE_1" />
+        <alias name="flowFromSecret" field="secret" entity-alias="NDE_1" />
+        <alias name="flowFromNodeDesc" field="description" entity-alias="NDE_1" />
+        <alias name="flowFromAppId" field="appId" entity-alias="NDE_1" />
+        <alias name="flowFromAppName" field="name" entity-alias="APP_1" />
         <alias name="flowToNodeName" field="name" entity-alias="NDE_2" />
+        <alias name="flowToNodeDesc" field="description" entity-alias="NDE_2" />
+        <alias name="flowToAppId" field="appId" entity-alias="NDE_2" />
+        <alias name="flowToAppName" field="name" entity-alias="APP_2" />
         <view-link entity-alias="SNK" rel-entity-alias="NDE_1">
             <key-map field-name="flowFrom" rel-field-name="nodeId" />
         </view-link>
         <view-link entity-alias="SNK" rel-entity-alias="NDE_2">
             <key-map field-name="flowTo" rel-field-name="nodeId" />
+        </view-link>
+        <view-link entity-alias="NDE_1" rel-entity-alias="APP_1">
+            <key-map field-name="appId" rel-field-name="appId" />
+        </view-link>
+        <view-link entity-alias="NDE_2" rel-entity-alias="APP_2">
+            <key-map field-name="appId" rel-field-name="appId" />
         </view-link>
     </view-entity>
 
@@ -163,5 +190,16 @@
             <key-map field-name="nodeId" />
         </relation>
     </entity>
+    
+    <view-entity entity-name="QueueRateWarningView" package-name="org.ofbiz.banyan" title="the view of QueueRateWarning">
+        <member-entity entity-alias="QRW" entity-name="QueueRateWarning" />
+        <member-entity entity-alias="ND" entity-name="Node" />
+        <alias-all entity-alias="QRW" />
+        <alias name="nodeName" field="name" entity-alias="ND" />
+        <alias name="appId" field="appId" entity-alias="ND" />
+        <view-link entity-alias="QRW" rel-entity-alias="ND">
+            <key-map field-name="nodeId" rel-field-name="nodeId" />
+        </view-link>
+    </view-entity>
 
 </entitymodel>

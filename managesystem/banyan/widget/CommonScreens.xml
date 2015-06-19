@@ -11,6 +11,16 @@
                 <set field="layoutSettings.companyName" from-field="uiLabelMap.BanyanCompanyName" global="true"/>
                 <set field="layoutSettings.companySubtitle" from-field="uiLabelMap.BanyanCompanySubtitle" global="true"/>
 
+                <!--<set field="layoutSettings.styleSheets[+0]" value="/example/assets/bui/1.0.0/css/dpl-min.css"/>-->
+                <!--<set field="layoutSettings.styleSheets[+1]" value="/example/assets/bui/1.0.0/css/bui-min.css"/>-->
+                <!--<set field="layoutSettings.styleSheets[+2]" value="/example/assets/bui/1.0.0/css/main.css"/>-->
+
+                <!--<set field="layoutSettings.javaScripts[+0]" value="/images/jquery/jquery-1.10.2.min.js"/>-->
+                <!--<set field="layoutSettings.javaScripts[+1]" value="/example/assets/bui/1.0.0/seed-min.js"/>-->
+                <!--<set field="layoutSettings.javaScripts[+2]" value="/example/assets/bui/1.0.0/config.js"/>-->
+
+                <set field="layoutSettings.javaScripts[+0]" value="/banyan/assets/echarts-2.2.1/build/dist/echarts.js"/>
+
                 <set field="activeApp" value="banyan" global="true"/>
                 <set field="applicationMenuName" value="MainAppBar" global="true"/>
                 <set field="applicationMenuLocation" value="component://banyan/widget/BanyanMenus.xml" global="true"/>

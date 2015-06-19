@@ -87,6 +87,7 @@ public class MessagebusUtil {
         aQueue.setMsgBodySize(entity.getString("msgBodySize"));
         aQueue.setTtl(entity.getString("ttl"));
         aQueue.setTtlPerMsg(entity.getString("ttlPerMsg"));
+        aQueue.setCompress(entity.getString("compress"));
 
         return aQueue;
     }

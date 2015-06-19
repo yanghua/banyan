@@ -27,7 +27,7 @@
     <Node nodeId="6" name="reqresp" value="exchange.proxy.message.reqresp" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.reqresp.#" available="1" isInner="1" creator="banyanAdmin" />
     <Node nodeId="7" name="rpc" value="exchange.proxy.message.rpc" parentId="3" type="0" routerType="topic" routingKey="routingkey.proxy.message.rpc.#" available="1" isInner="1" creator="banyanAdmin" />
     <Node nodeId="8" name="notification" value="exchange.proxy.message.notification" parentId="3" type="0" routerType="fanout" routingKey="routingkey.proxy.message.notification.#" available="1" isInner="1" creator="banyanAdmin" />
-    <Node nodeId="9" secret="hkajhdfiuwxjdhakjdshuuuqoxdfasg" name="file" value="exchange.proxy.log.file" parentId="2" type="1" routerType="" routingKey="" available="1" isInner="1" creator="banyanAdmin" communicateType="consume" />
+    <Node nodeId="9" secret="hkajhdfiuwxjdhakjdshuuuqoxdfasg" name="file" value="exchange.proxy.log.file" parentId="2" type="1" routerType="" routingKey="" available="1" isInner="0" creator="banyanAdmin" communicateType="consume" auditTypeCode="AUDIT_SUCCESS" />
 
     <!-- inner app -->
     <App appId="1" name="server" creator="admin" fromDate="2015-03-22 09:15:45" />

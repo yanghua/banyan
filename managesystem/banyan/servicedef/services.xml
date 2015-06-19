@@ -18,9 +18,14 @@
     </service>
 
     <!-- app -->
-    <service name="createAppService" engine="java" location="org.ofbiz.banyan.service.AppService" invoke="createApp">
+    <service name="createAppService" export="true" engine="java" location="org.ofbiz.banyan.service.AppService" invoke="createApp">
         <description>Create a app</description>
+        <attribute name="appId" type="String" mode="IN" optional="true" />
         <attribute name="name" type="java.lang.String" mode="IN" optional="false" />
+    </service>
+    <service name="batchCreateAppService" export="true" engine="java" location="org.ofbiz.banyan.service.AppService" invoke="batchCreateApp">
+        <description>batch create a app</description>
+        <attribute name="apps" type="Map" mode="IN" optional="false" />
     </service>
     <service name="updateAppService" engine="java" location="org.ofbiz.banyan.service.AppService" invoke="updateApp">
         <description>Update a node</description>
@@ -33,10 +38,11 @@
     </service>
 
     <!-- node & queue -->
-    <service name="createQueueService" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="createQueue">
+    <service name="createQueueService" export="true" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="createQueue">
         <description>Create a queue</description>
         <attribute name="name" type="java.lang.String" mode="IN" optional="false" />
-        <attribute name="carryType" type="java.lang.String" mode="IN" optional="false" />
+        <attribute name="description" type="java.lang.String" mode="IN" optional="true" />
+        <attribute name="communicateType" type="java.lang.String" mode="IN" optional="false" />
         <attribute name="appId" type="java.lang.String" mode="IN" optional="false" />
         <attribute name="rateLimit" type="java.lang.String" mode="IN" optional="true" />
         <attribute name="threshold" type="java.lang.String" mode="IN" optional="true" />
@@ -44,21 +50,41 @@
         <attribute name="ttl" type="java.lang.String" mode="IN" optional="true" />
         <attribute name="ttlPerMsg" type="java.lang.String" mode="IN" optional="true" />
         <attribute name="canBroadcast" type="java.lang.String" mode="IN" optional="true" />
+        <attribute name="compress" type="java.lang.String" mode="IN" optional="true" />
     </service>
     <service name="deleteNodeService" engine="java" location="org.ofbiz.banyan.service.NodeService" invoke="deleteNode">
         <description>Delete a node</description>
         <attribute name="nodeId" type="java.lang.String" mode="IN" optional="false" />
     </service>
-    <service name="updateQueueService" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="updateQueue">
+    <service name="updateQueueService" export="true" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="updateQueue">
         <description>update a queue</description>
         <attribute name="nodeId" type="String" mode="IN" optional="false" />
         <attribute name="name" type="java.lang.String" mode="IN" optional="false" />
+        <attribute name="description" type="java.lang.String" mode="IN" optional="true" />
         <attribute name="available" type="java.lang.String" mode="IN" optional="false" />
         <attribute name="canBroadcast" type="java.lang.String" mode="IN" optional="false" />
     </service>
-    <service name="auditQueueService" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="auditQueue">
+    <service name="auditQueueService" export="true" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="auditQueue">
         <description>audit queue service</description>
         <attribute name="queueId" type="String" mode="IN" optional="false" />
+    </service>
+    <service name="getAvailableFlowToQueuesService" export="true" engine="java" location="org.ofbiz.banyan.service.QueueService" invoke="getAvailableFlowToQueues">
+        <description>get available flow to queue list service</description>
+        <attribute name="flowFromId" type="String" mode="IN" optional="false" />
+
+        <!-- common query's attribute -->
+        <attribute name="entityName" type="String" mode="IN" optional="false"/>
+        <attribute name="inputFields" type="java.util.Map" mode="IN" optional="false"/>
+        <attribute name="orderBy" type="String" mode="IN" optional="true"/>
+        <attribute name="noConditionFind" type="String" mode="IN" optional="true"><!-- find with no condition (empty entityConditionList) only done when this is Y --></attribute>
+        <attribute name="filterByDate" type="String" mode="IN" optional="true"/>
+        <attribute name="filterByDateValue" type="Timestamp" mode="IN" optional="true"/>
+        <attribute name="viewIndex" type="Integer" mode="IN" optional="true"/>
+        <attribute name="viewSize" type="Integer" mode="IN" optional="true"/>
+        <attribute name="list" type="List" mode="OUT" optional="true"/>
+        <attribute name="listSize" type="Integer" mode="OUT" optional="false"/>
+        <attribute name="queryString" type="String" mode="OUT" optional="true"/>
+        <attribute name="queryStringMap" type="java.util.Map" mode="OUT" optional="true"/>
     </service>
 
 

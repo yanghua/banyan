@@ -19,6 +19,7 @@
                 <field-map field-name="viewSize" from-field="viewSize"/>
             </service>
         </actions>
+        <field name="appId"><display /></field>
         <field name="name" title="${uiLabelMap.appName}" ><display /></field>
         <field name="fromDate"><display/></field>
         <field name="createdStamp" title="${uiLabelMap.CommonCreatedStamp}"><display /></field>
@@ -130,7 +131,8 @@
     <form name="createQueueForm" target="createQueue" title="" type="single" header-row-style="header-row"
           default-table-style="basic-table">
         <field name="name" title="${uiLabelMap.NodeName}"><text /></field>
-        <field name="carryType" title="${uiLabelMap.carryType}">
+        <field name="description" title="${uiLabelMap.description}"><text /></field>
+        <field name="communicateType" title="${uiLabelMap.communicateType}">
             <drop-down allow-empty="false">
                 <option key="_NA_" description="请选择通信类型" />
                 <option key="produce" description="produce" />
@@ -163,6 +165,13 @@
                 <option key="1" description="是" />
             </radio>
         </field>
+        <field name="compress" title="${uiLabelMap.compress}">
+            <radio>
+                <option key="" description="否" />
+                <option key="snappy" description="snappy" />
+                <option key="lzf" description="lzf" />
+            </radio>
+        </field>
         <field name="submitButton" title="${uiLabelMap.CommonSave}" widget-style="smallSubmit"><submit /></field>
         <field name="cancelLink" title="" widget-style="buttontext">
             <hyperlink target="${donePage}" also-hidden="false" description="${uiLabelMap.CommonCancelDone}" />
@@ -172,6 +181,7 @@
           header-row-style="header-row" default-table-style="basic-table" default-map-name="editingQueue">
         <field name="nodeId"><hidden /></field>
         <field name="name" title="${uiLabelMap.NodeName}"><text /></field>
+        <field name="description" title="${uiLabelMap.description}"><text /></field>
         <field name="available" title="${uiLabelMap.available}">
             <radio>
                 <option key="0" description="否" />
@@ -403,10 +413,14 @@
     </form>
     <form name="ViewNodeDetail" type="single" default-map-name="lookupNode">
         <field name="name" title="${uiLabelMap.NodeName}"><display /></field>
+        <field name="description" title="${uiLabelMap.description}"><display /></field>
+        <field name="secret" title="${uiLabelMap.secret}"><display /></field>
         <field name="value" title="${uiLabelMap.NodeValue}"><display/></field>
         <field name="routerType" title="${uiLabelMap.routerType}"><display /></field>
         <field name="routingKey" title="${uiLabelMap.routingKey}"><display /></field>
         <field name="type" title="${uiLabelMap.nodeType}"><display description="${(lookupNode.type==0)?'exchange':'queue'}" /></field>
+        <field name="canBroadcast" title="${uiLabelMap.canBroadcast}"><display description="${(lookupNode.canBroadcast==0)?'否':'是'}" /></field>
+        <field name="compress" title="${uiLabelMap.compress}"><display /></field>
         <!--<field name="statusId"><display-entity entity-name="StatusItem" key-field-name="statusId" description="${description}"/></field>-->
     </form>
 
