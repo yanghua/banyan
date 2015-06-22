@@ -30,33 +30,33 @@ public abstract class CommonLoopHandler extends AbstractHandler {
         QueueingConsumer currentConsumer = (QueueingConsumer) context.getOtherParams().get("consumer");
         try {
             while (true) {
-                QueueingConsumer.Delivery delivery = currentConsumer.nextDelivery();
-
-                final Message msg = MessageFactory.createMessage(delivery);
-
-                if (msg == null) continue;
-
-                if (msg.getMessageType().equals(MessageType.QueueMessage)) {
-                    this.doUncompress(context, msg);
-                }
-
-                context.setConsumeMsgs(new ArrayList<Message>(1) {{
-                    this.add(msg);
-                }});
-
                 try {
+                    QueueingConsumer.Delivery delivery = currentConsumer.nextDelivery();
+
+                    final Message msg = MessageFactory.createMessage(delivery);
+
+                    if (msg == null) continue;
+
+                    if (msg.getMessageType().equals(MessageType.QueueMessage)) {
+                        this.doUncompress(context, msg);
+                    }
+
+                    context.setConsumeMsgs(new ArrayList<Message>(1) {{
+                        this.add(msg);
+                    }});
+
                     if (msg.getMessageType().equals(MessageType.BroadcastMessage) && context.getNoticeListener() != null) {
                         IMessageReceiveListener noticeListener = context.getNoticeListener();
                         noticeListener.onMessage(msg);
                     } else {
                         process(context);
                     }
+                } catch (InterruptedException e) {
+                    logger.info(" consume interrupted!");
                 } catch (Exception e) {
-                    ExceptionHelper.logException(logger, e, "outer of message handler");
+                    ExceptionHelper.logException(logger, e, "message process");
                 }
             }
-        } catch (InterruptedException e) {
-            logger.info("[run] close the consumer's message handler!");
         } catch (Exception e) {
             ExceptionHelper.logException(logger, e, "common loop handler");
         } finally {
@@ -70,6 +70,7 @@ public abstract class CommonLoopHandler extends AbstractHandler {
                     ExceptionHelper.logException(logger, e1, "cancel a consumer");
                 }
             }
+
             chain.handle(context);
         }
     }

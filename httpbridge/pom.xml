@@ -5,19 +5,19 @@
     <parent>
         <artifactId>messagebus</artifactId>
         <groupId>com.messagebus</groupId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>httpbridge</artifactId>
     <packaging>war</packaging>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <dependencies>
         <dependency>
             <groupId>com.messagebus</groupId>
             <artifactId>client</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </dependency>
         <!-- servlet it's version shuold be at least 3.1.0 to support jetty version 9.X  -->
         <dependency>

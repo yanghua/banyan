@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -57,8 +58,14 @@ abstract class InnerClient {
 
                 this.isOpen.compareAndSet(true, false);
             } catch (IOException e) {
-                ExceptionHelper.logException(logger, e, "close");
-                throw new RuntimeException(e);
+                logger.error("close inner client exception : ", e);
+                throw new RuntimeException("close inner client exception : ", e);
+            } catch (TimeoutException e) {
+                logger.error("close inner client exception : ", e);
+                throw new RuntimeException("close inner client exception : ", e);
+            } catch (Exception e) {
+                logger.error("close inner client exception : ", e);
+                throw new RuntimeException("close inner client exception : ", e);
             }
         }
     }

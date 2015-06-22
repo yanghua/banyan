@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by yanghua on 3/18/15.
@@ -83,10 +84,11 @@ public class MessagebusPool {
             Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL
         });
 
+        ConnectionFactory connectionFactory = null;
         try {
             this.configManager.checkServerState();
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory = new ConnectionFactory();
             String host = this.configManager.getConfig("messagebus.client.host");
             connectionFactory.setHost(host);
 
@@ -99,13 +101,25 @@ public class MessagebusPool {
 
             connectionFactory.setAutomaticRecoveryEnabled(true);
             connectionFactory.setTopologyRecoveryEnabled(true);
-            connectionFactory.setConnectionTimeout(5000);
-            connectionFactory.setRequestedHeartbeat(5);
+            connectionFactory.setConnectionTimeout(60000);
+            connectionFactory.setRequestedHeartbeat(10);
 
             this.connection = connectionFactory.newConnection();
         } catch (IOException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
+            logger.error("init message pool exception with host : " + connectionFactory.getHost()
+                 + " and port : " + connectionFactory.getPort(), e);
+            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
+                                           + " and port : " + connectionFactory.getPort(), e);
+        } catch (TimeoutException e) {
+            logger.error("init message pool exception with host : " + connectionFactory.getHost()
+                             + " and port : " + connectionFactory.getPort(), e);
+            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
+                                           + " and port : " + connectionFactory.getPort(), e);
+        } catch (Exception e) {
+            logger.error("init message pool exception with host : " + connectionFactory.getHost()
+                             + " and port : " + connectionFactory.getPort(), e);
+            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
+                                           + " and port : " + connectionFactory.getPort(), e);
         }
     }
 
