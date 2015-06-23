@@ -72,7 +72,8 @@ public class MessagebusPool {
         this.exchangeManager = new PubsuberManager(this.pubsuberHost, this.pubsuberPort);
 
         if (!this.exchangeManager.isPubsuberAlive())
-            throw new RuntimeException("can not connect to pubsub server.");
+            throw new RuntimeException("can not connect to pubsub server , host : " + this.pubsuberHost
+                                           + ", port : " + this.pubsuberPort);
 
         this.configManager = new ConfigManager();
         this.configManager.setPubsuberManager(this.exchangeManager);
