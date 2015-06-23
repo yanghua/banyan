@@ -12,6 +12,7 @@ import com.messagebus.common.ExceptionHelper;
 import com.messagebus.common.compress.CompressorFactory;
 import com.messagebus.common.compress.ICompressor;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,8 +29,10 @@ public abstract class CommonLoopHandler extends AbstractHandler {
     @Override
     public void handle(MessageContext context, IHandlerChain chain) {
         QueueingConsumer currentConsumer = (QueueingConsumer) context.getOtherParams().get("consumer");
+        int retryCount = 0, retryTotalCount = 10;
+        boolean stop = false;
         try {
-            while (true) {
+            while (!stop) {
                 try {
                     QueueingConsumer.Delivery delivery = currentConsumer.nextDelivery();
 
@@ -53,6 +56,9 @@ public abstract class CommonLoopHandler extends AbstractHandler {
                     }
                 } catch (InterruptedException e) {
                     logger.info(" consume interrupted!");
+                } catch (ShutdownSignalException e) {
+                    retryCount++;
+                    if (retryCount >= retryTotalCount) stop = true;
                 } catch (Exception e) {
                     ExceptionHelper.logException(logger, e, "message process");
                 }
