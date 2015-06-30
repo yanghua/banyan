@@ -5,7 +5,7 @@
     <parent>
         <artifactId>messagebus</artifactId>
         <groupId>com.messagebus</groupId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.messagebus</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
 
         <!-- apache zookeeper -->
@@ -34,5 +34,21 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <finalName>messagebus-client</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,7 +1,11 @@
 package com.messagebus.client;
 
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
+import com.messagebus.client.event.component.ClientDestroyEventProcessor;
+import com.messagebus.client.event.component.ClientInitedEventProcessor;
 import com.messagebus.common.Constants;
-import com.messagebus.common.RandomHelper;
+import com.messagebus.interactor.pubsub.IPubSubListener;
 import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -10,6 +14,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -19,12 +26,12 @@ public class MessagebusPool {
 
     private static final Log logger = LogFactory.getLog(MessagebusPool.class);
 
-    private String          poolId;
     private String          pubsuberHost;
     private int             pubsuberPort;
-    private PubsuberManager exchangeManager;
+    private PubsuberManager pubsuberManager;
     private ConfigManager   configManager;
     private Connection      connection;
+    private EventBus        componentEventBus;
 
     protected InnerPool innerPool;
 
@@ -35,9 +42,14 @@ public class MessagebusPool {
         this.innerPool = new InnerPool(poolConfig,
                                        pubsuberHost,
                                        pubsuberPort,
-                                       exchangeManager,
+                                       pubsuberManager,
                                        configManager,
-                                       connection);
+                                       connection,
+                                       componentEventBus);
+    }
+
+    public void registerComponentEventListener(Object listener) {
+        this.componentEventBus.register(listener);
     }
 
     public Messagebus getResource() {
@@ -51,14 +63,6 @@ public class MessagebusPool {
     public void destroy() {
         this.innerPool.destroy();
 
-        //release resource
-        if (exchangeManager != null)
-            exchangeManager.removeRegister(this.poolId);
-
-        if (configManager != null)
-            configManager.destroy();
-
-
         if (this.connection != null && this.connection.isOpen()) {
             try {
                 this.connection.close();
@@ -69,21 +73,27 @@ public class MessagebusPool {
     }
 
     protected void init() {
-        this.exchangeManager = new PubsuberManager(this.pubsuberHost, this.pubsuberPort);
+        this.pubsuberManager = new PubsuberManager(this.pubsuberHost, this.pubsuberPort);
 
-        if (!this.exchangeManager.isPubsuberAlive())
+        if (!this.pubsuberManager.isPubsuberAlive())
             throw new RuntimeException("can not connect to pubsub server , host : " + this.pubsuberHost
                                            + ", port : " + this.pubsuberPort);
 
+        this.componentEventBus = new AsyncEventBus("componentEventBus", Executors.newSingleThreadExecutor());
+
         this.configManager = new ConfigManager();
-        this.configManager.setPubsuberManager(this.exchangeManager);
-        this.poolId = RandomHelper.randomNumberAndCharacter(12);
-        this.exchangeManager.registerWithMultiChannels(poolId, this.configManager, new String[]{
-            Constants.PUBSUB_NODEVIEW_CHANNEL,
-            Constants.PUBSUB_CONFIG_CHANNEL,
-            Constants.PUBSUB_SERVER_STATE_CHANNEL,
-            Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL
-        });
+        this.configManager.setPubsuberManager(this.pubsuberManager);
+        this.configManager.setComponentEventBus(this.componentEventBus);
+
+        this.registerComponentEventProcessor();
+
+        Map<String, IPubSubListener> channelEventMap = new HashMap<String, IPubSubListener>(5);
+        channelEventMap.put(Constants.PUBSUB_NODEVIEW_CHANNEL, configManager.new NodeViewChangedHandler());
+        channelEventMap.put(Constants.PUBSUB_CONFIG_CHANNEL, configManager.new ConfigChangedHandler());
+        channelEventMap.put(Constants.PUBSUB_SERVER_STATE_CHANNEL, configManager.new ServerStateChangedHandler());
+        channelEventMap.put(Constants.PUBSUB_NOTIFY_CHANNEL, configManager.new NotifyHandler());
+
+        this.pubsuberManager.registerWithMultiChannels(channelEventMap);
 
         ConnectionFactory connectionFactory = null;
         try {
@@ -106,9 +116,10 @@ public class MessagebusPool {
             connectionFactory.setRequestedHeartbeat(10);
 
             this.connection = connectionFactory.newConnection();
+
         } catch (IOException e) {
             logger.error("init message pool exception with host : " + connectionFactory.getHost()
-                 + " and port : " + connectionFactory.getPort(), e);
+                             + " and port : " + connectionFactory.getPort(), e);
             throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
                                            + " and port : " + connectionFactory.getPort(), e);
         } catch (TimeoutException e) {
@@ -122,6 +133,11 @@ public class MessagebusPool {
             throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
                                            + " and port : " + connectionFactory.getPort(), e);
         }
+    }
+
+    private void registerComponentEventProcessor() {
+        this.componentEventBus.register(new ClientDestroyEventProcessor());
+        this.componentEventBus.register(new ClientInitedEventProcessor());
     }
 
 }

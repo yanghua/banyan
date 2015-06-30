@@ -8,9 +8,6 @@ import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

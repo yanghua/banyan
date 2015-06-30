@@ -1,5 +1,7 @@
 #overview
 
+[![Build Status](https://travis-ci.org/yanghua/banyan.svg?branch=messagebus-ng)](https://travis-ci.org/yanghua/banyan)
+
 ![img 15][15]
 
 

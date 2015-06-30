@@ -1,24 +1,24 @@
 package com.messagebus.interactor.pubsub;
 
-import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ *
+ */
 public class PubsuberManager {
 
     private static final Log logger = LogFactory.getLog(PubsuberManager.class);
 
-    private Map<String, ChannelListenerEntry> registry;
-    private IPubSuber                         pubsuber;
-    private IDataConverter                    pubsuberDataConverter;
-    private boolean dataFetcherInited = false;
+    private Map<String, IPubSubListener> registry;
+    private IPubSuber                    pubsuber;
+    private IDataConverter               pubsuberDataConverter;
 
     public PubsuberManager(String pubsuberHost, int pubsuberPort) {
         this.pubsuber = PubSuberFactory.createPubSuber();
@@ -31,15 +31,7 @@ public class PubsuberManager {
         if (!isAlive)
             return;
 
-        registry = new ConcurrentHashMap<String, ChannelListenerEntry>();
-
-        List<String> channels = new ArrayList<String>();
-        channels.add(Constants.PUBSUB_CONFIG_CHANNEL);
-        channels.add(Constants.PUBSUB_SERVER_STATE_CHANNEL);
-        channels.add(Constants.PUBSUB_NODEVIEW_CHANNEL);
-        channels.add(Constants.PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL);
-
-        this.watchPubSuber(channels);
+        registry = new ConcurrentHashMap<String, IPubSubListener>();
     }
 
     public boolean isPubsuberAlive() {
@@ -76,33 +68,12 @@ public class PubsuberManager {
         this.pubsuber.publish(channel, data);
     }
 
-
-    public void registerWithChannel(String clientId, IPubsuberDataListener onChanged, String channel) {
-        if (!registry.containsKey(clientId)) {
-            ChannelListenerEntry entry = new ChannelListenerEntry();
-            entry.setOnChanged(onChanged);
-            List<String> channels = new ArrayList<String>();
-            channels.add(channel);
-            entry.setChannels(channels);
-
-            registry.put(clientId, entry);
-        } else {
-            ChannelListenerEntry entry = registry.get(clientId);
-            entry.getChannels().add(channel);
-        }
+    public byte[] serialize(Serializable obj, Class<?> clazz) {
+        return this.pubsuberDataConverter.serialize(obj, clazz);
     }
 
-    public void registerWithMultiChannels(String clientId, IPubsuberDataListener onChanged, String[] channels) {
-        for (String channel : channels) {
-            this.registerWithChannel(clientId, onChanged, channel);
-        }
-    }
-
-    public void removeRegister(String appId) {
-        this.registry.remove(appId);
-        if (this.registry.size() == 0) {
-            this.pubsuber.close();
-        }
+    public <T> T deserialize(byte[] originalData, Class<T> clazz) {
+        return this.pubsuberDataConverter.deSerializeObject(originalData, clazz);
     }
 
     public void destroy() {
@@ -110,43 +81,34 @@ public class PubsuberManager {
             this.pubsuber.close();
     }
 
-    public void watchPubSuber(List<String> channels) {
+    private void registerWithChannel(String channel, IPubSubListener handler) {
+        if (!registry.containsKey(channel)) {
+            registry.put(channel, handler);
+        }
+    }
+
+    public void registerWithMultiChannels(Map<String, IPubSubListener> channelHandlerMap) {
+        List<String> channels = new ArrayList<String>(channelHandlerMap.size());
+        for (Map.Entry<String, IPubSubListener> channelHandler : channelHandlerMap.entrySet()) {
+            this.registerWithChannel(channelHandler.getKey(), channelHandler.getValue());
+            channels.add(channelHandler.getKey());
+        }
+
+        this.watchPubSuber(channels);
+    }
+
+    private void watchPubSuber(List<String> channels) {
         this.pubsuber.watch(channels.toArray(new String[channels.size()]), new IPubSubListener() {
 
             public void onChange(String channel, byte[] data, Map<String, Object> params) {
-
-                for (ChannelListenerEntry entry : registry.values()) {
-                    if (entry.getChannels().contains(channel)) {
-                        entry.getOnChanged().onChannelDataChanged(channel, new String(data, Charset.defaultCharset()));
-                    }
+                IPubSubListener handler = registry.get(channel);
+                if (handler == null) {
+                    logger.warn("channel : " + channel + "occurs a event but can not get handler ! ");
+                } else {
+                    handler.onChange(channel, data, params);
                 }
             }
         });
-    }
-
-    private static final class ChannelListenerEntry {
-        private List<String>          channels;
-        private IPubsuberDataListener onChanged;
-
-        public ChannelListenerEntry() {
-        }
-
-        public List<String> getChannels() {
-            return channels;
-        }
-
-        public void setChannels(List<String> channels) {
-            this.channels = channels;
-        }
-
-        public IPubsuberDataListener getOnChanged() {
-            return onChanged;
-        }
-
-        public void setOnChanged(IPubsuberDataListener onChanged) {
-            this.onChanged = onChanged;
-        }
-
     }
 
 }

@@ -184,9 +184,9 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
      *
      * @param notificationListener 广播消息接收处理器
      */
+    @Deprecated
     public void setNotificationListener(IMessageReceiveListener notificationListener) {
-        this.notificationListener = notificationListener;
-        context.setNoticeListener(this.notificationListener);
+        throw new UnsupportedOperationException("this interface has been deprecated! ");
     }
 
     /**
@@ -253,6 +253,25 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
     @Override
     public WrappedRpcServer buildRpcServer(String secret, IRpcMessageProcessor rpcMsgProcessor) {
         return rpcResponser.buildRpcServer(secret, rpcMsgProcessor);
+    }
+
+    /**
+     * 注册消息总线支持的事件处理器；事件处理器对象遵循Guava的事件订阅模式（@Subscribe）
+     *
+     * @param eventProcessor 事件处理器对象的实例
+     */
+    public void registerEventProcessor(Object eventProcessor) {
+        componentEventBus.register(eventProcessor);
+    }
+
+
+    /**
+     * 注销消息总线支持的事件处理器；
+     *
+     * @param eventProcessor 事件处理器对象的实例
+     */
+    public void unregisterEventProcessor(Object eventProcessor) {
+        componentEventBus.unregister(eventProcessor);
     }
 
 }

@@ -1,9 +1,10 @@
 package com.messagebus.client.carry;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.IRpcMessageProcessor;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.WrappedRpcServer;
-import com.messagebus.client.handler.MessageCarryHandlerChain;
+import com.messagebus.client.event.carry.RpcResponseEventProcessor;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
 import com.messagebus.common.ExceptionHelper;
@@ -18,81 +19,30 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by yanghua on 4/8/15.
  */
-public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcResponser, Runnable {
+public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcResponser {
 
     private static final Log logger = LogFactory.getLog(GenericRpcResponser.class);
-
-    private Thread   currentThread;
-    private String   secret;
-    private Class<?> clazzOfInterface;
-    private Object   serviceProvider;
-    private TimeUnit timeUnit;
-
-    private       long      timeout     = 0;
-    private final Lock      mainLock    = new ReentrantLock();
-    private final Condition mainBlocker = mainLock.newCondition();
 
     public GenericRpcResponser() {
     }
 
     @Override
-    public void run() {
+    public void callback(String secret, Class<?> clazzOfInterface, Object serviceProvider, long timeout, TimeUnit timeUnit) {
         MessageContext ctx = initMessageContext();
-        ctx.setSecret(this.secret);
+        ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.RPCRESPONSE);
         ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         Map<String, Object> otherParams = ctx.getOtherParams();
-        otherParams.put("serviceProvider", this.serviceProvider);
-        otherParams.put("clazzOfInterface", this.clazzOfInterface);
-        ctx.setNoticeListener(getContext().getNoticeListener());
+        otherParams.put("serviceProvider", serviceProvider);
+        otherParams.put("clazzOfInterface", clazzOfInterface);
+        ctx.setTimeout(timeout);
+        ctx.setTimeoutUnit(timeUnit);
 
-        checkState();
-
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RPCRESPONSE, this.getContext());
-        this.handlerChain.handle(ctx);
-    }
-
-    @Override
-    public void callback(String secret, Class<?> clazzOfInterface, Object serviceProvider, long timeout, TimeUnit timeUnit) {
-        this.secret = secret;
-        this.timeout = timeout;
-        this.timeUnit = timeUnit;
-        this.clazzOfInterface = clazzOfInterface;
-        this.serviceProvider = serviceProvider;
-        this.currentThread = new Thread(this);
-        this.currentThread.setDaemon(true);
-
-        this.startup();
-    }
-
-    private void startup() {
-        if (this.timeout != 0) {
-            mainLock.lock();
-
-            try {
-                this.currentThread.start();
-                mainBlocker.await(this.timeout,
-                                  this.timeUnit == null ? TimeUnit.SECONDS : this.timeUnit);
-            } catch (InterruptedException e) {
-
-            } finally {
-                this.currentThread.interrupt();
-                mainLock.unlock();
-            }
-        } else {
-            this.currentThread.start();
-        }
-    }
-
-    public void shutdown() {
-        this.currentThread.interrupt();
+        this.innerRpcResponse(ctx);
     }
 
     @Override
@@ -134,4 +84,21 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
             throw new RuntimeException(e);
         }
     }
+
+    private void innerRpcResponse(MessageContext ctx) {
+        checkState();
+
+        EventBus carryEventBus = this.getContext().getCarryEventBus();
+
+        //register event processor
+        RpcResponseEventProcessor eventProcessor = new RpcResponseEventProcessor();
+        carryEventBus.register(eventProcessor);
+
+        RpcResponseEventProcessor.RpcResponseEvent rpcResponseEvent = new RpcResponseEventProcessor.RpcResponseEvent();
+
+        rpcResponseEvent.setMessageContext(ctx);
+        carryEventBus.post(rpcResponseEvent);
+        carryEventBus.unregister(eventProcessor);
+    }
+
 }

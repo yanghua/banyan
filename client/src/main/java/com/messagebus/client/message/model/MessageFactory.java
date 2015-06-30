@@ -18,6 +18,7 @@ public class MessageFactory {
 
         aMsg = new Message();
         aMsg.setType(messageType.getType());
+        aMsg.setMsgType(messageType);
 
         return aMsg;
     }

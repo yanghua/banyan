@@ -1,7 +1,8 @@
 package com.messagebus.client.carry;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.MessageCarryHandlerChain;
+import com.messagebus.client.event.carry.RpcRequestEventProcessor;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
@@ -33,13 +34,31 @@ public class GenericRpcRequester extends AbstractMessageCarryer implements IRpcR
         otherParams.put("methodName", methodName);
         otherParams.put("params", params);
 
-        checkState();
-
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.RPCREQUEST, this.getContext());
-        this.handlerChain.handle(ctx);
+        this.innerRpcRequest(ctx);
 
         return otherParams.get("result");
     }
 
+    private void innerRpcRequest(MessageContext ctx) {
+        checkState();
+
+        EventBus carryEventBus = this.getContext().getCarryEventBus();
+
+        //register event processor
+        RpcRequestEventProcessor eventProcessor = new RpcRequestEventProcessor();
+        carryEventBus.register(eventProcessor);
+
+        RpcRequestEventProcessor.PermissionCheckEvent permissionCheckEvent = new RpcRequestEventProcessor.PermissionCheckEvent();
+        RpcRequestEventProcessor.RpcRequestEvent rpcRequestEvent = new RpcRequestEventProcessor.RpcRequestEvent();
+
+        permissionCheckEvent.setMessageContext(ctx);
+        rpcRequestEvent.setMessageContext(ctx);
+
+        carryEventBus.post(permissionCheckEvent);
+        carryEventBus.post(rpcRequestEvent);
+
+        //unregister
+        carryEventBus.unregister(eventProcessor);
+    }
 
 }

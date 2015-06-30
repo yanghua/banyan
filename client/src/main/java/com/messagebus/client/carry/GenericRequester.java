@@ -1,11 +1,14 @@
 package com.messagebus.client.carry;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.MessageResponseTimeoutException;
-import com.messagebus.client.handler.MessageCarryHandlerChain;
+import com.messagebus.client.event.carry.CommonEventProcessor;
+import com.messagebus.client.event.carry.RequestEventProcessor;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
+import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.RpcClient;
 import org.apache.commons.logging.Log;
@@ -44,11 +47,7 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         ctx.setTimeout(timeout);
         ctx.setMessages(new Message[]{msg});
 
-        checkState();
-
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.REQUEST, this.getContext());
-        //launch pre pipeline
-        this.handlerChain.handle(ctx);
+        this.innerRequest(ctx);
 
         if (ctx.isTimeout() || ctx.getConsumeMsgs() == null || ctx.getConsumeMsgs().size() == 0)
             throw new MessageResponseTimeoutException("message request time out.");
@@ -57,13 +56,20 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
     }
 
     @Override
-    public byte[] primitiveRequest(String secret, String target, byte[] requestMsg, String token, long timeoutOfMilliSecond) {
+    public byte[] primitiveRequest(String secret,
+                                   String target,
+                                   byte[] requestMsg,
+                                   String token,
+                                   long timeoutOfMilliSecond) {
         Node sourceNode = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
         Node targetNode = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(target);
 
         RpcClient innerRpcClient = null;
         try {
-            innerRpcClient = new RpcClient(this.getContext().getChannel(), "exchange.proxy", targetNode.getRoutingKey(), (int) timeoutOfMilliSecond);
+            innerRpcClient = new RpcClient(this.getContext().getChannel(),
+                                           Constants.PROXY_EXCHANGE_NAME,
+                                           targetNode.getRoutingKey(),
+                                           (int) timeoutOfMilliSecond);
             return innerRpcClient.primitiveCall(requestMsg);
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "primitive request ");
@@ -80,5 +86,49 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         return new byte[0];
     }
 
+
+    private void innerRequest(MessageContext ctx) {
+        checkState();
+
+        EventBus carryEventBus = this.getContext().getCarryEventBus();
+
+        //register event processor
+        RequestEventProcessor eventProcessor = new RequestEventProcessor();
+        carryEventBus.register(eventProcessor);
+
+        RequestEventProcessor.ValidateEvent validateEvent = new RequestEventProcessor.ValidateEvent();
+        CommonEventProcessor.MsgBodySizeCheckEvent msgBodySizeCheckEvent = new CommonEventProcessor.MsgBodySizeCheckEvent();
+        RequestEventProcessor.PermissionCheckEvent permissionCheckEvent = new RequestEventProcessor.PermissionCheckEvent();
+        CommonEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new CommonEventProcessor.MsgIdGenerateEvent();
+        RequestEventProcessor.TempQueueInitializeEvent tempQueueInitializeEvent = new RequestEventProcessor.TempQueueInitializeEvent();
+        CommonEventProcessor.MsgBodyCompressEvent msgBodyCompressEvent = new CommonEventProcessor.MsgBodyCompressEvent();
+        RequestEventProcessor.RequestEvent requestEvent = new RequestEventProcessor.RequestEvent();
+        CommonEventProcessor.TagGenerateEvent tagGenerateEvent = new CommonEventProcessor.TagGenerateEvent();
+        RequestEventProcessor.BlockAndTimeoutResponseEvent blockAndTimeoutResponseEvent = new RequestEventProcessor.BlockAndTimeoutResponseEvent();
+
+        validateEvent.setMessageContext(ctx);
+        msgBodySizeCheckEvent.setMessageContext(ctx);
+        permissionCheckEvent.setMessageContext(ctx);
+        msgIdGenerateEvent.setMessageContext(ctx);
+        tempQueueInitializeEvent.setMessageContext(ctx);
+        msgBodyCompressEvent.setMessageContext(ctx);
+        requestEvent.setMessageContext(ctx);
+        tagGenerateEvent.setMessageContext(ctx);
+        blockAndTimeoutResponseEvent.setMessageContext(ctx);
+
+        //arrange event order and emit
+        carryEventBus.post(validateEvent);
+        carryEventBus.post(msgBodySizeCheckEvent);
+        carryEventBus.post(permissionCheckEvent);
+        carryEventBus.post(msgIdGenerateEvent);
+        carryEventBus.post(tempQueueInitializeEvent);
+        carryEventBus.post(msgBodyCompressEvent);
+        carryEventBus.post(requestEvent);
+        carryEventBus.post(tagGenerateEvent);
+        carryEventBus.post(blockAndTimeoutResponseEvent);
+
+        //unregister
+        carryEventBus.unregister(eventProcessor);
+    }
 
 }

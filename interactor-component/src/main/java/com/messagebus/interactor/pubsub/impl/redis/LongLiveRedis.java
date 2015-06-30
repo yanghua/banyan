@@ -97,7 +97,6 @@ public class LongLiveRedis implements IPubSuber {
 
     public void close() {
         watcher.stop();
-//        jedis.close();
         if (jedisPool != null) {
             jedisPool.returnResource(jedis);
             jedisPool.destroy();
@@ -125,6 +124,7 @@ public class LongLiveRedis implements IPubSuber {
         public void run() {
             try {
                 realPubSuber = new JedisPubSub() {
+
                     @Override
                     public void onMessage(String channel, String message) {
                         getListener().onChange(channel, message.getBytes(Charset.defaultCharset()), null);
@@ -133,7 +133,8 @@ public class LongLiveRedis implements IPubSuber {
 
                 suber.subscribe(realPubSuber, getChannels());
             } catch (Exception e) {
-                logger.error(e.toString());
+                e.printStackTrace();
+                logger.error(e);
             } finally {
                 suber.close();
             }

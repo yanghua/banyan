@@ -1,10 +1,10 @@
 package com.messagebus.client.message.model;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Message implements Cloneable {
+public class Message implements Cloneable, Serializable {
 
     //header
     private long                messageId;
@@ -28,6 +28,10 @@ public class Message implements Cloneable {
 
     public MessageType getMessageType() {
         return this.msgType;
+    }
+
+    public void setMsgType(MessageType msgType) {
+        this.msgType = msgType;
     }
 
     public Message() {

@@ -1,7 +1,9 @@
 package com.messagebus.client.api;
 
+import com.google.common.eventbus.Subscribe;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.core.BaseTestCase;
+import com.messagebus.client.event.component.NotifyEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -37,43 +39,25 @@ public class Broadcast extends BaseTestCase {
 
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
+        NotificationEventProcessor eventProcessor = new NotificationEventProcessor();
+        client.registerEventProcessor(eventProcessor);
+
         client.broadcast(secret, new Message[]{msg});
 
-        //-------------------------------------------------------
+        TimeUnit.SECONDS.sleep(10);
 
-        secret = "kjhasdfhlkuqjhgaebjhasgdfabfak";
-        //notification handler
-        client.setNotificationListener(new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message message) {
-                assertNotNull(message);
-                assertEquals("test", new String(message.getContent(), Constants.CHARSET_OF_UTF8));
-            }
-        });
+        client.unregisterEventProcessor(eventProcessor);
+    }
 
-        //business handler
-        client.consume(secret, 3, TimeUnit.SECONDS, new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message message) {
+    public static class NotificationEventProcessor {
 
-            }
-        });
-
-        secret = "zxdjnflakwenklasjdflkqpiasdfnj";
-        client.setNotificationListener(new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message message) {
-                assertNotNull(message);
-                assertEquals("test", new String(message.getContent(), Constants.CHARSET_OF_UTF8));
-            }
-        });
-
-        client.consume(secret, 3, TimeUnit.SECONDS, new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message message) {
-
-            }
-        });
+        @Subscribe
+        public void onNotification(NotifyEvent event) {
+            logger.info("onNotification");
+            Message message = event.getMsg();
+            assertNotNull(message);
+            assertEquals("test", new String(message.getContent(), Constants.CHARSET_OF_UTF8));
+        }
 
     }
 }
