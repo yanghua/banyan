@@ -40,7 +40,6 @@ public class Constants {
 
     public static final String PROXY_EXCHANGE_NAME        = "exchange.proxy";
     public static final String DEFAULT_FILE_QUEUE_NAME    = "queue.proxy.log.file";
-    public static final String NOTIFICATION_EXCHANGE_NAME = "notification";
 
     public static final Charset CHARSET_OF_UTF8 = Charset.forName("UTF-8");
 

@@ -40,19 +40,9 @@ public class MQDataInitializer extends AbstractInitializer {
 
         super.init();
 
-        String notificationExchangeRealName = null;
-
         //declare exchange
         for (Node node : sortedExchangeNodes) {
             channel.exchangeDeclare(node.getValue(), node.getRouterType(), true);
-            if (node.getName().equals(com.messagebus.common.Constants.NOTIFICATION_EXCHANGE_NAME)) {
-                notificationExchangeRealName = node.getValue();
-            }
-        }
-
-        if (Strings.isNullOrEmpty(notificationExchangeRealName)) {
-            logger.error("can not find a exchange named : " + com.messagebus.common.Constants.NOTIFICATION_EXCHANGE_NAME);
-            throw new RuntimeException("can not find a exchange named : " + com.messagebus.common.Constants.NOTIFICATION_EXCHANGE_NAME);
         }
 
         //bind exchange
@@ -104,9 +94,6 @@ public class MQDataInitializer extends AbstractInitializer {
         for (Node node : sortedQueueNodes) {
             if (!node.isVirtual()) {
                 channel.queueBind(node.getValue(), nodeMap.get(node.getParentId()).getValue(), node.getRoutingKey());
-
-                //binding to event exchange
-                channel.queueBind(node.getValue(), notificationExchangeRealName, "");
             }
         }
 
