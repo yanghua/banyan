@@ -1,8 +1,10 @@
 package com.messagebus.client.carry;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.MessageCarryHandlerChain;
+import com.messagebus.client.event.carry.CommonEventProcessor;
+import com.messagebus.client.event.carry.ConsumeEventProcessor;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
@@ -10,56 +12,27 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * a async consumer
+ * Created by yanghua on 6/26/15.
  */
-class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsumer {
+class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
 
     private static final Log logger = LogFactory.getLog(GenericConsumer.class);
 
-    private Thread                  currentThread;
-    private String                  secret;
-    private IMessageReceiveListener onMessage;
-    private TimeUnit                timeUnit;
-
-    private       long      timeout     = 0;
-    private final Lock      mainLock    = new ReentrantLock();
-    private final Condition mainBlocker = mainLock.newCondition();
-
-    public GenericConsumer() {
-    }
-
     @Override
-    public void run() {
+    public void consume(String secret, long timeout, TimeUnit unit, IMessageReceiveListener onMessage) {
         logger.debug("current secret is : " + secret);
         final MessageContext ctx = initMessageContext();
-        ctx.setSecret(this.secret);
+        ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.CONSUME);
         ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
         ctx.setReceiveListener(onMessage);
+        ctx.setTimeout(timeout);
+        ctx.setTimeoutUnit(unit);
         ctx.setSync(false);
-        ctx.setNoticeListener(getContext().getNoticeListener());
 
-        checkState();
-
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
-        this.handlerChain.handle(ctx);
-    }
-
-    @Override
-    public void consume(String secret, long timeout, TimeUnit unit, IMessageReceiveListener onMessage) {
-        this.onMessage = onMessage;
-        this.timeout = timeout;
-        this.timeUnit = unit;
-        this.secret = secret;
-        this.currentThread = new Thread(this);
-        this.currentThread.setDaemon(true);
-
-        this.startup();
+        this.innerConsume(ctx);
     }
 
     @Override
@@ -71,36 +44,52 @@ class GenericConsumer extends AbstractMessageCarryer implements Runnable, IConsu
         ctx.setConsumeMsgNum(expectedNum);
         ctx.setSync(true);
 
-        checkState();
-
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
-        //launch pipeline
-        this.handlerChain.handle(ctx);
+        this.innerConsume(ctx);
 
         return ctx.getConsumeMsgs();
     }
 
-    public void shutdown() {
-        this.currentThread.interrupt();
-    }
+    private void innerConsume(MessageContext ctx) {
+        checkState();
 
-    private void startup() {
-        if (this.timeout != 0) {
-            mainLock.lock();
+//        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
+//        //launch pipeline
+//        this.handlerChain.handle(ctx);
 
-            try {
-                this.currentThread.start();
-                mainBlocker.await(this.timeout,
-                                  this.timeUnit == null ? TimeUnit.SECONDS : this.timeUnit);
-            } catch (InterruptedException e) {
+        EventBus carryEventBus = this.getContext().getCarryEventBus();
 
-            } finally {
-                this.currentThread.interrupt();
-                mainLock.unlock();
-            }
+        //register event processor
+        ConsumeEventProcessor eventProcessor = new ConsumeEventProcessor();
+        carryEventBus.register(eventProcessor);
+
+        //init events
+        ConsumeEventProcessor.ValidateEvent validateEvent = new ConsumeEventProcessor.ValidateEvent();
+        ConsumeEventProcessor.PermissionCheckEvent permissionCheckEvent = new ConsumeEventProcessor.PermissionCheckEvent();
+        ConsumeEventProcessor.TagGenerateEvent tagGenerateEvent = new ConsumeEventProcessor.TagGenerateEvent();
+        CommonEventProcessor.PreConsumeEvent perConsumeEvent = new CommonEventProcessor.PreConsumeEvent();
+
+        validateEvent.setMessageContext(ctx);
+        permissionCheckEvent.setMessageContext(ctx);
+        tagGenerateEvent.setMessageContext(ctx);
+        perConsumeEvent.setMessageContext(ctx);
+
+        //arrange event order and emit
+        carryEventBus.post(validateEvent);
+        carryEventBus.post(permissionCheckEvent);
+        carryEventBus.post(tagGenerateEvent);
+        carryEventBus.post(perConsumeEvent);
+
+        if (ctx.isSync()) {
+            ConsumeEventProcessor.SyncConsumeEvent syncConsumeEvent = new ConsumeEventProcessor.SyncConsumeEvent();
+            syncConsumeEvent.setMessageContext(ctx);
+            carryEventBus.post(syncConsumeEvent);
         } else {
-            this.currentThread.start();
+            ConsumeEventProcessor.AsyncMessageLoopEvent asyncMessageLoopEvent = new ConsumeEventProcessor.AsyncMessageLoopEvent();
+            asyncMessageLoopEvent.setMessageContext(ctx);
+            carryEventBus.post(asyncMessageLoopEvent);
         }
+
+        carryEventBus.unregister(eventProcessor);
     }
 
 }

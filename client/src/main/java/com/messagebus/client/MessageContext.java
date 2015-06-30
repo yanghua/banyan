@@ -1,8 +1,10 @@
 package com.messagebus.client;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
+import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * the message context, mostly used in handler chain
@@ -30,13 +33,16 @@ public class MessageContext {
     private Channel                 channel;
     private IMessageReceiveListener receiveListener;
     private long                    timeout;
+    private TimeUnit                timeoutUnit;
     private boolean                 hasTimeout;
     private int                     consumeMsgNum;
     private List<Message>           consumeMsgs;
     private String                  tempQueueName;
     private ConfigManager           configManager;
+    private PubsuberManager         pubsuberManager;
     private IMessageReceiveListener noticeListener;
     private IRequestListener        requestListener;
+    private EventBus                carryEventBus;
 
     private Map<String, Object> otherParams = new HashMap<String, Object>();
     private boolean             isSync      = false;
@@ -136,6 +142,14 @@ public class MessageContext {
         this.timeout = timeout;
     }
 
+    public TimeUnit getTimeoutUnit() {
+        return timeoutUnit;
+    }
+
+    public void setTimeoutUnit(TimeUnit timeoutUnit) {
+        this.timeoutUnit = timeoutUnit;
+    }
+
     public boolean isTimeout() {
         return hasTimeout;
     }
@@ -192,12 +206,12 @@ public class MessageContext {
         this.configManager = configManager;
     }
 
-    public IMessageReceiveListener getNoticeListener() {
-        return noticeListener;
+    public PubsuberManager getPubsuberManager() {
+        return pubsuberManager;
     }
 
-    public void setNoticeListener(IMessageReceiveListener noticeListener) {
-        this.noticeListener = noticeListener;
+    public void setPubsuberManager(PubsuberManager pubsuberManager) {
+        this.pubsuberManager = pubsuberManager;
     }
 
     public IRequestListener getRequestListener() {
@@ -206,6 +220,14 @@ public class MessageContext {
 
     public void setRequestListener(IRequestListener requestListener) {
         this.requestListener = requestListener;
+    }
+
+    public EventBus getCarryEventBus() {
+        return carryEventBus;
+    }
+
+    public void setCarryEventBus(EventBus carryEventBus) {
+        this.carryEventBus = carryEventBus;
     }
 
     @Override

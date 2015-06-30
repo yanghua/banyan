@@ -1,6 +1,8 @@
 package com.messagebus.client;
 
-import com.messagebus.common.ExceptionHelper;
+import com.google.common.eventbus.EventBus;
+import com.messagebus.client.event.component.ClientDestroyEvent;
+import com.messagebus.client.event.component.ClientInitedEvent;
 import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -19,13 +21,14 @@ abstract class InnerClient {
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
     //inject by reflector
-    private PubsuberManager exchangeManager;
-    private ConfigManager   configManager;
-    private Connection      connection;
+    private   PubsuberManager pubsuberManager;
+    private   ConfigManager   configManager;
+    private   Connection      connection;
+    protected EventBus        componentEventBus;
+    protected EventBus        carryEventBus;
 
     private   Channel                 channel;
     protected GenericContext          context;
-    protected IMessageReceiveListener notificationListener;
 
     private AtomicBoolean isOpen = new AtomicBoolean(false);
 
@@ -33,7 +36,7 @@ abstract class InnerClient {
         context = new GenericContext();
     }
 
-    private void open() throws MessagebusConnectedFailedException {
+    private void open() {
         if (this.isOpen())
             return;
 
@@ -41,12 +44,20 @@ abstract class InnerClient {
             this.channel = this.connection.createChannel();
             context.setChannel(this.channel);
         } catch (IOException e) {
+            logger.error("create channel error, connection host : " + this.connection.getAddress().getHostAddress()
+                             + " connection port : " + this.connection.getPort(), e);
             throw new RuntimeException(e);
         }
+
+        carryEventBus = new EventBus("carryEventBusPerClient");
+        context.setCarryEventBus(carryEventBus);
+        context.setPubsuberManager(pubsuberManager);
         context.setConfigManager(this.configManager);
         context.setConnection(this.connection);
 
         this.isOpen.compareAndSet(false, true);
+
+        this.componentEventBus.post(new ClientInitedEvent());
     }
 
     private void close() {
@@ -56,7 +67,11 @@ abstract class InnerClient {
                 if (this.channel != null && this.channel.isOpen())
                     this.channel.close();
 
+                this.carryEventBus = null;
+
                 this.isOpen.compareAndSet(true, false);
+
+                this.componentEventBus.post(new ClientDestroyEvent());
             } catch (IOException e) {
                 logger.error("close inner client exception : ", e);
                 throw new RuntimeException("close inner client exception : ", e);

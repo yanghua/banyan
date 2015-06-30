@@ -2,7 +2,6 @@ package com.messagebus.client.carry;
 
 import com.messagebus.client.GenericContext;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.IHandlerChain;
 import com.messagebus.common.Constants;
 
 /**
@@ -11,8 +10,7 @@ import com.messagebus.common.Constants;
  */
 abstract class AbstractMessageCarryer {
 
-    private   GenericContext context;
-    protected IHandlerChain  handlerChain;
+    private GenericContext context;
 
     protected void checkState() {
         //check server state
@@ -24,9 +22,11 @@ abstract class AbstractMessageCarryer {
 
     protected MessageContext initMessageContext() {
         MessageContext msgCtx = new MessageContext();
+        msgCtx.setPubsuberManager(this.context.getPubsuberManager());
         msgCtx.setConfigManager(this.context.getConfigManager());
         msgCtx.setChannel(this.context.getChannel());
         msgCtx.setHost(this.context.getConfigManager().getConfig("messagebus.client.host"));
+        msgCtx.setCarryEventBus(this.context.getCarryEventBus());
 
         return msgCtx;
     }

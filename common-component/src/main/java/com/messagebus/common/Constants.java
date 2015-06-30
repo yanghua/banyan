@@ -16,8 +16,8 @@ public class Constants {
 
     public static final String PUBSUB_NODEVIEW_CHANNEL              = "/event/nodeView";
     public static final String PUBSUB_CONFIG_CHANNEL                = "/event/config";
-    public static final String PUBSUB_NOTIFICATION_EXCHANGE_CHANNEL = "/event/notification";
     public static final String PUBSUB_SERVER_STATE_CHANNEL          = "/event/serverState";
+    public static final String PUBSUB_NOTIFY_CHANNEL                = "/event/notify";
 
 
     public static final String COMMUNICATE_TYPE_PRODUCE                = "produce";

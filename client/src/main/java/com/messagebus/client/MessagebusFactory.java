@@ -1,5 +1,6 @@
 package com.messagebus.client;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
@@ -23,23 +24,26 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
     private String          pubsuberHost;
     private int             pubsuberPort;
-    private PubsuberManager exchangeManager;
+    private PubsuberManager pubsuberManager;
     private ConfigManager   configManager;
     private Connection      connection;
+    private EventBus        componentEventBus;
 
     private final Method openMethod;
     private final Method closeMethod;
 
     public MessagebusFactory(String pubsuberHost,
                              int pubsuberPort,
-                             PubsuberManager exchangeManager,
+                             PubsuberManager pubsuberManager,
                              ConfigManager configManager,
-                             Connection connection) {
+                             Connection connection,
+                             EventBus componentEventBus) {
         this.pubsuberHost = pubsuberHost;
         this.pubsuberPort = pubsuberPort;
-        this.exchangeManager = exchangeManager;
+        this.pubsuberManager = pubsuberManager;
         this.configManager = configManager;
         this.connection = connection;
+        this.componentEventBus = componentEventBus;
 
         try {
             openMethod = Messagebus.class.getSuperclass().getDeclaredMethod("open");
@@ -61,10 +65,10 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         Class<?> superClient = Messagebus.class.getSuperclass();
 
         //set private field
-        Field exchangeManagerField = superClient.getDeclaredField("exchangeManager");
-        exchangeManagerField.setAccessible(true);
-        exchangeManagerField.set(client, this.exchangeManager);
-        exchangeManagerField.setAccessible(false);
+        Field pubsuberManagerField = superClient.getDeclaredField("pubsuberManager");
+        pubsuberManagerField.setAccessible(true);
+        pubsuberManagerField.set(client, this.pubsuberManager);
+        pubsuberManagerField.setAccessible(false);
 
         Field configManagerField = superClient.getDeclaredField("configManager");
         configManagerField.setAccessible(true);
@@ -75,6 +79,11 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         connectionField.setAccessible(true);
         connectionField.set(client, this.connection);
         connectionField.setAccessible(false);
+
+        Field componentEventBus = superClient.getDeclaredField("componentEventBus");
+        componentEventBus.setAccessible(true);
+        componentEventBus.set(client, this.componentEventBus);
+        componentEventBus.setAccessible(false);
 
         openMethod.invoke(client);
 

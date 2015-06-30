@@ -1,7 +1,8 @@
 package com.messagebus.client.carry;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.handler.MessageCarryHandlerChain;
+import com.messagebus.client.event.carry.ProduceEventProcessor;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
@@ -15,9 +16,6 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
 
     private static final Log logger = LogFactory.getLog(GenericProducer.class);
 
-    public GenericProducer() {
-    }
-
     /**
      * simple producer just produces a message
      *
@@ -28,9 +26,9 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
      */
     @Override
     public void produce(String secret, String to, Message msg, String token) {
-        MessageContext ctx = this.innerProduce(secret, to, token);
+        MessageContext ctx = this.initMsgContext(secret, to, token);
         ctx.setMessages(new Message[]{msg});
-        commonCarry(ctx);
+        innerProduce(ctx);
     }
 
     /**
@@ -43,12 +41,12 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
      */
     @Override
     public void batchProduce(String secret, String to, Message[] msgs, String token) {
-        MessageContext context = this.innerProduce(secret, to, token);
+        MessageContext context = this.initMsgContext(secret, to, token);
         context.setMessages(msgs);
-        commonCarry(context);
+        innerProduce(context);
     }
 
-    private MessageContext innerProduce(String secret, String to, String token) {
+    private MessageContext initMsgContext(String secret, String to, String token) {
         MessageContext context = initMessageContext();
         context.setSecret(secret);
         context.setCarryType(MessageCarryType.PRODUCE);
@@ -66,12 +64,40 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
         return context;
     }
 
-    private void commonCarry(MessageContext ctx) {
+    private void innerProduce(MessageContext ctx) {
         checkState();
 
-        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.PRODUCE, this.getContext());
-        //launch pipeline
-        this.handlerChain.handle(ctx);
+        EventBus carryEventBus = this.getContext().getCarryEventBus();
+
+        //register event processor
+        ProduceEventProcessor eventProcessor = new ProduceEventProcessor();
+        carryEventBus.register(eventProcessor);
+
+        //init events
+        ProduceEventProcessor.ValidateEvent validateEvent = new ProduceEventProcessor.ValidateEvent();
+        ProduceEventProcessor.MsgBodySizeCheckEvent msgBodySizeCheckEvent = new ProduceEventProcessor.MsgBodySizeCheckEvent();
+        ProduceEventProcessor.PermissionCheckEvent permissionCheckEvent = new ProduceEventProcessor.PermissionCheckEvent();
+        ProduceEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new ProduceEventProcessor.MsgIdGenerateEvent();
+        ProduceEventProcessor.MsgBodyCompressEvent msgBodyCompressEvent = new ProduceEventProcessor.MsgBodyCompressEvent();
+        ProduceEventProcessor.ProduceEvent produceEvent = new ProduceEventProcessor.ProduceEvent();
+
+        validateEvent.setMessageContext(ctx);
+        msgBodySizeCheckEvent.setMessageContext(ctx);
+        permissionCheckEvent.setMessageContext(ctx);
+        msgIdGenerateEvent.setMessageContext(ctx);
+        msgBodyCompressEvent.setMessageContext(ctx);
+        produceEvent.setMessageContext(ctx);
+
+        //arrange event order and emit!
+        carryEventBus.post(validateEvent);
+        carryEventBus.post(msgBodySizeCheckEvent);
+        carryEventBus.post(permissionCheckEvent);
+        carryEventBus.post(msgIdGenerateEvent);
+        carryEventBus.post(msgBodyCompressEvent);
+        carryEventBus.post(produceEvent);
+
+        //unregister event processor
+        carryEventBus.unregister(eventProcessor);
     }
 
 }

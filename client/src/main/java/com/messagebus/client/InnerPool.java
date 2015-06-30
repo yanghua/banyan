@@ -1,5 +1,6 @@
 package com.messagebus.client;
 
+import com.google.common.eventbus.EventBus;
 import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -12,14 +13,16 @@ class InnerPool extends AbstractPool<Messagebus> {
     public InnerPool(GenericObjectPoolConfig poolConfig,
                      String pubsuberHost,
                      int pubsuberPort,
-                     PubsuberManager exchangeManager,
+                     PubsuberManager pubsuberManager,
                      ConfigManager configManager,
-                     Connection connection) {
+                     Connection connection,
+                     EventBus componentEventBus) {
         super(poolConfig, new MessagebusFactory(pubsuberHost,
                                                 pubsuberPort,
-                                                exchangeManager,
+                                                pubsuberManager,
                                                 configManager,
-                                                connection)
+                                                connection,
+                                                componentEventBus)
              );
     }
 

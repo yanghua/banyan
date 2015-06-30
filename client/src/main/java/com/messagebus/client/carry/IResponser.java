@@ -9,7 +9,8 @@ public interface IResponser {
 
     /**
      * response a temp message to a named queue
-     *  @param toTmpQueue      the temp queue name
+     *
+     * @param toTmpQueue      the temp queue name
      * @param msg             the entity of message
      * @param receiveListener
      * @param secret
