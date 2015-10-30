@@ -50,12 +50,6 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
     }
 
     private void innerConsume(MessageContext ctx) {
-        checkState();
-
-//        this.handlerChain = new MessageCarryHandlerChain(MessageCarryType.CONSUME, this.getContext());
-//        //launch pipeline
-//        this.handlerChain.handle(ctx);
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

@@ -86,8 +86,6 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
     }
 
     private void innerRpcResponse(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

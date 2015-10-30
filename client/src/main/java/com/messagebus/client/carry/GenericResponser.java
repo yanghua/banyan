@@ -29,8 +29,6 @@ class GenericResponser extends AbstractMessageCarryer implements IResponser {
     }
 
     private void innerResponse(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

@@ -3,13 +3,12 @@ package com.messagebus.service.daemon.impl;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusPool;
+import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.HttpHelper;
 import com.messagebus.service.Constants;
-import com.messagebus.service.daemon.DaemonService;
-import com.messagebus.service.daemon.RunPolicy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,22 +16,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@DaemonService(value = "mqServerInfoService", policy = RunPolicy.ONCE)
+//@DaemonService(value = "mqServerInfoService", policy = RunPolicy.ONCE)
 public class MQServerInfoService extends AbstractService {
 
     private static final Log    logger = LogFactory.getLog(MQServerInfoService.class);
     private static final String secret = "iqwjasdfklakqoiajsidfoasidjoqw";
 
-    private MessagebusPool messagebusPool;
+    private String mqHost;
+    private int    mqPort;
 
     public MQServerInfoService(Map<String, Object> context) {
         super(context);
 
-        messagebusPool = (MessagebusPool) this.context.get(Constants.GLOBAL_CLIENT_POOL);
+        mqHost = this.context.get(com.messagebus.service.Constants.MQ_HOST_KEY).toString();
+        mqPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.MQ_PORT_KEY).toString());
     }
 
     @Override
     public void run() {
+        MessagebusPool messagebusPool = new MessagebusSinglePool(mqHost, mqPort);
         Messagebus client = messagebusPool.getResource();
         try {
             client.response(secret, new IRequestListener() {

@@ -6,11 +6,11 @@ import com.messagebus.common.Event;
 /**
  * Created by yanghua on 6/29/15.
  */
-public class NotifyEvent extends Event {
+public class NoticeEvent extends Event {
 
     private Message msg;
 
-    public NotifyEvent() {
+    public NoticeEvent() {
     }
 
     public Message getMsg() {

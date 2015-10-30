@@ -3,7 +3,6 @@ package com.messagebus.client;
 import com.google.common.eventbus.EventBus;
 import com.messagebus.client.event.component.ClientDestroyEvent;
 import com.messagebus.client.event.component.ClientInitedEvent;
-import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
@@ -20,15 +19,13 @@ abstract class InnerClient {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
-    //inject by reflector
-    private   PubsuberManager pubsuberManager;
-    private   ConfigManager   configManager;
-    private   Connection      connection;
-    protected EventBus        componentEventBus;
-    protected EventBus        carryEventBus;
+    private   ConfigManager configManager;
+    private   Connection    connection;
+    protected EventBus      componentEventBus;
+    protected EventBus      carryEventBus;
 
-    private   Channel                 channel;
-    protected GenericContext          context;
+    private   Channel        channel;
+    protected GenericContext context;
 
     private AtomicBoolean isOpen = new AtomicBoolean(false);
 
@@ -51,7 +48,6 @@ abstract class InnerClient {
 
         carryEventBus = new EventBus("carryEventBusPerClient");
         context.setCarryEventBus(carryEventBus);
-        context.setPubsuberManager(pubsuberManager);
         context.setConfigManager(this.configManager);
         context.setConnection(this.connection);
 

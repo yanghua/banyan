@@ -1,9 +1,8 @@
 package com.messagebus.client.api;
 
 import com.google.common.eventbus.Subscribe;
-import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.core.BaseTestCase;
-import com.messagebus.client.event.component.NotifyEvent;
+import com.messagebus.client.event.component.NoticeEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
@@ -52,7 +51,7 @@ public class Broadcast extends BaseTestCase {
     public static class NotificationEventProcessor {
 
         @Subscribe
-        public void onNotification(NotifyEvent event) {
+        public void onNotification(NoticeEvent event) {
             logger.info("onNotification");
             Message message = event.getMsg();
             assertNotNull(message);

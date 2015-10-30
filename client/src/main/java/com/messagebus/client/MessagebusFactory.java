@@ -2,7 +2,6 @@ package com.messagebus.client;
 
 import com.google.common.eventbus.EventBus;
 import com.messagebus.common.ExceptionHelper;
-import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,25 +21,22 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
     private static final Log logger = LogFactory.getLog(MessagebusFactory.class.getName());
 
-    private String          pubsuberHost;
-    private int             pubsuberPort;
-    private PubsuberManager pubsuberManager;
-    private ConfigManager   configManager;
-    private Connection      connection;
-    private EventBus        componentEventBus;
+    private String        host;
+    private int           port;
+    private ConfigManager configManager;
+    private Connection    connection;
+    private EventBus      componentEventBus;
 
     private final Method openMethod;
     private final Method closeMethod;
 
-    public MessagebusFactory(String pubsuberHost,
-                             int pubsuberPort,
-                             PubsuberManager pubsuberManager,
+    public MessagebusFactory(String host,
+                             int port,
                              ConfigManager configManager,
                              Connection connection,
                              EventBus componentEventBus) {
-        this.pubsuberHost = pubsuberHost;
-        this.pubsuberPort = pubsuberPort;
-        this.pubsuberManager = pubsuberManager;
+        this.host = host;
+        this.port = port;
         this.configManager = configManager;
         this.connection = connection;
         this.componentEventBus = componentEventBus;
@@ -65,11 +61,6 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
         Class<?> superClient = Messagebus.class.getSuperclass();
 
         //set private field
-        Field pubsuberManagerField = superClient.getDeclaredField("pubsuberManager");
-        pubsuberManagerField.setAccessible(true);
-        pubsuberManagerField.set(client, this.pubsuberManager);
-        pubsuberManagerField.setAccessible(false);
-
         Field configManagerField = superClient.getDeclaredField("configManager");
         configManagerField.setAccessible(true);
         configManagerField.set(client, this.configManager);

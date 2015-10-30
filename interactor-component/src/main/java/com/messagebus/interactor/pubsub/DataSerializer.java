@@ -1,8 +1,7 @@
-package com.messagebus.interactor.pubsub.impl.redis;
+package com.messagebus.interactor.pubsub;
 
 import com.google.gson.Gson;
 import com.messagebus.common.ExceptionHelper;
-import com.messagebus.interactor.pubsub.IDataConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,13 +12,12 @@ import java.util.List;
 /**
  * Created by yanghua on 2/11/15.
  */
-public class RedisDataConverter implements IDataConverter {
+public class DataSerializer {
 
-    private static final Log logger = LogFactory.getLog(RedisDataConverter.class);
+    private static final Log logger = LogFactory.getLog(DataSerializer.class);
 
     private static final Gson gson = new Gson();
 
-    @Override
     public <T> byte[] serialize(Serializable obj) {
         String tmp;
         if (obj instanceof String) {
@@ -34,14 +32,12 @@ public class RedisDataConverter implements IDataConverter {
     }
 
 
-    @Override
     public <T> byte[] serialize(Serializable obj, Class<T> clazz) {
         String tmp;
         tmp = gson.toJson(obj, clazz);
         return tmp.getBytes(Charset.defaultCharset());
     }
 
-    @Override
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
         if (originalData == null || originalData.length == 0)
             try {
@@ -56,7 +52,6 @@ public class RedisDataConverter implements IDataConverter {
         return gson.fromJson(jsonStr, clazz);
     }
 
-    @Override
     public <T> T[] deSerializeArray(byte[] originalData, Class<T[]> clazz) {
         String jsonStr = new String(originalData, Charset.defaultCharset());
         return gson.fromJson(jsonStr, clazz);

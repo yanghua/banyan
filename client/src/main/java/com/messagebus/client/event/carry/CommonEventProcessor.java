@@ -2,9 +2,7 @@ package com.messagebus.client.event.carry;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
-import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.event.component.NotifyEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;

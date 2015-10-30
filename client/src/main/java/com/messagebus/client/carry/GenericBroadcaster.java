@@ -28,8 +28,6 @@ class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster 
     }
 
     private void innerBroadcast(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         BroadcastEventProcessor eventProcessor = new BroadcastEventProcessor();

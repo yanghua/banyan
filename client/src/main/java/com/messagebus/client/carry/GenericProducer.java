@@ -65,8 +65,6 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
     }
 
     private void innerProduce(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

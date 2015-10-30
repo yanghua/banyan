@@ -10,8 +10,8 @@ import junit.framework.TestCase;
  */
 public class BaseTestCase extends TestCase {
 
-    protected String host = TestVariableInfo.PUBSUBER_HOST;
-    protected int    port = TestVariableInfo.PUBSUBER_PORT;
+    protected String host = TestVariableInfo.HOST;
+    protected int    port = TestVariableInfo.PORT;
 
     protected MessagebusSinglePool singlePool;
     protected Messagebus           client;

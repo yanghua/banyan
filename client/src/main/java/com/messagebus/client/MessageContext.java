@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
-import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +38,6 @@ public class MessageContext {
     private List<Message>           consumeMsgs;
     private String                  tempQueueName;
     private ConfigManager           configManager;
-    private PubsuberManager         pubsuberManager;
     private IMessageReceiveListener noticeListener;
     private IRequestListener        requestListener;
     private EventBus                carryEventBus;
@@ -204,14 +202,6 @@ public class MessageContext {
 
     public void setConfigManager(ConfigManager configManager) {
         this.configManager = configManager;
-    }
-
-    public PubsuberManager getPubsuberManager() {
-        return pubsuberManager;
-    }
-
-    public void setPubsuberManager(PubsuberManager pubsuberManager) {
-        this.pubsuberManager = pubsuberManager;
     }
 
     public IRequestListener getRequestListener() {

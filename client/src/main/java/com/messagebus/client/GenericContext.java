@@ -1,7 +1,6 @@
 package com.messagebus.client;
 
 import com.google.common.eventbus.EventBus;
-import com.messagebus.interactor.pubsub.PubsuberManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -11,7 +10,6 @@ import com.rabbitmq.client.Connection;
  */
 public class GenericContext {
 
-    private PubsuberManager         pubsuberManager;
     private ConfigManager           configManager;
     private Channel                 channel;
     private Connection              connection;
@@ -60,14 +58,6 @@ public class GenericContext {
 
     public void setComponentEventBus(EventBus componentEventBus) {
         this.componentEventBus = componentEventBus;
-    }
-
-    public PubsuberManager getPubsuberManager() {
-        return pubsuberManager;
-    }
-
-    public void setPubsuberManager(PubsuberManager pubsuberManager) {
-        this.pubsuberManager = pubsuberManager;
     }
 
     @Override

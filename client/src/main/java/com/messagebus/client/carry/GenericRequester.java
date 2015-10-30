@@ -88,8 +88,6 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
 
 
     private void innerRequest(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

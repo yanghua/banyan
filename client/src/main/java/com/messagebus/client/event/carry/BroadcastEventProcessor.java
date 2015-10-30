@@ -5,13 +5,19 @@ import com.google.common.eventbus.Subscribe;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
+import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
+import com.messagebus.interactor.proxy.ProxyProducer;
+import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yanghua on 6/29/15.
@@ -19,6 +25,8 @@ import java.util.Date;
 public class BroadcastEventProcessor extends CommonEventProcessor {
 
     private static final Log logger = LogFactory.getLog(BroadcastEventProcessor.class);
+
+    private static final String EVENT_ROUTING_KEY_NAME = "routingkey.proxy.message.inner.#";
 
     @Subscribe
     public void onValidate(ValidateEvent event) {
@@ -54,9 +62,24 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
     public void onBroadcast(BroadcastEvent event) {
         logger.debug("=-=-=- event : onBroadcast =-=-=-");
         MessageContext context = event.getMessageContext();
-        for (Message msg : context.getMessages()) {
-            byte[] serializedData = context.getPubsuberManager().serialize(msg, Message.class);
-            context.getPubsuberManager().publish(Constants.PUBSUB_NOTIFY_CHANNEL, serializedData);
+        try {
+            for (Message msg : context.getMessages()) {
+
+                Map<String, Object> map = new HashMap<String, Object>(1);
+                map.put("type", "notice");
+                msg.setHeaders(map);
+                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
+
+                ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
+                                      context.getChannel(),
+                                      EVENT_ROUTING_KEY_NAME,
+                                      msg.getContent(),
+                                      properties);
+
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 

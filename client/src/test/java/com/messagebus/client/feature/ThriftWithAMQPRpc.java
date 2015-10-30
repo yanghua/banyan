@@ -48,8 +48,8 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
     }
 
     public static void main(String[] args) {
-        String host = TestVariableInfo.PUBSUBER_HOST;
-        int port = TestVariableInfo.PUBSUBER_PORT;
+        String host = TestVariableInfo.HOST;
+        int port = TestVariableInfo.PORT;
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
 

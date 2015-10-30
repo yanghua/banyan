@@ -2,43 +2,45 @@ package com.messagebus.client;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import com.messagebus.client.event.component.NotifyEvent;
+import com.google.common.eventbus.Subscribe;
+import com.google.gson.Gson;
+import com.messagebus.client.event.component.InnerEvent;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.model.Node;
 import com.messagebus.client.model.NodeView;
 import com.messagebus.common.Constants;
-import com.messagebus.interactor.pubsub.IPubSubListener;
-import com.messagebus.interactor.pubsub.PubsuberManager;
+import com.messagebus.common.InnerEventEntity;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.tools.jsonrpc.JsonRpcClient;
+import com.rabbitmq.tools.jsonrpc.JsonRpcException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 /**
  * the config manager
  */
 public class ConfigManager {
 
-    private static final Log logger = LogFactory.getLog(ConfigManager.class);
+    private static final Log  logger = LogFactory.getLog(ConfigManager.class);
+    private static final Gson GSON   = new Gson();
 
-    private volatile String                serverState       = Constants.MESSAGEBUS_SERVER_EVENT_STOPPED;
-    private          Map<String, NodeView> secretNodeViewMap = new ConcurrentHashMap<String, NodeView>();
-    private          Map<String, String>   configMap         = new ConcurrentHashMap<String, String>();
+    private Map<String, NodeView> secretNodeViewMap = new ConcurrentHashMap<String, NodeView>();
+    private Map<String, String>   configMap         = new ConcurrentHashMap<String, String>();
 
-    private PubsuberManager pubsuberManager;
-    private EventBus        componentEventBus;
+    private String host;
+    private int    port;
 
-    public ConfigManager() {
-    }
+    private EventBus componentEventBus;
 
-    public PubsuberManager getPubsuberManager() {
-        return pubsuberManager;
-    }
-
-    public void setPubsuberManager(PubsuberManager pubsuberManager) {
-        this.pubsuberManager = pubsuberManager;
+    public ConfigManager(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
     public EventBus getComponentEventBus() {
@@ -53,36 +55,6 @@ public class ConfigManager {
         return secretNodeViewMap;
     }
 
-    public Map<String, String> getConfigMap() {
-        return configMap;
-    }
-
-    public String getServerState() {
-        return serverState;
-    }
-
-    public synchronized void setServerState(String serverState) {
-        this.serverState = serverState;
-    }
-
-    public void checkServerState() {
-        String tmp = this.getPubsuberManager().get(Constants.PUBSUB_SERVER_STATE_CHANNEL, String.class);
-        logger.debug("current server state is : " + tmp);
-        if (tmp != null) {
-            this.setServerState(tmp);
-        }
-    }
-
-    public String getConfig(String key) {
-        if (this.configMap.containsKey(key)) {
-            return this.configMap.get(key);
-        } else {
-            String configValue = this.pubsuberManager.get(key, String.class);
-            this.configMap.put(key, configValue);
-            return configValue;
-        }
-    }
-
     public NodeView getNodeView(String secret) {
         if (Strings.isNullOrEmpty(secret)) {
             throw new NullPointerException("the secret can not be null or empty");
@@ -91,57 +63,65 @@ public class ConfigManager {
         if (this.secretNodeViewMap.containsKey(secret)) {   //local cache
             return this.secretNodeViewMap.get(secret);
         } else {                                            //remote data then local cache
-            NodeView nodeViewObj = this.pubsuberManager.get(secret, NodeView.class);
-            this.secretNodeViewMap.put(secret, nodeViewObj);
-            return nodeViewObj;
-        }
-    }
-
-    public class ConfigChangedHandler implements IPubSubListener {
-
-        @Override
-        public void onChange(String channel, byte[] data, Map<String, Object> params) {
-            String key = new String(data);
-
-            if (getConfigMap().containsKey(key)) {
-                getConfigMap().remove(key);
-                getConfig(key);
+//            NodeView nodeViewObj = this.pubsuberManager.get(secret, NodeView.class);
+            Object[] params = new Object[]{secret};
+            Object responseObj = this.innerRpcRequest("getNodeViewBySecret",
+                                                      params);
+            if (responseObj != null) {
+                NodeView nodeViewObj = GSON.fromJson(responseObj.toString(), NodeView.class);
+                this.secretNodeViewMap.put(secret, nodeViewObj);
+                return nodeViewObj;
+            } else {
+                throw new RuntimeException("can not get config info!");
             }
         }
     }
 
-    public class NodeViewChangedHandler implements IPubSubListener {
+    public class InnerEventProcessor {
 
-        @Override
-        public void onChange(String channel, byte[] data, Map<String, Object> params) {
-            if (getSecretNodeViewMap().containsKey(channel)) {
-                getSecretNodeViewMap().remove(channel);
-                getNodeView(channel);
+        @Subscribe
+        public void onInnerEvent(InnerEvent innerEvent) {
+            Message msg = innerEvent.getMsg();
+            String jsonStr = new String(msg.getContent());
+            logger.info("received inner event , content : " + jsonStr);
+            InnerEventEntity innerEventObj = GSON.fromJson(jsonStr, InnerEventEntity.class);
+
+            String identifier = innerEventObj.getIdentifier();
+
+            if (identifier.equals(Constants.PUBSUB_NODEVIEW_CHANNEL)) {
+                //if local cache not exists just ignore
+                if (!Strings.isNullOrEmpty(identifier) && secretNodeViewMap.containsKey(identifier)) {
+                    getNodeView(identifier);
+                }
             }
         }
 
     }
 
-    public class ServerStateChangedHandler implements IPubSubListener {
+    private Object innerRpcRequest(String method, Object[] params) {
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        connectionFactory.setHost(this.host);
+        try {
+            Connection connection = connectionFactory.newConnection();
+            Channel channel = connection.createChannel();
+            JsonRpcClient client = new JsonRpcClient(channel,
+                                                     Constants.PROXY_EXCHANGE_NAME,
+                                                     "routingkey.proxy.message.rpc.configRpcResponse",
+                                                     10000);
 
-        @Override
-        public void onChange(String channel, byte[] data, Map<String, Object> params) {
-            String currentState = new String(data);
-            setServerState(currentState);
-        }
-
-    }
-
-    public class NotifyHandler implements IPubSubListener {
-
-        @Override
-        public void onChange(String channel, byte[] data, Map<String, Object> params) {
-            NotifyEvent notifyEvent = new NotifyEvent();
-            Message broadcastMsg = pubsuberManager.deserialize(data, Message.class);
-            if (broadcastMsg != null && broadcastMsg.getMessageType().equals(MessageType.BroadcastMessage)) {
-                notifyEvent.setMsg(broadcastMsg);
-                getComponentEventBus().post(notifyEvent);
-            }
+            return client.call(method, params);
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (JsonRpcException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 

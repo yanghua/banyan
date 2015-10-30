@@ -7,9 +7,9 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
  */
 public class MessagebusSinglePool extends MessagebusPool {
 
-    public MessagebusSinglePool(String pubsuberHost, int pubsuberPort) {
-        super(pubsuberHost,
-              pubsuberPort,
+    public MessagebusSinglePool(String host, int port) {
+        super(host,
+              port,
               new DefaultMessagebusPoolConfig());
     }
 

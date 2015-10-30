@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
  * snappy compressor
  * more detail : https://github.com/xerial/snappy-java
  */
- class SnappyCompressor implements ICompressor {
+class SnappyCompressor implements ICompressor {
 
     private static final Log logger = LogFactory.getLog(SnappyCompressor.class);
 

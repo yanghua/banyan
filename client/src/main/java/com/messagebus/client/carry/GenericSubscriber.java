@@ -38,8 +38,6 @@ class GenericSubscriber extends AbstractMessageCarryer implements ISubscriber {
     }
 
     private void innerSubscribe(MessageContext ctx) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor

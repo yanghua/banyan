@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
  * LZF compressor
  * more detail : https://github.com/ning/compress
  */
- class LZFCompressor implements ICompressor {
+class LZFCompressor implements ICompressor {
 
     public byte[] compress(byte[] source) {
         return LZFEncoder.encode(source);

@@ -28,8 +28,6 @@ class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
     }
 
     private void innerPublish(MessageContext context) {
-        checkState();
-
         EventBus carryEventBus = this.getContext().getCarryEventBus();
 
         //register event processor
