@@ -31,7 +31,6 @@ public class ConfigManager {
     private static final Gson GSON   = new Gson();
 
     private Map<String, NodeView> secretNodeViewMap = new ConcurrentHashMap<String, NodeView>();
-    private Map<String, String>   configMap         = new ConcurrentHashMap<String, String>();
 
     private String host;
     private int    port;
@@ -88,11 +87,9 @@ public class ConfigManager {
 
             String identifier = innerEventObj.getIdentifier();
 
-            if (identifier.equals(Constants.PUBSUB_NODEVIEW_CHANNEL)) {
-                //if local cache not exists just ignore
-                if (!Strings.isNullOrEmpty(identifier) && secretNodeViewMap.containsKey(identifier)) {
-                    getNodeView(identifier);
-                }
+            //if local cache not exists just ignore
+            if (!Strings.isNullOrEmpty(identifier) && secretNodeViewMap.containsKey(identifier)) {
+                getNodeView(identifier);
             }
         }
 
@@ -106,7 +103,7 @@ public class ConfigManager {
             Channel channel = connection.createChannel();
             JsonRpcClient client = new JsonRpcClient(channel,
                                                      Constants.PROXY_EXCHANGE_NAME,
-                                                     "routingkey.proxy.message.rpc.configRpcResponse",
+                                                     Constants.DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY,
                                                      10000);
 
             return client.call(method, params);

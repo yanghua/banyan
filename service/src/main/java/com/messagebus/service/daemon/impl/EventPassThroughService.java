@@ -33,44 +33,39 @@ public class EventPassThroughService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(EventPassThroughService.class);
 
-    private static final String EVENT_ROUTING_KEY_NAME = "routingkey.proxy.message.inner.#";
+    private static final String EVENT_ROUTING_KEY_NAME    = "routingkey.proxy.message.inner.#";
+    private static final String REVERSE_MESSAGE_PATH      = "/reverse/message";
+    private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
+
 
     private static final Gson GSON = new Gson();
 
-    private String            mqHost;
-    private int               mqPort;
-    private LongLiveZookeeper zookeeper;
-    private Connection        connection;
-    private Channel           mqChannel;
-    private String            pubsuberHost;
-    private int               pubsuberPort;
+    private Connection connection;
+    private Channel    mqChannel;
 
     public EventPassThroughService(Map<String, Object> context) {
         super(context);
-
-        mqHost = this.context.get(com.messagebus.service.Constants.MQ_HOST_KEY).toString();
-        mqPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.MQ_PORT_KEY).toString());
-        pubsuberHost = this.context.get("zookeeper.host").toString();
-        pubsuberPort = Integer.parseInt(this.context.get("zookeeper.port").toString());
     }
 
     @Override
     public void run() {
         logger.info("started event pass through service");
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(mqHost);
+        String zkHost = this.context.get(com.messagebus.service.Constants.ZK_HOST_KEY).toString();
+        int zkPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.ZK_PORT_KEY).toString());
 
-        zookeeper = new LongLiveZookeeper(this.pubsuberHost, this.pubsuberPort);
-        zookeeper.open();
-
+        LongLiveZookeeper zookeeper = new LongLiveZookeeper(zkHost, zkPort);
         try {
+            zookeeper.open();
+
+            Map mbHostAndPortObj = zookeeper.get(COMPONENT_MESSAGE_ZK_PATH, Map.class);
+
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.setHost(mbHostAndPortObj.get("mqHost").toString());
             connection = connectionFactory.newConnection();
             mqChannel = connection.createChannel();
 
-            String[] paths = new String[]{
-                Constants.PUBSUB_NODEVIEW_CHANNEL
-            };
-            this.zookeeper.watch(paths, new EventChangedHandler());
+            String[] paths = new String[]{REVERSE_MESSAGE_PATH};
+            zookeeper.watch(paths, new EventChangedHandler());
             TimeUnit.MINUTES.sleep(Integer.MAX_VALUE);
         } catch (IOException e) {
             logger.error(e);
@@ -90,12 +85,14 @@ public class EventPassThroughService extends AbstractService {
                     this.connection.close();
                 }
 
-                if (zookeeper != null && zookeeper.isAlive()) {
+                if (zookeeper.isAlive()) {
                     zookeeper.close();
                 }
             } catch (IOException e) {
                 logger.error(e);
             } catch (TimeoutException e) {
+                logger.error(e);
+            } catch (Exception e) {
                 logger.error(e);
             }
         }
@@ -108,8 +105,9 @@ public class EventPassThroughService extends AbstractService {
         public void onChange(String channel, byte[] data, Map<String, Object> params) {
             logger.info("received node view change from pubsuber, key : " + channel);
             try {
+                String secret = channel.replace(REVERSE_MESSAGE_PATH + "/", "");
                 InnerEventEntity eventEntity = new InnerEventEntity();
-                eventEntity.setIdentifier(channel);
+                eventEntity.setIdentifier(secret);
                 eventEntity.setValue(new String(data));
                 eventEntity.setType("event");
                 String jsonObjStr = GSON.toJson(eventEntity);

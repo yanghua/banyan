@@ -24,39 +24,40 @@ public class ConfigRpcService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(ConfigRpcService.class);
 
-    private static final Gson GSON = new Gson();
+    private static final Gson   GSON                      = new Gson();
+    private static final String REVERSE_MESSAGE_ZK_PATH   = "/reverse/message";
+    private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
 
     private LongLiveZookeeper zookeeper;
-    private String            mqHost;
-    private String            pubsuberHost;
-    private int               pubsuberPort;
 
     public ConfigRpcService(Map<String, Object> context) {
         super(context);
-        pubsuberHost = this.context.get("zookeeper.host").toString();
-        pubsuberPort = Integer.parseInt(this.context.get("zookeeper.port").toString());
-        mqHost = this.context.get(Constants.MQ_HOST_KEY).toString();
     }
 
     @Override
     public void run() {
         logger.info("config rpc service start.");
-        zookeeper = new LongLiveZookeeper(this.pubsuberHost, this.pubsuberPort);
-        zookeeper.open();
 
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(mqHost);
+        String zkHost = this.context.get(Constants.ZK_HOST_KEY).toString();
+        int zkPort = Integer.parseInt(this.context.get(Constants.ZK_PORT_KEY).toString());
 
         JsonRpcServer server = null;
+        zookeeper = new LongLiveZookeeper(zkHost, zkPort);
         try {
+            zookeeper.open();
+
+            Map mbHostAndPortObj = zookeeper.get(COMPONENT_MESSAGE_ZK_PATH, Map.class);
+
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.setHost(mbHostAndPortObj.get("mqHost").toString());
+
             Connection connection = connectionFactory.newConnection();
             Channel channel = connection.createChannel();
             server = new JsonRpcServer(channel,
-                                       "queue.proxy.message.rpc.configRpcResponse",
+                                       Constants.DEFAULT_CONFIG_RPC_RESPONSE_QUEUE_NAME,
                                        ConfigRpcInterface.class,
                                        new ConfigRpcResponse());
             server.mainloop();
-            logger.info("config rpc service break.");
         } catch (IOException e) {
             logger.error(e);
         } catch (Exception e) {
@@ -83,7 +84,8 @@ public class ConfigRpcService extends AbstractService {
         @Override
         public String getNodeViewBySecret(String secret) {
             logger.info("received node view request [secret : " + secret + "]");
-            NodeView nodeView = zookeeper.get(secret, NodeView.class);
+            String fullKey = REVERSE_MESSAGE_ZK_PATH + "/" + secret;
+            NodeView nodeView = zookeeper.get(fullKey, NodeView.class);
             return GSON.toJson(nodeView, NodeView.class);
         }
 

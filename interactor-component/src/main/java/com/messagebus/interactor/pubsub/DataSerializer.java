@@ -39,7 +39,7 @@ public class DataSerializer {
     }
 
     public <T> T deSerializeObject(byte[] originalData, Class<T> clazz) {
-        if (originalData == null || originalData.length == 0)
+        if (originalData == null || originalData.length == 0) {
             try {
                 return clazz.newInstance();
             } catch (InstantiationException e) {
@@ -47,6 +47,7 @@ public class DataSerializer {
             } catch (IllegalAccessException e) {
                 ExceptionHelper.logException(logger, e, "");
             }
+        }
 
         String jsonStr = new String(originalData, Charset.defaultCharset());
         return gson.fromJson(jsonStr, clazz);
