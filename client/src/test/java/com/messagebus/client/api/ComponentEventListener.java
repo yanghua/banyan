@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by yanghua on 6/25/15.
  */
@@ -31,6 +33,8 @@ public class ComponentEventListener extends BaseTestCase {
         singlePool = new MessagebusSinglePool(host, port);
         singlePool.registerComponentEventListener(new EventListener());
         client = singlePool.getResource();
+
+        TimeUnit.SECONDS.sleep(5);
 
         singlePool.returnResource(client);
         singlePool.destroy();

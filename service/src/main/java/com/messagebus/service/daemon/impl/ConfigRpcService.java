@@ -2,7 +2,6 @@ package com.messagebus.service.daemon.impl;
 
 import com.google.gson.Gson;
 import com.messagebus.client.model.NodeView;
-import com.messagebus.interactor.pubsub.LongLiveZookeeper;
 import com.messagebus.service.Constants;
 import com.messagebus.service.daemon.DaemonService;
 import com.messagebus.service.daemon.RunPolicy;
@@ -10,6 +9,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.tools.jsonrpc.JsonRpcServer;
+import com.wisedu.astraea.configuration.LongLiveZookeeper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

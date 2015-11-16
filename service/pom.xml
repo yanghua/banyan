@@ -31,9 +31,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>1.7.3</version>
+            <groupId>com.wisedu.astraea</groupId>
+            <artifactId>astraea-configuration</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

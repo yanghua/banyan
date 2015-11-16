@@ -10,8 +10,8 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.HttpHelper;
-import com.messagebus.interactor.pubsub.LongLiveZookeeper;
 import com.messagebus.service.Constants;
+import com.wisedu.astraea.configuration.LongLiveZookeeper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 //@DaemonService(value = "mqServerInfoService", policy = RunPolicy.ONCE)
 public class MQServerInfoService extends AbstractService {
 
-    private static final     Log    logger                    = LogFactory.getLog(MQServerInfoService.class);
-    private static final     String secret                    = "iqwjasdfklakqoiajsidfoasidjoqw";
+    private static final Log    logger                    = LogFactory.getLog(MQServerInfoService.class);
+    private static final String secret                    = "iqwjasdfklakqoiajsidfoasidjoqw";
     private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
-    private static final     Gson   GSON                      = new Gson();
+    private static final Gson   GSON                      = new Gson();
 
     private Map mbHostAndPortObj;
 

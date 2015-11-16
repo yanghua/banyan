@@ -83,16 +83,24 @@ public class ConfigManager {
             Message msg = innerEvent.getMsg();
             String jsonStr = new String(msg.getContent());
             logger.info("received inner event , content : " + jsonStr);
-            InnerEventEntity innerEventObj = GSON.fromJson(jsonStr, InnerEventEntity.class);
+//            InnerEventEntity innerEventObj = GSON.fromJson(jsonStr, InnerEventEntity.class);
 
-            String identifier = innerEventObj.getIdentifier();
+            refreshNodeView();
+        }
+    }
 
-            //if local cache not exists just ignore
-            if (!Strings.isNullOrEmpty(identifier) && secretNodeViewMap.containsKey(identifier)) {
-                getNodeView(identifier);
+    private void refreshNodeView() {
+        for (String secret : this.secretNodeViewMap.keySet()) {
+            Object[] params = new Object[]{secret};
+            Object responseObj = this.innerRpcRequest("getNodeViewBySecret",
+                                                      params);
+            if (responseObj != null) {
+                NodeView nodeViewObj = GSON.fromJson(responseObj.toString(), NodeView.class);
+                this.secretNodeViewMap.put(secret, nodeViewObj);
+            } else {
+                throw new RuntimeException("can not get config info!");
             }
         }
-
     }
 
     private Object innerRpcRequest(String method, Object[] params) {

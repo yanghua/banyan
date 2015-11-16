@@ -4,6 +4,7 @@ package com.messagebus.service.bootstrap;
 import com.google.common.base.Strings;
 import com.messagebus.client.model.Node;
 import com.messagebus.interactor.rabbitmq.AbstractInitializer;
+import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,69 +36,106 @@ public class MQDataInitializer extends AbstractInitializer {
 
     public void initTopologyComponent(Node[] nodes) throws IOException {
         Map<String, Node> nodeMap = this.buildNodeMap(nodes);
-        TreeSet<Node> sortedExchangeNodes = this.extractExchangeNodes(nodes);
+        initExchange(nodes, nodeMap);
+        initQueue(nodes, nodeMap);
+    }
+
+    public void initQueue(Node[] nodes, Map<String, Node> nodeMap) {
         TreeSet<Node> sortedQueueNodes = this.extractQueueNodes(nodes);
 
-        super.init();
+        try {
+            super.init();
 
-        //declare exchange
-        for (Node node : sortedExchangeNodes) {
-            channel.exchangeDeclare(node.getValue(), node.getRouterType(), true);
-        }
+            //declare queue
+            for (Node node : sortedQueueNodes) {
+                if (!node.isVirtual()) {
+                    Map<String, Object> queueConfig = new HashMap<String, Object>(2);
+                    String thresholdStr = node.getThreshold();
 
-        //bind exchange
-        for (Node node : sortedExchangeNodes) {
-            if (node.getParentId().equals("-1"))
-                continue;
+                    if (!Strings.isNullOrEmpty(thresholdStr)) {
+                        int threshold = Integer.parseInt(thresholdStr);
+                        queueConfig.put("x-max-length", threshold);
+                    }
 
-            channel.exchangeBind(node.getValue(),
-                                 nodeMap.get(node.getParentId()).getValue(),
-                                 node.getRoutingKey());
-        }
+                    String msgSizeOfBodyStr = node.getMsgBodySize();
+                    if (!Strings.isNullOrEmpty(thresholdStr) && !Strings.isNullOrEmpty(msgSizeOfBodyStr)) {
+                        int threshold = Integer.parseInt(thresholdStr);
+                        int msgSizeOfBody = Integer.parseInt(msgSizeOfBodyStr);
+                        int allMsgSize = threshold * msgSizeOfBody;
+                        queueConfig.put("x-max-length-bytes", allMsgSize);
+                    }
 
-        //declare queue
-        for (Node node : sortedQueueNodes) {
-            if (!node.isVirtual()) {
-                Map<String, Object> queueConfig = new HashMap<String, Object>(2);
-                String thresholdStr = node.getThreshold();
+                    String ttl = node.getTtl();
+                    if (!Strings.isNullOrEmpty(ttl)) {
+                        channel.queueDelete(node.getValue());
+                        queueConfig.put("x-expires", Integer.parseInt(ttl));
+                    }
 
-                if (!Strings.isNullOrEmpty(thresholdStr)) {
-                    int threshold = Integer.parseInt(thresholdStr);
-                    queueConfig.put("x-max-length", threshold);
+                    String ttlPerMsg = node.getTtlPerMsg();
+                    if (!Strings.isNullOrEmpty(ttlPerMsg)) {
+                        channel.queueDelete(node.getValue());
+                        queueConfig.put("x-message-ttl", Integer.parseInt(ttlPerMsg));
+                    }
+
+                    channel.queueDeclare(node.getValue(), true, false, false, queueConfig);
                 }
-
-                String msgSizeOfBodyStr = node.getMsgBodySize();
-                if (!Strings.isNullOrEmpty(thresholdStr) && !Strings.isNullOrEmpty(msgSizeOfBodyStr)) {
-                    int threshold = Integer.parseInt(thresholdStr);
-                    int msgSizeOfBody = Integer.parseInt(msgSizeOfBodyStr);
-                    int allMsgSize = threshold * msgSizeOfBody;
-                    queueConfig.put("x-max-length-bytes", allMsgSize);
-                }
-
-                String ttl = node.getTtl();
-                if (!Strings.isNullOrEmpty(ttl)) {
-                    channel.queueDelete(node.getValue());
-                    queueConfig.put("x-expires", Integer.parseInt(ttl));
-                }
-
-                String ttlPerMsg = node.getTtlPerMsg();
-                if (!Strings.isNullOrEmpty(ttlPerMsg)) {
-                    channel.queueDelete(node.getValue());
-                    queueConfig.put("x-message-ttl", Integer.parseInt(ttlPerMsg));
-                }
-
-                channel.queueDeclare(node.getValue(), true, false, false, queueConfig);
             }
-        }
 
-        //bind queue
-        for (Node node : sortedQueueNodes) {
-            if (!node.isVirtual()) {
-                channel.queueBind(node.getValue(), nodeMap.get(node.getParentId()).getValue(), node.getRoutingKey());
+            //bind queue
+            for (Node node : sortedQueueNodes) {
+                if (!node.isVirtual()) {
+                    channel.queueBind(node.getValue(), nodeMap.get(node.getParentId()).getValue(), node.getRoutingKey());
+                }
             }
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } finally {
+            super.close();
         }
+    }
 
-        super.close();
+    public void deleteQueueNoWait(String queueName) {
+        try {
+            super.init();
+            AMQP.Queue.DeleteOk deleteOk = channel.queueDelete(queueName);
+            if (deleteOk == null) {
+                throw new RuntimeException("delete queue with name : " + queueName + " failed.");
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } finally {
+            super.close();
+        }
+    }
+
+    private void initExchange(Node[] nodes, Map<String, Node> nodeMap) {
+        TreeSet<Node> sortedExchangeNodes = this.extractExchangeNodes(nodes);
+
+        try {
+            super.init();
+
+            //declare exchange
+            for (Node node : sortedExchangeNodes) {
+                channel.exchangeDeclare(node.getValue(), node.getRouterType(), true);
+            }
+
+            //bind exchange
+            for (Node node : sortedExchangeNodes) {
+                if (node.getParentId().equals("-1"))
+                    continue;
+
+                channel.exchangeBind(node.getValue(),
+                                     nodeMap.get(node.getParentId()).getValue(),
+                                     node.getRoutingKey());
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } finally {
+            super.close();
+        }
     }
 
     private void destroyTopologyComponent() throws IOException {

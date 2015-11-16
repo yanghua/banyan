@@ -59,40 +59,20 @@ public class PublishEventProcessor extends CommonEventProcessor {
     }
 
     @Subscribe
-    public void onPublishFiltrate(FiltrateEvent event) {
-        logger.debug("=-=-=- event : onPublishFiltrate =-=-=-");
-        MessageContext context = event.getMessageContext();
-        List<Node> pushToNodes = context.getConfigManager()
-                                        .getNodeView(context.getSecret())
-                                        .getSubscribeNodes();
-        if (pushToNodes == null || pushToNodes.size() == 0) return;
-
-        context.getOtherParams().put("publishList", pushToNodes);
-    }
-
-    @Subscribe
     public void onPublish(PublishEvent event) {
         logger.debug("=-=-=- event : onPublish =-=-=-");
         MessageContext context = event.getMessageContext();
         try {
-            List<Node> publishNodes = (List<Node>) context.getOtherParams().get("publishList");
-            for (Node node : publishNodes) {
-                for (Message msg : context.getMessages()) {
-                    //process message content (compress)
-                    Message compressedMsg = this.doCompress(msg, node);
-                    AMQP.BasicProperties properties = MessageHeaderTransfer.box(compressedMsg);
+            for (Message msg : context.getMessages()) {
+                AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
 
-                    ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
-                                          context.getChannel(),
-                                          node.getRoutingKey(),
-                                          compressedMsg.getContent(),
-                                          properties);
-                }
+                ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
+                                      context.getChannel(),
+                                      context.getSourceNode().getRoutingKey(),
+                                      msg.getContent(),
+                                      properties);
             }
         } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "handle");
-            throw new RuntimeException(e);
-        } catch (CloneNotSupportedException e) {
             ExceptionHelper.logException(logger, e, "handle");
             throw new RuntimeException(e);
         }
@@ -103,37 +83,11 @@ public class PublishEventProcessor extends CommonEventProcessor {
         throw new UnsupportedOperationException("this method should be implemented in consume event processor!");
     }
 
-    private Message doCompress(Message msg, Node Subscriber) throws CloneNotSupportedException {
-        String compressAlgo = Subscriber.getCompress();
-        if (!Strings.isNullOrEmpty(compressAlgo)) {
-            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
-            if (compressor != null) {
-                Message clonedMsg = (Message) msg.clone();
-                if (clonedMsg.getHeaders() == null) clonedMsg.setHeaders(new HashMap<String, Object>(1));
-
-                clonedMsg.getHeaders().put(Constants.MESSAGE_HEADER_KEY_COMPRESS_ALGORITHM, compressAlgo);
-                clonedMsg.setContent(compressor.compress(clonedMsg.getContent()));
-
-                return clonedMsg;
-            } else {
-                logger.error("the target subscriber with name : " + Subscriber.getName()
-                                 + " configured a compress named : " + compressAlgo
-                                 + " but client can not get the compressor instance. ");
-            }
-        }
-
-        return msg;
-    }
-
-
     //region publish events definition
     public static class ValidateEvent extends CarryEvent {
     }
 
     public static class PermissionCheckEvent extends CarryEvent {
-    }
-
-    public static class FiltrateEvent extends CarryEvent {
     }
 
     public static class PublishEvent extends CarryEvent {

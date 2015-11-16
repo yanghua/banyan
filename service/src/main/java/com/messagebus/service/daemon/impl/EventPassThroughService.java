@@ -8,14 +8,15 @@ import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.InnerEventEntity;
 import com.messagebus.interactor.proxy.ProxyProducer;
-import com.messagebus.interactor.pubsub.IPubSubListener;
-import com.messagebus.interactor.pubsub.LongLiveZookeeper;
 import com.messagebus.service.daemon.DaemonService;
 import com.messagebus.service.daemon.RunPolicy;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.wisedu.astraea.configuration.IPubSubListener;
+import com.wisedu.astraea.configuration.LongLiveZookeeper;
+import com.wisedu.astraea.configuration.ZKEventType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,6 +41,7 @@ public class EventPassThroughService extends AbstractService {
 
     private static final Gson GSON = new Gson();
 
+    private LongLiveZookeeper zookeeper;
     private Connection connection;
     private Channel    mqChannel;
 
@@ -53,7 +55,7 @@ public class EventPassThroughService extends AbstractService {
         String zkHost = this.context.get(com.messagebus.service.Constants.ZK_HOST_KEY).toString();
         int zkPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.ZK_PORT_KEY).toString());
 
-        LongLiveZookeeper zookeeper = new LongLiveZookeeper(zkHost, zkPort);
+        zookeeper = new LongLiveZookeeper(zkHost, zkPort);
         try {
             zookeeper.open();
 
@@ -64,8 +66,7 @@ public class EventPassThroughService extends AbstractService {
             connection = connectionFactory.newConnection();
             mqChannel = connection.createChannel();
 
-            String[] paths = new String[]{REVERSE_MESSAGE_PATH};
-            zookeeper.watch(paths, new EventChangedHandler());
+            zookeeper.watch(REVERSE_MESSAGE_PATH, new EventChangedHandler());
             TimeUnit.MINUTES.sleep(Integer.MAX_VALUE);
         } catch (IOException e) {
             logger.error(e);
@@ -76,6 +77,7 @@ public class EventPassThroughService extends AbstractService {
         } catch (Exception e) {
             logger.error(e);
         } finally {
+            logger.info("event pass through service shut down...");
             try {
                 if (this.mqChannel != null && this.mqChannel.isOpen()) {
                     this.mqChannel.close();
@@ -102,13 +104,13 @@ public class EventPassThroughService extends AbstractService {
     public class EventChangedHandler implements IPubSubListener {
 
         @Override
-        public void onChange(String channel, byte[] data, Map<String, Object> params) {
-            logger.info("received node view change from pubsuber, key : " + channel);
+        public void onChange(String channel, ZKEventType eventType) {
+            logger.info("received node view change from zookeeper, key : " + channel);
             try {
                 String secret = channel.replace(REVERSE_MESSAGE_PATH + "/", "");
                 InnerEventEntity eventEntity = new InnerEventEntity();
                 eventEntity.setIdentifier(secret);
-                eventEntity.setValue(new String(data));
+                eventEntity.setValue("");
                 eventEntity.setType("event");
                 String jsonObjStr = GSON.toJson(eventEntity);
 
@@ -126,8 +128,10 @@ public class EventPassThroughService extends AbstractService {
                                       properties);
             } catch (IOException e) {
                 logger.error(e);
+                throw new RuntimeException(e);
             } catch (Exception e) {
                 logger.error(e);
+                throw new RuntimeException(e);
             }
         }
 

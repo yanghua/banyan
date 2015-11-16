@@ -12,7 +12,6 @@ public class NodeView implements Serializable {
     private String            secret;
     private Node              currentQueue;
     private List<String>      sinkTokens;
-    private List<Node>        subscribeNodes;
     private Map<String, Node> relatedQueueNameNodeMap;
 
     public NodeView() {
@@ -40,14 +39,6 @@ public class NodeView implements Serializable {
 
     public void setSinkTokens(List<String> sinkTokens) {
         this.sinkTokens = sinkTokens;
-    }
-
-    public List<Node> getSubscribeNodes() {
-        return subscribeNodes;
-    }
-
-    public void setSubscribeNodes(List<Node> subscribeNodes) {
-        this.subscribeNodes = subscribeNodes;
     }
 
     public Map<String, Node> getRelatedQueueNameNodeMap() {

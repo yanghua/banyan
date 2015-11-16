@@ -51,13 +51,5 @@ public class PublishSubscribe extends BaseTestCase {
             }
         }, 3, TimeUnit.SECONDS);
 
-        secret = "zxcnvblawelkusahdfqwiuhowefhnx";
-        client.subscribe(secret, new IMessageReceiveListener() {
-            @Override
-            public void onMessage(Message message) {
-                assertNotNull(message);
-                assertEquals("test", new String(message.getContent(), Constants.CHARSET_OF_UTF8));
-            }
-        }, 3, TimeUnit.SECONDS);
     }
 }
