@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by yanghua on 10/27/15.
@@ -22,11 +23,9 @@ import java.util.Map;
 @DaemonService(value = "configRpcService", policy = RunPolicy.ONCE)
 public class ConfigRpcService extends AbstractService {
 
-    private static final Log logger = LogFactory.getLog(ConfigRpcService.class);
+    private static final Log  logger = LogFactory.getLog(ConfigRpcService.class);
+    private static final Gson GSON   = new Gson();
 
-    private static final Gson   GSON                      = new Gson();
-    private static final String REVERSE_MESSAGE_ZK_PATH   = "/reverse/message";
-    private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
 
     private LongLiveZookeeper zookeeper;
 
@@ -41,6 +40,8 @@ public class ConfigRpcService extends AbstractService {
         String zkHost = this.context.get(Constants.ZK_HOST_KEY).toString();
         int zkPort = Integer.parseInt(this.context.get(Constants.ZK_PORT_KEY).toString());
 
+        Connection connection = null;
+        Channel channel = null;
         JsonRpcServer server = null;
         zookeeper = new LongLiveZookeeper(zkHost, zkPort);
         try {
@@ -51,8 +52,8 @@ public class ConfigRpcService extends AbstractService {
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(mbHostAndPortObj.get("mqHost").toString());
 
-            Connection connection = connectionFactory.newConnection();
-            Channel channel = connection.createChannel();
+            connection = connectionFactory.newConnection();
+            channel = connection.createChannel();
             server = new JsonRpcServer(channel,
                                        Constants.DEFAULT_CONFIG_RPC_RESPONSE_QUEUE_NAME,
                                        ConfigRpcInterface.class,
@@ -63,8 +64,23 @@ public class ConfigRpcService extends AbstractService {
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            if (server != null) {
-                server.terminateMainloop();
+            try {
+                if (server != null) {
+                    server.terminateMainloop();
+                    server.close();
+                }
+
+                if (channel != null && channel.isOpen()) {
+                    channel.close();
+                }
+
+                if (connection != null && connection.isOpen()) {
+                    connection.close();
+                }
+            } catch (IOException e) {
+                logger.error(e);
+            } catch (TimeoutException e) {
+                logger.error(e);
             }
 
             if (zookeeper.isAlive()) {

@@ -35,10 +35,6 @@ public class EventPassThroughService extends AbstractService {
     private static final Log logger = LogFactory.getLog(EventPassThroughService.class);
 
     private static final String EVENT_ROUTING_KEY_NAME    = "routingkey.proxy.message.inner.#";
-    private static final String REVERSE_MESSAGE_PATH      = "/reverse/message";
-    private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
-
-
     private static final Gson GSON = new Gson();
 
     private LongLiveZookeeper zookeeper;
@@ -66,7 +62,7 @@ public class EventPassThroughService extends AbstractService {
             connection = connectionFactory.newConnection();
             mqChannel = connection.createChannel();
 
-            zookeeper.watch(REVERSE_MESSAGE_PATH, new EventChangedHandler());
+            zookeeper.watch(REVERSE_MESSAGE_ZK_PATH, new EventChangedHandler());
             TimeUnit.MINUTES.sleep(Integer.MAX_VALUE);
         } catch (IOException e) {
             logger.error(e);
@@ -107,7 +103,7 @@ public class EventPassThroughService extends AbstractService {
         public void onChange(String channel, ZKEventType eventType) {
             logger.info("received node view change from zookeeper, key : " + channel);
             try {
-                String secret = channel.replace(REVERSE_MESSAGE_PATH + "/", "");
+                String secret = channel.replace(REVERSE_MESSAGE_ZK_PATH + "/", "");
                 InnerEventEntity eventEntity = new InnerEventEntity();
                 eventEntity.setIdentifier(secret);
                 eventEntity.setValue("");

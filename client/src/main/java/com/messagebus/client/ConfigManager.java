@@ -61,8 +61,7 @@ public class ConfigManager {
 
         if (this.secretNodeViewMap.containsKey(secret)) {   //local cache
             return this.secretNodeViewMap.get(secret);
-        } else {                                            //remote data then local cache
-//            NodeView nodeViewObj = this.pubsuberManager.get(secret, NodeView.class);
+        } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{secret};
             Object responseObj = this.innerRpcRequest("getNodeViewBySecret",
                                                       params);
@@ -106,13 +105,16 @@ public class ConfigManager {
     private Object innerRpcRequest(String method, Object[] params) {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost(this.host);
+        Connection connection = null;
+        Channel channel = null;
+        JsonRpcClient client = null;
         try {
-            Connection connection = connectionFactory.newConnection();
-            Channel channel = connection.createChannel();
-            JsonRpcClient client = new JsonRpcClient(channel,
+            connection = connectionFactory.newConnection();
+            channel = connection.createChannel();
+            client = new JsonRpcClient(channel,
                                                      Constants.PROXY_EXCHANGE_NAME,
                                                      Constants.DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY,
-                                                     10000);
+                                                     30000);
 
             return client.call(method, params);
         } catch (IOException e) {
@@ -127,6 +129,23 @@ public class ConfigManager {
         } catch (Exception e) {
             logger.error(e);
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (client != null) {
+                    client.close();
+                }
+
+                if (channel != null && channel.isOpen()) {
+                    channel.close();
+                }
+                if (connection != null && connection.isOpen()) {
+                    connection.close();
+                }
+            } catch (IOException e) {
+                logger.error(e);
+            } catch (TimeoutException e) {
+                logger.error(e);
+            }
         }
     }
 
