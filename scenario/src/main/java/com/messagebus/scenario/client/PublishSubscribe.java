@@ -53,7 +53,7 @@ public class PublishSubscribe {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        client.subscribe(secret, new IMessageReceiveListener() {
+        client.subscribe(secret, , , new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageId());
@@ -70,7 +70,7 @@ public class PublishSubscribe {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        client.subscribe(secret, new IMessageReceiveListener() {
+        client.subscribe(secret, , , new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 logger.info(message.getMessageId());

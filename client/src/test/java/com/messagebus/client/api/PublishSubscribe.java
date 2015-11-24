@@ -30,7 +30,6 @@ public class PublishSubscribe extends BaseTestCase {
 
     public void testPublishAndSubscribe() throws Exception {
         String secret = "oiqwenncuicnsdfuasdfnkajkwqowe";
-        String token = "kjkjasdjfhkajsdfhksdjhfkasdf";
 
         Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
         msg.setContentType("text/plain");
@@ -43,7 +42,8 @@ public class PublishSubscribe extends BaseTestCase {
         //--------------------------subscribe-------------------------------
 
         secret = "nckljsenlkjanefluiwnlanfmsdfas";
-        client.subscribe(secret, new IMessageReceiveListener() {
+        String token = "nclajsdljhqiuwehfiusaiudfhiausd";
+        client.subscribe(secret, "erpDemoPublish", token, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 assertNotNull(message);

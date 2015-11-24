@@ -1,11 +1,11 @@
 package com.messagebus.client.carry;
 
 import com.google.common.eventbus.EventBus;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.event.carry.ProduceEventProcessor;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,16 +50,11 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
         MessageContext context = initMessageContext();
         context.setSecret(secret);
         context.setCarryType(MessageCarryType.PRODUCE);
-        context.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
-
-        if (to.equals(context.getSourceNode().getName())) {
-            context.setTargetNode(context.getSourceNode());
-        } else {
-            Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(to);
-            context.setTargetNode(node);
-        }
-
+        context.setSource(this.getContext().getConfigManager().getSourceBySecret(secret));
+        ConfigManager.Sink sink = this.getContext().getConfigManager().getSinkByName(to);
+        context.setSink(sink);
         context.setToken(token);
+        context.setStream(this.getContext().getConfigManager().getStreamByToken(token));
 
         return context;
     }

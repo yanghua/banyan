@@ -65,7 +65,7 @@ public class RpcResponseEventProcessor extends CommonEventProcessor {
             JsonRpcServer server = null;
             try {
                 server = new JsonRpcServer(msgContext.getChannel(),
-                                           msgContext.getSourceNode().getValue(),
+                                           msgContext.getSink().getQueueName(),
                                            clazzOfInterface,
                                            obj);
                 server.mainloop();

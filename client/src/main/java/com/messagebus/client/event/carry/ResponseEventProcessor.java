@@ -1,13 +1,12 @@
 package com.messagebus.client.event.carry;
 
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.IRequestListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
-import com.messagebus.common.Constants;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -40,17 +39,16 @@ public class ResponseEventProcessor extends CommonEventProcessor {
     public void onPermissionCheck(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        boolean hasPermission = sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_RESPONSE)
-            || sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_REQUEST_RESPONSE);
+        ConfigManager.Sink sink = context.getSink();
+        boolean hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.RESPONSE);
 
         if (!hasPermission) {
             logger.error("permission error : can not response. " +
                              "may be communicate type is wrong. " +
-                             "current secret is : " + sourceNode.getSecret());
+                             "current secret is : " + sink.getSecret());
             throw new RuntimeException("permission error : can not response. " +
                                            "may be communicate type is wrong. " +
-                                           "current secret is : " + sourceNode.getSecret());
+                                           "current secret is : " + sink.getSecret());
         }
     }
 

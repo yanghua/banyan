@@ -3,7 +3,6 @@ package com.messagebus.client;
 import com.google.common.eventbus.EventBus;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.rabbitmq.client.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,8 +26,9 @@ public class MessageContext {
     private Message[]               messages;
     private String                  consumerTag;
     private MessageCarryType        carryType;
-    private Node                    sourceNode;
-    private Node                    targetNode;
+    private ConfigManager.Source    source;
+    private ConfigManager.Sink      sink;
+    private ConfigManager.Stream    stream;
     private Channel                 channel;
     private IMessageReceiveListener receiveListener;
     private long                    timeout;
@@ -104,20 +104,28 @@ public class MessageContext {
         this.carryType = carryType;
     }
 
-    public Node getTargetNode() {
-        return targetNode;
+    public ConfigManager.Sink getSink() {
+        return sink;
     }
 
-    public void setTargetNode(Node targetNode) {
-        this.targetNode = targetNode;
+    public void setSink(ConfigManager.Sink sink) {
+        this.sink = sink;
     }
 
-    public Node getSourceNode() {
-        return sourceNode;
+    public ConfigManager.Source getSource() {
+        return source;
     }
 
-    public void setSourceNode(Node sourceNode) {
-        this.sourceNode = sourceNode;
+    public void setSource(ConfigManager.Source source) {
+        this.source = source;
+    }
+
+    public ConfigManager.Stream getStream() {
+        return stream;
+    }
+
+    public void setStream(ConfigManager.Stream stream) {
+        this.stream = stream;
     }
 
     public Map<String, Object> getOtherParams() {

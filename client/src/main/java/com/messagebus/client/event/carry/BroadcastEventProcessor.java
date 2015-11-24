@@ -2,12 +2,12 @@ package com.messagebus.client.event.carry;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
@@ -46,15 +46,13 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         boolean hasPermission;
         MessageContext context = event.getMessageContext();
-
-        Node sourceNode = context.getSourceNode();
-        hasPermission = sourceNode.isCanBroadcast();
-
+        ConfigManager.Source source = context.getSource();
+        hasPermission = source.getBroadcastable().equals("1");
         if (!hasPermission) {
-            logger.error("the queue with name : " + sourceNode.getName()
-                             + ", with secret : " + sourceNode.getSecret() + " can not broadcast !");
-            throw new RuntimeException("the queue with name : " + sourceNode.getName()
-                                           + ", with secret : " + sourceNode.getSecret() + " can not broadcast !");
+            logger.error("the source with name : " + source.getName()
+                             + ", with secret : " + source.getSecret() + " can not broadcast !");
+            throw new RuntimeException("the queue with name : " + source.getName()
+                                           + ", with secret : " + source.getSecret() + " can not broadcast !");
         }
     }
 
@@ -93,7 +91,7 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
         for (Message msg : context.getMessages()) {
             //app id
             if (Strings.isNullOrEmpty(msg.getAppId()))
-                msg.setAppId(context.getSourceNode().getAppId());
+                msg.setAppId(context.getSource().getAppId());
 
             //timestamp
             if (msg.getTimestamp() == 0)

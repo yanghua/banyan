@@ -34,12 +34,12 @@ public class EventPassThroughService extends AbstractService {
 
     private static final Log logger = LogFactory.getLog(EventPassThroughService.class);
 
-    private static final String EVENT_ROUTING_KEY_NAME    = "routingkey.proxy.message.inner.#";
-    private static final Gson GSON = new Gson();
+    private static final String EVENT_ROUTING_KEY_NAME = "routingkey.proxy.message.inner.#";
+    private static final Gson   GSON                   = new Gson();
 
     private LongLiveZookeeper zookeeper;
-    private Connection connection;
-    private Channel    mqChannel;
+    private Connection        connection;
+    private Channel           mqChannel;
 
     public EventPassThroughService(Map<String, Object> context) {
         super(context);

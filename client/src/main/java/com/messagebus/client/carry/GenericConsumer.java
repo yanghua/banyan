@@ -26,7 +26,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         final MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.CONSUME);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        ctx.setSink(this.getContext().getConfigManager().getSinkBySecret(secret));
         ctx.setReceiveListener(onMessage);
         ctx.setTimeout(timeout);
         ctx.setTimeoutUnit(unit);
@@ -40,7 +40,7 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         final MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.CONSUME);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        ctx.setSink(this.getContext().getConfigManager().getSinkBySecret(secret));
         ctx.setConsumeMsgNum(expectedNum);
         ctx.setSync(true);
 

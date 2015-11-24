@@ -1,13 +1,13 @@
 package com.messagebus.client.carry;
 
 import com.google.common.eventbus.EventBus;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.MessageResponseTimeoutException;
 import com.messagebus.client.event.carry.CommonEventProcessor;
 import com.messagebus.client.event.carry.RequestEventProcessor;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.RpcClient;
@@ -41,9 +41,10 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         ctx.setSecret(secret);
         ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.REQUEST);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
-        Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(to);
-        ctx.setTargetNode(node);
+        ctx.setSource(this.getContext().getConfigManager().getSourceBySecret(secret));
+        ctx.setStream(this.getContext().getConfigManager().getStreamByToken(token));
+        ConfigManager.Sink sink = this.getContext().getConfigManager().getSinkByName(to);
+        ctx.setSink(sink);
         ctx.setTimeout(timeout);
         ctx.setMessages(new Message[]{msg});
 
@@ -61,14 +62,14 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
                                    byte[] requestMsg,
                                    String token,
                                    long timeoutOfMilliSecond) {
-        Node sourceNode = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
-        Node targetNode = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(target);
+        ConfigManager.Source source = this.getContext().getConfigManager().getSourceBySecret(secret);
+        ConfigManager.Sink sink = this.getContext().getConfigManager().getSinkByName(target);
 
         RpcClient innerRpcClient = null;
         try {
             innerRpcClient = new RpcClient(this.getContext().getChannel(),
                                            Constants.PROXY_EXCHANGE_NAME,
-                                           targetNode.getRoutingKey(),
+                                           sink.getRoutingKey(),
                                            (int) timeoutOfMilliSecond);
             return innerRpcClient.primitiveCall(requestMsg);
         } catch (IOException e) {

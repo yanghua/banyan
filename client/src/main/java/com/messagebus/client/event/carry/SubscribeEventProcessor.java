@@ -1,11 +1,11 @@
 package com.messagebus.client.event.carry;
 
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.model.Node;
-import com.messagebus.common.Constants;
+import com.messagebus.client.model.MessageCarryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,16 +26,19 @@ public class SubscribeEventProcessor extends CommonEventProcessor {
     public void onPermissionCheck(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
+        ConfigManager.Sink sink = context.getSink();
+        ConfigManager.Source source = context.getSource();
+        ConfigManager.Stream stream = context.getStream();
 
-        boolean hasPermission = sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_SUBSCRIBE)
-            || sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PUBLISH_SUBSCRIBE);
+        boolean hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.SUBSCRIBE);
+        hasPermission = hasPermission && (stream != null && stream.getSourceSecret().equals(source.getSecret())
+            && sink.getName().equals(stream.getSinkName()));
 
         if (!hasPermission) {
             logger.error("permission error : can not subscribe. may be communicate type is wrong . " +
-                             " current secret is : " + sourceNode.getSecret());
+                             " current secret is : " + sink.getSecret());
             throw new RuntimeException("permission error : can not subscribe. may be communicate type is wrong . " +
-                                           " current secret is : " + sourceNode.getSecret());
+                                           " current secret is : " + sink.getSecret());
         }
     }
 

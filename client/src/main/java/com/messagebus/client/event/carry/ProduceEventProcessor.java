@@ -1,11 +1,11 @@
 package com.messagebus.client.event.carry;
 
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -31,32 +31,32 @@ public class ProduceEventProcessor extends CommonEventProcessor {
         super.onValidate(event);
 
         MessageContext context = event.getMessageContext();
-        Node currentNode = context.getSourceNode();
+        ConfigManager.Source source = context.getSource();
         if (!context.getCarryType().equals(MessageCarryType.PRODUCE)) {
             logger.error("message carry type should be produce, but current is : "
                              + context.getCarryType()
-                             + "; node name : " + currentNode.getName()
-                             + "; node secret is : " + currentNode.getSecret());
+                             + "; node name : " + source.getName()
+                             + "; node secret is : " + source.getSecret());
             throw new RuntimeException("message carry type should be produce, but current is : "
                                            + context.getCarryType()
-                                           + "; node name : " + currentNode.getName()
-                                           + "; node secret is : " + currentNode.getSecret());
+                                           + "; node name : " + source.getName()
+                                           + "; node secret is : " + source.getSecret());
         }
 
-        if (context.getTargetNode() == null) {
+        if (context.getSink() == null) {
             logger.error("target node can not be null "
-                             + "; node name : " + currentNode.getName()
-                             + "; node secret is : " + currentNode.getSecret());
+                             + "; node name : " + source.getName()
+                             + "; node secret is : " + source.getSecret());
             throw new RuntimeException("target node can not be null "
-                                           + "; node name : " + currentNode.getName()
-                                           + "; node secret is : " + currentNode.getSecret());
+                                           + "; node name : " + source.getName()
+                                           + "; node secret is : " + source.getSecret());
         }
 
-        if (context.getTargetNode().getType().equals("0")) {
+        if (!MessageCarryType.lookup(context.getSink().getType()).equals(MessageCarryType.CONSUME)) {
             logger.error("target node's type is illegal , "
-                             + "target node name : " + context.getTargetNode().getName());
+                             + "target node name : " + context.getSink().getName());
             throw new RuntimeException("target node's type is illegal , "
-                                           + "target node name : " + context.getTargetNode().getName());
+                                           + "target node name : " + context.getSink().getName());
         }
 
         this.validateMessagesProperties(context);
@@ -66,32 +66,20 @@ public class ProduceEventProcessor extends CommonEventProcessor {
     public void onPermissionCheckEvent(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheckEvent =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        Node targetNode = context.getTargetNode();
+        ConfigManager.Source source = context.getSource();
+        ConfigManager.Sink sink = context.getSink();
 
-        boolean hasPermission = true;
-        if (!hasPermission) {
-            logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +
-                             "] to queue [" + targetNode.getName() + "]");
-            throw new RuntimeException("can not produce message from queue [" + sourceNode.getName() +
-                                           "] to queue [" + targetNode.getName() + "]");
-        }
+        boolean hasPermission = false;
 
-        String token = context.getToken();
-
-        //send to itself queue
-        if (token.equals(context.getSecret())) {
-            hasPermission = sourceNode.getNodeId().equals(targetNode.getNodeId());
-            hasPermission = hasPermission && sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE_CONSUME);
-        } else {
-            hasPermission = hasPermission && context.getConfigManager().getNodeView(context.getSecret()).getSinkTokens().contains(token);
-        }
+        ConfigManager.Stream stream = context.getStream();
+        hasPermission = stream.getSourceName().equals(source.getName())
+            && stream.getSinkSecret().equals(sink.getSecret());
 
         if (!hasPermission) {
-            logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +
-                             "] to queue [" + targetNode.getName() + "]");
-            throw new RuntimeException("can not produce message from queue [" + sourceNode.getName() +
-                                           "] to queue [" + targetNode.getName() + "]");
+            logger.error("[handle] can not produce message from queue [" + source.getName() +
+                             "] to queue [" + sink.getName() + "]");
+            throw new RuntimeException("can not produce message from queue [" + source.getName() +
+                                           "] to queue [" + sink.getName() + "]");
         }
     }
 
@@ -105,7 +93,7 @@ public class ProduceEventProcessor extends CommonEventProcessor {
                     AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
                     ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                                 context.getChannel(),
-                                                context.getTargetNode().getRoutingKey(),
+                                                context.getSink().getRoutingKey(),
                                                 msg.getContent(),
                                                 properties);
                 }
@@ -115,7 +103,7 @@ public class ProduceEventProcessor extends CommonEventProcessor {
 
                     ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                           context.getChannel(),
-                                          context.getTargetNode().getRoutingKey(),
+                                          context.getSink().getRoutingKey(),
                                           msg.getContent(),
                                           properties);
                 }

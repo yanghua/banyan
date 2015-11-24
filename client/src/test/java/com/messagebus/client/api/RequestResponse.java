@@ -37,7 +37,7 @@ public class RequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                final String secret = "zxjhvclawenlkfhsladfnqpwenflak";
+                final String secret = "muciasnajjkasbdfbaskjdfkjkasja";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
                 final Messagebus client = singlePool.getResource();
 
@@ -84,7 +84,7 @@ public class RequestResponse extends BaseTestCase {
         Message responseMsg = null;
 
         try {
-            responseMsg = client.request(secret, "emapDemoResponse", msg, token, 10);
+            responseMsg = client.request(secret, "erpDemoResponse", msg, token, 10);
         } catch (MessageResponseTimeoutException e) {
             e.printStackTrace();
         }

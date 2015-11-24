@@ -1,6 +1,8 @@
 package com.messagebus.client;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.messagebus.client.event.component.ClientDestroyEvent;
 import com.messagebus.client.event.component.ClientInitedEvent;
 import com.rabbitmq.client.Channel;
@@ -46,7 +48,16 @@ abstract class InnerClient {
             throw new RuntimeException(e);
         }
 
-        carryEventBus = new EventBus("carryEventBusPerClient");
+        carryEventBus = new EventBus(new SubscriberExceptionHandler() {
+            @Override
+            public void handleException(Throwable throwable,
+                                        SubscriberExceptionContext subscriberExceptionContext) {
+                //if throw any exception just stop the event stream by unregister subscriber
+                //TODO : 通过传递错误事件给下一个事件进行判断来替代取消订阅者的方式
+                EventBus thisBus = subscriberExceptionContext.getEventBus();
+                thisBus.unregister(subscriberExceptionContext.getSubscriber());
+            }
+        });
         context.setCarryEventBus(carryEventBus);
         context.setConfigManager(this.configManager);
         context.setConnection(this.connection);

@@ -2,12 +2,12 @@ package com.messagebus.client.event.carry;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.model.Node;
-import com.messagebus.common.Constants;
+import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.GetResponse;
@@ -36,18 +36,17 @@ public class ConsumeEventProcessor extends CommonEventProcessor {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
 
-        Node sourceNode = context.getSourceNode();
-        boolean hasPermission = !Strings.isNullOrEmpty(sourceNode.getCommunicateType());
-        hasPermission = hasPermission &&
-            (sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_CONSUME)
-                || sourceNode.getCommunicateType().equals(Constants.COMMUNICATE_TYPE_PRODUCE_CONSUME));
-        hasPermission = hasPermission || sourceNode.isInner();
+        ConfigManager.Sink sink = context.getSink();
+        boolean hasPermission = false;
+        hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.CONSUME)
+            && !Strings.isNullOrEmpty(sink.getQueueName())
+            && !Strings.isNullOrEmpty(sink.getName());
 
         if (!hasPermission) {
             logger.error("permission error : can not consume. may be communicate type is wrong. " +
-                             " current secret is : " + sourceNode.getSecret());
+                             " current secret is : " + sink.getSecret());
             throw new RuntimeException("permission error : can not consume. may be communicate type is wrong. " +
-                                           " current secret is : " + sourceNode.getSecret());
+                                           " current secret is : " + sink.getSecret());
         }
     }
 
@@ -62,7 +61,9 @@ public class ConsumeEventProcessor extends CommonEventProcessor {
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
-                                                                              context.getSourceNode().getValue());
+                                                                              context.getSink().getQueueName());
+
+                    if (response == null) continue;
 
                     final Message msg = MessageFactory.createMessage(response);
 

@@ -10,8 +10,7 @@ import java.util.concurrent.TimeUnit;
 public interface ISubscriber {
 
     public void subscribe(String secret,
-                          IMessageReceiveListener onMessage,
-                          long timeout,
-                          TimeUnit unit);
+                          String from, String token, IMessageReceiveListener onMessage,
+                          long timeout, TimeUnit unit);
 
 }

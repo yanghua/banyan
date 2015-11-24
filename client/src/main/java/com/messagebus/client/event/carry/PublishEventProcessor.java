@@ -1,24 +1,19 @@
 package com.messagebus.client.event.carry;
 
-import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
-import com.messagebus.common.compress.CompressorFactory;
-import com.messagebus.common.compress.ICompressor;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by yanghua on 6/26/15.
@@ -46,12 +41,10 @@ public class PublishEventProcessor extends CommonEventProcessor {
     public void onPermissionCheck(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        boolean hasPermission = true;
+        ConfigManager.Source source = context.getSource();
+        boolean hasPermission = false;
 
-        hasPermission = sourceNode.getCommunicateType().equals("publish")
-            || sourceNode.getCommunicateType().equals("publish-subscribe");
-
+        hasPermission = MessageCarryType.lookup(source.getType()).equals(MessageCarryType.PUBLISH);
         if (!hasPermission) {
             throw new RuntimeException("can not publish message! maybe the communicate is error. "
                                            + " secret is : " + context.getSecret());
@@ -68,7 +61,7 @@ public class PublishEventProcessor extends CommonEventProcessor {
 
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
                                       context.getChannel(),
-                                      context.getSourceNode().getRoutingKey(),
+                                      context.getSource().getRoutingKey(),
                                       msg.getContent(),
                                       properties);
             }

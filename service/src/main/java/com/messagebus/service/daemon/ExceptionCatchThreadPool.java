@@ -1,6 +1,5 @@
 package com.messagebus.service.daemon;
 
-import com.messagebus.common.ExceptionHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

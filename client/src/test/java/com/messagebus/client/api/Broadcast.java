@@ -43,7 +43,7 @@ public class Broadcast extends BaseTestCase {
 
         client.broadcast(secret, new Message[]{msg});
 
-        TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(5);
 
         client.unregisterEventProcessor(eventProcessor);
     }

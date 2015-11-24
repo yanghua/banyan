@@ -1,7 +1,6 @@
 package com.messagebus.service.daemon.impl;
 
 import com.google.gson.Gson;
-import com.messagebus.client.model.NodeView;
 import com.messagebus.service.Constants;
 import com.messagebus.service.daemon.DaemonService;
 import com.messagebus.service.daemon.RunPolicy;
@@ -26,6 +25,14 @@ public class ConfigRpcService extends AbstractService {
     private static final Log  logger = LogFactory.getLog(ConfigRpcService.class);
     private static final Gson GSON   = new Gson();
 
+    private static final String REVERSE_MESSAGE_PATH               = "/reverse/message";
+    private static final String REVERSE_MESSAGE_SOURCE_PATH        = "/reverse/message/source";
+    private static final String REVERSE_MESSAGE_SOURCE_SECRET_PATH = "/reverse/message/source/secret";
+    private static final String REVERSE_MESSAGE_SOURCE_NAME_PATH   = "/reverse/message/source/name";
+    private static final String REVERSE_MESSAGE_SINK_PATH          = "/reverse/message/sink";
+    private static final String REVERSE_MESSAGE_SINK_SECRET_PATH   = "/reverse/message/sink/secret";
+    private static final String REVERSE_MESSAGE_SINK_NAME_PATH     = "/reverse/message/sink/name";
+    private static final String REVERSE_MESSAGE_STREAM_PATH        = "/reverse/message/stream";
 
     private LongLiveZookeeper zookeeper;
 
@@ -91,20 +98,54 @@ public class ConfigRpcService extends AbstractService {
 
     public interface ConfigRpcInterface {
 
-        String getNodeViewBySecret(String secret);
+        String getSourceBySecret(String secret);
+
+        String getSourceByName(String name);
+
+        String getSinkBySecret(String secret);
+
+        String getSinkByName(String name);
+
+        String getStreamByToken(String token);
 
     }
 
     public class ConfigRpcResponse implements ConfigRpcInterface {
 
         @Override
-        public String getNodeViewBySecret(String secret) {
-            logger.info("received node view request [secret : " + secret + "]");
-            String fullKey = REVERSE_MESSAGE_ZK_PATH + "/" + secret;
-            NodeView nodeView = zookeeper.get(fullKey, NodeView.class);
-            return GSON.toJson(nodeView, NodeView.class);
+        public String getSourceBySecret(String secret) {
+            logger.info("secret : " + secret);
+            String key = REVERSE_MESSAGE_SOURCE_SECRET_PATH + "/" + secret;
+            return zookeeper.get(key, String.class);
         }
 
+        @Override
+        public String getSourceByName(String name) {
+            logger.info("name : " + name);
+            String key = REVERSE_MESSAGE_SOURCE_NAME_PATH + "/" + name;
+            return zookeeper.get(key, String.class);
+        }
+
+        @Override
+        public String getSinkBySecret(String secret) {
+            logger.info("secret : " + secret);
+            String key = REVERSE_MESSAGE_SINK_SECRET_PATH + "/" + secret;
+            return zookeeper.get(key, String.class);
+        }
+
+        @Override
+        public String getSinkByName(String name) {
+            logger.info("name : " + name);
+            String key = REVERSE_MESSAGE_SINK_NAME_PATH + "/" + name;
+            return zookeeper.get(key, String.class);
+        }
+
+        @Override
+        public String getStreamByToken(String token) {
+            logger.info("token : " + token);
+            String key = REVERSE_MESSAGE_STREAM_PATH + "/" + token;
+            return zookeeper.get(key, String.class);
+        }
     }
 
 }

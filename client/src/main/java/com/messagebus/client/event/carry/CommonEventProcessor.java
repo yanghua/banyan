@@ -2,17 +2,15 @@ package com.messagebus.client.event.carry;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.messagebus.common.RandomHelper;
 import com.messagebus.common.UUIDGenerator;
-import com.messagebus.common.compress.CompressorFactory;
-import com.messagebus.common.compress.ICompressor;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
@@ -22,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -36,22 +33,7 @@ public abstract class CommonEventProcessor {
     private static final Random random = new Random();
 
     protected void onValidate(CarryEvent event) {
-        MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        if (sourceNode == null) {
-            logger.error(" source node is null. the secret is : " + context.getSecret());
-            throw new RuntimeException(" source node is null. the secret is : " + context.getSecret());
-        }
-
-        if (sourceNode.getType().equals("0")) {
-            logger.error(" the node with name " + sourceNode.getName() + " must be a queue ");
-            throw new RuntimeException(" the node with name " + sourceNode.getName() + " must be a queue ");
-        }
-
-        if (!sourceNode.isAvailable()) {
-            logger.error(" the queue " + sourceNode.getName() + " is not available ");
-            throw new RuntimeException(" the queue " + sourceNode.getName() + " is not available ");
-        }
+        //todo
     }
 
     @Subscribe
@@ -63,7 +45,7 @@ public abstract class CommonEventProcessor {
             UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), Constants.DEFAULT_DATACENTER_ID_FOR_UUID);
             logger.debug("message id is : " + generator.nextId());
             msg.setMessageId(generator.nextId());
-            msg.setCorrelationId(context.getSourceNode().getName());
+            msg.setCorrelationId(context.getSource().getName());
         }
     }
 
@@ -71,10 +53,10 @@ public abstract class CommonEventProcessor {
     public void onMsgBodySizeCheck(MsgBodySizeCheckEvent event) {
         logger.debug("=-=-=- event : onMsgBodySizeCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node targetNode = context.getTargetNode();
+        ConfigManager.Sink sink = context.getSink();
 
-        if (targetNode != null && !Strings.isNullOrEmpty(targetNode.getMsgBodySize())) {
-            String msgBodySizeStr = targetNode.getMsgBodySize();
+        if (sink != null && !Strings.isNullOrEmpty(sink.getMsgBodySize())) {
+            String msgBodySizeStr = sink.getMsgBodySize();
             int msgBodySize = Integer.parseInt(msgBodySizeStr);
 
             if (msgBodySize != -1) {
@@ -82,7 +64,7 @@ public abstract class CommonEventProcessor {
                 for (Message msg : msgs) {
                     if (msg.getContent().length > msgBodySize) {
                         logger.error("message body's size can not be more than : " + msgBodySizeStr
-                                         + " B, the limit comes from queue name : " + targetNode.getName());
+                                         + " B, the limit comes from queue name : " + sink.getName());
                         throw new RuntimeException("message body's size can not be more than : " + msgBodySizeStr + " B");
                     }
                 }
@@ -100,23 +82,24 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onMsgBodyCompress(MsgBodyCompressEvent event) {
-        logger.debug("=-=-=- event : onMsgBodyCompress =-=-=-");
-        MessageContext context = event.getMessageContext();
-        String compressAlgo = context.getTargetNode().getCompress();
-        if (!Strings.isNullOrEmpty(compressAlgo)) {
-            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
-            if (compressor != null) {
-                for (Message msg : context.getMessages()) {
-                    if (msg.getHeaders() == null) msg.setHeaders(new HashMap<String, Object>(1));
-                    msg.getHeaders().put(Constants.MESSAGE_HEADER_KEY_COMPRESS_ALGORITHM, compressAlgo);
-                    msg.setContent(compressor.compress(msg.getContent()));
-                }
-            } else {
-                logger.error("the target node with name : " + context.getTargetNode().getName()
-                                 + " configured a compress named : " + compressAlgo
-                                 + " but client can not get the compressor instance. ");
-            }
-        }
+        //TODO : 不提供自定义功能,有总线决定压缩方式
+//        logger.debug("=-=-=- event : onMsgBodyCompress =-=-=-");
+//        MessageContext context = event.getMessageContext();
+//        String compressAlgo = context.getSink().getCompress();
+//        if (!Strings.isNullOrEmpty(compressAlgo)) {
+//            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
+//            if (compressor != null) {
+//                for (Message msg : context.getMessages()) {
+//                    if (msg.getHeaders() == null) msg.setHeaders(new HashMap<String, Object>(1));
+//                    msg.getHeaders().put(Constants.MESSAGE_HEADER_KEY_COMPRESS_ALGORITHM, compressAlgo);
+//                    msg.setContent(compressor.compress(msg.getContent()));
+//                }
+//            } else {
+//                logger.error("the target node with name : " + context.getSink().getName()
+//                                 + " configured a compress named : " + compressAlgo
+//                                 + " but client can not get the compressor instance. ");
+//            }
+//        }
     }
 
     @Subscribe
@@ -127,7 +110,7 @@ public abstract class CommonEventProcessor {
             QueueingConsumer consumer = null;
             try {
                 consumer = ProxyConsumer.consume(context.getChannel(),
-                                                 context.getSourceNode().getValue(),
+                                                 context.getSink().getQueueName(),
                                                  context.getConsumerTag());
             } catch (IOException e) {
                 ExceptionHelper.logException(logger, e, "real consumer");
@@ -233,11 +216,11 @@ public abstract class CommonEventProcessor {
                         retryCount++;
                         if (retryCount >= retryTotalCount) stop = true;
                     } catch (Exception e) {
-                        ExceptionHelper.logException(logger, e, "message process");
+                        logger.error(e);
                     }
                 }
             } catch (Exception e) {
-                ExceptionHelper.logException(logger, e, "common loop handler");
+                logger.error(e);
             }
         }
     }
@@ -247,7 +230,7 @@ public abstract class CommonEventProcessor {
         for (Message msg : context.getMessages()) {
             //app id
             if (msg.getAppId() == null || msg.getAppId().isEmpty())
-                msg.setAppId(context.getSourceNode().getAppId());
+                msg.setAppId(context.getSource().getAppId());
 
             //timestamp
             if (msg.getTimestamp() == 0)
@@ -261,16 +244,17 @@ public abstract class CommonEventProcessor {
     }
 
     protected void doUncompress(MessageContext context, Message receivedMsg) {
-        String compressAlgo = context.getSourceNode().getCompress();
-        if (!Strings.isNullOrEmpty(compressAlgo)) {
-            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
-            if (compressor != null) {
-                receivedMsg.setContent(compressor.uncompress(receivedMsg.getContent()));
-            } else {
-                logger.error("the target node with name : " + context.getTargetNode().getName()
-                                 + " configured a compress named : " + compressAlgo
-                                 + " but client can not get the compressor instance. ");
-            }
-        }
+        //TODO : 不提供自定义功能,有总线决定压缩方式
+//        String compressAlgo = context.getSource().getCompress();
+//        if (!Strings.isNullOrEmpty(compressAlgo)) {
+//            ICompressor compressor = CompressorFactory.createCompressor(compressAlgo);
+//            if (compressor != null) {
+//                receivedMsg.setContent(compressor.uncompress(receivedMsg.getContent()));
+//            } else {
+//                logger.error("the target node with name : " + context.getSink().getName()
+//                                 + " configured a compress named : " + compressAlgo
+//                                 + " but client can not get the compressor instance. ");
+//            }
+//        }
     }
 }

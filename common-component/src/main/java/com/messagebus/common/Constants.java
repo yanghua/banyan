@@ -14,20 +14,6 @@ public class Constants {
 
     public static final byte[] EMPTY_PRIMITIVE_BYTE_ARRAY = new byte[0];
 
-    public static final String COMMUNICATE_TYPE_PRODUCE                = "produce";
-    public static final String COMMUNICATE_TYPE_CONSUME                = "consume";
-    public static final String COMMUNICATE_TYPE_PRODUCE_CONSUME        = "produce-consume";
-    public static final String COMMUNICATE_TYPE_REQUEST                = "request";
-    public static final String COMMUNICATE_TYPE_RESPONSE               = "response";
-    public static final String COMMUNICATE_TYPE_REQUEST_RESPONSE       = "request-response";
-    public static final String COMMUNICATE_TYPE_RPCREQUEST             = "rpcrequest";
-    public static final String COMMUNICATE_TYPE_RPCRESPONSE            = "rpcresponse";
-    public static final String COMMUNICATE_TYPE_RPCREQUEST_RPCRESPONSE = "rpcrequest-rpcresponse";
-    public static final String COMMUNICATE_TYPE_PUBLISH                = "publish";
-    public static final String COMMUNICATE_TYPE_SUBSCRIBE              = "subscribe";
-    public static final String COMMUNICATE_TYPE_PUBLISH_SUBSCRIBE      = "publish-subscribe";
-    public static final String COMMUNICATE_TYPE_BROADCAST              = "broadcast";
-
     public static final String PROXY_EXCHANGE_NAME     = "exchange.proxy";
     public static final String DEFAULT_FILE_QUEUE_NAME = "queue.proxy.log.file";
     public static final String DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY = "routingkey.proxy.message.rpc.configRpcResponse";

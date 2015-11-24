@@ -353,7 +353,7 @@ public class HttpBridge extends HttpServlet {
         });
 
         try {
-            messagebus.subscribe(request.getParameter("secret"), new IMessageReceiveListener() {
+            messagebus.subscribe(request.getParameter("secret"), , , new IMessageReceiveListener() {
 
                 @Override
                 public void onMessage(Message message) {

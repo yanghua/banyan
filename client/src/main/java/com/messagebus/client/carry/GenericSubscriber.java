@@ -6,7 +6,6 @@ import com.messagebus.client.MessageContext;
 import com.messagebus.client.event.carry.CommonEventProcessor;
 import com.messagebus.client.event.carry.SubscribeEventProcessor;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,14 +20,16 @@ class GenericSubscriber extends AbstractMessageCarryer implements ISubscriber {
 
     @Override
     public void subscribe(String secret,
+                          String from, String token,
                           IMessageReceiveListener onMessage,
-                          long timeout,
-                          TimeUnit unit) {
+                          long timeout, TimeUnit unit) {
         final MessageContext ctx = initMessageContext();
         ctx.setCarryType(MessageCarryType.SUBSCRIBE);
         ctx.setSecret(secret);
-        Node sourceNode = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
-        ctx.setSourceNode(sourceNode);
+        ctx.setToken(token);
+        ctx.setSource(this.getContext().getConfigManager().getSourceByName(from));
+        ctx.setSink(this.getContext().getConfigManager().getSinkBySecret(secret));
+        ctx.setStream(this.getContext().getConfigManager().getStreamByToken(token));
         ctx.setReceiveListener(onMessage);
         ctx.setSync(false);
         ctx.setTimeout(timeout);

@@ -20,7 +20,7 @@ class GenericResponser extends AbstractMessageCarryer implements IResponser {
         final MessageContext ctx = initMessageContext();
         ctx.setCarryType(MessageCarryType.RESPONSE);
         ctx.setSecret(secret);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        ctx.setSink(this.getContext().getConfigManager().getSinkBySecret(secret));
         ctx.setRequestListener(onRequest);
         ctx.setTimeout(timeout);
         ctx.setTimeoutUnit(timeUnit);

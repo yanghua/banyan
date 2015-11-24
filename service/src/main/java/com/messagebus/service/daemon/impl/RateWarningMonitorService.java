@@ -17,12 +17,12 @@ import java.util.Map;
 
 public class RateWarningMonitorService extends AbstractService {
 
-    private static final     Log    logger                    = LogFactory.getLog(RateWarningMonitorService.class);
+    private static final Log    logger                    = LogFactory.getLog(RateWarningMonitorService.class);
     private static final String COMPONENT_MESSAGE_ZK_PATH = "/component/message";
-    private static final     Gson   GSON                      = new Gson();
+    private static final Gson   GSON                      = new Gson();
 
     private IServiceCallback callback;
-    private Map mbHostAndPortObj;
+    private Map              mbHostAndPortObj;
 
     public RateWarningMonitorService(Map<String, Object> context) {
         super(context);

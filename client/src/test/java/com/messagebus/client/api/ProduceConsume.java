@@ -19,7 +19,7 @@ public class ProduceConsume extends BaseTestCase {
 
     private static final Log logger = LogFactory.getLog(ProduceConsume.class);
 
-    private String consumeSecret = "zxdjnflakwenklasjdflkqpiasdfnj";
+    private String consumeSecret = "kjhasdfhlkuqjhgaebjhasgdfabfak";
 
     @Override
     public void setUp() throws Exception {
@@ -40,13 +40,11 @@ public class ProduceConsume extends BaseTestCase {
         msg.setContentEncoding("utf-8");
         msg.setContent("test".getBytes());
 
-        client.produce(secret, "emapDemoConsume", msg, token);
+        client.produce(secret, "erpDemoConsume", msg, token);
     }
 
     public void testSimpleProduceConsume() throws Exception {
         commonProduce();
-
-        consumeSecret = "zxdjnflakwenklasjdflkqpiasdfnj";
 
         List<Message> msgs = client.consume(consumeSecret, 1);
         assertNotNull(msgs);
@@ -64,7 +62,7 @@ public class ProduceConsume extends BaseTestCase {
     public void testProduceAndConsumeWithPushStyle() {
         commonProduce();
 
-        client.consume(consumeSecret, 10, TimeUnit.SECONDS, new IMessageReceiveListener() {
+        client.consume(consumeSecret, 3, TimeUnit.SECONDS, new IMessageReceiveListener() {
             @Override
             public void onMessage(Message message) {
                 assertNotNull(message);

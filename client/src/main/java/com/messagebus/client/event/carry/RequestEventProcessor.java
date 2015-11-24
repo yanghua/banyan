@@ -1,12 +1,12 @@
 package com.messagebus.client.event.carry;
 
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.messagebus.interactor.proxy.ProxyProducer;
@@ -40,15 +40,20 @@ public class RequestEventProcessor extends CommonEventProcessor {
             throw new RuntimeException("message carry type should be request");
         }
 
+        if (!MessageCarryType.lookup(context.getSource().getType()).equals(MessageCarryType.REQUEST)) {
+            logger.error("message carry type should be request");
+            throw new RuntimeException("message carry type should be request");
+        }
+
         Message[] msgs = context.getMessages();
         if (msgs == null || msgs.length != 1) {
             logger.error(" request message must be just one! ");
             throw new RuntimeException(" request message must be just one! ");
         }
 
-        if (context.getTargetNode() == null) {
-            logger.error(" target node can not be null. ");
-            throw new RuntimeException(" target node can not be null. ");
+        if (context.getSink() == null) {
+            logger.error(" sink can not be null. ");
+            throw new RuntimeException(" sink can not be null. ");
         }
 
         this.validateMessagesProperties(context);
@@ -58,20 +63,22 @@ public class RequestEventProcessor extends CommonEventProcessor {
     public void onPermissionCheck(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        Node targetNode = context.getTargetNode();
-
-        boolean hasPermission;
-
+        ConfigManager.Source source = context.getSource();
+        ConfigManager.Sink sink = context.getSink();
         String token = context.getToken();
 
-        hasPermission = context.getConfigManager().getNodeView(context.getSecret()).getSinkTokens().contains(token);
+        boolean hasPermission = false;
+
+        ConfigManager.Stream stream = context.getStream();
+        hasPermission = stream != null && stream.getToken().equals(token)
+            && stream.getSourceSecret().equals(source.getSecret())
+            && stream.getSinkSecret().equals(sink.getSecret());
 
         if (!hasPermission) {
-            logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +
-                             "] to queue [" + targetNode.getName() + "]");
-            throw new RuntimeException("can not produce message from queue [" + sourceNode.getName() +
-                                           "] to queue [" + targetNode.getName() + "]");
+            logger.error("[handle] can not produce message from queue [" + source.getName() +
+                             "] to queue [" + sink.getName() + "]");
+            throw new RuntimeException("can not produce message from queue [" + source.getName() +
+                                           "] to queue [" + sink.getName() + "]");
         }
     }
 
@@ -79,7 +86,7 @@ public class RequestEventProcessor extends CommonEventProcessor {
     public void onTempQueueInitialize(TempQueueInitializeEvent event) {
         logger.debug("=-=-=- event : onTempQueueInitialize =-=-=-");
         MessageContext context = event.getMessageContext();
-        String correlationId = context.getSourceNode().getName();
+        String correlationId = context.getSource().getName();
         context.getMessages()[0].setCorrelationId(correlationId);
         QueueManager queueManager = QueueManager.defaultQueueManager(context.getHost());
         try {
@@ -99,7 +106,7 @@ public class RequestEventProcessor extends CommonEventProcessor {
         try {
             ProxyProducer.produceWithTX(Constants.PROXY_EXCHANGE_NAME,
                                         context.getChannel(),
-                                        context.getTargetNode().getRoutingKey(),
+                                        context.getSink().getRoutingKey(),
                                         reqMsg.getContent(),
                                         properties);
         } catch (IOException e) {

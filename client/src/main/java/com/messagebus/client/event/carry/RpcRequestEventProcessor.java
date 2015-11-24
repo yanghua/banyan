@@ -1,8 +1,8 @@
 package com.messagebus.client.event.carry;
 
 import com.google.common.eventbus.Subscribe;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
-import com.messagebus.client.model.Node;
 import com.messagebus.common.Constants;
 import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.tools.jsonrpc.JsonRpcClient;
@@ -27,19 +27,19 @@ public class RpcRequestEventProcessor extends CommonEventProcessor {
     public void onPermissionCheck(PermissionCheckEvent event) {
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
-        Node sourceNode = context.getSourceNode();
-        Node targetNode = context.getTargetNode();
-        boolean hasPermission;
+        ConfigManager.Source source = context.getSource();
+        ConfigManager.Sink sink = context.getSink();
+        boolean hasPermission = false;
 
-        String token = context.getToken();
-
-        hasPermission = context.getConfigManager().getNodeView(context.getSecret()).getSinkTokens().contains(token);
+        hasPermission = context.getStream() != null
+            && context.getStream().getSinkSecret().equals(sink.getSecret())
+            && context.getStream().getSourceName().equals(source.getName());
 
         if (!hasPermission) {
-            logger.error("[handle] can not produce message from queue [" + sourceNode.getName() +
-                             "] to queue [" + targetNode.getName() + "]");
-            throw new RuntimeException("can not produce message from queue [" + sourceNode.getName() +
-                                           "] to queue [" + targetNode.getName() + "]");
+            logger.error("[handle] can not produce message from queue [" + source.getName() +
+                             "] to queue [" + sink.getName() + "]");
+            throw new RuntimeException("can not produce message from queue [" + source.getName() +
+                                           "] to queue [" + sink.getName() + "]");
         }
     }
 
@@ -51,7 +51,7 @@ public class RpcRequestEventProcessor extends CommonEventProcessor {
         try {
             client = new JsonRpcClient(context.getChannel(),
                                        Constants.PROXY_EXCHANGE_NAME,
-                                       context.getTargetNode().getRoutingKey(),
+                                       context.getSink().getRoutingKey(),
                                        (int) context.getTimeout());
             Object[] params = null;
             if (context.getOtherParams().get("params") != null) {

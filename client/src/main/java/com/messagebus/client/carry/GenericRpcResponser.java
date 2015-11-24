@@ -1,13 +1,12 @@
 package com.messagebus.client.carry;
 
 import com.google.common.eventbus.EventBus;
+import com.messagebus.client.ConfigManager;
 import com.messagebus.client.IRpcMessageProcessor;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.WrappedRpcServer;
 import com.messagebus.client.event.carry.RpcResponseEventProcessor;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
-import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.RpcServer;
@@ -35,7 +34,7 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
         MessageContext ctx = initMessageContext();
         ctx.setSecret(secret);
         ctx.setCarryType(MessageCarryType.RPCRESPONSE);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        ctx.setSink(this.getContext().getConfigManager().getSinkBySecret(secret));
         Map<String, Object> otherParams = ctx.getOtherParams();
         otherParams.put("serviceProvider", serviceProvider);
         otherParams.put("clazzOfInterface", clazzOfInterface);
@@ -47,9 +46,9 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
 
     @Override
     public WrappedRpcServer buildRpcServer(String secret, final IRpcMessageProcessor rpcMsgProcessor) {
-        Node source = this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue();
+        ConfigManager.Sink sink = this.getContext().getConfigManager().getSinkBySecret(secret);
         try {
-            RpcServer aServer = new RpcServer(this.getContext().getChannel(), source.getValue()) {
+            RpcServer aServer = new RpcServer(this.getContext().getChannel(), sink.getQueueName()) {
 
                 @Override
                 public byte[] handleCall(QueueingConsumer.Delivery request, AMQP.BasicProperties replyProperties) {
@@ -65,22 +64,22 @@ public class GenericRpcResponser extends AbstractMessageCarryer implements IRpcR
 
             return wrappedRpcServer;
         } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         } catch (InstantiationException e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         } catch (Exception e) {
-            ExceptionHelper.logException(logger, e, "buildRpcServer");
+            logger.error(e);
             throw new RuntimeException(e);
         }
     }

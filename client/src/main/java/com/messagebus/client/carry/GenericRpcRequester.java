@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.event.carry.RpcRequestEventProcessor;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.client.model.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,10 +25,10 @@ public class GenericRpcRequester extends AbstractMessageCarryer implements IRpcR
         ctx.setSecret(secret);
         ctx.setToken(token);
         ctx.setCarryType(MessageCarryType.RPCREQUEST);
-        ctx.setSourceNode(this.getContext().getConfigManager().getNodeView(secret).getCurrentQueue());
+        ctx.setSource(this.getContext().getConfigManager().getSourceBySecret(secret));
         ctx.setTimeout(timeoutOfMilliSecond);
-        Node node = this.getContext().getConfigManager().getNodeView(secret).getRelatedQueueNameNodeMap().get(target);
-        ctx.setTargetNode(node);
+        ctx.setSink(this.getContext().getConfigManager().getSinkByName(target));
+        ctx.setStream(this.getContext().getConfigManager().getStreamByToken(token));
         Map<String, Object> otherParams = ctx.getOtherParams();
         otherParams.put("methodName", methodName);
         otherParams.put("params", params);

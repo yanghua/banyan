@@ -156,14 +156,15 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
      * 然后以一个独立的处理线程来控制它，并将该处理线程的控制权暴露给主控线程
      *
      * @param secret    通过管控台申请的自身队列标识
+     * @param from
+     * @param token
      * @param onMessage 订阅某个频道队列(Channel Queue)后，收到消息的事件处理器
      * @param timeout   阻塞超时时间值，该值必须与参数<param>unit</param>一起参考才有意义
      * @param unit      阻塞超时时间的单位，该值必须与参数<param>timeout</param>一起参考才有意义
      */
     @Override
-    public void subscribe(String secret, IMessageReceiveListener onMessage, long timeout,
-                          TimeUnit unit) {
-        subscriber.subscribe(secret, onMessage, timeout, unit);
+    public void subscribe(String secret, String from, String token, IMessageReceiveListener onMessage, long timeout, TimeUnit unit) {
+        subscriber.subscribe(secret, from, token, onMessage, timeout, unit);
     }
 
     /**
