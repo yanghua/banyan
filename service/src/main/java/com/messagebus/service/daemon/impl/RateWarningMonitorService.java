@@ -5,9 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.messagebus.common.GsonUtil;
 import com.messagebus.common.HttpHelper;
+import com.messagebus.common.configuration.LongLiveZookeeper;
 import com.messagebus.service.Constants;
 import com.messagebus.service.daemon.IServiceCallback;
-import com.wisedu.astraea.configuration.LongLiveZookeeper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

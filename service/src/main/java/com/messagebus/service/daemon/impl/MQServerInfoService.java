@@ -10,8 +10,8 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.HttpHelper;
+import com.messagebus.common.configuration.LongLiveZookeeper;
 import com.messagebus.service.Constants;
-import com.wisedu.astraea.configuration.LongLiveZookeeper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -30,11 +30,6 @@
             <version>1.0.5</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.wisedu.astraea</groupId>
-            <artifactId>astraea-configuration</artifactId>
-            <version>1.0.0</version>
-        </dependency>
     </dependencies>
 
     <build>
