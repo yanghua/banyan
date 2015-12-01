@@ -23,21 +23,9 @@ public class Message implements Cloneable, Serializable {
 
     private short deliveryMode = 2;
 
-    private MessageType msgType;
     private byte[]      content;
 
-    public MessageType getMessageType() {
-        return this.msgType;
-    }
-
-    public void setMsgType(MessageType msgType) {
-        this.msgType = msgType;
-    }
-
-    public Message() {
-        this.msgType = MessageType.QueueMessage;
-        this.type = MessageType.QueueMessage.getType();
-    }
+    public Message() {}
 
     public long getMessageId() {
         return messageId;

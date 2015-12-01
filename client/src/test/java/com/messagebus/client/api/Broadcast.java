@@ -5,7 +5,6 @@ import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.event.component.NoticeEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +31,7 @@ public class Broadcast extends BaseTestCase {
     public void testBroadcast() throws Exception {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
 
-        Message msg = MessageFactory.createMessage(MessageType.BroadcastMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
 

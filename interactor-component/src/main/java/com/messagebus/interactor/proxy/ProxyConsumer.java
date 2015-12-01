@@ -12,22 +12,16 @@ public class ProxyConsumer {
 
     private static final Log logger = LogFactory.getLog(ProxyConsumer.class);
 
-    /**
-     * common consume mostly for customization
-     *
-     * @param channel
-     * @param queueName
-     * @param consumerTag
-     * @return
-     * @throws IOException
-     */
     public static QueueingConsumer consume(Channel channel,
                                            String queueName,
+                                           boolean autoAck,
                                            String consumerTag) throws IOException {
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName, true, consumerTag, consumer);
+        channel.basicConsume(queueName, autoAck, consumerTag, consumer);
         return consumer;
     }
+
+
 
     public static GetResponse consumeSingleMessage(Channel channel,
                                                    String queueName) throws IOException {

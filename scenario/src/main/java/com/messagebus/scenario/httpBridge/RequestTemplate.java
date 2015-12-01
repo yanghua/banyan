@@ -2,7 +2,6 @@ package com.messagebus.scenario.httpBridge;
 
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -26,7 +25,7 @@ public class RequestTemplate {
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = null;
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setReplyTo(testQueue);
 
         msg.setContent("test".getBytes());

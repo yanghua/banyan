@@ -1,6 +1,5 @@
 package com.messagebus.httpbridge.model;
 
-import com.messagebus.client.message.model.MessageType;
 
 import java.util.Date;
 import java.util.Map;
@@ -27,17 +26,9 @@ public class TextMessage {
 
     private short deliveryMode = 2;
 
-    private MessageType msgType;
     private String      content;
 
-    public MessageType getMessageType() {
-        return this.msgType;
-    }
-
-    public TextMessage() {
-        this.msgType = MessageType.QueueMessage;
-        this.type = MessageType.QueueMessage.getType();
-    }
+    public TextMessage() {}
 
     public long getMessageId() {
         return messageId;

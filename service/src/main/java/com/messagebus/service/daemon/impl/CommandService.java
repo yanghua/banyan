@@ -8,7 +8,6 @@ import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.configuration.LongLiveZookeeper;
 import com.messagebus.service.Constants;
 import org.apache.commons.logging.Log;
@@ -74,7 +73,7 @@ public class CommandService extends AbstractService {
 
                     boolean baseCheck = (headers != null && headers.containsKey("COMMAND"));
 
-                    Message respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                    Message respMsg = MessageFactory.createMessage();
                     Map<String, Object> respHeader = new HashMap<String, Object>(1);
 
                     if (baseCheck) {

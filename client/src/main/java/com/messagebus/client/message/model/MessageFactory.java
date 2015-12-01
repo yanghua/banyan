@@ -13,12 +13,10 @@ public class MessageFactory {
 
     private static final Log logger = LogFactory.getLog(MessageFactory.class);
 
-    public static Message createMessage(MessageType messageType) {
+    public static Message createMessage() {
         Message aMsg;
 
         aMsg = new Message();
-        aMsg.setType(messageType.getType());
-        aMsg.setMsgType(messageType);
 
         return aMsg;
     }
@@ -27,19 +25,12 @@ public class MessageFactory {
         AMQP.BasicProperties properties = delivery.getProperties();
         byte[] msgBody = delivery.getBody();
 
-        String msgTypeStr = properties.getType();
-        if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-            return null;
-        }
+//        String msgTypeStr = properties.getType();
+//        if (msgTypeStr == null || msgTypeStr.isEmpty()) {
+//            return null;
+//        }
 
-        MessageType msgType = null;
-        try {
-            msgType = MessageType.lookup(msgTypeStr);
-        } catch (UnknownError unknownError) {
-            ExceptionHelper.logException(logger, unknownError, "common loop handler");
-            return null;
-        }
-        Message msg = MessageFactory.createMessage(msgType);
+        Message msg = MessageFactory.createMessage();
         initMessage(msg, properties, msgBody);
 
         return msg;
@@ -51,20 +42,17 @@ public class MessageFactory {
 
 //      context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
 
-        String msgTypeStr = properties.getType();
-        MessageType msgType = null;
-        try {
-            msgType = MessageType.lookup(msgTypeStr);
-        } catch (UnknownError unknownError) {
-            throw new RuntimeException("unknown message type : " + msgTypeStr);
-        }
-        Message msg = MessageFactory.createMessage(msgType);
+//        String msgTypeStr = properties.getType();
+
+        Message msg = MessageFactory.createMessage();
         initMessage(msg, properties, msgBody);
 
         return msg;
     }
 
-    private static void initMessage(Message msg, AMQP.BasicProperties properties, byte[] bodyData) {
+    private static void initMessage(Message msg,
+                                    AMQP.BasicProperties properties,
+                                    byte[] bodyData) {
         MessageHeaderTransfer.unbox(properties, msg);
         msg.setContent(bodyData);
     }

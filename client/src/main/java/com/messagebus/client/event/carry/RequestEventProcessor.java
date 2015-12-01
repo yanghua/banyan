@@ -123,9 +123,11 @@ public class RequestEventProcessor extends CommonEventProcessor {
 
         try {
             //just receive one
-            QueueingConsumer consumer = ProxyConsumer.consume(context.getChannel(),
-                                                              correlationId,
-                                                              context.getConsumerTag());
+            QueueingConsumer consumer = ProxyConsumer.consume(
+                    context.getChannel(),
+                    correlationId,
+                    true,
+                    context.getConsumerTag());
             QueueingConsumer.Delivery delivery = consumer.nextDelivery(context.getTimeout() * 1000);
 
             //timeout
@@ -134,7 +136,6 @@ public class RequestEventProcessor extends CommonEventProcessor {
                 return;
             }
 
-//            context.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             final Message msg = MessageFactory.createMessage(delivery);
 
             if (msg == null) return;

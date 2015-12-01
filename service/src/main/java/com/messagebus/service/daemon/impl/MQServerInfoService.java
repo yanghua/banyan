@@ -8,7 +8,6 @@ import com.messagebus.client.MessagebusPool;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.HttpHelper;
 import com.messagebus.common.configuration.LongLiveZookeeper;
 import com.messagebus.service.Constants;
@@ -62,7 +61,7 @@ public class MQServerInfoService extends AbstractService {
                 @Override
                 public Message onRequest(Message requestMsg) {
                     String rabbitmqServerInfo = getRabbitmqServerInfo();
-                    Message respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                    Message respMsg = MessageFactory.createMessage();
                     respMsg.setContent(rabbitmqServerInfo.getBytes());
 
                     return respMsg;

@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.common.Constants;
@@ -96,11 +95,6 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
             //timestamp
             if (msg.getTimestamp() == 0)
                 msg.setTimestamp(currentDate.getTime());
-
-            if (!MessageType.BroadcastMessage.getType().equals(msg.getType())) {
-                logger.error("[validateMessagesProperites] the message's type is not Broadcast Message ");
-                throw new RuntimeException(" the message's type is not  Broadcast Message ");
-            }
         }
     }
 

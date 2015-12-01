@@ -3,7 +3,6 @@ package com.messagebus.service.daemon.impl;
 import com.google.gson.Gson;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.InnerEventEntity;
@@ -110,7 +109,7 @@ public class EventPassThroughService extends AbstractService {
                 eventEntity.setType("event");
                 String jsonObjStr = GSON.toJson(eventEntity);
 
-                Message eventMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                Message eventMsg = MessageFactory.createMessage();
                 Map<String, Object> map = new HashMap<String, Object>(1);
                 map.put("type", "event");
                 eventMsg.setHeaders(map);

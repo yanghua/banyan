@@ -6,9 +6,7 @@ import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
-import com.messagebus.common.ExceptionHelper;
 import com.messagebus.common.RandomHelper;
 import com.messagebus.common.UUIDGenerator;
 import com.messagebus.interactor.proxy.ProxyConsumer;
@@ -40,7 +38,7 @@ public abstract class CommonEventProcessor {
     public void onMsgIdGenerate(MsgIdGenerateEvent event) {
         logger.debug("=-=-=- event : onMsgIdGenerate =-=-=-");
         MessageContext context = event.getMessageContext();
-        Message[] msgs = context.getMessages();
+        Message[]      msgs    = context.getMessages();
         for (Message msg : msgs) {
             UUIDGenerator generator = new UUIDGenerator(random.nextInt(31), Constants.DEFAULT_DATACENTER_ID_FOR_UUID);
             logger.debug("message id is : " + generator.nextId());
@@ -52,19 +50,19 @@ public abstract class CommonEventProcessor {
     @Subscribe
     public void onMsgBodySizeCheck(MsgBodySizeCheckEvent event) {
         logger.debug("=-=-=- event : onMsgBodySizeCheck =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ConfigManager.Sink sink = context.getSink();
+        MessageContext     context = event.getMessageContext();
+        ConfigManager.Sink sink    = context.getSink();
 
         if (sink != null && !Strings.isNullOrEmpty(sink.getMsgBodySize())) {
             String msgBodySizeStr = sink.getMsgBodySize();
-            int msgBodySize = Integer.parseInt(msgBodySizeStr);
+            int    msgBodySize    = Integer.parseInt(msgBodySizeStr);
 
             if (msgBodySize != -1) {
                 Message[] msgs = context.getMessages();
                 for (Message msg : msgs) {
                     if (msg.getContent().length > msgBodySize) {
                         logger.error("message body's size can not be more than : " + msgBodySizeStr
-                                         + " B, the limit comes from queue name : " + sink.getName());
+                                + " B, the limit comes from queue name : " + sink.getName());
                         throw new RuntimeException("message body's size can not be more than : " + msgBodySizeStr + " B");
                     }
                 }
@@ -76,7 +74,7 @@ public abstract class CommonEventProcessor {
     public void onTagGenerate(TagGenerateEvent event) {
         logger.debug("=-=-=- event : onTagGenerate =-=-=-");
         MessageContext context = event.getMessageContext();
-        String tag = "consumer.tag." + RandomHelper.randomNumberAndCharacter(6);
+        String         tag     = "consumer.tag." + RandomHelper.randomNumberAndCharacter(6);
         context.setConsumerTag(tag);
     }
 
@@ -110,10 +108,11 @@ public abstract class CommonEventProcessor {
             QueueingConsumer consumer = null;
             try {
                 consumer = ProxyConsumer.consume(context.getChannel(),
-                                                 context.getSink().getQueueName(),
-                                                 context.getConsumerTag());
+                        context.getSink().getQueueName(),
+                        false,      //auto ack false
+                        context.getConsumerTag());
             } catch (IOException e) {
-                ExceptionHelper.logException(logger, e, "real consumer");
+                logger.error(e);
                 throw new RuntimeException(e);
             }
 
@@ -125,9 +124,9 @@ public abstract class CommonEventProcessor {
     @Subscribe
     public void onAsyncMessageLoop(AsyncMessageLoopEvent event) {
         logger.debug("=-=-=- event : onAsyncMessageLoop =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> messageLoopTask = executor.submit(new MessageLoopTask(context));
+        MessageContext  context         = event.getMessageContext();
+        ExecutorService executor        = Executors.newFixedThreadPool(1);
+        Future<?>       messageLoopTask = executor.submit(new MessageLoopTask(context));
 
         //block until interrupt or timeout
         try {
@@ -138,7 +137,7 @@ public abstract class CommonEventProcessor {
             logger.error(" execution exception : ", e);
         } catch (TimeoutException e) {
             logger.info("message loop timeout after : "
-                            + context.getTimeout() + " [" + context.getTimeoutUnit() + "]");
+                    + context.getTimeout() + " [" + context.getTimeoutUnit() + "]");
         } finally {
             //close the consume based on this channel
             synchronized (context.getChannel()) {
@@ -188,8 +187,8 @@ public abstract class CommonEventProcessor {
         @Override
         public void run() {
             QueueingConsumer currentConsumer = (QueueingConsumer) msgContext.getOtherParams().get("consumer");
-            int retryCount = 0, retryTotalCount = 10;
-            boolean stop = false;
+            int              retryCount      = 0, retryTotalCount = 10;
+            boolean          stop            = false;
             try {
                 while (!stop) {
                     try {
@@ -199,17 +198,16 @@ public abstract class CommonEventProcessor {
 
                         if (msg == null) continue;
 
-                        if (msg.getMessageType().equals(MessageType.QueueMessage)) {
-                            doUncompress(msgContext, msg);
-                        }
+                        doUncompress(msgContext, msg);
 
                         msgContext.setConsumeMsgs(new ArrayList<Message>(1) {{
                             this.add(msg);
                         }});
 
-                        if (msg.getMessageType().equals(MessageType.QueueMessage)) {
-                            process(msgContext);
-                        }
+                        process(msgContext);
+
+                        //TODO: 参数化配置
+                        msgContext.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                     } catch (InterruptedException e) {
                         logger.info(" message loop task interrupted!");
                     } catch (ShutdownSignalException e) {
@@ -235,11 +233,6 @@ public abstract class CommonEventProcessor {
             //timestamp
             if (msg.getTimestamp() == 0)
                 msg.setTimestamp(currentDate.getTime());
-
-            if (!MessageType.QueueMessage.getType().equals(msg.getType())) {
-                logger.error("the message is not QueueMessage");
-                throw new RuntimeException("the message is not QueueMessage");
-            }
         }
     }
 

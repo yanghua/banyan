@@ -5,7 +5,6 @@ import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;
@@ -41,7 +40,7 @@ public class ProduceConsume {
             Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port")));
         Messagebus client = singlePool.getResource();
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));

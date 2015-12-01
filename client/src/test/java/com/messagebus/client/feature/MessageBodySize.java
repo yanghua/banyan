@@ -3,7 +3,6 @@ package com.messagebus.client.feature;
 import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.core.MessageUtil;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.model.MessageType;
 
 /**
  * Created by yanghua on 3/27/15.
@@ -24,7 +23,7 @@ public class MessageBodySize extends BaseTestCase {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
         String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
 
-        Message msg = MessageUtil.create(MessageType.QueueMessage, 4000);
+        Message msg = MessageUtil.create(4000);
 
         client.produce(secret, "emapDemoConsume", msg, token);
     }

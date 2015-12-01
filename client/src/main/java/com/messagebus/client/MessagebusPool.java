@@ -173,9 +173,11 @@ public class MessagebusPool {
                 innerChannel.queueBind(queueName, INNER_EXCHANGE_NAME, EVENT_ROUTING_KEY_NAME, matchHeader);
 
                 String randomTag = RandomHelper.randomNumberAndCharacter(6);
-                QueueingConsumer consumer = ProxyConsumer.consume(innerChannel,
-                                                                  queueName,
-                                                                  EVENT_CONSUMER_TAG_PREFIX + randomTag);
+                QueueingConsumer consumer = ProxyConsumer.consume(
+                        innerChannel,
+                        queueName,
+                        true,
+                        EVENT_CONSUMER_TAG_PREFIX + randomTag);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
 
@@ -231,9 +233,11 @@ public class MessagebusPool {
                 innerChannel.queueBind(queueName, INNER_EXCHANGE_NAME, NOTICE_ROUTING_KEY_NAME, matchHeader);
 
                 String randomTag = RandomHelper.randomNumberAndCharacter(6);
-                QueueingConsumer consumer = ProxyConsumer.consume(innerChannel,
-                                                                  queueName,
-                                                                  NOTICE_CONSUMER_TAG_PREFIX + randomTag);
+                QueueingConsumer consumer = ProxyConsumer.consume(
+                        innerChannel,
+                        queueName,
+                        true,
+                        NOTICE_CONSUMER_TAG_PREFIX + randomTag);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
 

@@ -12,14 +12,10 @@ public class MessageJSONSerializer {
     private static final Gson gson   = new GsonBuilder().serializeNulls().create();
 
     public static String serialize(Message msg) {
-        checkMessageType(msg.getMessageType());
-
         return gson.toJson(msg);
     }
 
-    public static Message deSerialize(String msgStr, MessageType type) {
-        checkMessageType(type);
-
+    public static Message deSerialize(String msgStr) {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(msgStr);
 
@@ -28,9 +24,7 @@ public class MessageJSONSerializer {
         return msg;
     }
 
-    public static Message deSerialize(JsonElement msgElement, MessageType type) {
-        checkMessageType(type);
-
+    public static Message deSerialize(JsonElement msgElement) {
         JsonObject obj = msgElement.getAsJsonObject();
         Message msg = gson.fromJson(obj.get("message"), Message.class);
 
@@ -38,16 +32,10 @@ public class MessageJSONSerializer {
     }
 
     public static String serializeMessages(Collection<Message> msgs) {
-        for (Message msg : msgs) {
-            checkMessageType(msg.getMessageType());
-        }
-
         return gson.toJson(msgs);
     }
 
-    public static Message[] deSerializeMessages(String msgArrStr, MessageType type) {
-        checkMessageType(type);
-
+    public static Message[] deSerializeMessages(String msgArrStr) {
         int i = 0;
 
         JsonParser parser = new JsonParser();
@@ -68,15 +56,6 @@ public class MessageJSONSerializer {
         }
 
         return msgs;
-    }
-
-    private static void checkMessageType(MessageType type) {
-        if (!type.equals(MessageType.QueueMessage)) {
-            logger.error("[serialize] unsupport message type : " + type.toString() +
-                             ", now just support QueueMessage");
-            throw new UnsupportedOperationException("unsupport message type : " + type.toString() +
-                                                        ", now just support QueueMessage");
-        }
     }
 
 }

@@ -5,7 +5,6 @@ import com.messagebus.client.Messagebus;
 import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +34,7 @@ public class PublishSubscribe {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
 

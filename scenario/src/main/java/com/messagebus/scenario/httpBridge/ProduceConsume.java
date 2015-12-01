@@ -3,7 +3,6 @@ package com.messagebus.scenario.httpBridge;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageJSONSerializer;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import com.messagebus.scenario.util.PropertiesHelper;
 import org.apache.commons.logging.Log;
@@ -51,7 +50,7 @@ public class ProduceConsume {
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = null;
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setReplyTo(testQueue);
         msg.setContentType("text/plain");
 

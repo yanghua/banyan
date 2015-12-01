@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageJSONSerializer;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +50,7 @@ public class PublishSubscribe {
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = null;
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContent("test".getBytes(Constants.CHARSET_OF_UTF8));
 
         List<Message> msgs = new ArrayList<Message>(1);

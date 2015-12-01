@@ -8,7 +8,6 @@ import com.messagebus.client.MessagebusSinglePool;
 import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +51,7 @@ public class RequestResponse extends BaseTestCase {
                         assertNotNull(requestMsg);
                         assertEquals("test", new String(requestMsg.getContent(), Constants.CHARSET_OF_UTF8));
 
-                        Message respMsg = MessageFactory.createMessage(MessageType.QueueMessage);
+                        Message respMsg = MessageFactory.createMessage();
                         respMsg.setContentType("text/plain");
                         respMsg.setContentEncoding("utf-8");
                         respMsg.setCorrelationId(requestMsg.getCorrelationId());
@@ -75,7 +74,7 @@ public class RequestResponse extends BaseTestCase {
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
         Messagebus client = singlePool.getResource();
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
 

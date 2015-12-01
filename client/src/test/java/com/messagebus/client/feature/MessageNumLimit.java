@@ -3,7 +3,6 @@ package com.messagebus.client.feature;
 import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.core.MessageUtil;
 import com.messagebus.client.message.model.Message;
-import com.messagebus.client.message.model.MessageType;
 
 /**
  * Created by yanghua on 3/27/15.
@@ -24,7 +23,7 @@ public class MessageNumLimit extends BaseTestCase {
         String secret = "muqwejlaksdfkljaliqwejflkasdfs";
         String token = "jhlkasdfkjhasdfqwkasdfjqkwjhas";
 
-        Message msg = MessageUtil.create(MessageType.QueueMessage, 500);
+        Message msg = MessageUtil.create(500);
 
         for (int i = 0; i < 300; i++) {
             client.produce(secret, "erpDemoProduce-Consume", msg, token);

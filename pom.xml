@@ -88,20 +88,20 @@
 
     </dependencies>
 
-    <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>release</id>-->
-            <!--<name>release@172.16.1.104</name>-->
-            <!--<url>http://172.16.1.104:8081/nexus/content/groups/public/</url>-->
-        <!--</repository>-->
-    <!--</repositories>-->
+    <repositories>
+        <repository>
+            <id>release</id>
+            <name>release@172.16.1.104</name>
+            <url>http://172.16.1.104:8081/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 
-    <!--<distributionManagement>-->
-        <!--<repository>-->
-            <!--<id>release</id>-->
-            <!--<name>release@172.16.1.104</name>-->
-            <!--<url>http://172.16.1.104:8081/nexus/content/repositories/releases/</url>-->
-        <!--</repository>-->
-    <!--</distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>release</id>
+            <name>release@172.16.1.104</name>
+            <url>http://172.16.1.104:8081/nexus/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
 
 </project>

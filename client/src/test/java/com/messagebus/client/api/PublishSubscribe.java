@@ -4,7 +4,6 @@ import com.messagebus.client.IMessageReceiveListener;
 import com.messagebus.client.core.BaseTestCase;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.common.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +30,7 @@ public class PublishSubscribe extends BaseTestCase {
     public void testPublishAndSubscribe() throws Exception {
         String secret = "oiqwenncuicnsdfuasdfnkajkwqowe";
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");
         msg.setContentEncoding("utf-8");
 

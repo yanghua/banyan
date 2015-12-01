@@ -5,7 +5,6 @@ import com.messagebus.client.*;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.model.MessageJSONSerializer;
-import com.messagebus.client.message.model.MessageType;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.httpbridge.util.CommonUtil;
 import com.messagebus.httpbridge.util.Constants;
@@ -166,7 +165,7 @@ public class HttpBridge extends HttpServlet {
             content = "";
         }
 
-        Message msg = MessageFactory.createMessage(MessageType.QueueMessage);
+        Message msg = MessageFactory.createMessage();
         msg.setTimestamp(new Date().getTime());
         msg.setContentEncoding(contentEncoding);
         msg.setContentType(contentType);
@@ -214,7 +213,7 @@ public class HttpBridge extends HttpServlet {
             return;
         }
 
-        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr);
 
         boolean mergedValidResult = true;
         for (Message msg : msgArr) {
@@ -274,7 +273,7 @@ public class HttpBridge extends HttpServlet {
 
         String msgArrStr = request.getParameter("messages");
 
-        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr, MessageType.QueueMessage);
+        Message[] msgArr = MessageJSONSerializer.deSerializeMessages(msgArrStr);
 
         boolean mergedValidResult = true;
         for (Message msg : msgArr) {
@@ -419,7 +418,7 @@ public class HttpBridge extends HttpServlet {
             return;
         }
 
-        Message msg = MessageJSONSerializer.deSerialize(msgStr, MessageType.QueueMessage);
+        Message msg = MessageJSONSerializer.deSerialize(msgStr);
 
         MessagebusPool pool = (MessagebusPool) (getServletContext().getAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ));
         Messagebus messagebus = pool.getResource();
