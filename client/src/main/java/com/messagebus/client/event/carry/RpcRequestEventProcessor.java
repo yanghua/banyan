@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import com.messagebus.client.ConfigManager;
 import com.messagebus.client.MessageContext;
 import com.messagebus.common.Constants;
-import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.tools.jsonrpc.JsonRpcClient;
 import com.rabbitmq.tools.jsonrpc.JsonRpcException;
 import org.apache.commons.logging.Log;
@@ -25,34 +24,36 @@ public class RpcRequestEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onPermissionCheck(PermissionCheckEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ConfigManager.Source source = context.getSource();
-        ConfigManager.Sink sink = context.getSink();
-        boolean hasPermission = false;
+        MessageContext       context       = event.getMessageContext();
+        ConfigManager.Source source        = context.getSource();
+        ConfigManager.Sink   sink          = context.getSink();
+        boolean              hasPermission = false;
 
         hasPermission = context.getStream() != null
-            && context.getStream().getSinkSecret().equals(sink.getSecret())
-            && context.getStream().getSourceName().equals(source.getName());
+                && context.getStream().getSinkSecret().equals(sink.getSecret())
+                && context.getStream().getSourceName().equals(source.getName());
 
         if (!hasPermission) {
             logger.error("[handle] can not produce message from queue [" + source.getName() +
-                             "] to queue [" + sink.getName() + "]");
-            throw new RuntimeException("can not produce message from queue [" + source.getName() +
-                                           "] to queue [" + sink.getName() + "]");
+                    "] to queue [" + sink.getName() + "]");
+            event.getMessageContext().setThrowable(new RuntimeException("can not produce message from queue [" + source.getName() +
+                    "] to queue [" + sink.getName() + "]"));
         }
     }
 
     @Subscribe
     public void onRpcRequest(RpcRequestEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onRpcRequest =-=-=-");
         MessageContext context = event.getMessageContext();
-        JsonRpcClient client = null;
+        JsonRpcClient  client  = null;
         try {
             client = new JsonRpcClient(context.getChannel(),
-                                       Constants.PROXY_EXCHANGE_NAME,
-                                       context.getSink().getRoutingKey(),
-                                       (int) context.getTimeout());
+                    Constants.PROXY_EXCHANGE_NAME,
+                    context.getSink().getRoutingKey(),
+                    (int) context.getTimeout());
             Object[] params = null;
             if (context.getOtherParams().get("params") != null) {
                 params = (Object[]) context.getOtherParams().get("params");
@@ -60,18 +61,18 @@ public class RpcRequestEventProcessor extends CommonEventProcessor {
             Object respObj = client.call(context.getOtherParams().get("methodName").toString(), params);
             context.getOtherParams().put("result", respObj);
         } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "rpc request handler : RealRpcRequest");
-            throw new RuntimeException(e);
+            logger.error(e);
+            event.getMessageContext().setThrowable(new RuntimeException(e));
         } catch (TimeoutException e) {
             context.setIsTimeout(true);
         } catch (JsonRpcException e) {
-            ExceptionHelper.logException(logger, e, "rpc request handler : RealRpcRequest");
-            throw new RuntimeException(e);
+            logger.error(e);
+            event.getMessageContext().setThrowable(new RuntimeException(e));
         } finally {
             try {
                 if (client != null) client.close();
             } catch (IOException e) {
-
+                logger.error(e);
             }
         }
     }

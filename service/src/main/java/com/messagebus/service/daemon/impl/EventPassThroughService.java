@@ -6,9 +6,6 @@ import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.common.Constants;
 import com.messagebus.common.InnerEventEntity;
-import com.messagebus.common.configuration.IPubSubListener;
-import com.messagebus.common.configuration.LongLiveZookeeper;
-import com.messagebus.common.configuration.ZKEventType;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.messagebus.service.daemon.DaemonService;
 import com.messagebus.service.daemon.RunPolicy;
@@ -18,6 +15,14 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,9 +41,8 @@ public class EventPassThroughService extends AbstractService {
     private static final String EVENT_ROUTING_KEY_NAME = "routingkey.proxy.message.inner.#";
     private static final Gson   GSON                   = new Gson();
 
-    private LongLiveZookeeper zookeeper;
-    private Connection        connection;
-    private Channel           mqChannel;
+    private Connection connection;
+    private Channel    mqChannel;
 
     public EventPassThroughService(Map<String, Object> context) {
         super(context);
@@ -48,20 +52,72 @@ public class EventPassThroughService extends AbstractService {
     public void run() {
         logger.info("started event pass through service");
         String zkHost = this.context.get(com.messagebus.service.Constants.ZK_HOST_KEY).toString();
-        int zkPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.ZK_PORT_KEY).toString());
+        int    zkPort = Integer.parseInt(this.context.get(com.messagebus.service.Constants.ZK_PORT_KEY).toString());
 
-        zookeeper = new LongLiveZookeeper(zkHost, zkPort);
+        RetryPolicy retryPolicy   = new ExponentialBackoffRetry(1000, 10);
+        String      connectionStr = String.format("%s:%s", zkHost, zkPort);
+        CuratorFramework zookeeper = CuratorFrameworkFactory.newClient(
+                connectionStr, retryPolicy);
+
         try {
-            zookeeper.open();
+            zookeeper.start();
 
-            Map mbHostAndPortObj = zookeeper.get(COMPONENT_MESSAGE_ZK_PATH, Map.class);
+            String mbServerInfoJson = new String(zookeeper.getData().forPath(COMPONENT_MESSAGE_ZK_PATH));
+            Map    mbHostAndPortObj = GSON.fromJson(mbServerInfoJson, Map.class);
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(mbHostAndPortObj.get("mqHost").toString());
             connection = connectionFactory.newConnection();
             mqChannel = connection.createChannel();
 
-            zookeeper.watch(REVERSE_MESSAGE_ZK_PATH, new EventChangedHandler());
+            //source -> secret
+            PathChildrenCache sourceSecretCache = new PathChildrenCache(zookeeper,
+                    REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH, false);
+            sourceSecretCache.getListenable().addListener(new PathChildrenCacheListener() {
+                public void childEvent(CuratorFramework curatorFramework,
+                                       PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                    onPathChildrenChanged(REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH);
+                }
+            });
+
+            //source -> name
+            PathChildrenCache souceNameCache = new PathChildrenCache(zookeeper,
+                    REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH, false);
+            souceNameCache.getListenable().addListener(new PathChildrenCacheListener() {
+                public void childEvent(CuratorFramework curatorFramework,
+                                       PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                    onPathChildrenChanged(REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH);
+                }
+            });
+
+            //sink -> secret
+            PathChildrenCache sinkSecretCache = new PathChildrenCache(zookeeper,
+                    REVERSE_MESSAGE_SINK_SECRET_ZK_PATH, false);
+            sinkSecretCache.getListenable().addListener(new PathChildrenCacheListener() {
+                public void childEvent(CuratorFramework curatorFramework,
+                                       PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                    onPathChildrenChanged(REVERSE_MESSAGE_SINK_SECRET_ZK_PATH);
+                }
+            });
+
+            //sink -> name
+            PathChildrenCache sinkNameCache = new PathChildrenCache(zookeeper,
+                    REVERSE_MESSAGE_SINK_NAME_ZK_PATH, false);
+            sinkNameCache.getListenable().addListener(new PathChildrenCacheListener() {
+                public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                    onPathChildrenChanged(REVERSE_MESSAGE_SINK_NAME_ZK_PATH);
+                }
+            });
+
+            //stream -> token
+            PathChildrenCache streamTokenCache = new PathChildrenCache(zookeeper,
+                    REVERSE_MESSAGE_STREAM_TOKEN_ZK_PATH, false);
+            streamTokenCache.getListenable().addListener(new PathChildrenCacheListener() {
+                public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                    onPathChildrenChanged(REVERSE_MESSAGE_STREAM_TOKEN_ZK_PATH);
+                }
+            });
+
             TimeUnit.MINUTES.sleep(Integer.MAX_VALUE);
         } catch (IOException e) {
             logger.error(e);
@@ -82,7 +138,7 @@ public class EventPassThroughService extends AbstractService {
                     this.connection.close();
                 }
 
-                if (zookeeper.isAlive()) {
+                if (zookeeper.getState().equals(CuratorFrameworkState.STARTED)) {
                     zookeeper.close();
                 }
             } catch (IOException e) {
@@ -96,40 +152,35 @@ public class EventPassThroughService extends AbstractService {
 
     }
 
-    public class EventChangedHandler implements IPubSubListener {
+    public void onPathChildrenChanged(String path) {
+        logger.info("received path change from zookeeper, key : " + path);
+        try {
+            String           secret      = path.replace(REVERSE_MESSAGE_ZK_PATH + "/", "");
+            InnerEventEntity eventEntity = new InnerEventEntity();
+            eventEntity.setIdentifier(secret);
+            eventEntity.setValue("");
+            eventEntity.setType("event");
+            String jsonObjStr = GSON.toJson(eventEntity);
 
-        @Override
-        public void onChange(String channel, ZKEventType eventType) {
-            logger.info("received node view change from zookeeper, key : " + channel);
-            try {
-                String secret = channel.replace(REVERSE_MESSAGE_ZK_PATH + "/", "");
-                InnerEventEntity eventEntity = new InnerEventEntity();
-                eventEntity.setIdentifier(secret);
-                eventEntity.setValue("");
-                eventEntity.setType("event");
-                String jsonObjStr = GSON.toJson(eventEntity);
+            Message             eventMsg = MessageFactory.createMessage();
+            Map<String, Object> map      = new HashMap<String, Object>(1);
+            map.put("type", "event");
+            eventMsg.setHeaders(map);
+            eventMsg.setContent(jsonObjStr.getBytes());
+            AMQP.BasicProperties properties = MessageHeaderTransfer.box(eventMsg);
 
-                Message eventMsg = MessageFactory.createMessage();
-                Map<String, Object> map = new HashMap<String, Object>(1);
-                map.put("type", "event");
-                eventMsg.setHeaders(map);
-                eventMsg.setContent(jsonObjStr.getBytes());
-                AMQP.BasicProperties properties = MessageHeaderTransfer.box(eventMsg);
-
-                ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
-                                      mqChannel,
-                                      EVENT_ROUTING_KEY_NAME,
-                                      eventMsg.getContent(),
-                                      properties);
-            } catch (IOException e) {
-                logger.error(e);
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                logger.error(e);
-                throw new RuntimeException(e);
-            }
+            ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
+                    mqChannel,
+                    EVENT_ROUTING_KEY_NAME,
+                    eventMsg.getContent(),
+                    properties);
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error(e);
+            throw new RuntimeException(e);
         }
-
     }
 
 }

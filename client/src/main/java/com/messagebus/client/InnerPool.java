@@ -10,17 +10,14 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 class InnerPool extends AbstractPool<Messagebus> {
 
     public InnerPool(GenericObjectPoolConfig poolConfig,
-                     String pubsuberHost,
-                     int pubsuberPort,
                      ConfigManager configManager,
                      Connection connection,
                      EventBus componentEventBus) {
-        super(poolConfig, new MessagebusFactory(pubsuberHost,
-                                                pubsuberPort,
-                                                configManager,
-                                                connection,
-                                                componentEventBus)
-             );
+        super(poolConfig, new MessagebusFactory(
+                configManager,
+                connection,
+                componentEventBus)
+        );
     }
 
     /**

@@ -32,12 +32,6 @@
             <artifactId>compress-lzf</artifactId>
             <version>1.0.3</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.3.4</version>
-        </dependency>
     </dependencies>
 
 </project>

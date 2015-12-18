@@ -22,20 +22,23 @@ public class RpcResponseEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onRpcResponse(RpcResponseEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onRpcResponse =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> rpcServerLoopTask = executor.submit(new RpcServerLoopTask(context));
+        MessageContext  context           = event.getMessageContext();
+        ExecutorService executor          = Executors.newFixedThreadPool(1);
+        Future<?>       rpcServerLoopTask = executor.submit(new RpcServerLoopTask(context));
 
         try {
             rpcServerLoopTask.get(context.getTimeout(), context.getTimeoutUnit());
         } catch (InterruptedException e) {
             logger.info(" rpc server interrupted!");
         } catch (ExecutionException e) {
-            logger.error(" execution exception : ", e);
+            logger.error(e);
+            event.getMessageContext().setThrowable(e);
         } catch (TimeoutException e) {
             logger.info("message loop timeout after : "
-                            + context.getTimeout() + " [" + context.getTimeoutUnit() + "]");
+                    + context.getTimeout() + " [" + context.getTimeoutUnit() + "]");
+            event.getMessageContext().setThrowable(e);
         }
     }
 
@@ -60,14 +63,14 @@ public class RpcResponseEventProcessor extends CommonEventProcessor {
 
         @Override
         public void run() {
-            Class<?> clazzOfInterface = (Class<?>) msgContext.getOtherParams().get("clazzOfInterface");
-            Object obj = msgContext.getOtherParams().get("serviceProvider");
-            JsonRpcServer server = null;
+            Class<?>      clazzOfInterface = (Class<?>) msgContext.getOtherParams().get("clazzOfInterface");
+            Object        obj              = msgContext.getOtherParams().get("serviceProvider");
+            JsonRpcServer server           = null;
             try {
                 server = new JsonRpcServer(msgContext.getChannel(),
-                                           msgContext.getSink().getQueueName(),
-                                           clazzOfInterface,
-                                           obj);
+                        msgContext.getSink().getQueueName(),
+                        clazzOfInterface,
+                        obj);
                 server.mainloop();
             } catch (IOException e) {
                 ExceptionHelper.logException(logger, e, "real rpc responser");

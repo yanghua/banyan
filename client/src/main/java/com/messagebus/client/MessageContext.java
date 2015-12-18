@@ -38,12 +38,13 @@ public class MessageContext {
     private List<Message>           consumeMsgs;
     private String                  tempQueueName;
     private ConfigManager           configManager;
-    private IMessageReceiveListener noticeListener;
     private IRequestListener        requestListener;
     private EventBus                carryEventBus;
 
     private Map<String, Object> otherParams = new HashMap<String, Object>();
     private boolean             isSync      = false;
+
+    private Throwable throwable;
 
     public MessageContext() {
     }
@@ -226,6 +227,14 @@ public class MessageContext {
 
     public void setCarryEventBus(EventBus carryEventBus) {
         this.carryEventBus = carryEventBus;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
     }
 
     @Override

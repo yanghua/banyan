@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.messagebus.client.event.component.InnerEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.common.Constants;
+import com.messagebus.common.InnerEventEntity;
+import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -25,8 +27,16 @@ import java.util.concurrent.TimeoutException;
  */
 public class ConfigManager {
 
-    private static final Log  logger = LogFactory.getLog(ConfigManager.class);
-    private static final Gson GSON   = new Gson();
+    private static final Log    logger                            = LogFactory.getLog(ConfigManager.class);
+    private static final Gson   GSON                              = new Gson();
+    private static final String SOURCE_EVENT_TYPE                 = "source";
+    private static final String SINK_EVENT_TYPE                   = "sink";
+    private static final String STREAM_EVENT_TYPE                 = "stream";
+    private static final String RPC_METHOD_NAME_FOR_SOURCE_SECRET = "getSourceBySecret";
+    private static final String RPC_METHOD_NAME_FOR_SOURCE_NAME   = "getSourceByName";
+    private static final String RPC_METHOD_NAME_FOR_SINK_SECRET   = "getSinkBySecret";
+    private static final String RPC_METHOD_NAME_FOR_SINK_NAME     = "getSinkByName";
+    private static final String RPC_METHOD_NAME_FOR_STREAM_TOKEN  = "getStreamByToken";
 
     private Map<String, Source> secretSourceMap = new HashMap<String, Source>();
     private Map<String, Source> nameSourceMap   = new HashMap<String, Source>();
@@ -34,14 +44,12 @@ public class ConfigManager {
     private Map<String, Sink>   nameSinkMap     = new HashMap<String, Sink>();
     private Map<String, Stream> streamMap       = new HashMap<String, Stream>();
 
-    private String host;
-    private int    port;
+    private Address[] addresses;
 
     private EventBus componentEventBus;
 
-    public ConfigManager(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public ConfigManager(Address[] addresses) {
+        this.addresses = addresses;
     }
 
     public EventBus getComponentEventBus() {
@@ -62,7 +70,7 @@ public class ConfigManager {
         } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{secret};
             Object responseObj = this.innerRpcRequest("getSourceBySecret",
-                                                      params);
+                    params);
             if (responseObj != null) {
                 Source source = GSON.fromJson(responseObj.toString(), Source.class);
                 this.secretSourceMap.put(secret, source);
@@ -83,7 +91,7 @@ public class ConfigManager {
         } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{name};
             Object responseObj = this.innerRpcRequest("getSourceByName",
-                                                      params);
+                    params);
             if (responseObj != null) {
                 Source source = GSON.fromJson(responseObj.toString(), Source.class);
                 this.nameSourceMap.put(name, source);
@@ -104,7 +112,7 @@ public class ConfigManager {
         } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{secret};
             Object responseObj = this.innerRpcRequest("getSinkBySecret",
-                                                      params);
+                    params);
             if (responseObj != null) {
                 Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
                 this.secretSinkMap.put(secret, sink);
@@ -125,7 +133,7 @@ public class ConfigManager {
         } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{name};
             Object responseObj = this.innerRpcRequest("getSinkByName",
-                                                      params);
+                    params);
             if (responseObj != null) {
                 Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
                 this.nameSinkMap.put(name, sink);
@@ -146,7 +154,7 @@ public class ConfigManager {
         } else {                                            //remote data then save to local cache
             Object[] params = new Object[]{token};
             Object responseObj = this.innerRpcRequest("getStreamByToken",
-                                                      params);
+                    params);
             if (responseObj != null) {
                 Stream stream = GSON.fromJson(responseObj.toString(), Stream.class);
                 this.streamMap.put(token, stream);
@@ -161,24 +169,33 @@ public class ConfigManager {
 
         @Subscribe
         public void onInnerEvent(InnerEvent innerEvent) {
-            Message msg = innerEvent.getMsg();
-            String jsonStr = new String(msg.getContent());
-            logger.info("received inner event , content : " + jsonStr);
+            Message          msg         = innerEvent.getMsg();
+            String           jsonStr     = new String(msg.getContent());
+            InnerEventEntity eventEntity = GSON.fromJson(jsonStr, InnerEventEntity.class);
 
-            //TODO:拆分三个path监听事件,判断到底刷新哪个
-            refreshSourceCache();
-
-            refreshSinkCache();
-
-            refreshStreamCache();
+            if (eventEntity.getIdentifier().startsWith(SOURCE_EVENT_TYPE)) {
+                boolean refreshBySecret = eventEntity.getIdentifier().endsWith("secret");
+                refreshSourceCache(refreshBySecret);
+            } else if (eventEntity.getIdentifier().startsWith(SINK_EVENT_TYPE)) {
+                boolean refreshBySecret = eventEntity.getIdentifier().endsWith("secret");
+                refreshSinkCache(refreshBySecret);
+            } else if (eventEntity.getIdentifier().startsWith(STREAM_EVENT_TYPE)) {
+                refreshStreamCache();
+            } else {
+                logger.warn("received unknown event type : " +
+                        eventEntity.getIdentifier());
+            }
         }
     }
 
-    private void refreshSourceCache() {
+    private void refreshSourceCache(boolean bySecret) {
+        String rpcMethod;
+        if (bySecret) rpcMethod = RPC_METHOD_NAME_FOR_SOURCE_SECRET;
+        else rpcMethod = RPC_METHOD_NAME_FOR_SOURCE_NAME;
+
         for (String secret : this.secretSourceMap.keySet()) {
-            Object[] params = new Object[]{secret};
-            Object responseObj = this.innerRpcRequest("getSourceBySecret",
-                                                      params);
+            Object[] params      = new Object[]{secret};
+            Object   responseObj = this.innerRpcRequest(rpcMethod, params);
             if (responseObj != null) {
                 Source source = GSON.fromJson(responseObj.toString(), Source.class);
                 this.secretSourceMap.put(secret, source);
@@ -188,11 +205,14 @@ public class ConfigManager {
         }
     }
 
-    private void refreshSinkCache() {
+    private void refreshSinkCache(boolean bySecret) {
+        String rpcMethod;
+        if (bySecret) rpcMethod = RPC_METHOD_NAME_FOR_SINK_SECRET;
+        else rpcMethod = RPC_METHOD_NAME_FOR_SINK_NAME;
+
         for (String secret : this.secretSinkMap.keySet()) {
-            Object[] params = new Object[]{secret};
-            Object responseObj = this.innerRpcRequest("getSinkBySecret",
-                                                      params);
+            Object[] params      = new Object[]{secret};
+            Object   responseObj = this.innerRpcRequest(rpcMethod, params);
             if (responseObj != null) {
                 Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
                 this.secretSinkMap.put(secret, sink);
@@ -205,8 +225,8 @@ public class ConfigManager {
     private void refreshStreamCache() {
         for (String token : this.streamMap.keySet()) {
             Object[] params = new Object[]{token};
-            Object responseObj = this.innerRpcRequest("getStreamByToken",
-                                                      params);
+            Object responseObj = this.innerRpcRequest(RPC_METHOD_NAME_FOR_STREAM_TOKEN,
+                    params);
             if (responseObj != null) {
                 Stream stream = GSON.fromJson(responseObj.toString(), Stream.class);
                 this.streamMap.put(token, stream);
@@ -218,17 +238,16 @@ public class ConfigManager {
 
     private Object innerRpcRequest(String method, Object[] params) {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(this.host);
-        Connection connection = null;
-        Channel channel = null;
-        JsonRpcClient client = null;
+        Connection        connection        = null;
+        Channel           channel           = null;
+        JsonRpcClient     client            = null;
         try {
-            connection = connectionFactory.newConnection();
+            connection = connectionFactory.newConnection(addresses);
             channel = connection.createChannel();
             client = new JsonRpcClient(channel,
-                                       Constants.PROXY_EXCHANGE_NAME,
-                                       Constants.DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY,
-                                       30000);
+                    Constants.PROXY_EXCHANGE_NAME,
+                    Constants.DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY,
+                    30000);
 
             return client.call(method, params);
         } catch (IOException e) {

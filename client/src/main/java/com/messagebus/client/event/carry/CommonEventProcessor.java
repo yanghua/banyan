@@ -34,8 +34,14 @@ public abstract class CommonEventProcessor {
         //todo
     }
 
+    protected void exceptionCheck(CarryEvent event) {
+        if (event.getMessageContext().getThrowable() != null)
+            return;
+    }
+
     @Subscribe
     public void onMsgIdGenerate(MsgIdGenerateEvent event) {
+        this.exceptionCheck(event);
         logger.debug("=-=-=- event : onMsgIdGenerate =-=-=-");
         MessageContext context = event.getMessageContext();
         Message[]      msgs    = context.getMessages();
@@ -49,6 +55,7 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onMsgBodySizeCheck(MsgBodySizeCheckEvent event) {
+        this.exceptionCheck(event);
         logger.debug("=-=-=- event : onMsgBodySizeCheck =-=-=-");
         MessageContext     context = event.getMessageContext();
         ConfigManager.Sink sink    = context.getSink();
@@ -63,7 +70,10 @@ public abstract class CommonEventProcessor {
                     if (msg.getContent().length > msgBodySize) {
                         logger.error("message body's size can not be more than : " + msgBodySizeStr
                                 + " B, the limit comes from queue name : " + sink.getName());
-                        throw new RuntimeException("message body's size can not be more than : " + msgBodySizeStr + " B");
+                        event.getMessageContext().setThrowable(
+                                new RuntimeException("message body's size can not be more than : "
+                                        + msgBodySizeStr + " B"));
+                        return;
                     }
                 }
             }
@@ -72,6 +82,7 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onTagGenerate(TagGenerateEvent event) {
+        this.exceptionCheck(event);
         logger.debug("=-=-=- event : onTagGenerate =-=-=-");
         MessageContext context = event.getMessageContext();
         String         tag     = "consumer.tag." + RandomHelper.randomNumberAndCharacter(6);
@@ -80,6 +91,7 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onMsgBodyCompress(MsgBodyCompressEvent event) {
+        this.exceptionCheck(event);
         //TODO : 不提供自定义功能,有总线决定压缩方式
 //        logger.debug("=-=-=- event : onMsgBodyCompress =-=-=-");
 //        MessageContext context = event.getMessageContext();
@@ -102,6 +114,7 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onPreConsume(PreConsumeEvent event) {
+        this.exceptionCheck(event);
         logger.debug("=-=-=- event : onPreConsume =-=-=-");
         MessageContext context = event.getMessageContext();
         if (!context.isSync()) {
@@ -113,7 +126,9 @@ public abstract class CommonEventProcessor {
                         context.getConsumerTag());
             } catch (IOException e) {
                 logger.error(e);
-                throw new RuntimeException(e);
+                event.getMessageContext().setThrowable(
+                        new RuntimeException(e));
+                return;
             }
 
             //add external params
@@ -123,6 +138,7 @@ public abstract class CommonEventProcessor {
 
     @Subscribe
     public void onAsyncMessageLoop(AsyncMessageLoopEvent event) {
+        this.exceptionCheck(event);
         logger.debug("=-=-=- event : onAsyncMessageLoop =-=-=-");
         MessageContext  context         = event.getMessageContext();
         ExecutorService executor        = Executors.newFixedThreadPool(1);
@@ -134,10 +150,12 @@ public abstract class CommonEventProcessor {
         } catch (InterruptedException e) {
             logger.info(" consume interrupted!");
         } catch (ExecutionException e) {
-            logger.error(" execution exception : ", e);
+            logger.error(e);
+            event.getMessageContext().setThrowable(e);
         } catch (TimeoutException e) {
             logger.info("message loop timeout after : "
                     + context.getTimeout() + " [" + context.getTimeoutUnit() + "]");
+            event.getMessageContext().setThrowable(e);
         } finally {
             //close the consume based on this channel
             synchronized (context.getChannel()) {
@@ -146,7 +164,8 @@ public abstract class CommonEventProcessor {
                         context.getChannel().basicCancel(context.getConsumerTag());
                     }
                 } catch (IOException e1) {
-                    logger.error(" occurs a IOException when closing channel : ", e1);
+                    logger.error(e1);
+                    event.getMessageContext().setThrowable(e1);
                 }
             }
         }

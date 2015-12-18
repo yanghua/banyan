@@ -10,7 +10,6 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.common.RandomHelper;
 import com.messagebus.interactor.proxy.ProxyConsumer;
-import com.rabbitmq.client.Address;
 import com.rabbitmq.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,11 +22,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Created by yanghua on 3/18/15.
+ * Created by yanghua on 2/12/2015.
  */
-public class MessagebusPool {
+public class ClusteredMessagebusPool {
 
-    private static final Log logger = LogFactory.getLog(MessagebusPool.class);
+    private static final Log logger = LogFactory.getLog(ClusteredMessagebusPool.class);
 
     private static final String INNER_EXCHANGE_NAME        = "exchange.proxy.message.inner";
     private static final String EVENT_ROUTING_KEY_NAME     = "routingkey.proxy.message.inner.event";
@@ -37,21 +36,18 @@ public class MessagebusPool {
     private static final String EVENT_CONSUMER_TAG_PREFIX  = "tag.proxy.message.inner.event.";
     private static final String NOTICE_CONSUMER_TAG_PREFIX = "tag.proxy.message.inner.notice.";
 
-    private String                   host;
-    private int                      port;
-    private ConfigManager            configManager;
-    private Connection               connection;
-    private Channel                  innerChannel;
-    private EventBus                 componentEventBus;
-    private RemoteInnerEventListener remoteInnerEventListener;
-    private RemoteNoticeListener     remoteNoticeListener;
+    private com.rabbitmq.client.Address[] innerAddresses;
+    private ConfigManager                 configManager;
+    private Connection                    connection;
+    private Channel                       innerChannel;
+    private EventBus                      componentEventBus;
+    private RemoteInnerEventListener      remoteInnerEventListener;
+    private RemoteNoticeListener          remoteNoticeListener;
 
     protected InnerPool innerPool;
 
-    public MessagebusPool(String host, int port, GenericObjectPoolConfig poolConfig) {
-        this.host = host;
-        this.port = port;
-        this.init();
+    public ClusteredMessagebusPool(Address[] addresses, GenericObjectPoolConfig poolConfig) {
+        this.init(addresses);
         this.innerPool = new InnerPool(poolConfig,
                 configManager,
                 connection,
@@ -96,12 +92,19 @@ public class MessagebusPool {
         }
     }
 
-    protected void init() {
+    protected void init(Address[] addresses) {
+        this.innerAddresses = new com.rabbitmq.client.Address[addresses.length];
+
+        for (int i = 0; i < addresses.length; i++) {
+            com.rabbitmq.client.Address address = new com.rabbitmq.client.Address(
+                    addresses[i].getHost(), addresses[i].getPort()
+            );
+            this.innerAddresses[i] = address;
+        }
+
         this.componentEventBus = new AsyncEventBus("componentEventBus", Executors.newSingleThreadExecutor());
 
-        com.rabbitmq.client.Address address = new Address(this.host, this.port);
-
-        this.configManager = new ConfigManager(new com.rabbitmq.client.Address[]{address});
+        this.configManager = new ConfigManager(innerAddresses);
         this.configManager.setComponentEventBus(this.componentEventBus);
 
         this.registerComponentEventProcessor();
@@ -109,15 +112,13 @@ public class MessagebusPool {
         ConnectionFactory connectionFactory = null;
         try {
             connectionFactory = new ConnectionFactory();
-            connectionFactory.setHost(this.host);
-            connectionFactory.setPort(this.port);
 
             connectionFactory.setAutomaticRecoveryEnabled(true);
             connectionFactory.setTopologyRecoveryEnabled(true);
             connectionFactory.setConnectionTimeout(60000);
             connectionFactory.setRequestedHeartbeat(10);
 
-            this.connection = connectionFactory.newConnection();
+            this.connection = connectionFactory.newConnection(innerAddresses);
             this.innerChannel = this.connection.createChannel();
 
         } catch (IOException e) {
@@ -268,14 +269,6 @@ public class MessagebusPool {
             this.currentThread.interrupt();
         }
 
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
     }
 
 }

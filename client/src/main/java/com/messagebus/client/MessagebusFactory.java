@@ -21,8 +21,6 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
 
     private static final Log logger = LogFactory.getLog(MessagebusFactory.class.getName());
 
-    private String        host;
-    private int           port;
     private ConfigManager configManager;
     private Connection    connection;
     private EventBus      componentEventBus;
@@ -30,13 +28,9 @@ class MessagebusFactory implements PooledObjectFactory<Messagebus> {
     private final Method openMethod;
     private final Method closeMethod;
 
-    public MessagebusFactory(String host,
-                             int port,
-                             ConfigManager configManager,
+    public MessagebusFactory(ConfigManager configManager,
                              Connection connection,
                              EventBus componentEventBus) {
-        this.host = host;
-        this.port = port;
         this.configManager = configManager;
         this.connection = connection;
         this.componentEventBus = componentEventBus;

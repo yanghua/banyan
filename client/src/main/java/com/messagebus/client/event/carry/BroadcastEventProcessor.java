@@ -29,12 +29,14 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onValidate(ValidateEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onValidate =-=-=-");
         super.onValidate(event);
         MessageContext context = event.getMessageContext();
         if (!context.getCarryType().equals(MessageCarryType.BROADCAST)) {
             logger.error("the message carry type should be broadcast");
-            throw new RuntimeException("the message carry type should be broadcast");
+            event.getMessageContext().setThrowable(new RuntimeException(
+                    "the message carry type should be broadcast"));
         }
 
         this.validateMessageProperties(context);
@@ -42,21 +44,23 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onPermissionCheck(PermissionCheckEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
-        boolean hasPermission;
-        MessageContext context = event.getMessageContext();
-        ConfigManager.Source source = context.getSource();
+        boolean              hasPermission;
+        MessageContext       context = event.getMessageContext();
+        ConfigManager.Source source  = context.getSource();
         hasPermission = source.getBroadcastable().equals("1");
         if (!hasPermission) {
             logger.error("the source with name : " + source.getName()
-                             + ", with secret : " + source.getSecret() + " can not broadcast !");
-            throw new RuntimeException("the queue with name : " + source.getName()
-                                           + ", with secret : " + source.getSecret() + " can not broadcast !");
+                    + ", with secret : " + source.getSecret() + " can not broadcast !");
+            event.getMessageContext().setThrowable(new RuntimeException("the queue with name : " + source.getName()
+                    + ", with secret : " + source.getSecret() + " can not broadcast !"));
         }
     }
 
     @Subscribe
     public void onBroadcast(BroadcastEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onBroadcast =-=-=-");
         MessageContext context = event.getMessageContext();
         try {
@@ -68,15 +72,16 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
                 AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
 
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
-                                      context.getChannel(),
-                                      EVENT_ROUTING_KEY_NAME,
-                                      msg.getContent(),
-                                      properties);
+                        context.getChannel(),
+                        EVENT_ROUTING_KEY_NAME,
+                        msg.getContent(),
+                        properties);
 
             }
         } catch (IOException e) {
             logger.error(e);
-            throw new RuntimeException(e);
+            event.getMessageContext().setThrowable(
+                    new RuntimeException(e));
         }
     }
 
@@ -100,8 +105,6 @@ public class BroadcastEventProcessor extends CommonEventProcessor {
 
     public static class ValidateEvent extends CarryEvent {
     }
-
-    ;
 
     public static class PermissionCheckEvent extends CarryEvent {
     }

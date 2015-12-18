@@ -7,7 +7,6 @@ import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
 import com.messagebus.client.model.MessageCarryType;
 import com.messagebus.common.Constants;
-import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyProducer;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
@@ -27,11 +26,14 @@ public class PublishEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onValidate(ValidateEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onValidate =-=-=-");
         super.onValidate(event);
         MessageContext context = event.getMessageContext();
         if (!context.getCarryType().equals(MessageCarryType.PUBLISH)) {
-            throw new RuntimeException("message carry type should be publish ");
+            logger.error("message carry type should be publish ");
+            event.getMessageContext().setThrowable(new RuntimeException("message carry type should be publish "));
+            return;
         }
 
         this.validateMessagesProperties(context);
@@ -39,20 +41,25 @@ public class PublishEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onPermissionCheck(PermissionCheckEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ConfigManager.Source source = context.getSource();
-        boolean hasPermission = false;
+        MessageContext       context       = event.getMessageContext();
+        ConfigManager.Source source        = context.getSource();
+        boolean              hasPermission = false;
 
         hasPermission = MessageCarryType.lookup(source.getType()).equals(MessageCarryType.PUBLISH);
         if (!hasPermission) {
-            throw new RuntimeException("can not publish message! maybe the communicate is error. "
-                                           + " secret is : " + context.getSecret());
+            logger.error("can not publish message! maybe the communicate is error. "
+                    + " secret is : " + context.getSecret());
+            event.getMessageContext().setThrowable(new RuntimeException("can not publish message! maybe the communicate is error. "
+                    + " secret is : " + context.getSecret()));
+            return;
         }
     }
 
     @Subscribe
     public void onPublish(PublishEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPublish =-=-=-");
         MessageContext context = event.getMessageContext();
         try {
@@ -60,14 +67,17 @@ public class PublishEventProcessor extends CommonEventProcessor {
                 AMQP.BasicProperties properties = MessageHeaderTransfer.box(msg);
 
                 ProxyProducer.produce(Constants.PROXY_EXCHANGE_NAME,
-                                      context.getChannel(),
-                                      context.getSource().getRoutingKey(),
-                                      msg.getContent(),
-                                      properties);
+                        context.getChannel(),
+                        context.getSource().getRoutingKey(),
+                        msg.getContent(),
+                        properties);
             }
         } catch (IOException e) {
-            ExceptionHelper.logException(logger, e, "handle");
-            throw new RuntimeException(e);
+            logger.error(e);
+            event.getMessageContext().setThrowable(e);
+        } catch (Exception e) {
+            logger.error(e);
+            event.getMessageContext().setThrowable(e);
         }
     }
 

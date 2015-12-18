@@ -26,49 +26,55 @@ public class ResponseEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onValidate(ValidateEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onValidate =-=-=-");
         super.onValidate(event);
         MessageContext context = event.getMessageContext();
         if (!context.getCarryType().equals(MessageCarryType.RESPONSE)) {
             logger.error(" message carry type should be response ");
-            throw new RuntimeException("message carry type should be response ");
+            event.getMessageContext().setThrowable(
+                    new RuntimeException("message carry type should be response "));
         }
     }
 
     @Subscribe
     public void onPermissionCheck(PermissionCheckEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
-        MessageContext context = event.getMessageContext();
-        ConfigManager.Sink sink = context.getSink();
-        boolean hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.RESPONSE);
+        MessageContext     context       = event.getMessageContext();
+        ConfigManager.Sink sink          = context.getSink();
+        boolean            hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.RESPONSE);
 
         if (!hasPermission) {
             logger.error("permission error : can not response. " +
-                             "may be communicate type is wrong. " +
-                             "current secret is : " + sink.getSecret());
-            throw new RuntimeException("permission error : can not response. " +
-                                           "may be communicate type is wrong. " +
-                                           "current secret is : " + sink.getSecret());
+                    "may be communicate type is wrong. " +
+                    "current secret is : " + sink.getSecret());
+            event.getMessageContext().setThrowable(new RuntimeException("permission error : can not response. " +
+                    "may be communicate type is wrong. " +
+                    "current secret is : " + sink.getSecret()));
         }
     }
 
     @Override
     public void process(MessageContext msgContext) {
         IRequestListener requestListener = msgContext.getRequestListener();
-        Message requestMsg = msgContext.getConsumeMsgs().get(0);
-        String tempQueueName = requestMsg.getCorrelationId();
+        Message          requestMsg      = msgContext.getConsumeMsgs().get(0);
+        String           tempQueueName   = requestMsg.getCorrelationId();
         msgContext.setTempQueueName(tempQueueName);
         Message respMsg = requestListener.onRequest(msgContext.getConsumeMsgs().get(0));
 
         AMQP.BasicProperties properties = MessageHeaderTransfer.box(respMsg);
         try {
             ProxyProducer.produce("",
-                                  msgContext.getChannel(),
-                                  tempQueueName,
-                                  respMsg.getContent(),
-                                  properties);
+                    msgContext.getChannel(),
+                    tempQueueName,
+                    respMsg.getContent(),
+                    properties);
         } catch (IOException e) {
-            logger.error(" occurs a IOException : ", e);
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error(e);
             throw new RuntimeException(e);
         }
     }

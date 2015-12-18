@@ -8,7 +8,6 @@ import com.messagebus.client.MessageContext;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.client.model.MessageCarryType;
-import com.messagebus.common.ExceptionHelper;
 import com.messagebus.interactor.proxy.ProxyConsumer;
 import com.rabbitmq.client.GetResponse;
 import org.apache.commons.logging.Log;
@@ -27,31 +26,35 @@ public class ConsumeEventProcessor extends CommonEventProcessor {
 
     @Subscribe
     public void onValidate(ValidateEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onValidate =-=-=-");
         super.onValidate(event);
     }
 
     @Subscribe
     public void onPermissionCheck(PermissionCheckEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onPermissionCheck =-=-=-");
         MessageContext context = event.getMessageContext();
 
-        ConfigManager.Sink sink = context.getSink();
-        boolean hasPermission = false;
+        ConfigManager.Sink sink          = context.getSink();
+        boolean            hasPermission = false;
         hasPermission = MessageCarryType.lookup(sink.getType()).equals(MessageCarryType.CONSUME)
-            && !Strings.isNullOrEmpty(sink.getQueueName())
-            && !Strings.isNullOrEmpty(sink.getName());
+                && !Strings.isNullOrEmpty(sink.getQueueName())
+                && !Strings.isNullOrEmpty(sink.getName());
 
         if (!hasPermission) {
             logger.error("permission error : can not consume. may be communicate type is wrong. " +
-                             " current secret is : " + sink.getSecret());
-            throw new RuntimeException("permission error : can not consume. may be communicate type is wrong. " +
-                                           " current secret is : " + sink.getSecret());
+                    " current secret is : " + sink.getSecret());
+            event.getMessageContext().setThrowable(
+                    new RuntimeException("permission error : can not consume. may be communicate type is wrong. " +
+                            " current secret is : " + sink.getSecret()));
         }
     }
 
     @Subscribe
     public void onSyncConsume(SyncConsumeEvent event) {
+        super.exceptionCheck(event);
         logger.debug("=-=-=- event : onSyncConsume =-=-=-");
         MessageContext context = event.getMessageContext();
         if (context.isSync()) {
@@ -61,7 +64,7 @@ public class ConsumeEventProcessor extends CommonEventProcessor {
                 int countDown = context.getConsumeMsgNum();
                 while (countDown-- > 0) {
                     GetResponse response = ProxyConsumer.consumeSingleMessage(context.getChannel(),
-                                                                              context.getSink().getQueueName());
+                            context.getSink().getQueueName());
 
                     if (response == null) continue;
 
@@ -74,9 +77,11 @@ public class ConsumeEventProcessor extends CommonEventProcessor {
                     consumeMsgs.add(msg);
                 }
             } catch (IOException e) {
-                ExceptionHelper.logException(logger, e, "handle");
+                logger.error(e);
+                event.getMessageContext().setThrowable(e);
             } catch (RuntimeException e) {
-                ExceptionHelper.logException(logger, e, "handle");
+                logger.error(e);
+                event.getMessageContext().setThrowable(e);
             }
         }
     }
