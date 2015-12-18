@@ -67,12 +67,12 @@ class GenericProducer extends AbstractMessageCarryer implements IProducer {
         carryEventBus.register(eventProcessor);
 
         //init events
-        ProduceEventProcessor.ValidateEvent validateEvent = new ProduceEventProcessor.ValidateEvent();
+        ProduceEventProcessor.ValidateEvent         validateEvent         = new ProduceEventProcessor.ValidateEvent();
         ProduceEventProcessor.MsgBodySizeCheckEvent msgBodySizeCheckEvent = new ProduceEventProcessor.MsgBodySizeCheckEvent();
-        ProduceEventProcessor.PermissionCheckEvent permissionCheckEvent = new ProduceEventProcessor.PermissionCheckEvent();
-        ProduceEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new ProduceEventProcessor.MsgIdGenerateEvent();
-        ProduceEventProcessor.MsgBodyCompressEvent msgBodyCompressEvent = new ProduceEventProcessor.MsgBodyCompressEvent();
-        ProduceEventProcessor.ProduceEvent produceEvent = new ProduceEventProcessor.ProduceEvent();
+        ProduceEventProcessor.PermissionCheckEvent  permissionCheckEvent  = new ProduceEventProcessor.PermissionCheckEvent();
+        ProduceEventProcessor.MsgIdGenerateEvent    msgIdGenerateEvent    = new ProduceEventProcessor.MsgIdGenerateEvent();
+        ProduceEventProcessor.MsgBodyCompressEvent  msgBodyCompressEvent  = new ProduceEventProcessor.MsgBodyCompressEvent();
+        ProduceEventProcessor.ProduceEvent          produceEvent          = new ProduceEventProcessor.ProduceEvent();
 
         validateEvent.setMessageContext(ctx);
         msgBodySizeCheckEvent.setMessageContext(ctx);

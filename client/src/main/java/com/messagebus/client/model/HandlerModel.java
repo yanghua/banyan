@@ -32,8 +32,8 @@ public class HandlerModel extends BaseModel implements Serializable {
     @Override
     public String toString() {
         return "Handler{" +
-            "handlerName='" + handlerName + '\'' +
-            ", handlerPath='" + handlerPath + '\'' +
-            "} ";
+                "handlerName='" + handlerName + '\'' +
+                ", handlerPath='" + handlerPath + '\'' +
+                "} ";
     }
 }

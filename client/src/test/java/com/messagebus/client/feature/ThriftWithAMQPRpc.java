@@ -35,21 +35,21 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
 
     public void testThriftRpc() throws Exception {
         TTransport transport = new TAMQPClientTransport(this.client,
-                                                        "kliwhiduhaiucvarkjajksdbfkjabw",
-                                                        "emapDemoRpcResponse",
-                                                        "klasehnfkljashdnflhkjahwlekdjf",
-                                                        10000);
+                "kliwhiduhaiucvarkjajksdbfkjabw",
+                "emapDemoRpcResponse",
+                "klasehnfkljashdnflhkjahwlekdjf",
+                10000);
         transport.open();
-        TProtocol protocol = new TJSONProtocol(transport);
-        CalcService.Client client = new CalcService.Client(protocol);
-        int result = client.calcSum();
+        TProtocol          protocol = new TJSONProtocol(transport);
+        CalcService.Client client   = new CalcService.Client(protocol);
+        int                result   = client.calcSum();
         logger.info(result);
         transport.close();
     }
 
     public static void main(String[] args) {
         String host = TestVariableInfo.HOST;
-        int port = TestVariableInfo.PORT;
+        int    port = TestVariableInfo.PORT;
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
 
@@ -58,11 +58,11 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
         //server code
         WrappedRpcServer rpcServer = null;
         try {
-            TProcessor processor = new CalcService.Processor(new CalcServiceImpl());
-            TProtocolFactory inProtocolFactory = new TJSONProtocol.Factory();
+            TProcessor       processor          = new CalcService.Processor(new CalcServiceImpl());
+            TProtocolFactory inProtocolFactory  = new TJSONProtocol.Factory();
             TProtocolFactory outProtocolFactory = new TJSONProtocol.Factory();
             rpcServer = client.buildRpcServer("mshdfjbqwejhfgasdfbjqkygaksdfa",
-                                              new ThriftMessageHandler(processor, inProtocolFactory, outProtocolFactory));
+                    new ThriftMessageHandler(processor, inProtocolFactory, outProtocolFactory));
 
             rpcServer.mainLoop();
         } finally {

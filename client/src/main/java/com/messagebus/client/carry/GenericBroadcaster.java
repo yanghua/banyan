@@ -33,10 +33,10 @@ class GenericBroadcaster extends AbstractMessageCarryer implements IBroadcaster 
         BroadcastEventProcessor eventProcessor = new BroadcastEventProcessor();
         carryEventBus.register(eventProcessor);
 
-        CommonEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new CommonEventProcessor.MsgIdGenerateEvent();
-        BroadcastEventProcessor.ValidateEvent validateEvent = new BroadcastEventProcessor.ValidateEvent();
+        CommonEventProcessor.MsgIdGenerateEvent      msgIdGenerateEvent   = new CommonEventProcessor.MsgIdGenerateEvent();
+        BroadcastEventProcessor.ValidateEvent        validateEvent        = new BroadcastEventProcessor.ValidateEvent();
         BroadcastEventProcessor.PermissionCheckEvent permissionCheckEvent = new BroadcastEventProcessor.PermissionCheckEvent();
-        BroadcastEventProcessor.BroadcastEvent broadcastEvent = new BroadcastEventProcessor.BroadcastEvent();
+        BroadcastEventProcessor.BroadcastEvent       broadcastEvent       = new BroadcastEventProcessor.BroadcastEvent();
 
         msgIdGenerateEvent.setMessageContext(ctx);
         validateEvent.setMessageContext(ctx);

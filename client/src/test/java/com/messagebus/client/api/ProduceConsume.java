@@ -32,7 +32,7 @@ public class ProduceConsume extends BaseTestCase {
 
     private void commonProduce() {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
-        String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
+        String token  = "hlkasjdhfkqlwhlfalksjdhgssssas";
 
         Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");

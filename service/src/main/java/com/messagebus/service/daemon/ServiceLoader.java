@@ -54,7 +54,7 @@ public class ServiceLoader {
     public void launch() {
         if (runOnceServiceMap.size() != 0) {
             ExecutorService executorService =
-                new ExceptionCatchThreadPool(runOnceServiceMap.size());
+                    new ExceptionCatchThreadPool(runOnceServiceMap.size());
             for (Map.Entry<String, IService> entry : this.runOnceServiceMap.entrySet()) {
                 executorService.submit((Runnable) entry.getValue());
             }
@@ -62,7 +62,7 @@ public class ServiceLoader {
 
         if (scheduleCycleServiceMap.size() != 0) {
             ScheduledExecutorService scheduledExecutorService =
-                Executors.newScheduledThreadPool(scheduleCycleServiceMap.size());
+                    Executors.newScheduledThreadPool(scheduleCycleServiceMap.size());
             for (Map.Entry<String, IService> entry : this.scheduleCycleServiceMap.entrySet()) {
                 scheduledExecutorService.scheduleAtFixedRate((Runnable) entry.getValue(), 0, 10, TimeUnit.SECONDS);
             }
@@ -136,7 +136,7 @@ public class ServiceLoader {
 
                                 default:
                                     throw new UnsupportedOperationException("unsupported daemon service policy : "
-                                                                                + daemonService.policy());
+                                            + daemonService.policy());
                             }
                         }
                     }
@@ -148,15 +148,15 @@ public class ServiceLoader {
     }
 
     private Set<Class<IService>> traverse() {
-        Set<Class<IService>> classes = new LinkedHashSet<Class<IService>>();
-        boolean recursive = true;
-        String packageDirName = packageStr.replace('.', '/');
+        Set<Class<IService>> classes        = new LinkedHashSet<Class<IService>>();
+        boolean              recursive      = true;
+        String               packageDirName = packageStr.replace('.', '/');
 
         Enumeration<URL> dirs;
         try {
             dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             while (dirs.hasMoreElements()) {
-                URL url = dirs.nextElement();
+                URL    url      = dirs.nextElement();
                 String protocol = url.getProtocol();
                 if ("file".equals(protocol)) {
                     //get physical path
@@ -164,12 +164,12 @@ public class ServiceLoader {
                     findAndAddClassesInPackageByFile(packageStr, filePath, recursive, classes);
                 } else if ("jar".equals(protocol)) {
                     JarFile jar;
-                    String packageName = packageStr;
+                    String  packageName = packageStr;
                     jar = ((JarURLConnection) url.openConnection()).getJarFile();
                     Enumeration<JarEntry> entries = jar.entries();
                     while (entries.hasMoreElements()) {
                         JarEntry entry = entries.nextElement();
-                        String name = entry.getName();
+                        String   name  = entry.getName();
 
                         if (name.charAt(0) == '/') {
                             name = name.substring(1);
@@ -220,22 +220,22 @@ public class ServiceLoader {
             @Override
             public boolean accept(File pathname) {
                 return (recursive && pathname.isDirectory()) ||
-                    (pathname.getName().endsWith(".class"));
+                        (pathname.getName().endsWith(".class"));
             }
         });
 
         for (File file : dirFiles) {
             if (file.isDirectory()) {
                 findAndAddClassesInPackageByFile(packageName + "." + file.getName(),
-                                                 file.getAbsolutePath(),
-                                                 recursive,
-                                                 classes);
+                        file.getAbsolutePath(),
+                        recursive,
+                        classes);
             } else {
                 String className = file.getName().substring(0, file.getName().length() - 6);
 
                 try {
                     Class clazz = Thread.currentThread().
-                        getContextClassLoader().loadClass(packageName + "." + className);
+                            getContextClassLoader().loadClass(packageName + "." + className);
 
                     //fetch the class that implemented the interface `IService`
                     Class[] ifClasses = clazz.getSuperclass().getInterfaces();
@@ -249,7 +249,7 @@ public class ServiceLoader {
 
                 } catch (ClassNotFoundException e) {
                     logger.error("[findAndAddClassesInPackageByFile] occurs a ClassNotFoundException : "
-                                     + e.getMessage());
+                            + e.getMessage());
                     throw new RuntimeException(e);
                 }
             }

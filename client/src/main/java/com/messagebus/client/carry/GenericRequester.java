@@ -63,14 +63,14 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
                                    String token,
                                    long timeoutOfMilliSecond) {
         ConfigManager.Source source = this.getContext().getConfigManager().getSourceBySecret(secret);
-        ConfigManager.Sink sink = this.getContext().getConfigManager().getSinkByName(target);
+        ConfigManager.Sink   sink   = this.getContext().getConfigManager().getSinkByName(target);
 
         RpcClient innerRpcClient = null;
         try {
             innerRpcClient = new RpcClient(this.getContext().getChannel(),
-                                           Constants.PROXY_EXCHANGE_NAME,
-                                           sink.getRoutingKey(),
-                                           (int) timeoutOfMilliSecond);
+                    Constants.PROXY_EXCHANGE_NAME,
+                    sink.getRoutingKey(),
+                    (int) timeoutOfMilliSecond);
             return innerRpcClient.primitiveCall(requestMsg);
         } catch (IOException e) {
             ExceptionHelper.logException(logger, e, "primitive request ");
@@ -95,14 +95,14 @@ class GenericRequester extends AbstractMessageCarryer implements IRequester {
         RequestEventProcessor eventProcessor = new RequestEventProcessor();
         carryEventBus.register(eventProcessor);
 
-        RequestEventProcessor.ValidateEvent validateEvent = new RequestEventProcessor.ValidateEvent();
-        CommonEventProcessor.MsgBodySizeCheckEvent msgBodySizeCheckEvent = new CommonEventProcessor.MsgBodySizeCheckEvent();
-        RequestEventProcessor.PermissionCheckEvent permissionCheckEvent = new RequestEventProcessor.PermissionCheckEvent();
-        CommonEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new CommonEventProcessor.MsgIdGenerateEvent();
-        RequestEventProcessor.TempQueueInitializeEvent tempQueueInitializeEvent = new RequestEventProcessor.TempQueueInitializeEvent();
-        CommonEventProcessor.MsgBodyCompressEvent msgBodyCompressEvent = new CommonEventProcessor.MsgBodyCompressEvent();
-        RequestEventProcessor.RequestEvent requestEvent = new RequestEventProcessor.RequestEvent();
-        CommonEventProcessor.TagGenerateEvent tagGenerateEvent = new CommonEventProcessor.TagGenerateEvent();
+        RequestEventProcessor.ValidateEvent                validateEvent                = new RequestEventProcessor.ValidateEvent();
+        CommonEventProcessor.MsgBodySizeCheckEvent         msgBodySizeCheckEvent        = new CommonEventProcessor.MsgBodySizeCheckEvent();
+        RequestEventProcessor.PermissionCheckEvent         permissionCheckEvent         = new RequestEventProcessor.PermissionCheckEvent();
+        CommonEventProcessor.MsgIdGenerateEvent            msgIdGenerateEvent           = new CommonEventProcessor.MsgIdGenerateEvent();
+        RequestEventProcessor.TempQueueInitializeEvent     tempQueueInitializeEvent     = new RequestEventProcessor.TempQueueInitializeEvent();
+        CommonEventProcessor.MsgBodyCompressEvent          msgBodyCompressEvent         = new CommonEventProcessor.MsgBodyCompressEvent();
+        RequestEventProcessor.RequestEvent                 requestEvent                 = new RequestEventProcessor.RequestEvent();
+        CommonEventProcessor.TagGenerateEvent              tagGenerateEvent             = new CommonEventProcessor.TagGenerateEvent();
         RequestEventProcessor.BlockAndTimeoutResponseEvent blockAndTimeoutResponseEvent = new RequestEventProcessor.BlockAndTimeoutResponseEvent();
 
         validateEvent.setMessageContext(ctx);

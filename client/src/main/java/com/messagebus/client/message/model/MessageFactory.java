@@ -2,7 +2,6 @@ package com.messagebus.client.message.model;
 
 
 import com.messagebus.client.message.transfer.MessageHeaderTransfer;
-import com.messagebus.common.ExceptionHelper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.GetResponse;
 import com.rabbitmq.client.QueueingConsumer;
@@ -23,7 +22,7 @@ public class MessageFactory {
 
     public static Message createMessage(QueueingConsumer.Delivery delivery) {
         AMQP.BasicProperties properties = delivery.getProperties();
-        byte[] msgBody = delivery.getBody();
+        byte[]               msgBody    = delivery.getBody();
 
 //        String msgTypeStr = properties.getType();
 //        if (msgTypeStr == null || msgTypeStr.isEmpty()) {
@@ -38,7 +37,7 @@ public class MessageFactory {
 
     public static Message createMessage(GetResponse response) {
         AMQP.BasicProperties properties = response.getProps();
-        byte[] msgBody = response.getBody();
+        byte[]               msgBody    = response.getBody();
 
 //      context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
 

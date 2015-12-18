@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
  * the main operator of messagebus client
  */
 public class Messagebus extends InnerClient implements IProducer, IConsumer,
-                                                       IRequester, IResponser,
-                                                       IRpcRequester, IRpcResponser,
-                                                       IPublisher, ISubscriber,
-                                                       IBroadcaster {
+        IRequester, IResponser,
+        IRpcRequester, IRpcResponser,
+        IPublisher, ISubscriber,
+        IBroadcaster {
 
     private static final Log logger = LogFactory.getLog(Messagebus.class);
 
@@ -118,7 +118,7 @@ public class Messagebus extends InnerClient implements IProducer, IConsumer,
      */
     @Override
     public Message request(String secret, String to, Message msg, String token, long timeout)
-        throws MessageResponseTimeoutException {
+            throws MessageResponseTimeoutException {
         return requester.request(secret, to, msg, token, timeout);
     }
 

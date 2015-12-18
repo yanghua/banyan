@@ -9,8 +9,8 @@ public class MessagebusSinglePool extends MessagebusPool {
 
     public MessagebusSinglePool(String host, int port) {
         super(host,
-              port,
-              new DefaultMessagebusPoolConfig());
+                port,
+                new DefaultMessagebusPoolConfig());
     }
 
     /**

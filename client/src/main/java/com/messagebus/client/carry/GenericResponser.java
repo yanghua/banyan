@@ -35,11 +35,11 @@ class GenericResponser extends AbstractMessageCarryer implements IResponser {
         ResponseEventProcessor eventProcessor = new ResponseEventProcessor();
         carryEventBus.register(eventProcessor);
 
-        CommonEventProcessor.TagGenerateEvent tagGenerateEvent = new CommonEventProcessor.TagGenerateEvent();
-        ResponseEventProcessor.ValidateEvent validateEvent = new ResponseEventProcessor.ValidateEvent();
-        ResponseEventProcessor.PermissionCheckEvent permissionCheckEvent = new ResponseEventProcessor.PermissionCheckEvent();
-        CommonEventProcessor.PreConsumeEvent perConsumeEvent = new CommonEventProcessor.PreConsumeEvent();
-        CommonEventProcessor.AsyncMessageLoopEvent asyncMessageLoopEvent = new CommonEventProcessor.AsyncMessageLoopEvent();
+        CommonEventProcessor.TagGenerateEvent       tagGenerateEvent      = new CommonEventProcessor.TagGenerateEvent();
+        ResponseEventProcessor.ValidateEvent        validateEvent         = new ResponseEventProcessor.ValidateEvent();
+        ResponseEventProcessor.PermissionCheckEvent permissionCheckEvent  = new ResponseEventProcessor.PermissionCheckEvent();
+        CommonEventProcessor.PreConsumeEvent        perConsumeEvent       = new CommonEventProcessor.PreConsumeEvent();
+        CommonEventProcessor.AsyncMessageLoopEvent  asyncMessageLoopEvent = new CommonEventProcessor.AsyncMessageLoopEvent();
 
         tagGenerateEvent.setMessageContext(ctx);
         validateEvent.setMessageContext(ctx);

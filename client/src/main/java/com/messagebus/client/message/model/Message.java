@@ -23,9 +23,10 @@ public class Message implements Cloneable, Serializable {
 
     private short deliveryMode = 2;
 
-    private byte[]      content;
+    private byte[] content;
 
-    public Message() {}
+    public Message() {
+    }
 
     public long getMessageId() {
         return messageId;

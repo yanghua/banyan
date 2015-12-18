@@ -46,11 +46,11 @@ class GenericSubscriber extends AbstractMessageCarryer implements ISubscriber {
         carryEventBus.register(eventProcessor);
 
         //init events
-        CommonEventProcessor.TagGenerateEvent tagGenerateEvent = new CommonEventProcessor.TagGenerateEvent();
-        SubscribeEventProcessor.ValidateEvent validateEvent = new SubscribeEventProcessor.ValidateEvent();
-        SubscribeEventProcessor.PermissionCheckEvent permissionCheckEvent = new SubscribeEventProcessor.PermissionCheckEvent();
-        CommonEventProcessor.PreConsumeEvent perConsumeEvent = new CommonEventProcessor.PreConsumeEvent();
-        CommonEventProcessor.AsyncMessageLoopEvent asyncMessageLoopEvent = new CommonEventProcessor.AsyncMessageLoopEvent();
+        CommonEventProcessor.TagGenerateEvent        tagGenerateEvent      = new CommonEventProcessor.TagGenerateEvent();
+        SubscribeEventProcessor.ValidateEvent        validateEvent         = new SubscribeEventProcessor.ValidateEvent();
+        SubscribeEventProcessor.PermissionCheckEvent permissionCheckEvent  = new SubscribeEventProcessor.PermissionCheckEvent();
+        CommonEventProcessor.PreConsumeEvent         perConsumeEvent       = new CommonEventProcessor.PreConsumeEvent();
+        CommonEventProcessor.AsyncMessageLoopEvent   asyncMessageLoopEvent = new CommonEventProcessor.AsyncMessageLoopEvent();
 
         tagGenerateEvent.setMessageContext(ctx);
         validateEvent.setMessageContext(ctx);

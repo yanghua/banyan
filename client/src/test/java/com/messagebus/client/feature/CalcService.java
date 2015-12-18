@@ -124,7 +124,7 @@ public class CalcService {
                     throw new IllegalStateException("Method call not finished!");
                 }
                 org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
-                org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+                org.apache.thrift.protocol.TProtocol              prot            = client.getProtocolFactory().getProtocol(memoryTransport);
                 return (new Client(prot)).recv_calcSum();
             }
         }
@@ -212,9 +212,9 @@ public class CalcService {
                     }
 
                     public void onError(Exception e) {
-                        byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+                        byte                    msgType = org.apache.thrift.protocol.TMessageType.REPLY;
                         org.apache.thrift.TBase msg;
-                        calcSum_result result = new calcSum_result();
+                        calcSum_result          result  = new calcSum_result();
                         {
                             msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
                             msg = (org.apache.thrift.TBase) new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
@@ -408,8 +408,8 @@ public class CalcService {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder("calcSum_args(");
-            boolean first = true;
+            StringBuilder sb    = new StringBuilder("calcSum_args(");
+            boolean       first = true;
 
             sb.append(")");
             return sb.toString();
@@ -577,7 +577,7 @@ public class CalcService {
         static {
             Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
             tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
-                                                                                      new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+                    new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
             metaDataMap = Collections.unmodifiableMap(tmpMap);
             org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(calcSum_result.class, metaDataMap);
         }
@@ -586,7 +586,7 @@ public class CalcService {
         }
 
         public calcSum_result(
-            int success) {
+                int success) {
             this();
             this.success = success;
             setSuccessIsSet(true);
@@ -744,8 +744,8 @@ public class CalcService {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder("calcSum_result(");
-            boolean first = true;
+            StringBuilder sb    = new StringBuilder("calcSum_result(");
+            boolean       first = true;
 
             sb.append("success:");
             sb.append(this.success);
@@ -838,8 +838,8 @@ public class CalcService {
 
             @Override
             public void write(org.apache.thrift.protocol.TProtocol prot, calcSum_result struct) throws TException {
-                TTupleProtocol oprot = (TTupleProtocol) prot;
-                BitSet optionals = new BitSet();
+                TTupleProtocol oprot     = (TTupleProtocol) prot;
+                BitSet         optionals = new BitSet();
                 if (struct.isSetSuccess()) {
                     optionals.set(0);
                 }
@@ -851,8 +851,8 @@ public class CalcService {
 
             @Override
             public void read(org.apache.thrift.protocol.TProtocol prot, calcSum_result struct) throws TException {
-                TTupleProtocol iprot = (TTupleProtocol) prot;
-                BitSet incoming = iprot.readBitSet(1);
+                TTupleProtocol iprot    = (TTupleProtocol) prot;
+                BitSet         incoming = iprot.readBitSet(1);
                 if (incoming.get(0)) {
                     struct.success = iprot.readI32();
                     struct.setSuccessIsSet(true);

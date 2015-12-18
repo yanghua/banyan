@@ -21,7 +21,7 @@ public class MessageNumLimit extends BaseTestCase {
 
     public void testMessageNumLimit() throws Exception {
         String secret = "muqwejlaksdfkljaliqwejflkasdfs";
-        String token = "jhlkasdfkjhasdfqwkasdfjqkwjhas";
+        String token  = "jhlkasdfkjhasdfqwkasdfjqkwjhas";
 
         Message msg = MessageUtil.create(500);
 

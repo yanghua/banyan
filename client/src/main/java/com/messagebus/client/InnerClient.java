@@ -42,7 +42,7 @@ abstract class InnerClient {
             context.setChannel(this.channel);
         } catch (IOException e) {
             logger.error("create channel error, connection host : " + this.connection.getAddress().getHostAddress()
-                             + " connection port : " + this.connection.getPort(), e);
+                    + " connection port : " + this.connection.getPort(), e);
             throw new RuntimeException(e);
         }
 

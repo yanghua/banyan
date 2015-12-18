@@ -37,11 +37,11 @@ public class ThriftMessageHandler implements IRpcMessageProcessor {
 
     @Override
     public byte[] onRpcMessage(byte[] inMsg) {
-        InputStream in = new ByteArrayInputStream(inMsg);
-        OutputStream out = new ByteArrayOutputStream();
-        TTransport transport = new TIOStreamTransport(in, out);
-        TProtocol inProtocol = inProtocolFactory.getProtocol(transport);
-        TProtocol outProtocol = outProtocolFactory.getProtocol(transport);
+        InputStream  in          = new ByteArrayInputStream(inMsg);
+        OutputStream out         = new ByteArrayOutputStream();
+        TTransport   transport   = new TIOStreamTransport(in, out);
+        TProtocol    inProtocol  = inProtocolFactory.getProtocol(transport);
+        TProtocol    outProtocol = outProtocolFactory.getProtocol(transport);
 
         try {
             processor.process(inProtocol, outProtocol);

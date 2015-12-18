@@ -57,10 +57,10 @@ class GenericConsumer extends AbstractMessageCarryer implements IConsumer {
         carryEventBus.register(eventProcessor);
 
         //init events
-        ConsumeEventProcessor.ValidateEvent validateEvent = new ConsumeEventProcessor.ValidateEvent();
+        ConsumeEventProcessor.ValidateEvent        validateEvent        = new ConsumeEventProcessor.ValidateEvent();
         ConsumeEventProcessor.PermissionCheckEvent permissionCheckEvent = new ConsumeEventProcessor.PermissionCheckEvent();
-        ConsumeEventProcessor.TagGenerateEvent tagGenerateEvent = new ConsumeEventProcessor.TagGenerateEvent();
-        CommonEventProcessor.PreConsumeEvent perConsumeEvent = new CommonEventProcessor.PreConsumeEvent();
+        ConsumeEventProcessor.TagGenerateEvent     tagGenerateEvent     = new ConsumeEventProcessor.TagGenerateEvent();
+        CommonEventProcessor.PreConsumeEvent       perConsumeEvent      = new CommonEventProcessor.PreConsumeEvent();
 
         validateEvent.setMessageContext(ctx);
         permissionCheckEvent.setMessageContext(ctx);

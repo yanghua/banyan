@@ -20,7 +20,7 @@ public enum MessageCarryType {
     RPCRESPONSE;
 
     private static final ConcurrentMap<String, MessageCarryType> lookups =
-        new ConcurrentHashMap<String, MessageCarryType>(9);
+            new ConcurrentHashMap<String, MessageCarryType>(9);
 
     static {
         lookups.put("produce", PRODUCE);
@@ -40,7 +40,7 @@ public enum MessageCarryType {
 
         if (result == null)
             throw new UnknownError("can not find the enum item of MessageCarryType which " +
-                                       " maped the key : " + strType);
+                    " maped the key : " + strType);
 
         return result;
     }

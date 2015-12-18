@@ -46,7 +46,7 @@ public class GenericRpcRequester extends AbstractMessageCarryer implements IRpcR
         carryEventBus.register(eventProcessor);
 
         RpcRequestEventProcessor.PermissionCheckEvent permissionCheckEvent = new RpcRequestEventProcessor.PermissionCheckEvent();
-        RpcRequestEventProcessor.RpcRequestEvent rpcRequestEvent = new RpcRequestEventProcessor.RpcRequestEvent();
+        RpcRequestEventProcessor.RpcRequestEvent      rpcRequestEvent      = new RpcRequestEventProcessor.RpcRequestEvent();
 
         permissionCheckEvent.setMessageContext(ctx);
         rpcRequestEvent.setMessageContext(ctx);

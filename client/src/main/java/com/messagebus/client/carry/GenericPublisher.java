@@ -35,10 +35,10 @@ class GenericPublisher extends AbstractMessageCarryer implements IPublisher {
         carryEventBus.register(eventProcessor);
 
         //init events
-        CommonEventProcessor.MsgIdGenerateEvent msgIdGenerateEvent = new CommonEventProcessor.MsgIdGenerateEvent();
-        PublishEventProcessor.ValidateEvent validateEvent = new PublishEventProcessor.ValidateEvent();
+        CommonEventProcessor.MsgIdGenerateEvent    msgIdGenerateEvent   = new CommonEventProcessor.MsgIdGenerateEvent();
+        PublishEventProcessor.ValidateEvent        validateEvent        = new PublishEventProcessor.ValidateEvent();
         PublishEventProcessor.PermissionCheckEvent permissionCheckEvent = new PublishEventProcessor.PermissionCheckEvent();
-        PublishEventProcessor.PublishEvent publishEvent = new PublishEventProcessor.PublishEvent();
+        PublishEventProcessor.PublishEvent         publishEvent         = new PublishEventProcessor.PublishEvent();
 
         msgIdGenerateEvent.setMessageContext(context);
         validateEvent.setMessageContext(context);

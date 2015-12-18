@@ -13,10 +13,10 @@ public class ExceptionCatchThreadPool extends ThreadPoolExecutor {
 
     public ExceptionCatchThreadPool(int nThreads) {
         super(nThreads,
-              nThreads,
-              0L,
-              TimeUnit.MILLISECONDS,
-              new LinkedBlockingQueue<Runnable>());
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
     }
 
     @Override

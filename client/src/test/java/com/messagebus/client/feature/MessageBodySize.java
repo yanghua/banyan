@@ -21,7 +21,7 @@ public class MessageBodySize extends BaseTestCase {
 
     public void testMsgBodySizeOverhead() throws Exception {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
-        String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
+        String token  = "hlkasjdhfkqlwhlfalksjdhgssssas";
 
         Message msg = MessageUtil.create(4000);
 

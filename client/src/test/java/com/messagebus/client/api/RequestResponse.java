@@ -36,9 +36,9 @@ public class RequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                final String secret = "muciasnajjkasbdfbaskjdfkjkasja";
+                final String         secret     = "muciasnajjkasbdfbaskjdfkjkasja";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-                final Messagebus client = singlePool.getResource();
+                final Messagebus     client     = singlePool.getResource();
 
                 client.response(secret, new IRequestListener() {
 
@@ -69,10 +69,10 @@ public class RequestResponse extends BaseTestCase {
 
         }).start();
 
-        String secret = "iuoqiwejicaoisfaisfbsqewnfjnfa";
-        String token = "cakjdhfjasdflqjoiajsdjflqkuwef";
+        String               secret     = "iuoqiwejicaoisfaisfbsqewnfjnfa";
+        String               token      = "cakjdhfjasdflqjoiajsdjflqkuwef";
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        Messagebus client = singlePool.getResource();
+        Messagebus           client     = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();
         msg.setContentType("text/plain");

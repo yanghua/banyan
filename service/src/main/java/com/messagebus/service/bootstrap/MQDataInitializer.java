@@ -64,8 +64,8 @@ public class MQDataInitializer extends AbstractInitializer {
                     continue;
 
                 channel.exchangeBind(exchange.getExchangeName(),
-                                     exchangeMap.get(exchange.getParentId()).getExchangeName(),
-                                     exchange.getRoutingKey());
+                        exchangeMap.get(exchange.getParentId()).getExchangeName(),
+                        exchange.getRoutingKey());
             }
         } catch (IOException e) {
             logger.error(e);
@@ -109,8 +109,8 @@ public class MQDataInitializer extends AbstractInitializer {
             //bind queue
             for (Queue queue : queues) {
                 channel.queueBind(queue.getQueueName(),
-                                  queue.getBindExchange(),
-                                  queue.getRoutingKey());
+                        queue.getBindExchange(),
+                        queue.getRoutingKey());
             }
         } catch (IOException e) {
             logger.error(e);

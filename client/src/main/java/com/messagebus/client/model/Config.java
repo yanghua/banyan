@@ -29,8 +29,8 @@ public class Config implements Serializable {
     @Override
     public String toString() {
         return "Config{" +
-            "key='" + key + '\'' +
-            ", value='" + value + '\'' +
-            '}';
+                "key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

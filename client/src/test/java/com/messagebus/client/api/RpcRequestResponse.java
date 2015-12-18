@@ -30,9 +30,9 @@ public class RpcRequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                String secret = "jhliquwdlaisudfqbjhasdfulquias";
+                String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-                final Messagebus client = singlePool.getResource();
+                final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
 
@@ -43,12 +43,12 @@ public class RpcRequestResponse extends BaseTestCase {
         }).start();
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        Messagebus client = singlePool.getResource();
+        Messagebus           client     = singlePool.getResource();
 
-        String secret = "kliwhiduhaiucvarkjajksdbfkjabw";
+        String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
         String targetQueue = "erpDemoRpcResponse";
-        String token = "klasehnfkljashdnflhkjahwlekdjf";
-        String methodName = "sayHello";
+        String token       = "klasehnfkljashdnflhkjahwlekdjf";
+        String methodName  = "sayHello";
         Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10000);
 
         assertNull(responseObj);
@@ -62,9 +62,9 @@ public class RpcRequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                String secret = "jhliquwdlaisudfqbjhasdfulquias";
+                String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-                final Messagebus client = singlePool.getResource();
+                final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
 
@@ -75,12 +75,12 @@ public class RpcRequestResponse extends BaseTestCase {
         }).start();
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        Messagebus client = singlePool.getResource();
+        Messagebus           client     = singlePool.getResource();
 
-        String secret = "kliwhiduhaiucvarkjajksdbfkjabw";
+        String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
         String targetQueue = "erpDemoRpcResponse";
-        String token = "klasehnfkljashdnflhkjahwlekdjf";
-        String methodName = "returnValueMethod";
+        String token       = "klasehnfkljashdnflhkjahwlekdjf";
+        String methodName  = "returnValueMethod";
         Object responseObj = client.call(secret, targetQueue, methodName, new Object[0], token, 10000);
 
         assertNotNull(responseObj);
@@ -95,9 +95,9 @@ public class RpcRequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                String secret = "jhliquwdlaisudfqbjhasdfulquias";
+                String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-                final Messagebus client = singlePool.getResource();
+                final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
 
@@ -108,12 +108,12 @@ public class RpcRequestResponse extends BaseTestCase {
         }).start();
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        Messagebus client = singlePool.getResource();
+        Messagebus           client     = singlePool.getResource();
 
-        String secret = "kliwhiduhaiucvarkjajksdbfkjabw";
+        String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
         String targetQueue = "erpDemoRpcResponse";
-        String token = "klasehnfkljashdnflhkjahwlekdjf";
-        String methodName = "printParam";
+        String token       = "klasehnfkljashdnflhkjahwlekdjf";
+        String methodName  = "printParam";
         Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10000);
 
         singlePool.returnResource(client);
@@ -125,9 +125,9 @@ public class RpcRequestResponse extends BaseTestCase {
 
             @Override
             public void run() {
-                String secret = "jhliquwdlaisudfqbjhasdfulquias";
+                String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
                 MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-                final Messagebus client = singlePool.getResource();
+                final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
 
@@ -138,12 +138,12 @@ public class RpcRequestResponse extends BaseTestCase {
         }).start();
 
         MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
-        Messagebus client = singlePool.getResource();
+        Messagebus           client     = singlePool.getResource();
 
-        String secret = "kliwhiduhaiucvarkjajksdbfkjabw";
+        String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
         String targetQueue = "erpDemoRpcResponse";
-        String token = "klasehnfkljashdnflhkjahwlekdjf";
-        String methodName = "returnParam";
+        String token       = "klasehnfkljashdnflhkjahwlekdjf";
+        String methodName  = "returnParam";
         Object responseObj = client.call(secret, targetQueue, methodName, new Object[]{"hello world"}, token, 10000);
 
         assertNotNull(responseObj);

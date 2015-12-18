@@ -16,7 +16,7 @@ public class MessageJSONSerializer {
     }
 
     public static Message deSerialize(String msgStr) {
-        JsonParser parser = new JsonParser();
+        JsonParser  parser  = new JsonParser();
         JsonElement element = parser.parse(msgStr);
 
         Message msg = gson.fromJson(element, Message.class);
@@ -26,7 +26,7 @@ public class MessageJSONSerializer {
 
     public static Message deSerialize(JsonElement msgElement) {
         JsonObject obj = msgElement.getAsJsonObject();
-        Message msg = gson.fromJson(obj.get("message"), Message.class);
+        Message    msg = gson.fromJson(obj.get("message"), Message.class);
 
         return msg;
     }
@@ -38,13 +38,13 @@ public class MessageJSONSerializer {
     public static Message[] deSerializeMessages(String msgArrStr) {
         int i = 0;
 
-        JsonParser parser = new JsonParser();
+        JsonParser  parser  = new JsonParser();
         JsonElement element = parser.parse(msgArrStr);
 
         if (!element.isJsonArray()) {
             logger.error("unsupported original data. it should be a string of json object array ");
             throw new UnsupportedOperationException("unsupported original data. " +
-                                                        "it should be a string of json object array ");
+                    "it should be a string of json object array ");
         }
 
         Message[] msgs = new Message[element.getAsJsonArray().size()];
