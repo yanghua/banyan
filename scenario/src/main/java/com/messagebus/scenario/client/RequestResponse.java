@@ -32,7 +32,7 @@ public class RequestResponse {
     private static void request() {
         String secret = "iuoqiwejicaoisfaisfbsqewnfjnfa";
         String token = "cakjdhfjasdflqjoiajsdjflqkuwef";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();
@@ -63,7 +63,7 @@ public class RequestResponse {
             @Override
             public void run() {
                 final String secret = "zxjhvclawenlkfhsladfnqpwenflak";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
                 final Messagebus client = singlePool.getResource();
 
                 client.response(secret, new IRequestListener() {

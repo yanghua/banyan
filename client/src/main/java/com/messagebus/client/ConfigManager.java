@@ -2,41 +2,37 @@ package com.messagebus.client;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
-import com.messagebus.client.event.component.InnerEvent;
-import com.messagebus.client.message.model.Message;
-import com.messagebus.common.Constants;
-import com.messagebus.common.InnerEventEntity;
-import com.rabbitmq.client.Address;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.tools.jsonrpc.JsonRpcClient;
-import com.rabbitmq.tools.jsonrpc.JsonRpcException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 /**
  * the config manager
  */
 public class ConfigManager {
 
-    private static final Log    logger                            = LogFactory.getLog(ConfigManager.class);
-    private static final Gson   GSON                              = new Gson();
-    private static final String SOURCE_EVENT_TYPE                 = "source";
-    private static final String SINK_EVENT_TYPE                   = "sink";
-    private static final String STREAM_EVENT_TYPE                 = "stream";
-    private static final String RPC_METHOD_NAME_FOR_SOURCE_SECRET = "getSourceBySecret";
-    private static final String RPC_METHOD_NAME_FOR_SOURCE_NAME   = "getSourceByName";
-    private static final String RPC_METHOD_NAME_FOR_SINK_SECRET   = "getSinkBySecret";
-    private static final String RPC_METHOD_NAME_FOR_SINK_NAME     = "getSinkByName";
-    private static final String RPC_METHOD_NAME_FOR_STREAM_TOKEN  = "getStreamByToken";
+    private static final Log    logger            = LogFactory.getLog(ConfigManager.class);
+    private static final Gson   GSON              = new Gson();
+    private static final String SOURCE_EVENT_TYPE = "source";
+    private static final String SINK_EVENT_TYPE   = "sink";
+    private static final String STREAM_EVENT_TYPE = "stream";
+
+    private static final String REVERSE_MESSAGE_ZK_PATH               = "/reverse/message";
+    private static final String REVERSE_MESSAGE_SOURCE_ZK_PATH        = REVERSE_MESSAGE_ZK_PATH + "/source";
+    private static final String REVERSE_MESSAGE_SINK_ZK_PATH          = REVERSE_MESSAGE_ZK_PATH + "/sink";
+    private static final String REVERSE_MESSAGE_STREAM_ZK_PATH        = REVERSE_MESSAGE_ZK_PATH + "/stream";
+    private static final String REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH = REVERSE_MESSAGE_SOURCE_ZK_PATH + "/secret";
+    private static final String REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH   = REVERSE_MESSAGE_SOURCE_ZK_PATH + "/name";
+    private static final String REVERSE_MESSAGE_SINK_SECRET_ZK_PATH   = REVERSE_MESSAGE_SINK_ZK_PATH + "/secret";
+    private static final String REVERSE_MESSAGE_SINK_NAME_ZK_PATH     = REVERSE_MESSAGE_SINK_ZK_PATH + "/name";
+    private static final String REVERSE_MESSAGE_STREAM_TOKEN_ZK_PATH  = REVERSE_MESSAGE_STREAM_ZK_PATH + "/token";
 
     private Map<String, Source> secretSourceMap = new HashMap<String, Source>();
     private Map<String, Source> nameSourceMap   = new HashMap<String, Source>();
@@ -44,12 +40,59 @@ public class ConfigManager {
     private Map<String, Sink>   nameSinkMap     = new HashMap<String, Sink>();
     private Map<String, Stream> streamMap       = new HashMap<String, Stream>();
 
-    private Address[] addresses;
+    private CuratorFramework openedZookeeper;
+    private EventBus         componentEventBus;
 
-    private EventBus componentEventBus;
+    public ConfigManager(CuratorFramework zookeeper) {
+        this.openedZookeeper = zookeeper;
 
-    public ConfigManager(Address[] addresses) {
-        this.addresses = addresses;
+        //source -> secret
+        PathChildrenCache sourceSecretCache = new PathChildrenCache(zookeeper,
+                REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH, false);
+        sourceSecretCache.getListenable().addListener(new PathChildrenCacheListener() {
+            public void childEvent(CuratorFramework curatorFramework,
+                                   PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                onPathChildrenChanged(REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH);
+            }
+        });
+
+        //source -> name
+        PathChildrenCache souceNameCache = new PathChildrenCache(zookeeper,
+                REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH, false);
+        souceNameCache.getListenable().addListener(new PathChildrenCacheListener() {
+            public void childEvent(CuratorFramework curatorFramework,
+                                   PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                onPathChildrenChanged(REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH);
+            }
+        });
+
+        //sink -> secret
+        PathChildrenCache sinkSecretCache = new PathChildrenCache(zookeeper,
+                REVERSE_MESSAGE_SINK_SECRET_ZK_PATH, false);
+        sinkSecretCache.getListenable().addListener(new PathChildrenCacheListener() {
+            public void childEvent(CuratorFramework curatorFramework,
+                                   PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                onPathChildrenChanged(REVERSE_MESSAGE_SINK_SECRET_ZK_PATH);
+            }
+        });
+
+        //sink -> name
+        PathChildrenCache sinkNameCache = new PathChildrenCache(zookeeper,
+                REVERSE_MESSAGE_SINK_NAME_ZK_PATH, false);
+        sinkNameCache.getListenable().addListener(new PathChildrenCacheListener() {
+            public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                onPathChildrenChanged(REVERSE_MESSAGE_SINK_NAME_ZK_PATH);
+            }
+        });
+
+        //stream -> token
+        PathChildrenCache streamTokenCache = new PathChildrenCache(zookeeper,
+                REVERSE_MESSAGE_STREAM_TOKEN_ZK_PATH, false);
+        streamTokenCache.getListenable().addListener(new PathChildrenCacheListener() {
+            public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+                onPathChildrenChanged(REVERSE_MESSAGE_STREAM_TOKEN_ZK_PATH);
+            }
+        });
     }
 
     public EventBus getComponentEventBus() {
@@ -68,16 +111,10 @@ public class ConfigManager {
         if (this.secretSourceMap.containsKey(secret)) {     //local cache
             return this.secretSourceMap.get(secret);
         } else {                                            //remote data then save to local cache
-            Object[] params = new Object[]{secret};
-            Object responseObj = this.innerRpcRequest("getSourceBySecret",
-                    params);
-            if (responseObj != null) {
-                Source source = GSON.fromJson(responseObj.toString(), Source.class);
-                this.secretSourceMap.put(secret, source);
-                return source;
-            } else {
-                throw new RuntimeException("can not get source info!");
-            }
+            String sourceStr = getDataFromZK(REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH + "/" + secret);
+            Source source    = GSON.fromJson(sourceStr, Source.class);
+            this.secretSourceMap.put(secret, source);
+            return source;
         }
     }
 
@@ -89,16 +126,10 @@ public class ConfigManager {
         if (this.nameSourceMap.containsKey(name)) {         //local cache
             return this.nameSourceMap.get(name);
         } else {                                            //remote data then save to local cache
-            Object[] params = new Object[]{name};
-            Object responseObj = this.innerRpcRequest("getSourceByName",
-                    params);
-            if (responseObj != null) {
-                Source source = GSON.fromJson(responseObj.toString(), Source.class);
-                this.nameSourceMap.put(name, source);
-                return source;
-            } else {
-                throw new RuntimeException("can not get source info!");
-            }
+            String sourceJson = getDataFromZK(REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH + "/" + name);
+            Source source     = GSON.fromJson(sourceJson, Source.class);
+            this.nameSourceMap.put(name, source);
+            return source;
         }
     }
 
@@ -110,16 +141,10 @@ public class ConfigManager {
         if (this.secretSinkMap.containsKey(secret)) {       //local cache
             return this.secretSinkMap.get(secret);
         } else {                                            //remote data then save to local cache
-            Object[] params = new Object[]{secret};
-            Object responseObj = this.innerRpcRequest("getSinkBySecret",
-                    params);
-            if (responseObj != null) {
-                Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
-                this.secretSinkMap.put(secret, sink);
-                return sink;
-            } else {
-                throw new RuntimeException("can not get sink info!");
-            }
+            String sinkJson = getDataFromZK(REVERSE_MESSAGE_SINK_SECRET_ZK_PATH + "/" + secret);
+            Sink   sink     = GSON.fromJson(sinkJson, Sink.class);
+            this.secretSinkMap.put(secret, sink);
+            return sink;
         }
     }
 
@@ -131,16 +156,10 @@ public class ConfigManager {
         if (this.nameSinkMap.containsKey(name)) {           //local cache
             return this.nameSinkMap.get(name);
         } else {                                            //remote data then save to local cache
-            Object[] params = new Object[]{name};
-            Object responseObj = this.innerRpcRequest("getSinkByName",
-                    params);
-            if (responseObj != null) {
-                Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
-                this.nameSinkMap.put(name, sink);
-                return sink;
-            } else {
-                throw new RuntimeException("can not get sink info!");
-            }
+            String sinkJson = getDataFromZK(REVERSE_MESSAGE_SINK_NAME_ZK_PATH + "/" + name);
+            Sink   sink     = GSON.fromJson(sinkJson, Sink.class);
+            this.nameSinkMap.put(name, sink);
+            return sink;
         }
     }
 
@@ -149,136 +168,53 @@ public class ConfigManager {
             throw new NullPointerException("the token can not be null or empty");
         }
 
-        if (this.streamMap.containsKey(token)) {   //local cache
+        if (this.streamMap.containsKey(token)) {            //local cache
             return this.streamMap.get(token);
         } else {                                            //remote data then save to local cache
-            Object[] params = new Object[]{token};
-            Object responseObj = this.innerRpcRequest("getStreamByToken",
-                    params);
-            if (responseObj != null) {
-                Stream stream = GSON.fromJson(responseObj.toString(), Stream.class);
-                this.streamMap.put(token, stream);
-                return stream;
-            } else {
-                throw new RuntimeException("can not get token info!");
-            }
-        }
-    }
-
-    public class InnerEventProcessor {
-
-        @Subscribe
-        public void onInnerEvent(InnerEvent innerEvent) {
-            Message          msg         = innerEvent.getMsg();
-            String           jsonStr     = new String(msg.getContent());
-            InnerEventEntity eventEntity = GSON.fromJson(jsonStr, InnerEventEntity.class);
-
-            if (eventEntity.getIdentifier().startsWith(SOURCE_EVENT_TYPE)) {
-                boolean refreshBySecret = eventEntity.getIdentifier().endsWith("secret");
-                refreshSourceCache(refreshBySecret);
-            } else if (eventEntity.getIdentifier().startsWith(SINK_EVENT_TYPE)) {
-                boolean refreshBySecret = eventEntity.getIdentifier().endsWith("secret");
-                refreshSinkCache(refreshBySecret);
-            } else if (eventEntity.getIdentifier().startsWith(STREAM_EVENT_TYPE)) {
-                refreshStreamCache();
-            } else {
-                logger.warn("received unknown event type : " +
-                        eventEntity.getIdentifier());
-            }
+            String streamJson = getDataFromZK(REVERSE_MESSAGE_STREAM_ZK_PATH + "/" + token);
+            Stream stream     = GSON.fromJson(streamJson, Stream.class);
+            this.streamMap.put(token, stream);
+            return stream;
         }
     }
 
     private void refreshSourceCache(boolean bySecret) {
-        String rpcMethod;
-        if (bySecret) rpcMethod = RPC_METHOD_NAME_FOR_SOURCE_SECRET;
-        else rpcMethod = RPC_METHOD_NAME_FOR_SOURCE_NAME;
-
-        for (String secret : this.secretSourceMap.keySet()) {
-            Object[] params      = new Object[]{secret};
-            Object   responseObj = this.innerRpcRequest(rpcMethod, params);
-            if (responseObj != null) {
-                Source source = GSON.fromJson(responseObj.toString(), Source.class);
+        if (bySecret) {
+            for (String secret : this.secretSourceMap.keySet()) {
+                String sourceStr = getDataFromZK(REVERSE_MESSAGE_SOURCE_SECRET_ZK_PATH + "/" + secret);
+                Source source    = GSON.fromJson(sourceStr, Source.class);
                 this.secretSourceMap.put(secret, source);
-            } else {
-                throw new RuntimeException("can not get source info!");
+            }
+        } else {
+            for (String name : this.nameSourceMap.keySet()) {
+                String sourceJson = getDataFromZK(REVERSE_MESSAGE_SOURCE_NAME_ZK_PATH + "/" + name);
+                Source source     = GSON.fromJson(sourceJson, Source.class);
+                this.nameSourceMap.put(name, source);
             }
         }
     }
 
     private void refreshSinkCache(boolean bySecret) {
-        String rpcMethod;
-        if (bySecret) rpcMethod = RPC_METHOD_NAME_FOR_SINK_SECRET;
-        else rpcMethod = RPC_METHOD_NAME_FOR_SINK_NAME;
-
-        for (String secret : this.secretSinkMap.keySet()) {
-            Object[] params      = new Object[]{secret};
-            Object   responseObj = this.innerRpcRequest(rpcMethod, params);
-            if (responseObj != null) {
-                Sink sink = GSON.fromJson(responseObj.toString(), Sink.class);
+        if (bySecret) {
+            for (String secret : this.secretSinkMap.keySet()) {
+                String sinkJson = getDataFromZK(REVERSE_MESSAGE_SINK_SECRET_ZK_PATH + "/" + secret);
+                Sink   sink     = GSON.fromJson(sinkJson, Sink.class);
                 this.secretSinkMap.put(secret, sink);
-            } else {
-                throw new RuntimeException("can not get sink info!");
+            }
+        } else {
+            for (String name : this.nameSinkMap.keySet()) {
+                String sinkJson = getDataFromZK(REVERSE_MESSAGE_SINK_NAME_ZK_PATH + "/" + name);
+                Sink   sink     = GSON.fromJson(sinkJson, Sink.class);
+                this.nameSinkMap.put(name, sink);
             }
         }
     }
 
     private void refreshStreamCache() {
         for (String token : this.streamMap.keySet()) {
-            Object[] params = new Object[]{token};
-            Object responseObj = this.innerRpcRequest(RPC_METHOD_NAME_FOR_STREAM_TOKEN,
-                    params);
-            if (responseObj != null) {
-                Stream stream = GSON.fromJson(responseObj.toString(), Stream.class);
-                this.streamMap.put(token, stream);
-            } else {
-                throw new RuntimeException("can not get token info!");
-            }
-        }
-    }
-
-    private Object innerRpcRequest(String method, Object[] params) {
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        Connection        connection        = null;
-        Channel           channel           = null;
-        JsonRpcClient     client            = null;
-        try {
-            connection = connectionFactory.newConnection(addresses);
-            channel = connection.createChannel();
-            client = new JsonRpcClient(channel,
-                    Constants.PROXY_EXCHANGE_NAME,
-                    Constants.DEFAULT_CONFIG_RPC_RESPONSE_ROUTING_KEY,
-                    30000);
-
-            return client.call(method, params);
-        } catch (IOException e) {
-            logger.error(e);
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
-            logger.error(e);
-            throw new RuntimeException(e);
-        } catch (JsonRpcException e) {
-            logger.error(e);
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            logger.error(e);
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                if (client != null) {
-                    client.close();
-                }
-
-                if (channel != null && channel.isOpen()) {
-                    channel.close();
-                }
-                if (connection != null && connection.isOpen()) {
-                    connection.close();
-                }
-            } catch (IOException e) {
-                logger.error(e);
-            } catch (TimeoutException e) {
-                logger.error(e);
-            }
+            String streamJson = getDataFromZK(REVERSE_MESSAGE_STREAM_ZK_PATH + "/" + token);
+            Stream stream     = GSON.fromJson(streamJson, Stream.class);
+            this.streamMap.put(token, stream);
         }
     }
 
@@ -350,6 +286,7 @@ public class ConfigManager {
         private String routingKey;
         private String type;
         private String appId;
+        private String autoAck;
         private String msgBodySize;
 
         public Sink() {
@@ -401,6 +338,14 @@ public class ConfigManager {
 
         public void setAppId(String appId) {
             this.appId = appId;
+        }
+
+        public boolean isAutoAck() {
+            return autoAck == "1";
+        }
+
+        public void setAutoAck(String autoAck) {
+            this.autoAck = autoAck;
         }
 
         public String getMsgBodySize() {
@@ -461,6 +406,35 @@ public class ConfigManager {
         public void setToken(String token) {
             this.token = token;
         }
+    }
+
+    private String getDataFromZK(String path) {
+        try {
+            logger.debug("path : " + path);
+            return new String(openedZookeeper.getData().forPath(path));
+        } catch (Exception e) {
+            logger.error(e);
+        }
+
+        return "";
+    }
+
+    private void onPathChildrenChanged(String path) {
+        logger.debug("received path change from zookeeper, key : " + path);
+        String partPath = path.replace(REVERSE_MESSAGE_ZK_PATH + "/", "");
+
+        if (partPath.startsWith(SOURCE_EVENT_TYPE)) {
+            boolean refreshBySecret = partPath.endsWith("secret");
+            refreshSourceCache(refreshBySecret);
+        } else if (partPath.startsWith(SINK_EVENT_TYPE)) {
+            boolean refreshBySecret = partPath.endsWith("secret");
+            refreshSinkCache(refreshBySecret);
+        } else if (partPath.startsWith(STREAM_EVENT_TYPE)) {
+            refreshStreamCache();
+        } else {
+            logger.warn("received unknown event type : " + partPath);
+        }
+
     }
 
 }

@@ -1,20 +1,24 @@
 package com.messagebus.client;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.messagebus.client.event.component.ClientDestroyEventProcessor;
 import com.messagebus.client.event.component.ClientInitedEventProcessor;
-import com.messagebus.client.event.component.InnerEvent;
 import com.messagebus.client.event.component.NoticeEvent;
 import com.messagebus.client.message.model.Message;
 import com.messagebus.client.message.model.MessageFactory;
 import com.messagebus.common.RandomHelper;
 import com.messagebus.interactor.proxy.ProxyConsumer;
-import com.rabbitmq.client.Address;
 import com.rabbitmq.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,22 +40,21 @@ public class MessagebusPool {
     private static final String NOTICE_QUEUE_NAME_PREFIX   = "autodelete_exclusive.queue.proxy.message.inner.notice.";
     private static final String EVENT_CONSUMER_TAG_PREFIX  = "tag.proxy.message.inner.event.";
     private static final String NOTICE_CONSUMER_TAG_PREFIX = "tag.proxy.message.inner.notice.";
+    private static final String MESSAGE_SERVER_ZK_PATH     = "/component/message/server";
 
-    private String                   host;
-    private int                      port;
-    private ConfigManager            configManager;
-    private Connection               connection;
-    private Channel                  innerChannel;
-    private EventBus                 componentEventBus;
-    private RemoteInnerEventListener remoteInnerEventListener;
-    private RemoteNoticeListener     remoteNoticeListener;
+    private com.rabbitmq.client.Address[] innerAddresses;
+    private ConfigManager                 configManager;
+    private CuratorFramework              zookeeper;
+    private Connection                    connection;
+    private Channel                       innerChannel;
+    private EventBus                      componentEventBus;
+    private RemoteNoticeListener          remoteNoticeListener;
 
     protected InnerPool innerPool;
 
-    public MessagebusPool(String host, int port, GenericObjectPoolConfig poolConfig) {
-        this.host = host;
-        this.port = port;
-        this.init();
+    public MessagebusPool(String zkConnectionStr,
+                          GenericObjectPoolConfig poolConfig) {
+        this.init(zkConnectionStr);
         this.innerPool = new InnerPool(poolConfig,
                 configManager,
                 connection,
@@ -71,7 +74,6 @@ public class MessagebusPool {
     }
 
     public void destroy() {
-        this.remoteInnerEventListener.shutdown();
         this.remoteNoticeListener.shutdown();
 
         this.innerPool.destroy();
@@ -84,6 +86,11 @@ public class MessagebusPool {
             if (this.connection != null && this.connection.isOpen()) {
                 this.connection.close();
             }
+
+            if (zookeeper != null
+                    && zookeeper.getState().equals(CuratorFrameworkState.STARTED)) {
+                this.zookeeper.close();
+            }
         } catch (IOException e) {
             logger.error(e);
             throw new RuntimeException(e);
@@ -96,119 +103,71 @@ public class MessagebusPool {
         }
     }
 
-    protected void init() {
-        this.componentEventBus = new AsyncEventBus("componentEventBus", Executors.newSingleThreadExecutor());
+    protected void init(String zkConnectionStr) {
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
+        zookeeper = CuratorFrameworkFactory.newClient(
+                zkConnectionStr, retryPolicy);
 
-        com.rabbitmq.client.Address address = new Address(this.host, this.port);
-
-        this.configManager = new ConfigManager(new com.rabbitmq.client.Address[]{address});
-        this.configManager.setComponentEventBus(this.componentEventBus);
-
-        this.registerComponentEventProcessor();
-
-        ConnectionFactory connectionFactory = null;
         try {
-            connectionFactory = new ConnectionFactory();
-            connectionFactory.setHost(this.host);
-            connectionFactory.setPort(this.port);
+            zookeeper.start();
+            String mqConnectionStr = new String(
+                    zookeeper.getData().forPath(MESSAGE_SERVER_ZK_PATH)
+            );
+
+            if (Strings.isNullOrEmpty(mqConnectionStr)) {
+                logger.info("can not get mq connection info");
+                throw new RuntimeException("can not get mq connection info");
+            }
+            String[] hostPortPairArr = mqConnectionStr.split(",");
+
+            this.innerAddresses = new com.rabbitmq.client.Address[hostPortPairArr.length];
+
+            for (int i = 0; i < hostPortPairArr.length; i++) {
+                String[] hostPortArr = hostPortPairArr[i].split(":");
+                com.rabbitmq.client.Address address = new com.rabbitmq.client.Address(
+                        hostPortArr[0], Integer.parseInt(hostPortArr[1])
+                );
+                this.innerAddresses[i] = address;
+            }
+
+            this.componentEventBus = new AsyncEventBus("componentEventBus",
+                    Executors.newSingleThreadExecutor());
+
+            this.configManager = new ConfigManager(zookeeper);
+            this.configManager.setComponentEventBus(this.componentEventBus);
+
+            this.registerComponentEventProcessor();
+
+            ConnectionFactory connectionFactory = new ConnectionFactory();
 
             connectionFactory.setAutomaticRecoveryEnabled(true);
             connectionFactory.setTopologyRecoveryEnabled(true);
             connectionFactory.setConnectionTimeout(60000);
             connectionFactory.setRequestedHeartbeat(10);
 
-            this.connection = connectionFactory.newConnection();
+            this.connection = connectionFactory.newConnection(innerAddresses);
             this.innerChannel = this.connection.createChannel();
 
         } catch (IOException e) {
-            logger.error("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
-            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
+            logger.error("init message pool exception ", e);
+            throw new RuntimeException("init message pool exception", e);
         } catch (TimeoutException e) {
-            logger.error("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
-            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
+            logger.error("init message pool exception ", e);
+            throw new RuntimeException("init message pool exception ", e);
         } catch (Exception e) {
-            logger.error("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
-            throw new RuntimeException("init message pool exception with host : " + connectionFactory.getHost()
-                    + " and port : " + connectionFactory.getPort(), e);
+            logger.error("init message pool exception ", e);
+            throw new RuntimeException("init message pool exception ", e);
         }
 
-        this.remoteInnerEventListener = new RemoteInnerEventListener();
         this.remoteNoticeListener = new RemoteNoticeListener();
 
-        //start listen remote event
-        this.remoteInnerEventListener.start();
+        //start listen remote notice
         this.remoteNoticeListener.start();
     }
 
     private void registerComponentEventProcessor() {
         this.componentEventBus.register(new ClientDestroyEventProcessor());
         this.componentEventBus.register(new ClientInitedEventProcessor());
-        this.componentEventBus.register(configManager.new InnerEventProcessor());
-    }
-
-    private class RemoteInnerEventListener implements Runnable {
-
-        private Thread currentThread;
-
-        public RemoteInnerEventListener() {
-            this.currentThread = new Thread(this);
-            this.currentThread.setDaemon(true);
-            this.currentThread.setName("remote inner event listener");
-        }
-
-        @Override
-        public void run() {
-            try {
-                String queueName = EVENT_QUEUE_NAME_PREFIX + RandomHelper.randomNumberAndCharacter(5);
-                //declare a non-durable auto-delete & exclusive queue then consume
-                innerChannel.queueDeclare(queueName, false, true, true, null);
-
-                Map<String, Object> matchHeader = new HashMap<String, Object>(2);
-                matchHeader.put("x-match", "all");
-                matchHeader.put("type", "event");
-                innerChannel.queueBind(queueName, INNER_EXCHANGE_NAME, EVENT_ROUTING_KEY_NAME, matchHeader);
-
-                String randomTag = RandomHelper.randomNumberAndCharacter(6);
-                QueueingConsumer consumer = ProxyConsumer.consume(
-                        innerChannel,
-                        queueName,
-                        true,
-                        EVENT_CONSUMER_TAG_PREFIX + randomTag);
-                while (true) {
-                    QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-
-                    final Message msg = MessageFactory.createMessage(delivery);
-
-                    if (msg == null) continue;
-
-                    InnerEvent innerEvent = new InnerEvent();
-                    innerEvent.setMsg(msg);
-
-                    logger.info("message bus pool received remote event !");
-
-                    componentEventBus.post(innerEvent);
-                }
-            } catch (InterruptedException e) {
-                logger.info(" message loop task interrupted!");
-            } catch (ShutdownSignalException e) {
-                logger.error(e);
-            } catch (Exception e) {
-                logger.error(e);
-            }
-        }
-
-        public void start() {
-            this.currentThread.start();
-        }
-
-        public void shutdown() {
-            this.currentThread.interrupt();
-        }
     }
 
     private class RemoteNoticeListener implements Runnable {
@@ -252,7 +211,6 @@ public class MessagebusPool {
                     componentEventBus.post(noticeEvent);
                 }
             } catch (InterruptedException e) {
-                logger.info(" message loop task interrupted!");
             } catch (ShutdownSignalException e) {
                 logger.error(e);
             } catch (Exception e) {
@@ -268,14 +226,6 @@ public class MessagebusPool {
             this.currentThread.interrupt();
         }
 
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
     }
 
 }

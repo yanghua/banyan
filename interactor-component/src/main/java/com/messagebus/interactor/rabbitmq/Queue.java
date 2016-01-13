@@ -1,4 +1,4 @@
-package com.messagebus.service.core;
+package com.messagebus.interactor.rabbitmq;
 
 import java.io.Serializable;
 

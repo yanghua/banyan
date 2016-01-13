@@ -31,7 +31,7 @@ public class RpcRequestResponse extends BaseTestCase {
             @Override
             public void run() {
                 String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
                 final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
@@ -42,7 +42,7 @@ public class RpcRequestResponse extends BaseTestCase {
 
         }).start();
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
         Messagebus           client     = singlePool.getResource();
 
         String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
@@ -63,7 +63,7 @@ public class RpcRequestResponse extends BaseTestCase {
             @Override
             public void run() {
                 String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
                 final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
@@ -74,7 +74,7 @@ public class RpcRequestResponse extends BaseTestCase {
 
         }).start();
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
         Messagebus           client     = singlePool.getResource();
 
         String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
@@ -96,7 +96,7 @@ public class RpcRequestResponse extends BaseTestCase {
             @Override
             public void run() {
                 String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
                 final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
@@ -107,7 +107,7 @@ public class RpcRequestResponse extends BaseTestCase {
 
         }).start();
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
         Messagebus           client     = singlePool.getResource();
 
         String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";
@@ -126,7 +126,7 @@ public class RpcRequestResponse extends BaseTestCase {
             @Override
             public void run() {
                 String               secret     = "jhliquwdlaisudfqbjhasdfulquias";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
                 final Messagebus     client     = singlePool.getResource();
 
                 client.callback(secret, TestInterface.class, new HelloServiceProvider(), 10, TimeUnit.SECONDS);
@@ -137,7 +137,7 @@ public class RpcRequestResponse extends BaseTestCase {
 
         }).start();
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
         Messagebus           client     = singlePool.getResource();
 
         String secret      = "kliwhiduhaiucvarkjajksdbfkjabw";

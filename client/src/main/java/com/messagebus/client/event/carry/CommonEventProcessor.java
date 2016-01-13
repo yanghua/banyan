@@ -120,9 +120,10 @@ public abstract class CommonEventProcessor {
         if (!context.isSync()) {
             QueueingConsumer consumer = null;
             try {
+                boolean autoAck = context.getSink().isAutoAck();
                 consumer = ProxyConsumer.consume(context.getChannel(),
                         context.getSink().getQueueName(),
-                        false,      //auto ack false
+                        autoAck,
                         context.getConsumerTag());
             } catch (IOException e) {
                 logger.error(e);
@@ -225,8 +226,9 @@ public abstract class CommonEventProcessor {
 
                         process(msgContext);
 
-                        //TODO: 参数化配置
-                        msgContext.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                        if (!msgContext.getSink().isAutoAck()) {
+                            msgContext.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                        }
                     } catch (InterruptedException e) {
                         logger.info(" message loop task interrupted!");
                     } catch (ShutdownSignalException e) {

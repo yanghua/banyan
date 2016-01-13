@@ -30,7 +30,7 @@ public class ComponentEventListener extends BaseTestCase {
 
     @Test
     public void testComponentEvent() throws Exception {
-        singlePool = new MessagebusSinglePool(host, port);
+        singlePool = new MessagebusSinglePool(zkConnectionStr);
         singlePool.registerComponentEventListener(new EventListener());
         client = singlePool.getResource();
 

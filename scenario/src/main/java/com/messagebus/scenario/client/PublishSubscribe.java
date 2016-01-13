@@ -31,7 +31,7 @@ public class PublishSubscribe {
 
     private static void publish() {
         String secret = "oiqwenncuicnsdfuasdfnkajkwqowe";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();
@@ -49,7 +49,7 @@ public class PublishSubscribe {
     private static void subscribe1() {
         String secret = "nckljsenlkjanefluiwnlanfmsdfas";
         String token = "kjkjasdjfhkajsdfhksdjhfkasdf";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         client.subscribe(secret, "", token, new IMessageReceiveListener() {
@@ -66,7 +66,7 @@ public class PublishSubscribe {
     private static void subscribe2() {
         String secret = "zxcnvblawelkusahdfqwiuhowefhnx";
         String token = "kjkjasdjfhkajsdfhksdjhfkasdf";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         client.subscribe(secret, "", token, new IMessageReceiveListener() {

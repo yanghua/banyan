@@ -48,7 +48,7 @@ public class ClientUnderMultiThread {
             GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
             poolConfig.setMaxTotal(2);
 
-            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
+            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost);
 
             Thread tmpThread;
             for (int i = 0; i < 2; i++) {
@@ -77,7 +77,7 @@ public class ClientUnderMultiThread {
             GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
             poolConfig.setMaxTotal(2);
             String appId = "D0fW8u2u1v7S1IvI8qoQg3dUlLL5b36q";
-            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost, pubsuberPort);
+            MessagebusSinglePool pool = new MessagebusSinglePool(pubsuberHost);
 
             Thread tmpThread;
             for (int i = 0; i < 2; i++) {

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by yanghua on 2/12/2015.
  */
-class Address implements Serializable {
+public class Address implements Serializable {
 
     private String host;
     private int    port;

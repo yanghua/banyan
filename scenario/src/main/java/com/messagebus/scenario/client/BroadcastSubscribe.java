@@ -29,7 +29,7 @@ public class BroadcastSubscribe {
     private static void broadcast() {
         String secret = "mucasdjfaskdufhqiiuuasdfasdnus";
         String token = "qiakdjfanekisdfadfhkqljwqheu";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();
@@ -48,7 +48,7 @@ public class BroadcastSubscribe {
 
     private static void subscribe1() {
         String secret = "kjhasdfhlkuqjhgaebjhasgdfabfak";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         //notification handler
@@ -74,7 +74,7 @@ public class BroadcastSubscribe {
 
     private static void subscribe2() {
         String sercet = "zxdjnflakwenklasjdflkqpiasdfnj";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(host);
         Messagebus client = singlePool.getResource();
 
         client.setNotificationListener(new IMessageReceiveListener() {

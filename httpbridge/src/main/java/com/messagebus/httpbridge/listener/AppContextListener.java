@@ -22,7 +22,7 @@ public class AppContextListener implements ServletContextListener {
 
         GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
         poolConfig.setMaxTotal(Integer.parseInt(servletContext.getInitParameter("messagebuspool.maxtotal")));
-        MessagebusPool messagebusPool = new MessagebusPool(pubsuberHost, pubsuberPort, poolConfig);
+        MessagebusPool messagebusPool = new MessagebusPool(pubsuberHost, poolConfig);
         servletContextEvent.getServletContext().setAttribute(Constants.KEY_OF_MESSAGEBUS_POOL_OBJ, messagebusPool);
     }
 

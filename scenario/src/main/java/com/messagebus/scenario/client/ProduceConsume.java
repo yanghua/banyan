@@ -36,8 +36,8 @@ public class ProduceConsume {
         String secret = "kljasdoifqoikjhhhqwhebasdfasdf";
         String token = "hlkasjdhfkqlwhlfalksjdhgssssas";
         MessagebusSinglePool singlePool = new MessagebusSinglePool(
-            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
-            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port")));
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host")
+        );
         Messagebus client = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();
@@ -54,8 +54,8 @@ public class ProduceConsume {
     private static void consumeWithPullStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
         MessagebusSinglePool singlePool = new MessagebusSinglePool(
-            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
-            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port")));
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host")
+        );
         Messagebus client = singlePool.getResource();
 
         List<Message> msgs = client.consume(secret, 1);
@@ -71,8 +71,7 @@ public class ProduceConsume {
     private static void consumeWithPushStyle() {
         String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
         MessagebusSinglePool singlePool = new MessagebusSinglePool(
-            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
-            Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port"))
+            PropertiesHelper.getPropertyValue("messagebus.pubsuber.host")
         );
         Messagebus client = singlePool.getResource();
 
@@ -116,8 +115,7 @@ public class ProduceConsume {
         public void run() {
             String secret = "zxdjnflakwenklasjdflkqpiasdfnj";
             singlePool = new MessagebusSinglePool(
-                PropertiesHelper.getPropertyValue("messagebus.pubsuber.host"),
-                Integer.parseInt(PropertiesHelper.getPropertyValue("messagebus.pubsuber.port"))
+                PropertiesHelper.getPropertyValue("messagebus.pubsuber.host")
             );
             client = singlePool.getResource();
 

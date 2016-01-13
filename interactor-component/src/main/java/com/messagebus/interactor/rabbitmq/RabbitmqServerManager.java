@@ -16,7 +16,7 @@ public class RabbitmqServerManager {
     public static void start(String mqHost) {
         if (!comeFromSameHost(mqHost)) {
             throw new RuntimeException("the message bus server's host and the mq server's host" +
-                                           " are not the same");
+                    " are not the same");
         }
 
         logger.info("starting mq server...");
@@ -34,7 +34,7 @@ public class RabbitmqServerManager {
     public static void stop(String mqHost) {
         if (!comeFromSameHost(mqHost)) {
             throw new RuntimeException("the message bus server's host and the mq server's host" +
-                                           " are not the same");
+                    " are not the same");
         }
 
         logger.info("stopping mq server...");
@@ -52,7 +52,7 @@ public class RabbitmqServerManager {
     public static boolean isAlive(String mqHost) {
         if (!comeFromSameHost(mqHost)) {
             throw new RuntimeException("the message bus server's host and the mq server's host" +
-                                           " are not the same");
+                    " are not the same");
         }
 
         try {

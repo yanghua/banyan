@@ -10,15 +10,14 @@ import junit.framework.TestCase;
  */
 public class BaseTestCase extends TestCase {
 
-    protected String host = TestVariableInfo.HOST;
-    protected int    port = TestVariableInfo.PORT;
+    protected String zkConnectionStr = TestVariableInfo.ZK_CONNECTION_STRING;
 
     protected MessagebusSinglePool singlePool;
     protected Messagebus           client;
 
     @Override
     public void setUp() throws Exception {
-        singlePool = new MessagebusSinglePool(host, port);
+        singlePool = new MessagebusSinglePool(zkConnectionStr);
         client = singlePool.getResource();
     }
 

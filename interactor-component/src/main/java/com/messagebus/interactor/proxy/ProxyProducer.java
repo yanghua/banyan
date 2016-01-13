@@ -13,7 +13,7 @@ public class ProxyProducer {
                                String routingKey,
                                byte[] data,
                                AMQP.BasicProperties properties
-                              ) throws IOException {
+    ) throws IOException {
         channel.basicPublish(exchangeName, routingKey, properties, data);
     }
 
@@ -22,7 +22,7 @@ public class ProxyProducer {
                                      String routingKey,
                                      byte[] data,
                                      AMQP.BasicProperties properties
-                                    ) throws IOException {
+    ) throws IOException {
 
         //transaction begin
         channel.txSelect();
@@ -39,7 +39,7 @@ public class ProxyProducer {
                                     String routingKey,
                                     List<byte[]> dataList,
                                     AMQP.BasicProperties properties
-                                   ) throws IOException {
+    ) throws IOException {
         for (byte[] bytes : dataList)
             produce(exchangeName, channel, routingKey, bytes, properties);
     }
@@ -49,7 +49,7 @@ public class ProxyProducer {
                                           String routingKey,
                                           List<byte[]> dataList,
                                           AMQP.BasicProperties properties
-                                         ) throws IOException {
+    ) throws IOException {
         for (byte[] bytes : dataList)
             produceWithTX(exchangeName, channel, routingKey, bytes, properties);
     }

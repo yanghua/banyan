@@ -37,7 +37,7 @@ public class RequestResponse extends BaseTestCase {
             @Override
             public void run() {
                 final String         secret     = "muciasnajjkasbdfbaskjdfkjkasja";
-                MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+                MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
                 final Messagebus     client     = singlePool.getResource();
 
                 client.response(secret, new IRequestListener() {
@@ -71,7 +71,7 @@ public class RequestResponse extends BaseTestCase {
 
         String               secret     = "iuoqiwejicaoisfaisfbsqewnfjnfa";
         String               token      = "cakjdhfjasdflqjoiajsdjflqkuwef";
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
         Messagebus           client     = singlePool.getResource();
 
         Message msg = MessageFactory.createMessage();

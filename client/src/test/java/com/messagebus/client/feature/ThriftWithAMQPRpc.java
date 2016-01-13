@@ -48,10 +48,9 @@ public class ThriftWithAMQPRpc extends BaseTestCase {
     }
 
     public static void main(String[] args) {
-        String host = TestVariableInfo.HOST;
-        int    port = TestVariableInfo.PORT;
+        String zkConnectionStr = TestVariableInfo.ZK_CONNECTION_STRING;
 
-        MessagebusSinglePool singlePool = new MessagebusSinglePool(host, port);
+        MessagebusSinglePool singlePool = new MessagebusSinglePool(zkConnectionStr);
 
         Messagebus client = singlePool.getResource();
 

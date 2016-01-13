@@ -22,7 +22,6 @@ public class ProxyConsumer {
     }
 
 
-
     public static GetResponse consumeSingleMessage(Channel channel,
                                                    String queueName) throws IOException {
         return channel.basicGet(queueName, true);

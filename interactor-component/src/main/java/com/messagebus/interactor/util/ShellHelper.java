@@ -12,11 +12,11 @@ public class ShellHelper {
     private static final Log logger = LogFactory.getLog(ShellHelper.class);
 
     public static ExecResult exec(String cmdStr) throws IOException, InterruptedException {
-        String[] cmd = {"/bin/sh", "-c", cmdStr};
-        Process process = Runtime.getRuntime().exec(cmd);
+        String[] cmd     = {"/bin/sh", "-c", cmdStr};
+        Process  process = Runtime.getRuntime().exec(cmd);
         process.waitFor();
 
-        String errStr = translateFromStream(process.getErrorStream());
+        String errStr  = translateFromStream(process.getErrorStream());
         String infoStr = translateFromStream(process.getInputStream());
 
         ExecResult execResult = new ExecResult();
@@ -32,9 +32,9 @@ public class ShellHelper {
     private static String translateFromStream(InputStream stream) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
 
-        StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[1024];
-        int bytesRead = 0;
+        StringBuilder sb        = new StringBuilder();
+        byte[]        buffer    = new byte[1024];
+        int           bytesRead = 0;
         while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
             sb.append(new String(buffer, 0, bytesRead));
         }
@@ -69,9 +69,9 @@ public class ShellHelper {
         @Override
         public String toString() {
             return "ExecResult{" +
-                "info='" + info + '\'' +
-                ", error='" + error + '\'' +
-                '}';
+                    "info='" + info + '\'' +
+                    ", error='" + error + '\'' +
+                    '}';
         }
     }
 

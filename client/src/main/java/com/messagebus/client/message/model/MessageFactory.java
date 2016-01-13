@@ -24,11 +24,6 @@ public class MessageFactory {
         AMQP.BasicProperties properties = delivery.getProperties();
         byte[]               msgBody    = delivery.getBody();
 
-//        String msgTypeStr = properties.getType();
-//        if (msgTypeStr == null || msgTypeStr.isEmpty()) {
-//            return null;
-//        }
-
         Message msg = MessageFactory.createMessage();
         initMessage(msg, properties, msgBody);
 
@@ -38,10 +33,6 @@ public class MessageFactory {
     public static Message createMessage(GetResponse response) {
         AMQP.BasicProperties properties = response.getProps();
         byte[]               msgBody    = response.getBody();
-
-//      context.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), false);
-
-//        String msgTypeStr = properties.getType();
 
         Message msg = MessageFactory.createMessage();
         initMessage(msg, properties, msgBody);

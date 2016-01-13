@@ -1,9 +1,5 @@
-package com.messagebus.service.bootstrap;
+package com.messagebus.interactor.rabbitmq;
 
-
-import com.messagebus.interactor.rabbitmq.AbstractInitializer;
-import com.messagebus.service.core.Exchange;
-import com.messagebus.service.core.Queue;
 import com.rabbitmq.client.AMQP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,15 +14,15 @@ public class MQDataInitializer extends AbstractInitializer {
     private static          Log               logger   = LogFactory.getLog(MQDataInitializer.class);
     private static volatile MQDataInitializer instance = null;
 
-    private MQDataInitializer(String host) {
-        super(host);
+    private MQDataInitializer(String mqConnectionStr) {
+        super(mqConnectionStr);
     }
 
-    public static MQDataInitializer getInstance(String mqHost) {
+    public static MQDataInitializer getInstance(String mqConnectionStr) {
         if (instance == null) {
             synchronized (MQDataInitializer.class) {
                 if (instance == null) {
-                    instance = new MQDataInitializer(mqHost);
+                    instance = new MQDataInitializer(mqConnectionStr);
                 }
             }
         }
