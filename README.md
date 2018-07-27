@@ -1,4 +1,4 @@
-#overview
+# Overview
 
 [![Build Status](https://travis-ci.org/yanghua/banyan.svg?branch=messagebus-ng)](https://travis-ci.org/yanghua/banyan)
 
@@ -30,7 +30,7 @@ the necessity of encapsulating with RabbitMQ:
 
 more information please see : [banyan-category](http://blog.csdn.net/column/details/banyan.html)
 
-##tree topology structure
+## Tree topology structure
 the message bus's implementation is based on Rabbitmq. It can takes advantage of multiple message exchange-types rabbitmq provided and builds many kinds of router pattern. The message bus's router topology lists below:
 
 
@@ -56,9 +56,9 @@ and some core model's maintenance such as queue :
 
 * [apis](https://github.com/yanghua/banyan/tree/master/httpbridge)
 
-##scenario & usage
+## Scenario & usage
 
-###produce & consume
+### Produce & consume
 
 * [produce](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L34) / [pull consume](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L46)
 * [produce](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L34) / [push consume](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsume.java#L64)
@@ -66,35 +66,35 @@ and some core model's maintenance such as queue :
 * [produce-loopback](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsumeLoopback.java#L15) / [consume-loopback](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FProduceConsumeLoopback.java#L15)
 
 
-###request & response
+### Request & response
 
 * [request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRequestResponse.java#L35) / [response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRequestResponse.java#L35) 
 
-###publish & subscirbe
+### Publish & subscirbe
 
 * [publish](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FPublishSubscribe.java#L31) / [subscribe](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FPublishSubscribe.java#L31)
 
-###broadcast & notification-handler
+### Broadcast & notification-handler
 
 * [broadcast](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FBroadcast.java#L31) / [notification-handler](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FBroadcast.java#L31)
 
-###json-rpc(wrapped-offical-java-client)
+### Json-rpc(wrapped-offical-java-client)
 
 * [rpc-request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRpcRequestResponse.java#L28) / [rpc-response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Fapi%2FRpcRequestResponse.java#L28)
 
-###thrift-rpc(thrid-party-rpc-integrated)
+### Thrift-rpc(thrid-party-rpc-integrated)
 
 * [rpc-request](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L36) / [rpc-response](https://github.com/yanghua/banyan/blob/master/client%2Fsrc%2Ftest%2Fjava%2Fcom%2Fmessagebus%2Fclient%2Ffeature%2FThriftWithAMQPRpc.java#L59)
 
 
-###http-restful
+### Http-restful
 
 * [http-apis](https://github.com/yanghua/banyan/tree/master/scenario/src/main/java/com/messagebus/scenario/httpBridge)
 
-##benchmark
+## Benchmark
 it shows the  `client` performance:
 
-###hardware
+### Hardware
 client : 
 
 ```
@@ -113,7 +113,7 @@ Memory : 8GB
 JDK Version : 1.7.0_72
 ```
 
-###produce
+### Produce
 * single thread，multiple message size ，cycle send，compare：
 
 ![img 10][10]
@@ -122,7 +122,7 @@ JDK Version : 1.7.0_72
 
 ![img 11][11]
 
-###consume
+### Consume
 * single thread，multiple message size，async receive，compare：
 
 ![img 12][12]
@@ -131,7 +131,7 @@ JDK Version : 1.7.0_72
 
 ![img 13][13]
 
-##licence
+## Licence
 Copyright (c) 2014-2015 yanghua. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
