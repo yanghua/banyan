@@ -132,7 +132,7 @@
         <repository>
             <id>release</id>
             <name>release@172.16.1.104</name>
-            <url>http://172.16.1.104:8081/nexus/content/repositories/releases/</url>
+            <url>https://172.16.1.104:8081/nexus/content/repositories/releases/</url>
         </repository>
     </distributionManagement>
 
